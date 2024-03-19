@@ -1,0 +1,49 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+the instantiate function returns an error, an instantiation will not have been created, and an
+invalid state_handle will be returned (see Section 9.1); however, the lack of a state_handle will
+be detected in a subsequent reseed or generate request. When the reseed function returns an error
+(see Section 9.2), the indicated instantiation will not have been reseeded (i.e., the internal state
+will not have been injected with fresh entropy). When the generate function returns an error, a
+null string is returned as the output string (see Section 9.3.1) and shall not be used as
+pseudorandom output.
+Comments are often included in the pseudocode in this Recommendation. A comment placed on
+a line that includes pseudocode applies to that line; a comment placed on a line containing no
+pseudocode applies to one or more lines of pseudocode immediately below that comment.
+
+9.1 Instantiating a DRBG
+
+A DRBG shall be instantiated prior to the generation of pseudorandom bits. The instantiate
+function:
+   1. Checks the validity of the input parameters,
+   2. Determines the security strength for the DRBG instantiation,
+   3. Obtains entropy input with entropy sufficient to support the security strength,
+   4. Obtains the nonce (if required),
+   5. Determines the initial internal state using the instantiate algorithm, and
+   6. If an implementation supports multiple simultaneous instantiations of the same DRBG, a
+      state_handle for the internal state is returned to the consuming application (see below).
+Let working_state be the working state for the particular DRBG mechanism (e.g.,
+HMAC_DRBG), and let min_length, max_ length, and highest_supported_security_strength be
+defined for each DRBG mechanism (see Section 10). Let Instantiate_algorithm be a call to the
+appropriate instantiate algorithm for the DRBG mechanism (see Section 10).
+The following or an equivalent process shall be used to instantiate a DRBG.
+Instantiate_function (requested_instantiation_security_strength, prediction_resistance_flag,
+   personalization_string):
+   1. requested_instantiation_security_strength: A requested security strength for the
+      instantiation. Implementations that support only one security strength do not require this
+      parameter; however, any consuming application using that implementation must be aware
+      of the security strength that is supported.
+   2. prediction_resistance_flag: Indicates whether or not prediction resistance may be
+      required by the consuming application during one or more requests for pseudorandom
+      bits. Implementations that always provide or do not support prediction resistance may not
+      need to support this parameter if the intent is implicitly known. However, the user of a
+      consuming application must determine whether or not prediction resistance may be
+      required by the consuming application before electing to use such an implementation. If
+      the prediction_resistance_flag is not needed (i.e., it is known that prediction resistance is
+      always performed or is not supported), then the prediction_resistance_flag input
+
+
+                                                 26
+

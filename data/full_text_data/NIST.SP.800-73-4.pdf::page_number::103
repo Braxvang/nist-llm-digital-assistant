@@ -1,0 +1,58 @@
+Special Publication 800-73-4                            Interfaces for Personal Identity Verification – Part 2:
+                                                        PIV Card Application Card Command Interface
+
+Tag      Tag       Tag          Length    Name                      Value
+                                                                         P-384)
+                     0x86       Variable Public Key object          Coded as follows: 04 || X || Y, where X
+                                                                    and Y are the coordinates of the point
+                                                                    on the curve. See the “Value” column
+                                                                    of Table 13.
+         0x5F4C                 1        Role Identifier            0x00 for card-application key CVC
+         0x5F37                 Variable DigitalSignature object DigitalSignature ::= SEQUENCE {
+                                                                      signatureAlgorithm
+                                                                      AlgorithmIdentifier,
+                                                                      signatureValue           BIT STRING
+                                                                    }
+                                                                    AlgorithmIdentifier ::= SEQUENCE {
+                                                                      algorithm       OBJECT IDENTIFIER,
+                                                                      parameters      ANY DEFINED BY
+                                                                                        algorithm OPTIONAL
+                                                                    }
+                                                                    algorithm is 1.2.840.10045.4.3.2 for
+                                                                    ECDSA with SHA-256 (cipher suite 2) and
+                                                                    1.2.840.10045.4.3.3 for ECDSA with SHA-
+                                                                    384 (cipher suite 7). For both algorithms,
+                                                                    the parameters field is absent.
+                                                                    signatureValue is the DER encoding of
+                                                                    signature result ECDSA-Sig-Value defined
+                                                                    below.
+                                                                    ECDSA-Sig-Value ::= SEQUENCE {
+                                                                       r       INTEGER,
+                                                                       s       INTEGER
+                                                                    }
+
+                          Table 16. Intermediate Card Verifiable Certificate Format
+
+Tag      Tag       Tag          Length    Name                  Value
+0x7F21                                    Card Verifiable
+                                          Certificate
+         0x5F29                 1         Credential Profile     0x80
+                                          Identifier
+         0x42                   8         Issuer Identification The leftmost 8 bytes of the
+                                          Number                 subjectKeyIdentifier in the content signing
+                                                                 certificate needed to verify the signature on
+                                                                 the Intermediate CVC.
+         0x5F20                 8         Subject Identifier     The leftmost 8 bytes of the SHA-1 hash of
+                                                                 the Public Key object.
+         0x7F49                Variable   PublicKey Data
+                                          Object
+                   0x06        Variable   Algorithm OID        Possible values are:
+                                                                 0x2A8648CE3D030107 for ECDH
+                                                                    (Curve P-256) or
+                                                                 0x2B81040022 for ECDH (Curve P-384)
+                   0x86        Variable   Public Key object Coded as follows: 04 || X || Y, where X and Y
+
+
+
+                                                       28
+

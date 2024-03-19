@@ -1,0 +1,78 @@
+payload and its associated data. The nonce shall be non-repeating in the sense that any two
+distinct data pairs to be protected by CCM during the lifetime of the key shall be assigned
+distinct nonces. In effect, the nonce determines an invocation of CCM. The nonce is not
+required to be random.
+
+The MAC that is generated within CCM is an internal variable, denoted T. The bit length of T,
+denoted Tlen, is a parameter of the mode that shall be fixed for all invocations of CCM with the
+given key. The requirements for the selection of Tlen are discussed in Appendix B.
+
+5.4     Input Formatting
+
+The CCM data elements N, P, and A shall be formatted into a non-empty sequence of complete
+data blocks, denoted B0, B1, …, Br for some non-negative integer r, in accordance with a function
+                               B           B   B
+
+
+
+
+called the formatting function (in [8], the formatting function is called the encoding function, β).
+The value of r depends on the formatting function and the input elements. For any given key, the
+following three properties shall hold for the formatting function:
+
+      1. The first block, B0, uniquely determines the nonce N.
+                                   B
+
+
+
+
+      2. The formatted data uniquely determines P and A; moreover, if (N, P, A) and (N, P', A')
+         are distinct input triples whose formatting is B0, B1, …, Br and B0', B1', …, Br'', then Bi is
+                                                                   B    B        B        B    B         B           B
+
+
+
+
+         distinct from Bi' for some index i such that i ≤ r and i ≤ r '. ∗
+                           B
+
+
+
+
+      3. The first block, B0, is distinct from any counter blocks that are used across all invocations
+                                       B
+
+
+
+
+         of CCM under the key.
+
+The third property suggests that the formatting function and the counter generation function
+should not be selected or constructed independently of each other.
+
+The formatting function may impose restrictions on the contents and the bit lengths of the input
+data N, P, and A, as well as the parameter Tlen. For example, the bit lengths may be restricted to
+multiples of eight and to a given range of values. Values that satisfy the restrictions of the
+formatting function are called valid. No value of Tlen smaller than 32 shall be valid.
+
+An example of a formatting function and counter generation function that together satisfy these
+requirements is given in Appendix A. Alternative formatting functions may be developed in the
+future.
+
+5.5     Examples of Operations and Functions
+
+Given a positive integer s and a non-negative integer x that is less than 2s, the binary
+representation of x in s bits is denoted [x]s. For example, for the (base 10) integer 45, the binary
+representation (base 2) is 101101, so [45]8 = 00101101.
+
+The concatenation operation on bit strings is denoted ||; for example, 001 || 10111 = 00110111.
+
+∗
+  This property deals with the case that a nonce is repeated within two distinct input triples. Although the legitimate
+source/sender of the data is already required to assign distinct nonces to different input triples, the security model in
+[8] takes into account that the recipient of purported ciphertexts might not monitor whether a nonce is repeated.
+
+
+
+                                                           8
+

@@ -1,0 +1,57 @@
+                                                                                              NIST SP 800-77 REV. 1                                                           GUIDE TO IPSEC VPNS
+
+
+                                                                                                      separate AAA backend will be set up to handle the EAP-TLS authentication. The VPN
+                                                                                                      gateway will send its certificate via IKE to the remote clients as a machine certificate, so
+                                                                                                      the clients do not need to contact the AAA server to authenticate the VPN’s server
+                                                                                                      certificate. Instead, the client uses the CA certificate to validate the VPN gateway
+                                                                                                      certificate and that this certificate matches the IKE ID of the VPN gateway.
+                                                                                                 •    Encryption and Integrity Protection Algorithms. The VPN gateway supports multiple
+                                                                                                      encryption algorithms for IKE and ESP, including AES-CBC and AES-GCM. Since not
+                                                                                                      all IKEv2 clients support AES-GCM for IKE, the gateway will also allow AES-CBC
+                                                                                                      with HMAC-SHA-2 for IKE. However, since most IKEv2 clients support AES-GCM for
+                                                                                                      ESP, the server does not normally permit AES-CBC with HMAC-SHA-2 as a default for
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      ESP because that would put an additional load on the server.
+                                                                                                 •    Packet Filters. To restrict the external developers’ usage as much as possible, the IPsec
+                                                                                                      packet filters should be configured to only permit access to the development network
+                                                                                                      over the VPN tunnel. This would ensure that the agency’s internal network is minimally
+                                                                                                      impacted by the remote VPN clients.
+                                                                                                 •    Split Tunneling. The IPsec client configuration could offer split tunnel configurations.
+                                                                                                      Since the developers’ laptops are issued for agency use only, their configurations do not
+                                                                                                      allow split tunneling. The split tunnel configuration would also not make sense on the
+                                                                                                      corporate WiFi, since all traffic will always reach the corporate gateway first. Therefore,
+                                                                                                      it makes sense to encrypt everything for the additional security it provides in case the
+                                                                                                      native WiFi link layer security is compromised. For mobile phones, the IPsec
+                                                                                                      configuration could allow split-tunnel configurations since the network traffic generated
+                                                                                                      by different applications on a phone are usually isolated from each other, and the VPN
+                                                                                                      could be provisioned in such a way that only the corporate application is allowed to send
+                                                                                                      traffic over the corporate VPN tunnel.
+
+                                                                                              9.2.3   Implementing a Prototype
+
+                                                                                              The VPN gateway administrator performs the following steps to configure and test a prototype of
+                                                                                              the IPsec solution between an external test system and the FreeBSD VPN gateway. Section
+                                                                                              9.2.3.1 describes the configuration of the VPN gateway device, while Section 9.2.3.2 describes
+                                                                                              the external system’s configuration. The testing of the whole solution is detailed in Section
+                                                                                              9.2.3.3.
+
+                                                                                              9.2.3.1 Configuring the Server
+
+                                                                                              The administrator performs the following steps to configure the FreeBSD VPN gateway for use
+                                                                                              with strongSwan. It is assumed that there is an existing CA system that can issue certificates.
+
+                                                                                                 1. Create a separate certificate for each device. Device certificates use a subjectAltName
+                                                                                                    (SAN) for the FQDN based on the user, a user-device@example.com-like syntax, or a
+                                                                                                    random globally unique identifier (GUID). For maximum compatibility, it will also set
+                                                                                                    the EKU attribute for serverAuth.
+
+
+
+
+                                                                                                                                              107
+

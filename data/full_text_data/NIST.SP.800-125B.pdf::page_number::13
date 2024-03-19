@@ -1,0 +1,49 @@
+NIST SP 800-125B                                                 SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                    FOR VM PROTECTION
+
+
+The span of the protected network segment is limited to a single virtualized host. Migration of the VMs in
+the protected network segment (for load balancing or fault tolerance reasons) to another virtualized host is
+possible only if the target host has an identical virtual network configuration, so this constrains VM
+migration flexibility. Creating virtualized hosts with identical virtual network configurations may limit
+full utilization of the hosts.
+
+2.4   Using VLANs in Virtual Network
+
+VLANs were originally implemented in data centers where nodes were configured to operate in Ethernet-
+switched modes for ease of control and network management (e.g., broadcast containment). As a network
+segmentation technique, it provided value as a security measure because of the traffic isolation effect. In a
+data center with all physical (non-virtualized) hosts, a VLAN is defined by assigning a unique ID called a
+VLAN tag to one or more ports of a physical switch. All hosts connected to those ports then become
+members of that VLAN ID, creating a logical grouping of servers (hosts), regardless of their physical
+locations, in the large flat network of a data center. An example of a VLAN configuration is shown in
+Figure 2.
+
+The concept of VLANs can be extended and implemented in a data center with virtualized hosts using
+virtual switches with ports or port groups that support VLAN tagging and processing. In other words,
+VLAN IDs are assigned to ports of a virtual switch inside a hypervisor kernel, and VMs are assigned to
+appropriate ports based on their VLAN membership. These VLAN-capable virtual switches can perform
+VLAN tagging of all packets going out of a VM (with the tag depending upon which port it has received
+the packet from) and can route an incoming packet with a specific VLAN tag to the appropriate VM by
+sending it through a port with a VLAN ID assignment equal to the VLAN tag of the packet and with a
+matching media access control (MAC) address match.
+
+Corresponding to the VLAN configuration of the various virtual switches inside a virtualized host, link
+aggregation should be configured on links between the pNICs of these virtualized hosts and the physical
+switches in the data center. This is necessary so that these links can carry traffic corresponding to all
+VLAN IDs configured inside that virtualized host. Further, the ports of the physical switch, which forms
+the termination point of these links, should also be configured as trunking ports (capable of receiving and
+sending traffic belonging to multiple VLANs). A given VLAN ID can be assigned to ports of virtual
+switches located in multiple virtualized hosts. Thus the combined VLAN configuration, consisting of the
+configuration inside the virtualized host (assigning VLAN IDs to ports of virtual switches or vNICs of
+VMs) and the configuration outside the virtualized host (link aggregation and port trunking in physical
+switches), provides a pathway for VLANs defined in the physical network to be carried into a virtualized
+host (and vice versa). This provides the ability to isolate traffic emanating from VMs distributed
+throughout the data center, and thus a means to provide confidentiality and integrity protection to the
+applications running inside those VMs.
+
+
+
+
+                                                      6
+

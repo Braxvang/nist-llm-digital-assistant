@@ -1,0 +1,49 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+       parameter and instantiate process step 2 are omitted, and the prediction_resistance_flag is
+       omitted from the internal state in step 11 of the instantiate process. In addition, step 6 can
+       be modified to not perform a check for the prediction_resistance_flag when the flag is
+       not used in an implementation; in this case, the Get_entropy_input call need not include
+       the prediction_resistance_request parameter.
+   3. personalization_string: An optional input that provides personalization information (see
+      Sections 8.6.1 and 8.7.1). The maximum length of the personalization string
+      (max_personalization_string_length) is implementation dependent, but shall be less than
+      or equal to the maximum length specified for the given DRBG mechanism (see Section
+      10). If the input of a personalization string is not supported, then the
+      personalization_string input parameter and step 3 of the instantiate process are omitted,
+      and instantiate process step 9 is modified to omit the personalization string.
+Required information not provided by the consuming application during instantiation
+(This information shall not be provided by the consuming application as an input parameter
+during the instantiate request):
+   1. entropy_input: Input bits containing entropy. The maximum length of the entropy_input
+      is implementation dependent, but shall be less than or equal to the specified maximum
+      length for the selected DRBG mechanism (see Section 10).
+   2. nonce: A nonce as specified in Section 8.6.7. Note that if a random value is used in the
+      nonce, the entropy_input and random portion of the nonce could be acquired using a
+      single Get_entropy_input call (see step 6 of the instantiate process); in this case, the
+      first parameter of the Get_entropy_input call is adjusted to include the entropy for the
+      nonce (i.e., the security_strength is increased by at least ½ security_strength, and min-
+      length is increased to accommodate the length of the nonce), instantiate process step 8 is
+      omitted, and the nonce is omitted from the parameter list in instantiate process step 9.
+       Note that in some cases, a nonce will not be used by a DRBG mechanism; in this case,
+       step 8 is omitted, and the nonce is omitted from the parameter list in instantiate process
+       step 9.
+Output to a consuming application after instantiation:
+   1. status: The status returned from the instantiate function. If any status other than
+      SUCCESS is returned, either no state_handle or an invalid state_handle shall be returned
+      to the consuming application. A consuming application should check the status to
+      determine that the DRBG has been correctly instantiated.
+   2. state_handle: Used to identify the internal state for this instantiation in subsequent calls
+      to the generate, reseed, uninstantiate and health test functions.
+       If a state handle is not required for an implementation because the implementation does
+       not support multiple simultaneous instantiations, a state_handle need not be returned. In
+       this case, instantiate process step 10 is omitted, process step 11 is revised to save the only
+       internal state, and process step 12 is altered to omit the state_handle.
+Information retained within the DRBG mechanism boundary after instantiation:
+
+
+
+                                                 27
+

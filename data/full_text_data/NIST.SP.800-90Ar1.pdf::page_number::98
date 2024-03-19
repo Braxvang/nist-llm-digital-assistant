@@ -1,0 +1,51 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+Performance. The Generate function is parallelizable, since it uses the counter mode. Within
+a generate request, each outlen-bit block of output requires one hash function computation and
+several addition operations; an additional hash function computation is required to provide the
+backtracking resistance. Hash_DRBG produces pseudorandom output bits in about half the
+time required by HMAC_DRBG.
+Security. Hash_DRBG’s security depends on the underlying hash function’s behavior when
+processing a series of sequential input blocks. If the hash function is replaced by a random
+oracle, Hash_DRBG is secure. It is difficult to relate the properties of the hash function
+required by Hash_DRBG with common properties, such as collision resistance, pre-image
+resistance, or pseudorandomness. There are known problems with Hash_DRBG when the
+DRBG is instantiated with insufficient entropy for the requested security strength, and then later
+provided with enough entropy to attain the amount of entropy required for the security strength,
+via the inclusion of additional input during a generate request. However, these problems do not
+affect the DRBG’s security when Hash_DRBG is instantiated with the amount of entropy
+specified in this Recommendation.
+Constraints on Outputs. As shown in Table 2 of Section 10.1, for each hash function, up to 248
+generate requests may be made, each of up to 219 bits.
+Resources. Hash_DRBG requires access to a hash function, and the ability to perform addition
+with seedlen-bit integers. Hash_DRBG uses the hash-based derivation function Hash_df
+(specified in Section 10.3.1) during instantiation and reseeding. Any implementation requires the
+storage space required for the internal state (see Section 10.1.1.1).
+Algorithm Choices. The choice of hash functions that may be used by Hash_DRBG is
+discussed in Section 10.1.
+
+C.2 HMAC_DRBG
+
+HMAC_DRBG is built around the use of an approved hash function using the HMAC
+construction. To generate pseudorandom bits from a secret key (Key) and a starting value V, the
+HMAC_DRBG computes
+       V = HMAC (Key, V).
+At the end of a generation request, the HMAC_DRBG generates a new Key and V, each
+requiring one HMAC computation.
+Performance. HMAC_DRBG produces pseudorandom outputs considerably more slowly than
+the underlying hash function processes inputs; for SHA-256, a long generate request produces
+output bits at about 1/4 of the rate that the hash function can process input bits. Each generate
+request also involves additional overhead equivalent to processing 2048 extra bits with SHA-
+256. Note, however, that hash functions are typically quite fast; few if any consuming
+applications are expected to need output bits faster than HMAC_DRBG can provide them.
+Security. The security of HMAC_DRBG is based on the assumption that an approved hash
+function used in the HMAC construction is a pseudorandom function family. Informally, this
+means that when an attacker does not know the key used, HMAC outputs look random, even
+given knowledge and control over the inputs. In general, even relatively weak hash functions
+seem to be quite strong when used in the HMAC construction. On the other hand, there is not a
+
+
+                                                89
+

@@ -1,0 +1,57 @@
+                                                                                           GUIDE TO SSL VPNS
+
+
+
+Disadvantages:
+
+ Holes need to be opened in the firewall between the SSL VPN device and internal hosts.
+ The firewall is bypassed when split tunneling is not used and user traffic is destined for hosts in the
+  DMZ. Possible solutions include turning on split tunneling, putting a firewall between DMZ hosts
+  and the VPN device, and configuring packet filtering on a router connecting the DMZ hosts to the
+  VPN device.
+ Using a second interface on the VPN device may introduce additional routing complexity (see next
+  section).
+If the organization decides to place the VPN device within the DMZ, it must decide how many holes to
+open in its firewall between the device and the internal network. If the organization must support many
+services through the SSL VPN then it may decide to completely open up all connectivity between the
+VPN device and the internal network. This enables VPN users to access any machine and port internally.
+The benefits of such an approach will have to be weighed against the costs of potential security issues.
+
+4.3.4.3 Routing Policy and Other Network Considerations
+
+Routing policy is as important as firewall configuration. Packets must be routed correctly within the
+internal network for the VPN to function properly. When the VPN components of proxying and
+application translation are used, routing is fairly straightforward. Packets from the VPN device that are
+destined for the internal network have the source address of the VPN device itself. As long as the VPN
+device’s source address is routable in the internal network, packets will be correctly routed from internal
+hosts back to the VPN device.
+
+If network extension is used, routing becomes more complicated. Network extension creates a point-to-
+point tunnel interface between the client machine and the VPN device. Each end of the tunnel is assigned
+a virtual IP address. The client’s virtual IP address is used as the source address of VPN packets from the
+client machine. Even after traffic from the client machine reaches the VPN device and is taken out of the
+SSL tunnel, the source address remains the same. This means that internal hosts must know how to route
+the client’s virtual IP address back to the VPN device, or routing will not work correctly.
+
+For example, a client establishes a VPN connection using network extension. It receives the address of
+192.168.1.200. The VPN device receives 192.168.1.1 for its virtual tunnel interface. When the VPN
+device forwards packets from the client to internal hosts, these internal hosts will receive packets with a
+source address of 192.168.1.200. If the internal routers cannot route these packets back to the VPN
+device, then the client will not be able to communicate with any internal hosts.
+
+Another option is to use Network Address Translation (NAT) for clients using network extension. If
+NAT is used, then all packets forwarded from the VPN device to the internal network are given the source
+address of the VPN device. The routing configuration can therefore remain unchanged because it is
+assumed that internal hosts can already route traffic to the VPN device. This approach has its own
+disadvantages. The biggest one is that it is no longer possible to track the network activity of VPN clients
+by IP address because all of them share a single address. For this reason it is recommended that NAT not
+be used for clients using network extension.
+
+One more issue with network extension that must be addressed is split tunneling. Split tunneling is
+defined as the process of allowing a remote VPN user to access a public network, most commonly the
+Internet, at the same time that the user is allowed to access resources on the VPN. A client machine that
+establishes a split tunnel connection with the VPN device does not send all of its network traffic through
+
+
+                                                    4-18
+

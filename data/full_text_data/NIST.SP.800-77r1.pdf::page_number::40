@@ -1,0 +1,60 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                              GUIDE TO IPSEC VPNS
+
+
+                                                                                              attacker, at least now the responder can defend itself against this abuse by, for example, rate-
+                                                                                              limiting the number of IKE negotiation attempts allowed by that IP address.
+
+                                                                                              The IKE_SA_INIT exchange is also used to detect the presence of network address translation
+                                                                                              (NAT) devices. If a NAT device is detected, the IKE negotiation will move to port 4500, and the
+                                                                                              IPsec connection will be configured to use UDP or TCP encapsulation to avoid problems with
+                                                                                              the NAT device rewriting the IP address of the IPsec packets. Often, NAT routers also drop all
+                                                                                              IP protocols except UDP and TCP, so by encapsulating the IPsec (ESP) packets into UDP or
+                                                                                              TCP, the packets will not be dropped by the NAT router. The endpoint behind the NAT device
+                                                                                              will also send one-byte KEEPALIVE packets, typically at 20-second intervals, to ensure that the
+                                                                                              NAT device will keep open the port mapping that is used by the endpoint behind NAT. This is
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              especially important with deployments of Carrier Grade NAT (CGN) that are typically deployed
+                                                                                              on mobile data networks (LTE/5G). The KEEPALIVE packets serve no purpose beyond passing
+                                                                                              the NAT device and are discarded by any endpoint IPsec stack that receives them.
+
+                                                                                              After the IKE_SA_INIT exchange has completed, both endpoints have performed the (EC)DH
+                                                                                              key exchange and have generated the secret value called the SKEYSEED. All encryption and
+                                                                                              authentication keys will be derived from this value using the negotiated PRF transform. 24 From
+                                                                                              here on, all further packets are encrypted. However, both the initiator and the responder still need
+                                                                                              to authenticate each other’s identity.
+
+                                                                                              3.2.2    The IKE_AUTH Exchange
+
+                                                                                              The peers still need to verify each other’s identities and prove that the initial unencrypted IKE
+                                                                                              SA messages were not modified in transit. The IKE_AUTH exchange contains the payloads
+                                                                                              needed for the responder to authenticate the initiator and its previous IKE_SA_INIT exchange.
+                                                                                              The IKE_AUTH exchange also contains payloads to negotiate the first IPsec SA, such as the
+                                                                                              proposals and transforms to negotiate the cryptographic parameters, the source/destination
+                                                                                              packet policies for the IPsec SA in the form of traffic selectors for the initiator (TSi) and
+                                                                                              responder (TSr), and other options such as the mode of the IPsec SA and Configuration Payload
+                                                                                              requests for obtaining an IP address and a DNS nameserver IP address.
+
+                                                                                              Since authentication can involve X.509 certificates and intermediary CA certificates, this packet
+                                                                                              can end up being larger than the network MTU. To work around networks that do not handle IP
+                                                                                              fragmentation properly, the IKE protocol itself supports fragmentation to prevent fragmentation
+                                                                                              at the network layer. Typically, only the IKE_AUTH packets trigger IKE fragmentation.
+
+                                                                                              Typical authentication methods are X.509 certificates, raw (unsigned) public keys (e.g., RSA or
+                                                                                              ECDSA public keys, usually formatted in the SubjectPublicKeyInfo [SPKI] format), or PSKs.
+                                                                                              IKE supports the Extensible Authentication Protocol (EAP). If EAP authentication is required,
+                                                                                              more than one IKE_AUTH exchange might be required to complete the authentication. The
+
+
+                                                                                              24   Usually, the integrity algorithm and the PRF negotiated are the same algorithm. When using an AEAD cipher that does not
+                                                                                                   require an integrity algorithm, the PRF negotiated is obviously a different algorithm—usually a hash function from the
+                                                                                                   SHA-2 family.
+
+
+
+
+                                                                                                                                                           23
+

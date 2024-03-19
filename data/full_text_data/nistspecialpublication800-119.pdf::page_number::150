@@ -1,0 +1,54 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+It does not work for clients behind NATs.
+
+The tunnel broker description leaves many feature choices to individual implementations. Typically,
+clients communicate with tunnel brokers using HyperText Transfer Protocol (HTTP). A tunnel broker
+may help the client with the actual tunnel setup by sending automated scripts, but this raises security
+concerns. The client may run dynamic DNS and may communicate with tunnel servers via SNMP
+(Simple Network Management Protocol). These are just examples, and other implementation details are
+possible.
+
+
+6.5.8.2     Security Considerations for IPv6 Tunnel Brokers
+
+Security must be a consideration for all the interactions between the tunnel broker and other entities:
+clients, tunnel servers, and the DNS. The appropriate security depends on how each of these interfaces is
+implemented:
+
+
+        For HTTP clients, using SSL/TLS to protect the username and password seems appropriate.
+         HTTP is a clear text protocol. When sending confidential information, an encrypted channel
+         should be used. Organizations should choose implementations that are inherently more
+         secure. For example, delivering lists of tunnel parameters is safer than downloading
+         executable scripts that run on the client.
+        SNMPv1 and SNMPv2 are clear text protocols. As such, they can disclose confidential
+         information. SNMPv3 provides encryption but lags behind SNMPv1 and SNMPv2 in support
+         and deployment. SNMP interfaces to tunnel servers should use IPsec or SNMP over SSH if
+         SNMPv3 is not an option. Using this option will support confidentiality and integrity of the
+         information passed on the channel.
+        For DNS updates, either Secure Dynamic Update (RFC 3007, Secure Domain Name System
+         (DNS) Dynamic Update) or command scripts protected by SSH or IPsec could be used.
+        If a host disconnects from the Internet and its IPv4 address is reallocated, the tunnel server
+         may not find out about this and may keep forwarding IPv6 traffic to that address.
+        Tunnel broker servers maintain state for each client. As such, they are susceptible to resource
+         exhaustion attacks and other types of DOS attacks.
+  6.5.9   Automatic Tunneling of IPv4 over IPv6 (Dual Stack Transition Mechanism
+          [DSTM])
+
+As IPv6 local networking and internetworking become more prevalent, tunneling IPv4 over IPv6 will
+increase in importance. One approach, called DSTM (for Dual Stack Transition Mechanism), defines an
+IPv6-dominant approach: convert the infrastructure to IPv6 and force IPv4 to run in tunnels over IPv6.
+All of the tunneling mechanisms discussed above (6over4, 6to4, 6rd, ISATAP, Teredo, and IPv6 tunnel
+broker) tunnel IPv6 packets within an IPv4 network. DSTM does the opposite, tunneling IPv4 packets
+within IPv6. DSTM has been implemented on multiple platforms; however, it has not been standardized
+within the IETF.
+
+DSTM could be used where there is an IPv6 network without any IPv4 infrastructure and a relatively
+small number of nodes needing IPv4 support. Such networks, called IPv6 dominant, can be deployed to
+encourage a rapid migration to IPv6. DSTM is functionally similar to the IPv6 tunnel broker with the
+
+
+                                                   6-28
+

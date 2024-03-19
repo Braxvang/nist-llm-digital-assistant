@@ -1,0 +1,62 @@
+                                                                                   GUIDELINES ON SECURING PUBLIC WEB SERVERS
+
+
+
+     server software can confirm that a client’s certificate is valid and was issued by a CA listed in the
+     server’s list of trusted CAs. 52 This confirmation might be important if the server, for example, is a
+     bank that is sending confidential financial information to a customer and wants to confirm the
+     recipient’s identity. 53 If client authentication is to be performed, server authentication must also be
+     performed.
+
+ Communication Encryption—SSL/TLS can encrypt most of the information being transmitted
+  between a Web browser (client) and a Web server or even between two Web servers. With an
+  appropriate encryption algorithm, SSL/TLS provides a high degree of confidentiality. In addition, all
+  data sent over an encrypted SSL/TLS connection is protected with a mechanism for detecting
+  tampering; that is, for automatically determining if the data has been altered in transit.
+
+7.5.2     Weaknesses of SSL/TLS
+
+Several limitations are inherent with SSL/TLS. Packets are encrypted at the TCP layer, so IP layer
+information is not encrypted. Although this protects the Web data being transmitted, a person monitoring
+an SSL/TLS session can determine both the sender and receiver via the unencrypted IP address
+information. In addition, SSL/TLS only protects data while it is being transmitted, not when it is stored at
+either endpoint. Thus, the data is still vulnerable while in storage (e.g., a credit card database) unless
+additional safeguards are taken at the endpoints.
+
+If SSL/TLS is implemented or used incorrectly, the communications intended to be protected may be
+vulnerable to a “man in the middle” attack. This occurs when a malicious entity intercepts all
+communication between the Web client and the Web server with which the client is attempting to
+establish an SSL/TLS connection. The attacker intercepts the legitimate keys that are passed back and
+forth during the SSL/TLS handshake (see Section 7.5.3) and substitutes the attacker’s keys, making it
+appear to the Web client that the attacker is the Web server and to the Web server that the attacker is the
+Web client [SSL98]. If SSL/TLS is implemented and used properly, it is not susceptible to man-in-the-
+middle attacks.
+
+The encrypted information exchanged at the beginning of the SSL/TLS handshake is actually encrypted
+with the malicious entity’s public key or private key, rather than the Web client’s or Web server’s real
+keys. The attacker program ends up establishing one set of session keys for use with the real Web server,
+and a different set of session keys for use with the Web client. This allows the attacker program not only
+to read all the data that flows between the Web client and the real Web server but also to change the data
+without being detected. This threat can be mitigated if clients rely upon server certificates issued by
+trusted CAs or on self-signed certificates obtained by secure mechanisms. Presentation of a self-signed
+certificate may be an indication that a man-in-the-middle attack is underway. Browsers may perform
+some checks automatically, but they cannot be relied upon in all instances.
+
+Even without performing a man-in-the-middle attack, attackers may attempt to trick users into accessing
+an invalid Web site. There are several possible methods for attack, including—
+
+ Presenting a self-signed certificate unknown to the user and getting the user to accept it as legitimate.
+  Although the Web browser can be configured to display a warning when a self-signed certificate is
+
+
+
+52
+     Servers and clients use different types of certificates for authentication; specifically, clients have to be authenticated using a
+     signature certificate. See Section 7.5.3 for additional information.
+53
+     Client authentication performed by SSL/TLS is rarely used for public Web servers because of the logistics involved in
+     providing client certificates to users and having them installed correctly for use by Web browsers.
+
+
+                                                                 7-4
+

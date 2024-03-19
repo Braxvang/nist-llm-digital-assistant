@@ -1,0 +1,53 @@
+NIST SP 800-85A-4                                         PIV CARD APPLICATION & MIDDLEWARE
+                                                                   INTERFACE TEST GUIDELINES
+
+                            1. The command returns '90 00'.
+                            2. The command returns '90 00'.
+                            3. The command returns '6A 80' (incorrect parameter in
+                               command data field).
+                            4. The command returns:
+                                    • '63 CX' until the maximum number of tries are
+                                       reached. (X indicates the number of further allowed
+                                       retries) (Verify that first response the value of ‘X’ is
+                                       one less than the reset retry value.)
+                                    • '69 83' (Reference data change operation blocked)
+                                       when the maximum number of tries is exceeded.
+                      4. The command returns an error status word.
+                      5. The command returns an error status word.
+                      6. The command returns an error status word.
+ Postcondition(s)     The card is blocked.
+
+C.2.2.2        Contactless Interface
+ Purpose              Validates that the PIV Card does not accept the CHANGE
+                      REFERENCE DATA command through the contactless interface
+                      when a VCI has not been established.
+ Reference(s)         1. SP 800-73-4 Part 2, Table 2
+                      2. AS05.03, AS05.24A-R4
+ Precondition(s)      1. The IUT is placed within the reading range of the contactless
+                          reader.
+                      2. There exists a valid PC/SC connection between the test system
+                          and the contactless reader.
+                      3. No other contactless card is within the proximity of the reader.
+                      4. PIV Card Application PIN is recorded.
+                      5. Global PIN (if supported) is recorded.
+                      6. The reset retry counter value(s) of the PIV Card Application PIN,
+                          Global PIN (if implemented) are recorded.
+                      7. The PIN Unblocking Key value is recorded.
+ Test Scenario        1. Send SELECT card command with
+                         • AID == 'A0 00 00 03 08 00 00 10 00 01 00'
+                      2. Send CHANGE REFERENCE DATA card command with
+                         • P2, key reference value is set to '80'
+                         • Data field of the command will contain the correct PIN
+                            value (PIN 1) obtained from the vendor, concatenated
+                            without delimitation with an arbitrary new PIN value
+                            (PIN 2). Both PINs should be padded with 'FF' to
+                            complete the total length of each value to 8 bytes
+                      3. Send CHANGE REFERENCE DATA card command with
+                         • P2, key reference value is set to '00'
+                         • Data field of the command will contain the correct PIN
+                            value (PIN 1—if Global PIN is unsupported use an
+
+
+
+                                       C-23
+

@@ -1,0 +1,1182 @@
+       NIST Special Publication 800-102
+
+
+   Recommendation for Digital
+        Signature Timeliness
+                                              Elaine Barker
+
+
+
+                             Computer Security Division
+                     Information Technology Laboratory
+
+
+
+
+COMPUTER SECURITY
+
+                                           September 2009
+
+
+
+
+                            U.S. Department of Commerce
+                                           Gary Locke, Secretary
+
+            National Institute of Standards and Technology
+                            Patrick D. Gallagher, Deputy Director
+                                       Abstract
+
+Establishing the time when a digital signature was generated is often a critical
+consideration. A signed message that includes the (purported) signing time provides no
+assurance that the private key was used to sign the message at that time unless the
+accuracy of the time can be trusted. With the appropriate use of digital signature-based
+timestamps from a Trusted Timestamp Authority (TTA) and/or verifier-supplied data that
+is included in the signed message, the signatory can provide some level of assurance
+about the time that the message was signed.
+
+
+KEY WORDS: digital signatures, timeliness, timestamp, Trusted Timestamp Authority
+
+
+
+
+                                           ii
+Acknowledgements
+The National Institute of Standards and Technology (NIST) gratefully acknowledges and
+appreciates contributions by Rich Davis from the National Security Agency concerning
+the many security issues associated with this Recommendation. NIST also thanks the
+many contributions by the public and private sectors whose thoughtful and constructive
+comments improved the quality and usefulness of this publication.
+
+
+
+
+                                         iii
+Table of Contents
+1 Introduction................................................................................................ 5
+2 Authority.................................................................................................... 5
+3 Definitions, Acronyms and Symbols......................................................... 6
+    3.1    Definitions............................................................................................................ 6
+    3.2    Acronyms............................................................................................................. 8
+    3.3    Symbols................................................................................................................ 8
+4 Using Timestamps from a Trusted Timestamp Authority......................... 9
+    4.1    Notation................................................................................................................ 9
+    4.2 Timestamp Provision by a TTA......................................................................... 10
+    4.3    Signatory Provision of a Timestamp with a Signed Message............................ 10
+           4.3.1      Optional (or No) User Information Provided to the TTA by Entity A .. 11
+           4.3.2      A Hash of M is Provided to the TTA by Entity A ................................. 13
+           4.3.3      A Digital Signature on M is Provided to the TTA by Entity A ............. 15
+           4.3.4      A Digital Signature on M is Provided to the TTA by Entity B.............. 17
+    4.4    Using an Additional Timestamp ........................................................................ 18
+           4.4.1      Entity A Requests the Second Timestamp............................................. 19
+           4.4.2      Entity B Requests the Second Timestamp ............................................. 21
+5 Evidence of Timeliness Using Verifier-Supplied Data ........................... 24
+    5.1 The Basic Scheme.............................................................................................. 25
+    5.2    Using a Timestamp to Obtain More Precision................................................... 25
+           5.2.1      Entity A Requests the Timestamp.......................................................... 25
+           5.2.2      Entity B Requests the Timestamp.......................................................... 27
+Appendix A: References............................................................................... 30
+
+
+
+
+                                                               iv
+     Recommendation for Digital Signature Timeliness
+1      Introduction
+A digital signature is an electronic analogue of a written signature; the digital signature
+can be used to provide assurance that the claimed signatory signed the information. In
+addition, a digital signature may be used to detect whether or not the information was
+modified after it was signed (i.e., to detect the integrity of the signed data).
+Establishing the time when a digital signature was generated is often a critical
+consideration. A signed message that includes the (purported) signing time provides no
+assurance that the private key was used to sign the message at that time unless the
+accuracy of the time can be trusted. With the appropriate use of 1) timestamps that are
+digitally signed by a Trusted Timestamp Authority (TTA), and/or 2) verifier-supplied
+data that is included in the signed message, some level of assurance about the time that
+the message was signed can be provided. A discussion of the establishment and
+management of a TTA is outside the scope of this Recommendation. For further
+information about TTAs, see [3], [4], and [5].
+
+2      Authority
+This document has been developed by the National Institute of Standards and Technology
+(NIST) in furtherance of its statutory responsibilities under the Federal Information
+Security Management Act (FISMA) of 2002, Public Law 107-347.
+NIST is responsible for developing standards and guidelines, including minimum
+requirements, for providing adequate information security for all agency operations and
+assets, but such standards and guidelines shall not apply to national security systems.
+This recommendation is consistent with the requirements of the Office of Management
+and Budget (OMB) Circular A-130, Section 8b(3), Securing Agency Information
+Systems, as analyzed in A-130, Appendix IV: Analysis of Key Sections. Supplemental
+information is provided in A-130, Appendix III.
+This Recommendation has been prepared for use by Federal agencies. It may be used by
+non-governmental organizations on a voluntary basis and is not subject to copyright
+(attribution would be appreciated by NIST).
+Nothing in this Recommendation should be taken to contradict standards and guidelines
+made mandatory and binding on Federal agencies by the Secretary of Commerce under
+statutory authority. Nor should this Recommendation be interpreted as altering or
+superseding the existing authorities of the Secretary of Commerce, Director of the OMB,
+or any other federal official.
+Conformance testing for implementations of this Recommendation will be conducted
+within the framework of the Cryptographic Module Validation Program (CMVP), a joint
+effort of NIST and the Communications Security Establishment Canada. The
+requirements of this Recommendation are indicated by the word “shall.”
+
+
+
+
+                                            5
+3        Definitions, Acronyms and Symbols
+3.1      Definitions
+
+Approved               FIPS-approved and/or NIST-recommended. An algorithm or
+                       technique that is either 1) specified in a FIPS or NIST
+                       Recommendation, or 2) adopted in a FIPS or NIST
+                       Recommendation or 3) specified in a list of NIST-approved
+                       security functions.
+
+Digital signature      The result of a cryptographic transformation of data that, when
+                       properly implemented, provides origin authentication,
+                       assurance of data integrity and signatory non-repudiation.
+
+Entity                 An individual (person), organization, device or process. Used
+                       interchangeably with “party”.
+
+Hash value             The result of applying a hash function to data.
+
+Key                    A parameter used in conjunction with a cryptographic
+                       algorithm that determines its operation. Examples applicable to
+                       this Recommendation include:
+                         1. The computation of a digital signature from data, and
+                         2. The verification of a digital signature.
+
+Message                The data that is signed.
+
+Nonce                  A time-varying value that has at most a negligible chance of
+                       repeating, for example, a random value that is generated anew
+                       for each use, a timestamp, a sequence number, or some
+                       combination of these.
+
+Party                  An individual (person), organization, device or process. Used
+                       interchangeably with “entity”.
+
+Private key/private    A cryptographic key that is used with an asymmetric (public
+signature key          key) cryptographic algorithm and is associated with a public
+                       key. The private key is uniquely associated with the owner and
+                       is not made public. This key is used to compute a digital
+                       signature that may be verified using the corresponding public
+                       key.
+
+
+
+
+                                         6
+Public key/public        A cryptographic key that is used with an asymmetric (public
+signature verification   key) cryptographic algorithm and is associated with a private
+key                      key. The public key is associated with an owner and may be
+                         made public. In the case of digital signatures, the public key is
+                         used to verify a digital signature that was signed using the
+                         corresponding private key.
+
+Relying party            A party that depends on the validity of the digital signature
+                         process.
+
+Security strength        A number associated with the amount of work (e.g., the
+                         number of operations) that is required to break a cryptographic
+                         algorithm or system.
+
+Shall                    Used to indicate a requirement of this Recommendation.
+
+Signatory                The entity that generates a digital signature on data using a
+                         private key.
+
+Signature generation     The process of using a digital signature algorithm and a private
+                         key to generate a digital signature on data.
+
+Signature verification   The process of using a digital signature algorithm and a public
+                         key to verify a digital signature on data.
+
+Timestamp                A token or packet of information that is used to provide
+                         assurance of timeliness; the timestamp contains timestamped
+                         data, including a time, and a signature generated by a Trusted
+                         Timestamp Authority (TTA).
+
+timestamp                Contains the time and, possibly, other information; a
+                         component of timestamped_data.
+
+timestamped_data         The data on which a digital signature is generated by a TTA.
+
+timestamp_packet         A unit of information that is transmitted by a TTA that contains
+                         timestamped_data and a timestamp_signature.
+
+timestamp_signatureTTA A digital signature that is generated using a TTA’s private
+                       signature key.
+
+Trusted timestamp        A timestamp that has been signed by a TTA.
+
+
+
+
+                                            7
+Trusted Timestamp     An entity that is trusted to provide accurate time information.
+Authority
+
+TTA_supplied_info     Additional information that is included in the
+                      timestamped_data by a TTA during the generation of a
+                      timestamp_signature.
+
+user_supplied_info    Additional information that is provided by an entity when
+                      requesting a timestamp from a TTA.
+
+Verifier              The entity that verifies the authenticity of a digital signature
+                      using the public key.
+
+3.2    Acronyms
+FIPS                 Federal Information Processing Standard.
+NIST                 National Institute of Standards and Technology.
+OMB                  Office of Management and Budget.
+RBG                  Random Bit Generator.
+TSP                  Timestamp Packet.
+TTA                  Trusted Timestamp Authority.
+
+3.3    Symbols
+D                    A payload of data that is assembled and transmitted by the
+                     message signatory, which includes (at least) the message and a
+                     digital signature, and may also include one or more timestamps.
+H(M)                 A hash value that is generated on M.
+M                    Message.
+SIGE(…)              A digital signature generated by the entity E using an approved
+                     hash function and an approved digital signature algorithm. The
+                     data that is signed is the information contained within the
+                     parentheses.
+
+
+
+
+                                         8
+4         Using Timestamps from a Trusted Timestamp Authority
+One method of obtaining assurance of the time of digital signature generation is by the
+use of a trusted timestamp authority (TTA) that is trusted by both the signatory and the
+verifier. The discussions in this section are intended to assist the reader in determining
+exactly what assurances are obtained using different digital signature-based timestamp
+schemes.
+
+4.1       Notation
+A trusted timestamp authority (TTA) is an entity that is trusted to produce timestamp
+packets. A timestamp packet (TSP) is transmitted by a TTA and contains:
+      •   A digital signature (timestamp_signatureTTA) that is generated using the TTA’s
+          private key, and
+      •   The timestamped_data upon which the digital signature is generated.
+The timestamped_data includes a timestamp — an accurate, unambiguous representation
+of the time of generation of the accompanying timestamp_signatureTTA.
+The following notation will be used in this discussion. Note that the commas are used to
+indicate a list of data, not to indicate the order or format of that data.
+      1. TSP = timestamp_packet = timestamped_data, timestamp_signatureTTA
+          where the TSP contains both timestamped_data and a timestamp_signatureTTA.
+      2. timestamp_signatureTTA = SIGTTA (timestamped_data)
+          where “SIGTTA” is a digital signature operation on the timestamped_data using
+          the TTA’s private digital signature key. This private key shall only be used for
+          the generation of digital signatures on timestamped_data.
+      3. timestamped_data = user_supplied_info, TTA_supplied_info, timestamp,
+          where
+             a. user_supplied_info is information that is provided by an entity when
+                requesting a timestamp from the TTA; the user_supplied_info may, in
+                fact, be Null. If provided, the information is used by the TTA during
+                timestamp_signatureTTA generation, but need not be transmitted in the
+                timestamp packet returned to the requestor. However, this information
+                must be available to entities that will verify timestamp_signatureTTA.
+             b. TTA_supplied_info is additional information that is used by the TTA
+                during timestamp_signatureTTA generation; the TTA_supplied_info may, in
+                fact, be Null. All or part of this information may be omitted from the
+                timestamp packet transmitted by the TTA if the omitted portion(s) can be
+                recreated and used by the entities that will verify timestamp_signatureTTA.
+             c. timestamp contains the time and (possibly) other information.
+
+
+                                               9
+Therefore, the generic TSP produced by a TTA has the form:
+      TSP = user_supplied_info, TTA_supplied_info, timestamp,
+           SIGTTA(user_supplied_info, TTA_supplied_info, timestamp)
+where user_supplied_info and/or TTA_supplied_info may be Null.
+
+4.2      Timestamp Provision by a TTA
+A TTA may either broadcast a timestamp packet (TSP) or provide a TSP in response to a
+request from a requesting entity. The requesting entity and any other party that needs to
+verify the TTA’s digital signature (i.e., a relying party) must be aware of the security
+strength provided by the TTA’s digital signature. If an X-bit security strength is required
+by the requesting entity’s or relying party’s application, then the TTA’s digital signature
+shall provide at least X bits of security strength in order to fulfill that requirement (see SP
+800-57).
+When a TTA broadcasts a TSP, the user_supplied_info in the TSP is Null. The
+timestamp_signature is generated on the TTA-supplied_info (which may be Null) and the
+timestamp. The TSP is then assembled and broadcast. Portions of the TTA_supplied_info
+that are known by all intended recipients of the TSP may be omitted from the data
+transmitted in the timestamped_data field of the TSP, even though the entire
+TTA_supplied_info is included in the data used during the generation and verification of
+timestamp_signatureTTA.
+When an entity requests a timestamp, the requesting entity provides the
+user_supplied_info (which may be Null) to the TTA in the request. A
+timestamp_signatureTTA is generated on the user_supplied_info, the TTA-supplied_info
+(which may be Null), and a timestamp. A TSP is assembled from timestamp_signatureTTA
+and timestamped_data, and then sent to the requesting entity. Portions of the TTA-
+supplied_info that are known by all intended recipients of the TSP, and the
+user_supplied_info that is otherwise made known to the verifying entity may be omitted
+from the data transmitted in the timestamped_data field of the returned TSP, even though
+they must be included in the (complete) version of the timestamped_data that is used
+during the generation and verification of the timestamp_signatureTTA.
+For each scheme in Section 4, a text description is provided, along with a figure to
+illustrate the message flow for the scheme. The number in the figure for each message
+indicates the step in the text description that describes that message. Note that the step
+numbers for internal operations are not indicated in the figure.
+
+4.3      Signatory Provision of a Timestamp with a Signed Message
+There are several useful schemes in which an entity A obtains a timestamp packet (TSP)
+from a trusted timestamp authority (TTA) and then combines the TSP with a message
+(M) and a signature into a payload of data (D) that is sent to recipient entity B.
+In the following schemes, signatures are generated by entity A or a TTA using an
+approved digital signature algorithm. Let SIGA( ) be a signature generated by entity A
+using its private signature key, and let SIGTTA( ) be a signature generated by a TTA using
+
+
+                                              10
+the TTA’s private signature key. SIGA( ) is verified using entity A’s public signature
+verification key, and SIGTTA( ) is verified using the TTA’s public signature verification
+key. The following discussions assume that entities A and B successfully verify all
+received signatures.
+
+4.3.1 Optional (or No) User Information Provided to the TTA by Entity A
+As shown in Figure 1, entity A may request a timestamp from a TTA, or entity A may use
+a timestamp that is broadcast from a TTA (i.e., entity A does not explicitly request a
+timestamp from the TTA).
+
+
+                                          TTA
+                                     fo
+                                   in
+                                 d_
+                               ie
+                             ppl
+                      TS _su
+                   2. ser
+                         P
+                        u
+                     l)
+                   na
+                   io
+                pt
+              (O
+             1.
+
+
+
+
+                           3. D = M, TSP, SIGA (M, TSP)
+             A                                                              B
+
+                   Figure 1: No User_Info Provided to the TTA
+   1. The Request message in Figure 1 is sent only if entity A explicitly requests a
+      timestamp from the TTA. If the request is sent, the Request message contains any
+      desired user_supplied_info (see Section 4.1).
+   2. The TTA sends a TSP to entity A (or broadcasts a TSP that is subsequently
+      obtained by A), where:
+           TSP = timestamped_data, timestamp_signatureTTA.
+       If a Request message was sent (in step 1):
+           timestamped_data = user_supplied_info, TTA-supplied_info, timestamp.
+           timestamp _signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+                                     timestamp).
+       If a Request message was not sent (in step 1), i.e., the TSP is broadcast:
+           timestamped_data = TTA_supplied_info, timestamp.
+           timestamp_signatureTTA = SIGTTA(TTA_supplied_info, timestamp),
+       Note that the user_supplied_info is Null in the case of a broadcast TSP.
+       If there is a mutual agreement between entity A and the TTA, the following
+
+                                            11
+       information may be omitted from the TSP data that is transmitted by the TTA:
+           •   Any portion of the user_supplied_info may be omitted, since it is known
+               by entity A.
+           •   Any portion of the TTA_supplied_info may be omitted when this
+               information is known or can be determined by entity A.
+       However, any such information omitted from the transmitted data shall be
+       included in the timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA = SIGTTA(timestamped_data).
+       Upon receiving the TSP from the TTA, entity A should 1) check that the
+       transmitted portions of the user_supplied_info are correct and 2) verify
+       timestamp_signatureTTA using the TTA’s public signature verification key.
+   3. Entity A signs (M, TSP), assembles D and sends it to entity B:
+           D = M, TSP, SIGA(M, TSP),
+       where the TSP is as specified in step 2.
+       If any portion of the user_supplied_info was omitted from the TSP received from
+       the TTA, then the entire user_supplied_info shall be inserted into the TSP used in
+       the assembly of D unless there is a mutual agreement between entity A and entity
+       B, in which case, any portion of the user_supplied_info may be omitted from the
+       TSP data transmitted by entity A if it is known or can be determined by entity B.
+       However, the entire user_supplied_info shall be included in the
+       timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA and SIGA(M, TSP).
+       If any portion of the TTA_supplied_info was omitted from the TSP received from
+       the TTA, then the entire TTA_supplied_info shall be inserted into the TSP used in
+       the assembly of D unless there is a mutual agreement between entity A and entity
+       B, in which case, any portion of the TTA_supplied_info may be omitted from the
+       TSP data transmitted by entity A if it is known or can be determined by entity B.
+       However, the entire TTA_supplied_info shall be included in the
+       timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA and SIGA(M, TSP).
+   4. Upon receiving D, entity B does the following:
+           •   Verifies timestamp_signatureTTA using the TTA’s public signature
+               verification key, and
+           •   Verifies SIGA(M, TSP) using entity A’s public signature verification key.
+       Note that it is irrelevant which of these steps is performed first; it is only
+       important that both verifications are successful.
+Because of the verifications performed in step 4, entity B knows (and/or has assurance
+of) the following:
+   a. M could have been assembled either before or after the TSP was received.
+
+                                             12
+   b. SIGA(M, TSP) was generated at some point after the time indicated by the
+      timestamp in the TSP.
+   c. D was assembled after the time indicated by the timestamp in the TSP.
+If a more precise time is required for the generation of SIGA(M, TSP), a second trusted
+timestamp may be acquired (as specified in Section 4.4) that will provide assurance that
+(M, TSP) had existed and been signed by (at least) the time indicated in the second
+timestamp.
+
+4.3.2 A Hash of M is Provided to the TTA by Entity A
+Entity A may provide the hash value of M to the TTA when requesting a timestamp as
+shown in Figure 2. Let H denote a hash value that is generated on M using an approved
+hash function (i.e., H = Hash(M)).
+
+                                                     TTA
+
+
+                                                 o
+                                            nf
+                                          _i
+                                 h   er
+                                          SP
+
+
+
+
+                              ot
+                                   T
+
+
+
+
+                          ,
+                         H
+                                2.
+
+
+
+
+                    1.
+
+
+                                      3. D = M, TSP, SIGA(M, TSP)
+             A                                                            B
+
+                 Figure 2: Entity A Provides a Hash Value to the TTA
+   1. Entity A sends H (and possibly other information) to the TTA in a timestamp
+      request, i.e., user_supplied_info = H, other_info. Note that the other_info may be
+      Null.
+   2. The TTA returns a TSP to entity A:
+           TSP = timestamped_data, timestamp_signatureTTA
+       where:
+           user_supplied_info = H, other_info.
+           timestamped_data = user_supplied_info, TTA-supplied_info, timestamp.
+           timestamp_signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+              timestamp).
+       If there is a mutual agreement between entity A and the TTA, the following
+       information may be omitted from the TSP data that is transmitted by the TTA:
+
+
+                                                     13
+       •   Any portion of the user_supplied_info may be omitted, since it is known
+           by entity A.
+       •   Any portion of the TTA_supplied_info may be omitted if this information
+           is already known or can be determined by entity A.
+   However, even though they may be omitted from the transmitted data, the entire
+   user_supplied_info and the entire TTA_supplied_info shall be included in the
+   timestamped_data that is used in the generation / verification of
+   timestamp_signatureTTA = SIGTTA(timestamped_data).
+   Upon receiving the TSP from the TTA, entity A should 1) check that the
+   transmitted portions of the user_supplied_info are correct and 2) verify the
+   timestamp_signatureTTA using the TTA’s public signature verification key.
+3. Entity A signs (M, TSP), assembles D and sends it to entity B:
+       D = M, TSP, SIGA(M, TSP)
+   where the TSP is as defined in step 2.
+   If any portion of the user_supplied_info was omitted from the TSP received from
+   the TTA, then the entire user_supplied_info shall be inserted into the TSP used in
+   the assembly of D unless there is a mutual agreement between entity A and entity
+   B, in which case, the following information may be omitted from the TSP data
+   transmitted in D by entity A:
+       •   H may be omitted, since it can be (re)calculated by entity B.
+       •   Any portion of the other_info in the user_supplied_info may be omitted if
+           this information is already known or can be determined by entity B.
+   However, the entire user_supplied_info shall be included in the
+   timestamped_data that is used in the generation / verification of
+   timestamp_signatureTTA and SIGA(M, TSP).
+   If any portion of the TTA_supplied_info was omitted from the TSP received from
+   the TTA, then the entire TTA_supplied_info shall be inserted into the TSP used in
+   the assembly of D unless there is a mutual agreement between entity A and entity
+   B, in which case, any portion of the TTA_supplied_info may be omitted from the
+   TSP data transmitted by entity A if the information is already known or can be
+   determined by entity B. However, the entire TTA_supplied_info shall be included
+   in the timestamped_data that is used in the generation/ verification of
+   timestamp_signatureTTA and SIGA(M, TSP).
+4. Upon receiving D, entity B does the following:
+       •   Computes H′ = Hash(M). If H was received in D as part of the transmitted
+           TSP (see step 3), then entity B verifies that H = H′; otherwise, B inserts H′
+           into the user_supplied_info when verifying timestamp_signatureTTA and
+           SIGA(M, TSP).
+       •   Verifies timestamp_signatureTTA using the TTA’s public signature
+
+
+                                        14
+               verification key, and
+           •   Verifies SIGA(M, TSP) using entity A’s public signature verification key.
+       Note that it is irrelevant which signature verification is performed first; it is only
+       important that both verifications are successful.
+Because of the verifications performed in step 4, entity B knows (and/or has assurance
+of) the following:
+   a. M was assembled, and H was generated prior to the time indicated by the
+      timestamp in the TSP obtained from the TTA; in particular, H was included in the
+      timestamped_data that was signed by the TTA.
+   b. M has remained unchanged since the time indicated by the timestamp in the TSP.
+   c. SIGA(M, TSP) was generated at some point after the time indicated by the
+      timestamp in the TSP.
+   d. D was assembled after the time indicated by the timestamp in the TSP.
+If a more precise time is required for the generation of SIGA(M, TSP), a second trusted
+timestamp may be acquired (as specified in Section 4.4) that will provide assurance that
+(M, TSP) had been signed by (at least) the time indicated in the second timestamp.
+
+4.3.3 A Digital Signature on M is Provided to the TTA by Entity A
+Entity A may provide the digital signature of M to the TTA when requesting a timestamp
+as shown in Figure 3.
+
+                                                                   TTA
+                                                               o
+                                                          i nf
+                                                       r_
+                                                     he
+                                                ot
+                                           ),
+                                                   P
+                                                TS
+
+
+
+
+                                      (M
+                                          2.
+
+
+
+
+                                     GA
+                                SI
+                           1.
+
+                                3. D = M, TSP, SIGA (M, TSP)
+                      A                                                  B
+
+                 Figure 3: Entity A Provides a Signature to the TTA
+
+   1. Entity A sends SIGA(M) (and possibly other information) to the TTA in a
+      timestamp request, i.e., user_supplied_info = SIGA(M), other_info. Note that the
+      other_info may be Null.
+   2. The TTA returns a TSP to entity A:
+
+
+                                                              15
+       TSP = timestamped_data, timestamp_signatureTTA
+   where:
+       user_supplied_info = SIGA(M), other_info.
+       timestamped_data = user_supplied_info, TTA_supplied_info, timestamp.
+       timestamp_signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+          timestamp).
+   If there is a mutual agreement between entity A and the TTA, the following
+   information may be omitted from the TSP transmitted by the TTA:
+       •    Any portion of the user_supplied_info may be omitted, since it is known
+            by entity A. However, if SIGA(M) is omitted from the TSP, it shall be
+            inserted back into the TSP when sent to entity B (see step 3).
+       •    Any portion of the TTA_supplied_info may be omitted when this
+            information is known or can be determined by entity A.
+   However, the entire user_supplied_info and the entire TTA_supplied_info shall be
+   included in the generation / verification of timestamp_signatureTTA.
+   Upon receiving the TSP from the TTA, entity A should 1) check that the
+   transmitted portions of the user_supplied_info are correct and 2) verify
+   timestamp_signatureTTA using the TTA’s public signature verification key.
+3. Entity A signs (M, TSP), assembles D and sends it to entity B:
+           D = M, TSP, SIGA(M, TSP)
+   where TSP is as defined in step 2.
+   If any portion of the user_supplied_info was omitted from the TSP received from
+   the TTA, then the entire user_supplied_info shall be inserted into the TSP used in
+   the assembly of D unless there is a mutual agreement between entity A and entity
+   B, in which case, any portion of the user_supplied_info may be omitted from the
+   TSP transmitted to entity B if it is known or can be determined by entity B.
+   However, the entire user_supplied_info shall be included in the
+   timestamped_data that is used in the generation / verification of
+   timestamp_signatureTTA and SIGA(M, TSP).
+   If any portion of the TTA_supplied_info was omitted from the TSP received from
+   the TTA, then the entire TTA_supplied_info shall be inserted into the TSP used in
+   the assembly of D unless there is a mutual agreement between entity A and entity
+   B, in which case, any portion of the TTA_supplied_info may be omitted from the
+   TSP data transmitted by entity A if the information is already known or can be
+   determined by entity B. However, the entire TTA_supplied_info shall be included
+   in the timestamped_data that is used in the generation / verification of
+   timestamp_signatureTTA and SIGA(M, TSP).
+4. Upon receiving D, entity B does the following:
+
+
+
+                                        16
+           •   Verifies SIGA(M) using entity A’s public signature verification key
+               (SIGA(M) was received in the TSP within D),
+           •   Verifies timestamp_signatureTTA using the TTA’s public signature
+               verification key, and
+           •   Verifies SIGA(M, TSP) using entity A’s public signature verification key.
+       Note that the order of performing these steps is irrelevant; it is only important that
+       all verifications are successful.
+Because of the verifications performed in step 4, entity B knows (and/or has assurance
+of) the following:
+   a. M and SIGA (M) were generated before the time indicated by the TSP’s
+      timestamp, and SIGA(M) was included in the timestamped_data that was signed
+      by the TTA.
+   b. M has remained unchanged since the time indicated by the timestamp in the TSP.
+   c. SIGA(M, TSP) was generated at some time after the time indicated by the
+      timestamp in the TSP.
+   d. D was assembled after the time indicated by the timestamp in the TSP.
+If a more precise time is required for the generation of SIGA(M, TSP), a second trusted
+timestamp may be acquired (as specified in Section 4.4) that will provide assurance that
+SIGA(M, TSP) was generated by (at least) the time indicated in the second timestamp.
+
+4.3.4 A Digital Signature on M is Provided to the TTA by Entity B
+Entity B may provide a digital signature to the TTA that was received from entity A as
+shown in Figure 4.
+   1. Entity A signs M, assembles D and                                                          TTA
+      sends it to Entity B:
+                                                                                  2. SIGA(M), other_info
+
+                 D = M, SIGA(M)
+       Entity B may verify SIGA(M) upon
+       receipt using entity A’s public
+       signature verification key, and may
+                                                                                                           3. TSP
+
+
+
+
+       record the (approximate) time that the
+       signature was received from Entity A
+       for his or her own purposes.
+   2. Entity B sends SIGA(M) (and possibly
+      other information) to the TTA in a
+      timestamp request, i.e.,                              1. D = M, SIGA(M)
+                                                     A                                                     B
+      user_supplied_info = SIGA(M),
+      other_info. Note that the other_info
+      may be Null.                                       Figure 4: Entity B Provides a
+   3. The TTA returns a TSP to entity B:                    Signature to the TTA
+
+
+                                            17
+             TSP = timestamped_data, timestamp_signatureTTA
+         where:
+             user_supplied_info = SIGA(M), other_info.
+             timestamped_data = user_supplied_info, TTA_supplied_info, timestamp.
+             timestamp_signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+                timestamp).
+         If there is a mutual agreement between entity B and the TTA, the following
+         information may be omitted from the TSP transmitted by entity B:
+             •    Any portion of the user_supplied_info may be omitted, since it is known
+                  by entity B.
+             •    Any portion of the TTA_supplied_info may be omitted when this
+                  information is known or can be determined by entity B.
+         However, the entire user_supplied_info and the entire TTA_supplied_info shall be
+         included in the generation / verification of timestamp_signatureTTA.
+      4. Upon receiving the TSP, entity B does the following:
+             •    Checks that the transmitted portions of the user_supplied_info are correct,
+             •    Verifies timestamp_signatureTTA using the TTA’s public signature
+                  verification key, and
+             •    Verifies SIGA(M) using entity A’s public signature verification key if it
+                  was not verified prior to sending it to the TTA.
+         Note that the order of performing these steps is irrelevant; it is only important that
+         all verifications are successful.
+Because of the verifications performed in step 4, entity B has evidence of the following:
+      a. M and SIGA (M) were generated before the time indicated by the TSP’s
+         timestamp, and
+      b. SIGA(M) was included in the timestamped_data that was signed by the TTA.
+This evidence (i.e., M, SIGA(M) and the TSP) can be presented to any third party who
+also trusts the TTA.
+
+4.4      Using an Additional Timestamp
+A refinement of the signature generation time may be obtained if a second timestamp is
+requested from a TTA. Any entity could make the request, although requests by entity A
+and entity B are discussed below. This procedure has the most value if the second
+timestamp request is made as close as possible to the generation of entity A’s signature
+on the first timestamp packet; thus, a minimal time interval is established during which
+the signature was generated. The discussions assume that all digital signatures are
+successfully verified.
+
+
+                                               18
+In the following schemes, the initial steps of a scheme specified in Sections 4.3.1 - 4.3.3
+are executed first, with the following changes:
+   •   user_supplied_info becomes user_supplied_info1,
+   •   the other_info within user_supplied_info1 becomes other_info1.
+   •   TTA_supplied_info becomes TTA_supplied_info1,
+   •   timestamp becomes timestamp1,
+   •   TTA becomes TTA1 (alternatively represented as TTA1 in a subscript), and
+   •   TSP becomes TSP1.
+The schemes indicate the use of two TTAs: TTA1 and TTA2. TTA2 may, in fact, be the
+same TTA as TTA1.
+
+4.4.1 Entity A Requests the Second Timestamp
+Both timestamps may be obtained by entity A. The TTA(s) providing the timestamps
+must be trusted by both entity A and entity B, and also by any third party that needs to be
+convinced of the signature generation time.
+Figure 5 shows that the first timestamp is obtained as specified in Section 4.3.1, 4.3.2, or
+4.3.3, after which entity A requests a second timestamp. The first two steps are the same
+as those specified for the schemes in 4.3.1 - 4.3.3.
+
+                    TTA1                          TTA2
+                                             3. SIGA (M, TSP1), other_info2
+                1. user_supplied_info1
+
+
+
+
+                                                        4. TSP2
+                       2. TSP1
+
+
+
+
+                                                                              5. D = M, TSP1, TSP2
+                                         A                                                           B
+
+
+
+ Figure 5: After Using a Scheme from 4.3, Entity A Requests a Second Timestamp
+The process continues as follows:
+   3. Entity A generates SIGA(M, TSP1) and sends it (and possibly other information)
+      to TTA2 in a second timestamp request, i.e., user_supplied_info2 =
+
+
+                                                                       19
+   SIGA(M,TSP1), other_info2. Note that other_info2 may be Null.
+   TSP1 is defined to be the TSP used for the scheme in 4.3.1, 4.3.2 or 4.3.3.
+ 4. TTA2 returns TSP2 to entity A:
+       TSP2 = timestamped_data2, timestamp_signatureTTA2
+   where:
+       user_supplied_info2 = SIGA(M, TSP1), other_info2.
+       timestamped_data2 = user_supplied_info2, TTA_supplied_info2, timestamp2.
+       timestamp_signatureTTA2 = SIGTTA2(user_supplied_info2, TTA_supplied_info2,
+                                 timestamp2).
+   If there is a mutual agreement between entity A and TTA2, the following
+   information may be omitted from the TSP2 data transmitted by TTA2:
+       •    Any portion of the user_supplied_info2 may be omitted, since it is known
+            by entity A. However, if SIGA(M, TSP1) is omitted from the TSP2 data, it
+            must be inserted back into the TSP2 data when sent to entity B (see step 5).
+       •    Any portion of the TTA_supplied_info2 may be omitted when the
+            information is known or can be determined by entity A.
+   However, even if they are omitted from the transmitted TSP2 data,
+   both the entire user_supplied_info2 and the entire TTA_supplied_info2 shall be
+   included in the timestamped_data2 that is used in the generation / verification of
+   timestamp_signatureTTA2 = SIGTTA2 (timestamped_data2).
+   Upon receiving TSP2 from TTA2, entity A should 1) check that the transmitted
+   portions of user_supplied_info2 are correct and 2) verify the
+   timestamp_signatureTTA2 using the TTA2’s public signature verification key.
+5. Entity A assembles D and sends it to entity B:
+            D = M, TSP1, TSP2
+   where TSP1 is defined in the appropriate subsection of Section 4.3, and TSP2 is as
+   defined in step 4. Note that if SIGA(M, TSP1) was not transmitted in the
+   timestamped_data2 of the TSP2 data sent from TTA2, it shall be inserted into the
+   TSP2 data used in the assembly of D.
+   If omitted from the TSPs received from the TTAs, the entire user_supplied_info1
+   and the entire TTA_supplied_info1 shall be inserted into TSP1, and the entire
+   user_supplied_info2 and the entire TTA_supplied_info2 shall be inserted into TSP2
+   unless there is a mutual agreement between entity A and entity B, in which case
+   the following may be omitted from the transmitted TSP1 and TSP2 data in D:
+       •    Any portion of user_supplied_info1 that is present in TSP1 may be omitted
+            if it is known or can be determined by entity B.
+       •    Any portion of user_supplied_info2 that is present in TSP2 may be omitted
+
+
+                                         20
+               if it is known or can be determined by entity B.
+           •   Any portion of TTA_supplied_info1 that is present in TSP1 may be omitted
+               if it is already known or can be determined by entity B.
+           •   Any portion of TTA_supplied_info2 may be omitted if it is already known
+               or can be determined by entity B.
+       However, any such information omitted from the transmitted data shall be
+       included in the appropriate timestamped_data field (timestamped_data1 and/or
+       timestamped_data2) used in the generation / verification of the quantities:
+               timestamp_signatureTTA1 = SIGTTA1 (timestamped_data1),
+               SIGA(M, TSP1), and
+               timestamp_signatureTTA2 = SIGTTA2 (timestamped_data2).
+   6. Upon receiving D, entity B does the following:
+           •   If the scheme in Section 4.3.2 was used, entity B computes H′ = Hash(M).
+               If H was received by entity B in D as part of the transmitted TSP1, entity B
+               verifies that H = H′; otherwise, entity B sets H = H′ in the
+               user_supplied_info1 when verifying timestamp_signatureTTA1 and
+               SIGA(M, TSP1).
+           •   Verifies timestamp_signatureTTA1 using TTA1’s public signature
+               verification key,
+           •   Verifies SIGA(M, TSP1) using entity A’s public signature verification key,
+               and
+           •   Verifies timestamp_signatureTTA2 using TTA2’s public signature
+               verification key.
+       Note that the order of performing these verifications is irrelevant; it is only
+       important that all verifications are successful.
+Because of the verifications performed in step 6, entity B knows (and/or has assurance
+of) the following in addition to what is known in the appropriate scheme from Section
+4.3:
+   a. SIGA(M, TSP1) was generated between the times indicated in timestamp1 and
+      timestamp2, and was included in the timestamped_data2 signed by TTA2.
+   b. D was assembled after the time indicated by timestamp2.
+
+4.4.2 Entity B Requests the Second Timestamp
+Entity B may request a second timestamp after receiving D from entity A and verifying
+the associated signatures (see step 4 of the schemes in Sections 4.3.1 - 4.3.3). The TTA
+that provides the first timestamp (TTA1) must be trusted by both entity A and entity B,
+but the TTA that provides the second timestamp (TTA2) may need to be trusted only by
+entity B. In general, any party that relies on the accuracy of the bounds on the generation
+
+
+                                             21
+time of SIGA(M, TSP1) must trust both TTAs.
+Figure 6 shows entity B requesting a second timestamp after receiving D from entity A.
+The first four steps of this scheme1 are the same as those specified in one of the schemes
+in Sections 4.3.1 - 4.3.3.
+After verifying the signatures, etc. in D (in step 4), the scheme proceeds as follows:
+       5. Entity B obtains SIGA(M, TSP1) from D and sends it (and possibly other
+          information) to TTA2 in a timestamp request, i.e., user_supplied_info2 = SIGA
+          (M, TSP1), other_info2. Note that other_info2 may be Null.
+
+                                       TTA1                             TTA2
+
+
+
+
+                                                                              5. S
+                                   1
+                                 fo
+
+
+
+
+                                                                                  IG A
+                     2. T lied_in
+
+
+
+
+                                                                                    6. T SP 1),
+                                                                                      (M,
+                                                                                        SP 2
+                            p
+                             1
+                          SP
+                        s up
+
+
+
+
+                                                                                          T
+                    ser_
+
+
+
+
+                                                                                                othe
+                1. u
+
+
+
+
+                                                                                                     r_in
+                                       3. D = M, TSP1, SIGA (M, TSP1)                                    fo 2
+               A                                                                                                B
+
+
+         Figure 6: Entity A Used a Scheme from 4.3; Entity B Requests the Second
+                                         Timestamp
+       6. TTA2 returns TSP2 to entity B:
+                TSP2 = timestamped_data2, timestamp_signatureTTA2
+           where:
+                user_supplied_info2 = SIGA (M, TSP1), other_info2.
+                timestamped_data2 = user_supplied_info2, TTA_supplied_info2, timestamp2
+                timestamp_signatureTTA2 = SIGTTA2(user_supplied_info2, TTA_supplied_info2,
+                                          timestamp2).
+           If there is a mutual agreement between entity B and TTA2, the following
+
+
+1
+    The assembly and transmission of the three messages, plus the verifications.
+
+
+                                                       22
+       information may be omitted from the TSP2 data transmitted by TTA2:
+           •   Any portion of the user_supplied_info2 may be omitted, since it is known
+               by entity B.
+           •   Any portion of TTA_supplied_info2 may be omitted if the information is
+               already known or can be determined by entity B.
+       However, even though they may be omitted from the transmitted TSP2 data,
+       the entire user_supplied_info2 and the entire TTA_supplied_info2 shall be
+       included in the timestamped_data2 that is used in the generation / verification of
+               timestamp_signatureTTA2 = SIGTTA2 (timestamped_data2).
+   7. Entity B then 1) checks that the transmitted portions of user_supplied_info2 are
+      correct and 2) verifies timestamp_signatureTTA2 using TTA2’s public signature
+      verification key.
+In addition to what is known from step 4 of the appropriate scheme from Section 4.3, the
+verification performed in step 7 provides entity B with evidence that the signature
+SIGA(M, TSP1) was generated between the times indicated in timestamp1 and timestamp2.
+This evidence (i.e., M, TSP1, SIGA(M, TSP1) and TSP2) can be presented to any third
+party who also trusts the TTAs.
+
+
+
+
+                                           23
+5       Evidence of Timeliness Using Verifier-Supplied Data
+Independent of the use of a trusted timestamping service by entity A, entity A can
+provide evidence to the verifier (entity B) of the timeliness of its signature by:
+    •   Combining fresh data that was supplied by the intended verifier with any other
+        data to be included in the message, and
+    •   Generating a digital signature on the combination.
+In the following schemes, a nonce is used to assist in establishing timeliness. A nonce is a
+time-varying value, represented as a byte string that has (at most) a negligible chance of
+repeating. For example, a nonce may be composed of one (or more) of the following
+components:
+    1. A random value that is generated anew for each nonce, using an approved
+       random bit generator (RBG). The security strength of the RBG used to obtain
+       each random value shall be equal to or greater than the security strength
+       associated with the digital signature process. The appropriate security strength
+       shall have been determined prior to the generation of this random value. The
+       length of the RBG output shall be equal to or greater than the security strength
+       associated with the digital signature process (e.g., if the security strength of the
+       digital signature process is 112 bits, then the length of the RBG output shall be at
+       least 112 bits). A nonce containing a component of this type is called a random
+       nonce.
+    2. A timestamp of sufficient resolution (detail) so that it is different each time it is
+       used.
+    3. A monotonically increasing sequence number.
+If a combination of a timestamp and a monotonically increasing sequence number is used
+without a random nonce, the sequence number shall be reset only when the timestamp
+changes. (For example, a timestamp may show the date but not the time of day, so a
+sequence number is appended that will not repeat during a particular day.)
+When using a nonce, a random nonce should be used.
+In the following schemes, let Nonce be the verifier-supplied nonce (i.e., supplied by
+entity B). Let D be the data transmitted by entity A to entity B, which includes the
+message M and various timestamps and/or digital signatures. Let SIGA( ) be the digital
+signature that is computed by entity A using an approved hash function and an
+approved digital signature algorithm; SIGA( ) is verified using entity A’s public
+signature verification key. The discussions assume that entities A and B successfully
+verify all digital signatures.
+For each scheme in Section 5, a text description is provided, along with a figure to
+illustrate the message flow for the scheme. The number in the figure for each message
+indicates the step in the text description that describes that message. Note that the step
+numbers for internal operations are not indicated in the figure.
+
+                                             24
+5.1      The Basic Scheme
+As shown in Figure 7, the scheme proceeds as follows:
+      1. Entity B sends a newly
+         generated Nonce to entity A.
+      2. Entity A signs (M, Nonce),
+         assembles D, and sends it to
+         entity B, where:
+             D = M, SIGA(M, Nonce).          Figure 7: Using Verifier Supplied Data
+      3. Upon receiving D, entity B then
+         verifies SIGA(M, Nonce) using entity A’s public signature verification key.
+Because of the verification performed in step 3, entity B knows (and/or has assurance of)
+the following:
+      a. M could have been assembled either before or after the Nonce was received from
+         entity B.
+      b. SIGA(M, Nonce) was generated at some time after the Nonce was received by
+         entity A.
+      c. D was assembled by entity A after the Nonce was received.
+If a more precise time is required for the generation of SIGA(M, Nonce), a trusted
+timestamp may be acquired as specified in Section 5.2; the timestamp will provide
+assurance that SIGA(M, Nonce) was generated by (at least) the time indicated in the
+timestamp.
+
+5.2      Using a Timestamp to Obtain More Precision
+When verifier-supplied data is used, a more precise time for the generation of a digital
+signature can be provided by requesting a timestamp. Any entity could make the request,
+although requests by entity A and entity B are discussed below. This procedure has the
+most value if the timestamp request is made as close to the generation of entity A’s
+signature as possible, since it may be used to establish a minimal time interval during
+which entity A’s signature was generated. The discussions assume that entities A and B
+successfully verify all digital signatures.
+
+5.2.1 Entity A Requests the Timestamp
+Entity A may request a timestamp before sending a message to entity B. The TTA that
+provides the timestamp must be trusted by both parties.
+Figure 8 depicts the case where entity A provides more precision as to when SIGA(M,
+Nonce) was generated. Note that the Nonce supplied by entity B could include a
+timestamp, in which case, this (additional) timestamp could establish an interval during
+which SIGA(M, Nonce) was generated.
+The scheme is as follows:
+
+
+                                             25
+1. Entity B sends a newly generated Nonce to entity A.
+2. Entity A generates SIGA(M, Nonce) and sends it (and possibly other information)
+   to the TTA in a timestamp request, i.e., user_supplied_info = SIGA(M, Nonce),
+   other_info. Note that other_info may be Null.
+
+                         TTA
+                 2. SIGA (M, Nonce), other_info
+                            3. TSP
+
+
+
+
+                                                      1. Nonce
+                                    A                             B
+                                                  4. D = M, TSP
+
+
+                           Figure 8: Entity A Requests a Timestamp
+3. The TTA returns a TSP to entity A:
+       TSP = timestamped_data, timestamp_signatureTTA
+   where:
+       user_supplied_info = SIGA(M, Nonce), other_info.
+       timestamped_data = user_supplied_info, TTA_supplied_info, timestamp.
+       timestamp_signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+          timestamp).
+   If there is a mutual agreement between entity A and the TTA, the following
+   information may be omitted from the TSP data transmitted by the TTA:
+       •    Any portion of the user_supplied_info may be omitted, since it is known
+            by entity A. However, if SIGA(M, Nonce) is omitted from the TSP, it must
+            be inserted back into the TSP when sent to entity B (see step 4).
+       •    Any portion of the TTA_supplied_info may be omitted if this information
+            is already known or can be determined by entity A.
+
+
+                                                        26
+       However, even though they may be omitted from the transmitted TSP data,
+       both the entire user_supplied_info and the entire TTA_supplied_info shall be
+       included in the timestamped_data that is used in the generation / verification of
+              timestamp_signatureTTA = SIGTTA(timestamped_data).
+       Upon receiving the TSP from the TTA, entity A then 1) checks that the
+       transmitted portions of the user_supplied_info are correct and 2) verifies the
+       timestamp_signatureTTA using the TTA’s public signature verification key.
+   4. Entity A assembles D and sends it to entity B:
+           D = M, TSP
+       where TSP is as defined in step 3.
+       If any portion of the user_supplied_info was omitted from the TSP received from
+       the TTA, then the entire user_supplied_info shall be inserted into the TSP used in
+       the assembly of D unless there is a mutual agreement between entity A and entity
+       B, in which case, any portion of the user_supplied_info may be omitted from the
+       TSP data transmitted to entity B if it is known or can be determined by entity B.
+       However, the entire user_supplied_info shall be included in the
+       timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA and SIGA(M, Nonce).
+       If any portion of the TTA_supplied_info was omitted from the TSP received from
+       the TTA, then the entire TTA_supplied_info shall be inserted into the TSP used in
+       the assembly of D unless there is a mutual agreement between entity A and entity
+       B, in which case, any portion of the TTA_supplied_info may be omitted from the
+       TSP data transmitted by entity A if it is known or can be determined by entity B.
+       However, the entire TTA_supplied_info shall be included in the
+       timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA and SIGA(M, Nonce).
+   5. Upon receiving D, entity B does the following:
+           •   Verifies SIGA(M, Nonce) using entity A’s verification public key, and
+           •   Verifies timestamp_signatureTTA using the TTA’s public signature
+               verification key.
+       Note that the order of performing these verifications is irrelevant; it is only
+       important that both verifications are successful.
+In addition to what has been determined by entity B in step 3 of Section 5.1, the
+verifications in step 5 provide entity B with evidence that SIGA(M, Nonce) was generated
+between the time that the Nonce was sent to entity A and the time indicated in the
+timestamp
+
+5.2.2 Entity B Requests the Timestamp
+Entity B may request a timestamp after receiving the message D from entity A. The TTA
+that provides the timestamp may need to be trusted only by entity B unless another party
+
+
+                                             27
+needs to be convinced of the signature generation time.
+Figure 9 depicts the case where entity A provides evidence of timeliness using data
+supplied by entity B, and entity B determines (more precisely) when the digital signature
+generated by entity A was received. This scheme is similar to the scheme in Section
+4.3.4, with the only difference being the nonce sent from entity B to entity A. Note that
+the Nonce supplied by entity B could include a timestamp (trusted by both entity A and
+entity B), in which case, this (additional) timestamp would establish an interval during
+which the signature was generated.
+The first three steps are the same as those                                                  TTA
+specified in Section 5.1. After entity B
+
+
+
+
+                                                                              4. SIGA(M), other_info
+verifies SIGA(M, Nonce), the scheme
+proceeds as follows:
+   4. Entity B sends SIGA(M, Nonce) (and
+      possibly other information) to the
+
+
+
+
+                                                                                                       5. TSP
+      TTA in a timestamp request, i.e,
+      user_supplied_info = SIGA(M),
+      other_info. Note that the other_info
+      may be Null.
+   5. The TTA returns a TSP to entity B:                      1. Nonce
+           TSP = timestamped_data,                 A      2. D = M, SIGA(M)                            B
+              timestamp_signatureTTA
+       where:
+                                                    Figure 9: Entity B Requests a
+           user_supplied_info = SIGA(M,                            Ti
+              Nonce), other_info.
+           timestamped_data = user_supplied_info, TTA_supplied_info, timestamp.
+           timestamp_signatureTTA = SIGTTA(user_supplied_info, TTA_supplied_info,
+              timestamp).
+       If there is a mutual agreement between entity B and the TTA, the following
+       information may be omitted from the TSP data transmitted by the TTA:
+           •    Any portion of the user_supplied_info may be omitted, since it is known
+                by entity B.
+           •    Any portion of the TTA_supplied_info may be omitted when this
+                information is known or can be determined by entity B.
+       However, even though they may be omitted from the transmitted TSP data, both
+       the entire user_supplied_info and the entire TTA_supplied_info shall be included
+       in the timestamped_data that is used in the generation / verification of
+       timestamp_signatureTTA = SIGTTA(timestamped_data).
+   6. Entity B then 1) checks that the transmitted portions of user_supplied_info are
+      correct and 2) verifies the timestamp_signatureTTA using the TTA’s public
+
+
+                                              28
+       signature verification key.
+In addition to what has been determined by Entity B in Section 5.1, the verification in
+step 6 provides entity B with evidence that timestamp_signatureTTA was generated before
+the time indicated in the timestamp.
+
+
+
+
+                                          29
+                           Appendix A: References
+[1]   Federal Information Processing Standard (FIPS) 186-3, The Digital Signature
+      Standard, dated June, 2009.
+[2]   NIST Special Publication (SP) 800-57, Recommendation for Key Management −
+      Part 1: General, Revised March, 2007.
+[3]   Request for Comment 3161, Internet X.509 Public Key Infrastructure Time-Stamp
+      Protocol (TSP), IETF Standards Track, August 2001.
+[4]   ISO/IEC 18014, Information Technology – Security Techniques – Time-stamping
+      Services, 2002.
+[5]   ANS X9.95, Trusted Timestamp Management and Security, 2005.
+
+
+
+
+                                          30
+

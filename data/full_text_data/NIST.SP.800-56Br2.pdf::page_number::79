@@ -1,0 +1,46 @@
+                                                                                               NIST SP 800-56B REV. 2                            RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                      USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                                                                 DB = HA || PS || 00000001 || K,
+                                                                                                              where 00000001 is a string of eight bits.
+                                                                                                          d. Using the RBG (see Section 5.3), generate a random byte string mgfSeed of HLen
+                                                                                                             bytes.
+                                                                                                          e. Apply the mask-generation function in Section 7.2.2.2 to compute:
+                                                                                                                          dbMask = MGF(mgfSeed, nLen – HLen – 1).
+                                                                                                          f. Let maskedDB = DB ⊕ dbMask.
+                                                                                                          g. Apply the mask-generation function in Section 7.2.2.2 to compute:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                                                           mgfSeedMask = MGF(maskedDB, HLen).
+                                                                                                          h. Let maskedMGFSeed = mgfSeed ⊕ mgfSeedMask.
+                                                                                                          i. Concatenate a single byte with hexadecimal value 00, maskedMGFSeed, and
+                                                                                                             maskedDB to form an encoded message EM of nLen bytes as follows:
+                                                                                                                        EM = 00000000 || maskedMGFSeed || maskedDB,
+                                                                                                              where 00000000 is a sting of eight bits.
+                                                                                                  4. RSA encryption:
+                                                                                                          a. Convert the encoded message EM to an integer em (see Appendix B.2):
+                                                                                                                                        em = BS2I(EM).
+                                                                                                          b. Apply RSAEP (see Section 7.1.1) to the integer em using the public key (n, e) to
+                                                                                                             produce a ciphertext integer c:
+                                                                                                                                     c = RSAEP((n, e), em).
+                                                                                                          c. Convert the ciphertext integer c to a ciphertext byte string C of nLen bytes (see
+                                                                                                             Appendix B.1):
+                                                                                                                                       C = I2BS(c, nLen).
+                                                                                                  5. Zeroize all intermediate values and output the ciphertext C.
+                                                                                               Output:    C: the ciphertext (a byte string of nLen bytes), or an error indicator.
+                                                                                               A routine that implements this operation shall destroy any local copies of sensitive input values
+                                                                                               (e.g., K and any sensitive portions of A), as well as any other potentially sensitive locally stored
+                                                                                               values used or produced during the execution of the routine (including HA, DB, mfgSeed, dbMask,
+                                                                                               maskedDB, mgfSeedMask, maskedMGFSeed, EM, and em). The destruction of these locally stored
+                                                                                               values shall occur prior to or during any exit from the routine – whether exiting early because of
+                                                                                               an error or exiting normally with the output of C.
+
+
+
+
+                                                                                                                                                69
+

@@ -1,0 +1,56 @@
+                                                           Practical Combinatorial Testing
+ _______________________________________________________
+end of the model are simple “reflections” that duplicate the access control rules as temporal
+logic statements. They are thus trivially provable, but we are interested in using them to
+generate tests rather than to prove properties of the system.
+
+   1.      MODULE main
+   2.      VAR
+   --Input parameters
+   3.      u_l:   0..2;                        -- user level
+   4.      f_l:   0..2;                        -- file level
+   5.      act: {rd,wr};                       -- action
+
+   --output parameter
+   6.      access: {START_, GRANT,DENY};
+
+   7.      ASSIGN
+   8.      init(access) := START_;
+   --if access is allowed under rules, then next state is GRANT
+   --else next state is DENY
+   9.      next(access) := case
+   10.     u_l >= f_l & act = rd : GRANT;
+   11.     f_l >= u_l & act = wr : GRANT;
+   12.     1 : DENY;
+   13.     esac;
+   14.     next(u_l) := u_l;
+   15.     next(f_l) := f_l;
+   16.     next(act) := act;
+
+   -- if user level is at or above file level then read is OK
+   SPEC AG ((u_l >= f_l & act = rd ) -> AX (access = GRANT));
+
+   -- if user level is at or below file level, then write is OK
+   SPEC AG ((f_l >= u_l & act = wr ) -> AX (access = GRANT));
+
+   -- if neither condition above is true, then DENY any action
+   SPEC AG (!( (u_l >= f_l & act = rd ) | (f_l >= u_l & act = wr ))
+             -> AX (access = DENY));
+                   Figure 27.     SMV model of access control rules
+
+
+ Separate documentation on SMV should be consulted to fully understand the syntax used,
+but specifications of the form “AG ((predicate 1) -> AX (predicate 2))”                 indicate
+essentially that for all paths (the “A” in “AG”) for all states globally (the “G”), if predicate
+1 holds then ( “->”) for all paths, in the next state (the “X” in “AX”) predicate 2 will hold.
+In the next section we will see how this specification can be used to produce complete
+tests, with test data input and the expected output for each set of input data.
+
+       Model checkers can be used to perform a variety of valuable functions, because
+they make it possible to evaluate whether certain properties are true of the system model.
+Conceptually, the model checker can be viewed as exploring all states of a system model to
+determine if a property claimed in a SPEC statement is true. If the statement can be proved
+
+
+                                                                                                   49
+

@@ -1,0 +1,51 @@
+                                                                 GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+    To have minimal impact on upper layer protocols in general and on transport protocols and
+     applications in particular
+
+    To address security threats identified in RFC 4218 through the combination of hash-based or
+     cryptographically-generated addresses and additional measures.
+
+    Not to require extra roundtrip up front to set up shim-specific state
+
+    To take advantage of multiple locators for load spreading so that different sets of communication to a
+     host (e.g., different connections) may use different locators of the host.
+The general idea is to use IPv6 normally but, through SHIM6 signaling, set up alternative locators that
+can be used when needed. The steps, roughly, are:
+
+    An AAAA DNS query provides a (possibly incomplete) set of locator addresses.
+
+    The source chooses a locator address to establish a conversation (choose a different Locator ID if the
+     first attempt is not successful).
+
+    Once upper layer communication begins, end hosts can signal SHIM6 capabilities and exchange a
+     complete set of locators.
+
+    The current source and destination locators are used as source and destination Upper Layer IDs.
+
+    In case of an outage, the source or destination can detect path failure in the forwarding plane and
+     change source or destination locator to any in the locator set.
+
+    Existing sessions continue uninterrupted using the unchanged Upper Layer ID.
+An important design paradigm is that no new name space is needed. The SHIM6 protocol uses four IPv6
+extension header messages called I1, I2, R1, and R2 to accomplish all of this. Figure 4-1 shows where
+the shim header fits into the IPv6 protocol stack.
+
+Although the most promising work on IPv6 multihoming is SHIM6, this is likely to get much more
+discussion and revision. Some concerns about this approach have been expressed. In particular, it may
+be difficult to provide adequate traffic engineering with a host-based solution like SHIM6. For large
+enterprises with complex routed networks, site-based multihoming may be more useful. One example of
+site-based multihoming that is currently being considered within the IETF is the Locator/ID Separation
+Protocol (LISP)32. On large servers with many simultaneous connections, the overhead of maintaining
+SHIM6 state information may impact performance significantly.
+
+
+
+
+32
+     IETF LISP Working Group Charter.
+
+
+                                                      4-3
+

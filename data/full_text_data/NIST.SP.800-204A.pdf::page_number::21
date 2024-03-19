@@ -1,0 +1,57 @@
+                                                                                              NIST SP 800-204A                                   BUILDING SECURE MICROSERVICES-BASED APPLICATIONS
+                                                                                                                                                                 USING SERVICE-MESH ARCHITECTURE
+
+
+                                                                                              identity can either be a server identity (also known as a host or domain) or a service identity
+                                                                                              (usually service account ID). The recommendations relating to certificate deployment are as
+                                                                                              follows:
+
+                                                                                              Recommendation for a Universal Identity Domain (SM-DR11): The identity of all instances of a
+                                                                                              microservice should be consistent and unique—consistent in that a service should have the same
+                                                                                              name regardless of where it is running and unique in that across the entire system, the service’s
+                                                                                              name corresponds only to that service. This does not mean different logical services in different
+                                                                                              locations; a typical usage of Domain Name System (DNS) where each service is assigned its own
+                                                                                              DNS name would satisfy this recommendation. Consistent names (identities) for services are
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204A
+
+
+
+
+                                                                                              required so that the system policy is manageable.
+
+                                                                                              Recommendation for Signing Certificate Deployment (SM-DR12): The Service Mesh control
+                                                                                              plane’s certificate management system should have its ability to generate self-signed certificates
+                                                                                              disabled. This functionality is frequently used to bootstrap an initial signing certificate for all
+                                                                                              other identity certificates in the Service Mesh. Instead, the signing certificate used by the mesh’s
+                                                                                              control plane should always be rooted in the enterprise’s existing PKI’s root of trust and
+                                                                                              provided securely to the Service Mesh control plane at startup. This simplifies the management
+                                                                                              of those certificates by an existing PKI (e.g., for revocation or audit). Further, we recommend
+                                                                                              that separate intermediate signing certificates should be generated for different domains to
+                                                                                              simplify rotation and enable fine-grained revocation.
+
+                                                                                              Recommendation for Identity Certificate Rotation (SM-DR13): The lifetime of a microservice’s
+                                                                                              identity certificate should be as short as is manageable within the infrastructure—preferably on
+                                                                                              the order of hours. This helps limit attacks since an attacker can only use a credential to
+                                                                                              impersonate a service until that credential expires, and successfully re-stealing a credential
+                                                                                              increases the difficulty for an attacker.
+
+                                                                                              Recommendation for the Service Proxy to Cycle Connections on Identity Change (SM-DR14):
+                                                                                              When a service proxy’s identity certificate is rotated, the service proxy should efficiently retire
+                                                                                              existing connections and establish all new connections with the new certificate. Certificates are
+                                                                                              only validated during the mTLS handshake, so replacing existing connections when a new
+                                                                                              certificate is issued is not strictly required; rather, this is important for limiting attacks in time.
+
+                                                                                              Recommendation for Non-Signing Identity Certificates (SM-DR15): Certificates used to identify
+                                                                                              microservices should not be signing certificates.
+
+                                                                                              Recommendation for Workload Authentication before Certificate Issuance (SM-DR16): The
+                                                                                              Service Mesh control plane’s certificate management system should perform authentication of a
+                                                                                              service instance before issuing it an identity certificate. In many systems, this can be achieved by
+                                                                                              attesting the instance against the system’s orchestration engine, and by using other local proofs
+                                                                                              (e.g. secrets retrieved from an HSM).
+
+                                                                                              The same care should be taken in provisioning the signing certificate for the Service Mesh
+                                                                                              control plane’s certificate management system. That signing certificate should be retrievable
+                                                                                              only by the Service Mesh control plane and only after some form of attestation has been done
+                                                                                                                                                 13
+

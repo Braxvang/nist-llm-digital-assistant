@@ -1,0 +1,56 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                      Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                         PIV Card Application Card Command Interface
+
+       SK CFRM || SK MAC || SK ENC || SK RMAC =
+       KDF(Z, len, OtherInfo)              H10
+       Zeroize Z H11
+       Check that AuthCryptogram ICC equals
+                     H12
+                     CMAC(SK CFRM , “KC_1_V” ||
+       ID sICC || ID sH || Q eH )
+       Zeroize SK CFRM            H13
+761
+762   Sections 4.1.1 and 4.1.2 provide additional details about each of the protocol steps performed by
+763   the client application and the PIV Card Application. Section 4.1.3 defines the notations used in
+764   the description of the protocol. Section 4.1.4 provides details about the two cipher suites that
+765   MAY be supported by the PIV Card Application. Section 4.1.5 specifies the format for the
+766   secure messaging card verifiable certificate (CVC) that is used to authenticate the PIV Card
+767   Application and for the optional Intermediate CVC that is used to verify the signature on the
+768   secure messaging CVC when the public key needed to verify the signature on the secure
+769   messaging CVC does not appear in an X.509 content signing certificate. Section 4.1.6 provides
+770   additional information about the key derivation function (KDF) used to derive the session keys
+771   that are used during secure messaging. Section 4.1.7 provides additional information about the
+772   computation of the authentication cryptogram for key confirmation. Section 4.1.8 demonstrates
+773   the use of the GENERAL AUTHENTICATE command to perform the key establishment
+774   protocol.
+
+775   4.1.1. Client Application Steps
+776                                         Table 15: Protocol Steps for Client Application
+
+       Step #                                     Description                                        Comment
+       H1          Set CB H to 0x00                                               The client application’s control byte is set to
+                                                                                  0x00 to indicate that the client application does
+                                                                                  not support persistent binding.
+       H2          Generate an ephemeral key pair (d eH ; Q eH )                  Generate an ephemeral ECC key pair
+                                                                                  for the client application using an
+                                                                                  approved method [FIPS186, Appendix
+                                                                                  B], and perform partial public-key
+                                                                                  validation [SP800-56A, Section
+                                                                                  5.6.2.3.2], either as part of the key
+                                                                                  generation process or as a separate
+                                                                                  process. If the 0xAC tag of the
+                                                                                  application property template (APT)
+                                                                                  includes '27', then generate an
+                                                                                  ephemeral key pair over Curve P-256.
+                                                                                  If the 0xAC tag of the APT includes
+                                                                                  '2E', then generate an ephemeral key
+                                                                                  pair over Curve P-384.
+       H3        Send CB H || ID sH || Q eH
+       Wait for response from PIV Card Application:
+              CB ICC || N ICC || AuthCryptogram ICC || C ICC
+
+
+
+
+                                                                   22
+

@@ -1,0 +1,59 @@
+                                                                                               NIST SP 800-177 REV. 1                                                          TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               users about what the results mean when evaluating potential phishing/spam email as well as not
+                                                                                               assuming positive results means they have a completely secure channel.
+
+                                                                                               4.3     Requirements for Using Domain-based Authentication Techniques for Federal
+                                                                                                       Systems
+
+                                                                                               As of the time of writing of this guidance document, the DHS has called out the use of domain-
+                                                                                               based authentication techniques for email as Binding Operational Directive (BOD) 18-01
+                                                                                               [BOD18-01]. �is includes the techniques discussed below. �is section gives best-common-
+                                                                                               practice guidance of the domain-based authentication techniques listed (but not described) in
+                                                                                               BOD 18-01 and [FISMAMET]. �is document does not extend those requirements in anyway
+                                                                                               but gives guidance on how to meet existing requirements.
+
+                                                                                               4.4     Sender Policy Framework (SPF)
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               Sender Policy Framework (SPF) is a standardized way for the domain of the envelope-From:
+                                                                                               address to identify and assert the mail originators (i.e., mail senders) for a given domain. �e
+                                                                                               sending domain does this by placing a specially formatted Text Resource Record (TXT RR) in
+                                                                                               the DNS database for the domain. �e idea is that a receiving MTA can check the IP address of
+                                                                                               the connecting MTA against the purported sending domain (the domain-part of the envelope-
+                                                                                               From: address) and see if the domain vouches for the sending MTA. �e receiving MTA does
+                                                                                               this by sending a DNS query to the purported sending domain for the list of valid senders.
+
+                                                                                               SPF was designed to address phishing and spam being sent by unauthorized senders (i.e.,
+                                                                                               botnets). SPF does not stop all spam, in that spam email being sent from a domain that asserts its
+                                                                                               sending MTAs via an SPF record will pass all SPF checks. �at is, a spammer can send email
+                                                                                               using an envelope-From: address using a domain that the spammer controls, and that email will
+                                                                                               not result in a failed SPF check. SPF checks fail when mail is received from a sending MTA
+                                                                                               other than those listed as approved senders for the envelope-From: domain. For example, an
+                                                                                               infected botnet of hosts in an enterprise may be sending spam on its own (i.e., not through the
+                                                                                               enterprises outgoing SMTP server), but those spam messages would be detected as the infected
+                                                                                               hosts would not be listed as valid senders for the enterprise domain and would fail SPF checks.
+                                                                                               See [HERZBERG2009] for a detailed review of SPF and its eﬀectiveness.
+
+                                                                                               4.4.1    Background
+
+                                                                                               SPF works by comparing the sender's IP address (IPv4 or IPv6, depending on the transport used
+                                                                                               to deliver the message) with the policy encoded in any SPF record found at the sending domain.
+                                                                                               �at is, the domain-part of the envelope-From: address. �is means that SPF checks can actually
+                                                                                               be applied before the bulk of the message is received from the sender. For example, in Fig 4-1,
+                                                                                               the sender with IP address 192.168.0.1 uses the envelope MAIL FROM: tag as
+                                                                                               alice@example.org even though the message header is alice.sender@example.net. �e
+                                                                                               receiver queries for the SPF RR for example.org and checks if the IP address is listed as a valid
+                                                                                               sender. If it is listed, or no valid SPF record is found, the message is processed as usual. If not,
+                                                                                               the receiver may mark the message as a potential spoofed email, quarantine it for further
+                                                                                               (possibly administrator) analysis or reject the message, depending on the SPF policy and/or the
+                                                                                               policy discovered in any associated DMARC record (see subsection 4.5, below) for example.org.
+
+                                                                                                                                               28
+

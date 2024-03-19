@@ -1,0 +1,51 @@
+                                                                  SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+As far as the choice of key size for the ZSK is concerned, performance certainly will be a factor because
+the ZSK is used for signing all RRsets in the zone. In terms of impact, however, it is restricted to just a
+single zone because the ZSK’s usage is limited to signing RRsets only for that zone. This is the
+justification for allowing 1024 bit RSA keys for use with DNSSEC beyond the USG stop date of 2010.
+Some network components have been shown to have problems handling large DNS responses. The use of
+1024 bit RSA keys is still considered acceptable to compensate for this as long as other rigorous key
+management practices are in place.
+
+The choice of crypto period (rollover period) is dictated by the amount of work required to compromise
+the given key. The large size of the KSK implies that the crypto period for that key can be long (usually a
+year or two). This aids in DNS operations as well, as KSK rollover is more disruptive and requires the
+zone administrator to interact with their parent zone to update the KSK’s DS RR in the parent delegation
+information. In the case of ZSK, the risk of key guessing is higher of its smaller size. This implies that
+ZSKs must be rolled over more frequently than KSKs (usually between 1-3 months). Since the ZSK is
+local to the zone, rolling the ZSK is not as disruptive as rolling the KSK.
+
+In the case of ZSK, the risk of compromise may be greater due to more frequent exposure. If the zone allows
+dynamic update, the ZSK is often stored on the same server as the zone. This factor, combined with the
+relatively smaller size of the key, implies that ZSKs must be rolled over more frequently than KSKs (usually
+between 1-3 months).
+
+In terms of the number of keys of each type (KSK and ZSK) to be generated, a good practice is to
+generate an extra ZSK in addition to the one that will be used for signing. Hence, the zone administrator
+should use the key generation program to generate one KSK and two ZSKs during initial deployment of
+DNSSEC. One ZSK is treated as the active key, and its private part (ZSK-private) will be used for
+signature generation. The other ZSK (ZSK-public) will be made part of DNSKEY RRSet, but its
+associated private part (ZSK-private) will not be used for signing RRsets. This additional ZSK will
+provide a readily available ZSK for immediate rollover in emergency situations such as key compromise
+and a form of advance notification to validating resolvers that this key is to be the one into which the zone
+is going to roll over after the current crypto period expires. The mere presence of the key in the DNSKEY
+RRSet enables validating resolvers to cache and establish trust in the new key so that they can
+immediately use the key for signature verification as soon as rollover occurs.
+
+The recommended digital signature algorithm suite, key sizes, and crypto periods for the KSK and ZSK
+keys are given in Table 9-1 [800-57P1]. As with all data authentication keys, this table assumes approved
+components 11 (hardware or software) and management operations are in place within the organization.
+
+
+
+
+11
+  For example, for US Federal Government use, all cryptographic components must be FIPS 140 approved. See
+http://csrc.nist.gov/groups/STM/cmvp/documents/140-1/140val-all.htm for a current list of approved components.
+
+
+                                                            9-5
+

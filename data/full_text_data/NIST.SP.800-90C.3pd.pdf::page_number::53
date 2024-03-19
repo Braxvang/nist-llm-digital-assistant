@@ -1,0 +1,45 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                         Recommendation for RBG Constructions
+       September 2022
+
+1447           b)   If the consuming application does not require full entropy in the returned bitstring, the
+1448                Get_randomness-source_input call is replaced by:
+1449                                   (status, entropy_bitstring) = Get_ES_Bitstring(3s/2).
+1450           Validated physical and/or non-physical entropy sources shall be used to provide the
+1451           requested entropy. For an RBG2(P) construction, the requested 3s/2 bits of entropy shall
+1452           be counted as specified in Method 1 of Section 2.3. For an RBG2(NP) construction, the
+1453           requested 3s/2 bits of entropy shall be counted as specified in Method 2 of Section 3.3.
+
+1454   5.2.2. Requesting Pseudorandom Bits from an RBG2 Construction
+1455   Pseudorandom bits may be requested using the following call (see Section 2.8.1.2):
+1456    (status, returned_bits) = Generate_function(RBG2_state_handle, requested_number_of_bits,
+1457             requested_security_strength, prediction_resistance_request, additional_input),
+1458   where state_handle (if used) was returned by the Instantiate_function (see Sections 2.8.1.1 and
+1459   5.2.1).
+1460   Support for prediction resistance is optional. If prediction resistance is supported, its use is
+1461   optional. This RBG may be designed to always provide prediction resistance, to only provide
+1462   prediction resistance upon request, or to be unable to provide prediction resistance (i.e., to not
+1463   support prediction-resistance requests during generation).
+1464   Note that when prediction resistance is requested, the Generate_function will invoke the
+1465   Reseed_function. If sufficient entropy is not available for reseeding, an error indication shall be
+1466   returned, and the requested bits shall not be generated.
+
+1467   5.2.3. Reseeding an RBG2 Construction
+1468   As discussed in Section 2.4.2, when the RBG2 construction includes a reseed capability, the
+1469   reseeding of the DRBG may be performed 1) upon request from a consuming application (either
+1470   an explicit request for reseeding or a request for the generation of bits with prediction resistance);
+1471   2) on a fixed schedule based on time, number of outputs, or events; or 3) as sufficient entropy
+1472   becomes available.
+1473   An RBG2 construction is reseeded using the following call:
+1474                    status = Reseed_function(RBG2_state_handle, additional_input),
+1475   where the RBG2_state_handle (when used) was obtained during the instantiation of the RBG (see
+1476   Sections 2.8.1.1 and 5.2.1).
+1477   SP 800-90A uses a Get_randomness-source_input call to obtain the entropy needed for
+1478   reseeding the DRBG (see Section 2.8.1.3 herein and in [SP800-90A]. The DRBG is reseeded at
+1479   the instantiated security strength recorded in the DRBG’s internal state. The Get_randomness-
+1480   source_input call in SP 800-90A shall be replaced with the following:
+1481       1. For the CTR_DRBG without a derivation function, use the appropriate replacement as
+1482          specified in step 1 of Section 5.2.1.
+
+
+                                                         40
+

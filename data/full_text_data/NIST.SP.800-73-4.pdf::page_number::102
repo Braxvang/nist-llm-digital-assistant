@@ -1,0 +1,58 @@
+Special Publication 800-73-4                                     Interfaces for Personal Identity Verification – Part 2:
+                                                                 PIV Card Application Card Command Interface
+
+                                                      128 bit channel strength 192 bit channel strength
+     C ICC signature                                  ECDSA with SHA-256                ECDSA with SHA-384
+                                                      using an ECDSA (Curve             using an ECDSA (Curve
+                                                      P-256) key                        P-384) key
+     C ICC public key                                 ECDH (Curve P-256)                ECDH (Curve P-384)
+     KDF hash                                         SHA-256                           SHA-384
+     Nonce (N ICC )                                   16 bytes                          24 bytes
+
+  4.1.5     Card Verifiable Certificates
+
+Table 15 specifies the format for the secure messaging CVC, C ICC , and Table 16 specifies the format for
+the optional Intermediate CVC.
+
+C ICC is used to authenticate the PIV Card Application. The specific data object tags and specified order
+must be used for both CVCs to allow the CVC processing within authentication protocols. The specific
+data object tags for C ICC and the optional Intermediate CVC are provided in Tables 15 and 16,
+respectively.
+
+The signature of the secure messaging CVC (DigitalSignature object) is calculated over the concatenation
+of the TLV encoded Credential Profile Identifier, Issuer Identification Number, Subject Identifier,
+CardHolderPublicKey Data Object, and Role Identifier, i.e., { '5F29' '01' '80' } || { '42' '08' IIN } || { '5F20'
+'10' GUID } || { '7F49' L1 { { '06' L2 OID } { '86' L3 '04' X Y } } } { '5F4C' '01' '00' }. Before signing the
+CVC the signer shall perform partial public-key validation [SP800-56A, Section 5.6.2.3.2] for the public
+key that will be placed in the Public Key object and shall verify that the PIV Card is in possession of the
+corresponding private key (see [SP800-56A, Section 5.6.2.2.3.2] and [SP800-57, Section 8.1.5.1.1.2] for
+discussions of methods to obtain assurance of private-key possession).
+
+                           Table 15. Secure Messaging Card Verifiable Certificate Format
+Tag        Tag         Tag         Length      Name                            Value
+0x7F21                                         Card Verifiable
+                                               Certificate
+           0x5F29                  1           Credential Profile              0x80
+                                               Identifier
+           0x42                    8           Issuer Identification           The leftmost 8 bytes of the
+                                               Number                          subjectKeyIdentifier in the content
+                                                                               signing certificate needed to verify the
+                                                                               signature on C ICC . 17
+           0x5F20                  16       Subject Identifier                 GUID (Card UUID)
+           0x7F49                  Variable CardHolderPublicKey
+                                            Data Object
+                         0x06      Variable Algorithm OID                      Possible values are:
+                                                                                0x2A8648CE3D030107 for ECDH
+                                                                                   (Curve P-256) or
+                                                                                0x2B81040022 for ECDH (Curve
+
+
+17 If the public key needed to verify the signature on the secure messaging CVC appears in an Intermediate CVC, then the Issuer
+
+Identification Number shall be the value of the Subject Identifier in the Intermediate CVC.
+
+
+
+
+                                                               27
+

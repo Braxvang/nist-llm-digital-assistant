@@ -1,0 +1,54 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                                 •    Encryption and Integrity Protection Algorithms. Since both ends use the same
+                                                                                                      enterprise Linux solution that supports Libreswan running a cryptographic module
+                                                                                                      operating in FIPS mode, IKE and ESP options will be left with their default values. That
+                                                                                                      means that the VPN will start out using AES-GCM with 256-bit keys for IKE and ESP,
+                                                                                                      SHA-256 as the IKE PRF, and DH 14 with PFS. When NIST-approved algorithms
+                                                                                                      change in the future, the Linux enterprise solution will update the Libreswan software,
+                                                                                                      and the configuration on the VPN servers will be automatically updated to use the new,
+                                                                                                      stronger algorithm requirements.
+                                                                                                 •    Packet Filters. To restrict the VPN access to the cloud from the agency’s internal
+                                                                                                      network, only workstations and servers at some specific IP addresses will be allowed to
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      access to the private cloud, such as only two IPv4 networks and one IPv6 network for the
+                                                                                                      developer workstations using 192.168.100.0/24 and the database servers using the IPv4
+                                                                                                      range 192.168.103.0/24 and the IPv6 range 2001:db8:0:2::/64.
+                                                                                                 •    MTU and TCP settings. It is not known exactly how many layers of encapsulations are
+                                                                                                      happening at the cloud provider or at the agency’s internet service provider (ISP). It is
+                                                                                                      known that a digital subscriber line (DSL) service adds at least one encapsulation using
+                                                                                                      PPP at the data link layer. To prevent unnecessary fragmentation and possible flow issues
+                                                                                                      on the database and remote SSH login connections that will use TCP, TCP MSS
+                                                                                                      clamping will be used and the MTU for packets across the VPN will be slightly reduced.
+
+                                                                                              9.3.3   Implementing a Prototype
+
+                                                                                              A new virtual machine instance is requested from the cloud provider. The cloud security policy
+                                                                                              is updated to temporarily allow SSH connections from port 2222 of the public IP to reach the
+                                                                                              SSH port 22 on the new VPN virtual machine. An administrative SSH public key is configured
+                                                                                              to be allowed to log in to the server, and password-based SSH logins are disabled. Using SSH to
+                                                                                              remotely log in, the virtual machine is configured as a VPN gateway. The configuration options
+                                                                                              of Libreswan use the terms left and right. The left side of the diagram is the virtual machine
+                                                                                              VPN, and the administrator uses left* options to refer to it. Similarly, the agency’s office VPN is
+                                                                                              on the right side of the diagram and denoted by right.
+
+                                                                                              9.3.3.1 Configuring the VPN gateways
+
+                                                                                              The cloud instance and the office gateway are prepared to run Libreswan by:
+
+                                                                                                 •    Updating the operating system: yum update
+                                                                                                 •    Installing Libreswan: yum install libreswan
+                                                                                                 •    Initializing Libreswan’s NSS database: ipsec initnss
+                                                                                                 •    Generating a new host key: ipsec newhostkey --output
+                                                                                                      /etc/ipsec.d/hostkey.secrets
+
+
+
+
+                                                                                                                                              113
+

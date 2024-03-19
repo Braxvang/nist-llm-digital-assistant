@@ -1,0 +1,44 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+       a. The security_strength of the DRBG instantiation.
+       b. A prediction_resistance_flag that indicates whether or not a prediction resistance
+          capability is required for the DRBG instantiation.
+The values of V and Key are the critical values of the internal state upon which the security of
+this DRBG mechanism depends (i.e., V and Key are the “secret values” of the internal state).
+10.2.1.2     The Update Function (CTR_DRBG_Update)
+
+The CTR_DRBG_Update function updates the internal state of the CTR_DRBG using the
+provided_data. The values for blocklen, keylen and seedlen are provided in Table 3 of Section
+10.2.1. The value of ctr_len is known by an implementation. The block cipher operation in step
+2.2 of the CTR_DRBG_UPDATE process uses the selected block cipher algorithm. The
+specification of Block_Encrypt is discussed in Section 10.3.3.
+The following or an equivalent process shall be used as the CTR_DRBG_Update function.
+   CTR_DRBG_Update (provided_data, Key, V):
+       1. provided_data: The data to be used. This must be exactly seedlen bits in length; this
+          length is guaranteed by the construction of the provided_data in the instantiate,
+          reseed and generate functions.
+       2. Key: The current value of Key.
+       3. V: The current value of V.
+   Output:
+       1. K: The new value for Key.
+       2. V: The new value for V.
+   CTR_DRBG_Update Process:
+       1. temp = Null.
+       2. While (len (temp) < seedlen) do
+           2.1   If ctr_len < blocklen
+                    2.1.1 inc = (rightmost (V, ctr_len) + 1) mod 2ctr_len.
+                    2.1.2 V = leftmost (V, blocklen-ctr_len) || inc.
+                 Else V = (V+1) mod 2blocklen.
+           2.2   output_block = Block_Encrypt (Key, V).
+           2.3   temp = temp || output_block.
+       3. temp = leftmost (temp, seedlen).
+       4   temp = temp ⊕ provided_data.
+       5. Key = leftmost (temp, keylen).
+       6. V = rightmost (temp, blocklen).
+
+
+
+                                                 51
+

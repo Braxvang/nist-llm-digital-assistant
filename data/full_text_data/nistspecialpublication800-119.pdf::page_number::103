@@ -1,0 +1,54 @@
+                                                                  GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+5.      IPv6 Security Advanced Topics
+
+This chapter covers four additional security topics that are new or different with IPv6. The first two
+topics are privacy addresses and cryptographically generated addresses, which become feasible because
+of the enormous size of the IPv6 address space. IPsec is the third security topic; new developments and
+certain aspects specific to IPv6 are covered here. The fourth topic is security for neighbor discovery
+(ND), which uses ICMPv6 on the local link. The two distinct approaches to security for ND are
+described and compared.
+
+5.1     Privacy Addresses
+
+IPv6 offers a number of different addressing options that can assist security architectures. Privacy
+addresses can be used by client applications to inhibit user tracking, which may be useful for protecting
+external communications. This section defines and discusses privacy addressing in IPv6, differences
+between the IPv6 and IPv4 standards, and their security ramifications.
+
+According to RFC 4291, interfaces using stateless address autoconfiguration generate interface identifiers
+based on their IEEE EUI-64 identifiers. This provides strong support for uniqueness, but it allows an
+interface to be tracked, even if it moves from one network to another, or the network prefix is changed.
+
+Consider, for example, a mobile device that connects to different wireless networks from different
+locations. Using IPv4, the device is likely to use DHCP in the different locations and receive completely
+uncorrelated addresses. If it used IPv6 autoconfiguration, its wireless interface’s address would have the
+same interface identifier in each instance. Moreover, the IEEE EUI-64 interface ID, because it is based
+on the hardware MAC address, might reveal what type of device it is.
+
+An interface that accepts inbound connections and has a DNS name clearly cannot have a private address,
+but it is still possible to use different addresses for outbound connections. RFC 4941, Privacy Extensions
+for Stateless Address Autoconfiguration in IPv6, defines a way to generate and change such temporary
+addresses. The important requirements are that the sequence of temporary addresses an interface chooses
+must be totally unpredictable and have low probability of colliding with choices made by other interfaces.
+
+The method recommended in RFC 4941 works approximately as follows:
+
+      1. Obtain the interface identifier that would be used without this scheme.
+      2. Apply a cryptographic hash function to this value and either a saved history value or a randomly
+         chosen 64-bit number.
+      3. Use the output of the hash function to select the interface identifier and to update the history
+         value.
+      4. Run Duplicate Address Detection (DAD).
+      5. Set the appropriate lifetimes and join the solicited node multicast group corresponding to the
+         interface identifier.
+      6. Continue to use prior interface identifiers for ongoing connections but not for new ones.
+      7. Repeat this process whenever one connects to a new network or the timers set during the previous
+         iteration expire.
+
+
+
+
+                                                      5-1
+

@@ -1,0 +1,56 @@
+                                                                                               NIST SP 800-177 REV. 1                                                         TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               5.2.6   Comparing DANE and MTA-STS
+
+                                                                                               Both DANE and MTA-STS were designed to assist opportunistic encryption and combat passive
+                                                                                               monitoring of SMTP connections. Receiving domains can support both if desired, to support all
+                                                                                               clients. Senders can implement both as well, as the current MTA-STS spec states that DANE
+                                                                                               DNSSEC responses take precedence. The basic merits of both are summarized in the table
+                                                                                               below:
+                                                                                                                             Table 5-3: Comparing DANE and MTA-STS
+
+                                                                                                           Feature                           DANE                           MTA-STS
+                                                                                                DNS RRType used                           TLSA RRs                          TXT RRs
+                                                                                                Client Requirements                        DNSSEC                            HTTPS
+                                                                                                CA scoping?                                   Yes                              No
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                                PKIX required?                             No always                           Yes
+                                                                                                Self-Signed certificates            Yes (when using CU=3)                      No
+                                                                                                acceptable?
+                                                                                                Failure reporting to receiver?                No                               Yes
+                                                                                                Client behavior on failure             Close connection                Depends on policy
+
+
+                                                                                               Security Recommendation 5-3: Receiving domains should implement protocols to signal
+                                                                                               TLS usage to clients. Receivers should implement DANE, MTA-STS (or both) for all mail
+                                                                                               servers listed in the domain’s MX Resource Record set.
+
+                                                                                               Security Recommendation 5-4: As federal agency use requires certiﬁcate chain
+                                                                                               authentication against a known CA, Certiﬁcate Usage DANE-TA(2) is recommended when
+                                                                                               deploying DANE to specify the CA that the agency has chosen to employ. Agencies should also
+                                                                                               publish a DANE-EE(3) RR alongside the DANE-TA(2) RR for increased reliability. In both
+                                                                                               cases the TLSA record should use a selector of SPKI(1) and a Matching ﬁeld type of SHA2-
+                                                                                               256(1), for parameter values of “3 1 1” and “2 1 1” respectively.
+
+                                                                                               5.2.7   Reporting TLS Errors to Senders
+
+                                                                                               Currently, there is no way for an MTA to report TLS failures to a receiving domain. If a sending
+                                                                                               MTA cannot establish a TLS protected connection, there is no automated signaling to the
+                                                                                               receiver as to the nature of the failure, only the receiver’s own logs. Previously, most MTAs
+                                                                                               would simply continue to connect without TLS and deliver the mail. However, with options
+                                                                                               such as MTA-STS (Section 5.2.5) or REQUIRETLS (Section 5.2.3), TLS errors will cause more
+                                                                                               failures in delivery.
+
+                                                                                               There is a way to have a standard way to report TLS failures back to receivers known as SMTP
+                                                                                               TLS Reporting [RFC8460]. The concept is similar to DMARC (see Section 4.6) where receivers
+                                                                                               send failure reports back to senders, only here senders send the failure report. The specification
+
+                                                                                                                                               69
+

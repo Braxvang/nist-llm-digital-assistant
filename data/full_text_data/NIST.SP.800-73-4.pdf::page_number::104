@@ -1,0 +1,55 @@
+Special Publication 800-73-4                                Interfaces for Personal Identity Verification – Part 2:
+                                                            PIV Card Application Card Command Interface
+
+Tag        Tag       Tag        Length      Name                    Value
+                                                                   are the coordinates of the point on the curve.
+                                                                   See the “Value” column of Table 13.
+           0x5F4C               1        Role Identifier            0x12 for card-application root CVC
+           0x5F37               Variable DigitalSignature           DigitalSignature ::= SEQUENCE {
+                                         object                         signatureAlgorithm     AlgorithmIdentifier,
+                                                                        signatureValue         BIT STRING
+                                                                    }
+                                                                    AlgorithmIdentifier ::= SEQUENCE {
+                                                                      algorithm    OBJECT IDENTIFIER,
+                                                                      parameters ANY DEFINED BY
+                                                                                    algorithm OPTIONAL
+                                                                    }
+                                                                    algorithm is 1.2.840.113549.1.1.11 for RSA
+                                                                    with SHA-256 and PKCS #1 v1.5 padding.
+                                                                    The parameters field shall be NULL.
+
+
+The signature of the Intermediate CVC (DigitalSignature object) is calculated over the concatenation of
+the TLV encoded Credential Profile Identifier, Issuer Identification Number, Subject Identifier,
+PublicKey Data Object, and Role Identifier, i.e., { '5F29' '01' '80' } || { '42' '08' IIN } || { '5F20' '08' SI } ||
+{ '7F49' L1 { { '06' L2 OID } { '86' L3 '04' X Y } } } { '5F4C' '01' '12' }. Before signing the CVC the
+signer shall perform partial public-key validation [SP800-56A, Section 5.6.2.3.2] for the public key that
+will be placed in the Public Key object and shall verify that the subject is in possession of the
+corresponding private key (see [SP800-56A, Section 5.6.2.2.3.2] and [SP800-57, Section 8.1.5.1.1.2] for
+discussions of methods to obtain assurance of private-key possession).
+
+  4.1.6 Key Derivation
+The session keys shall be derived in Steps C7 and H10 of the protocol using the key derivation function
+from [SP800-56A, Section 5.8.1], with the auxiliary function H being the hash function specified as the
+KDF hash in Table 14, the length of the keying material to be derived (len) being 512 bits for CS2 and
+1024 bits for CS7, and OtherInfo being constructed using the concatenation format as show below:
+
+Cipher                                                       OtherInfo
+Suite ID
+CS2         0x04 || 0x09 || 0x09 || 0x09 || 0x09 || 0x08 || ID sH || 0x01 || CB H || 0x10 || T 16 (Q eH ) || 0x08 ||
+            ID sICC || 0x10 || N ICC || 0x01 || CB ICC
+CS7         0x04 || 0x0D || 0x0D || 0x0D || 0x0D || 0x08 || ID sH || 0x01 || CB H || 0x10 || T 16 (Q eH ) || 0x08 ||
+            ID sICC || 0x18 || N ICC || 0x01 || CB ICC
+
+For Q eH , the coordinates of the ephemeral public key are converted from field elements to byte strings as
+specified in [SP800-56A, Appendix C.2], Field-Element-to-Byte String Conversion, and concatenated
+(with x first) to form a single byte string. The first 16 bytes from this byte string are included in
+OtherInfo.
+
+  4.1.7 Key Confirmation
+Key confirmation shall be performed in Steps C9 and H12 of the protocol in accordance with Sections
+5.9.1.1 and 6.2.2.3 of [SP800-56A] by the generation of AuthCryptogram ICC . AuthCryptogram ICC shall be
+
+
+                                                           29
+

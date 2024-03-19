@@ -1,0 +1,54 @@
+NIST SP 800-58                                             Voice Over IP Security
+    _________________________________________________________________________
+
+       implementation would need to leave 10,000 UDP ports and several H.323 specific
+       TCP ports wide open [sample configuration provided in 1]. There is thus a need
+       for a stateful firewall that understands VOIP, specifically H.323. Such a firewall
+       can read H.323 messages and dynamically open the correct ports for each channel
+       as the protocol moves through its call setup process. Such a firewall must be part
+       of a security architecture especially in scenarios where protocol–provided security
+       measures are applied, e.g. message integrity. Barring this, some kind of proxy
+       server or middlebox would have to be used. Several solutions to this problem are
+       presented in chapter 6.
+
+       Even with a VOIP-aware firewall, parsing H.323 traffic is not a trivial matter.
+       H.323 traffic is encoded in a binary format based on ASN.1. ASN.1 does not use
+       fixed offsets for address information, and different instances of an application
+       may negotiate different options, resulting in different byte offsets for the same
+       information [21]. This level of complexity does not allow for simple parsing tools
+       or uncomplicated Perl scripts to decode the traffic; in fact special code generators
+       are needed [18]. Such technology is not available on traditional packet filtering
+       firewalls or even simple stateful firewalls. Although this analysis can be done
+       using modern VOIP-aware gateways, the complex parsing necessary to discern
+       the contents of the ASN.1 encoded packets introduces further latency into a
+       speed-sensitive system that is already saturated with delays.
+
+       NAT is also particularly troublesome for VOIP systems using the H.323 call setup
+       protocol. NAT complicates H.323 communications because the internal IP
+       address and port specified in the H.323 headers and messages themselves are not
+       the actual address/port numbers used externally by a remote terminal. This
+       disrupts the “setup next” procedure used by each protocol within the H.323 suite
+       (e.g., H.225 setting up H.245). Not only does the firewall have to comprehend
+       this, but it is essential that the VOIP application receiving these H.323
+       communications receives the correct translated address/port numbers. Thus, if
+       H.323 is to traverse a NAT gateway, the NAT device must be able to reconfigure
+       the addresses in the control stream. So with NAT, not only does H.323 traffic
+       need to be read, it must also be modified so that the correct address/port numbers
+       are sent to each of the endpoints.
+
+ 4.3   Encryption Issues and Performance
+
+       Delay in a VOIP system can be added by codecs and by addtional processing such
+       as encryption. Codecs add delay in coding and compressing speech data.
+       Processing time increases with the degree of compression, because larger blocks
+       of speech data are needed to produce higher degrees of compression.
+
+       Encryption serves two purposes for VOIP: privacy protection, by encrypting
+       voice data, and message authentication, which protects the origin and integrity of
+       voice packets. Encryption may be done using either a stream or block cipher. If
+       a stream cipher is used, very little delay is introduced if the key stream can be
+       produced before or at least as fast as voice data arrives. In this case there will be
+
+
+                                                                                           37
+

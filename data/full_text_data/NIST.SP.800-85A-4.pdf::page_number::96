@@ -1,0 +1,56 @@
+NIST SP 800-85A-4                                         PIV CARD APPLICATION & MIDDLEWARE
+                                                                   INTERFACE TEST GUIDELINES
+
+                          •   (OUT) algorithmOutput
+                          •   (INOUT) outputLength
+ Expected Result(s)    Call returns with status_word of PIV_INPUT_BYTES_MALFORMED.
+ Postcondition(s)      1. The PIV Card Application returns to the state it had prior to the
+                           pivCrypt function call.
+                       2. The precondition states are unaffected.
+
+
+B.9.2.5         Security Conditions are Enforced
+ Purpose                Verify that Internal Authenticate is performed with enforced security
+                        conditions with/without logging into (PIN VERIFY) the PIV Card
+                        Application (see Table 4, Part 1 and Table 2, Part 2 (GENERAL
+                        AUTHENTICATE) security condition requirements).
+ Target                pivCrypt
+ Reference(s)          1. SP 800-73-4 Part 3, Section 3.3.1
+                       2. AS04.08
+ Precondition(s)       1. The client application owns a connection to the PIV Card
+                          Application accessible through cardHandle.
+                       2. The client application has successfully executed the
+                          pivSelectCardApplication command.
+                       3. The client is not logged into the PIV Card Application.
+ Test Steps            1. Set cardHandle := <<valid cardHandle>>
+                       2. Set keyReference := <<'9A'>>
+                       3. Set algorithmIdentifier := <<'07' or '11'>>
+                       4. Set algorithmInput : = <<Use the Dynamic Authentication
+                          Template format (Table 7 of SP 800-73-4 Part 2) to encode
+                          a challenge to be sent to the card>>
+                       5. Create algorithmOutput reference
+                       6. Call pivCrypt with
+                          • (IN) cardHandle
+                          • (IN) algorithmIdentifier
+                          • (IN) keyReference
+                          • (IN) algorithmInput
+                          • (IN) inputLength
+                          • (OUT) algorithmOutput
+                          • (INOUT) outputLength
+                       7. Repeat steps 1 – 6 but with the '9E' key reference (Card
+                          Authentication key) and algorithmIdentifier := <<'00',
+                          '03', '07', '08', '0A', '0C' or '11'>>
+                       8. Repeat steps 1 – 6, but with the '9C' key reference
+                          (digital signature key) and algorithmIdentifier <<'07',
+                          '11' or '14'>>
+                       9. Repeat steps 1 – 6, but with the '9D' key reference (key
+                          management key) and algorithmIdentifier << '07', '11' or
+                          '14'>>
+ Expected Result(s)    1. Step 7 call returns with status_word of PIV_OK with the
+                          algorithmOutput carrying the encrypted challenge from the card.
+
+
+
+
+                                       B-30
+

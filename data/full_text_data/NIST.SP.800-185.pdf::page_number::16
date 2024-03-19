@@ -1,0 +1,60 @@
+                                                                                             NIST SP 800-185                                                              SHA-3 DERIVED FUNCTIONS: CSHAKE,
+                                                                                                                                                                         KMAC, TUPLEHASH, AND PARALLELHASH
+
+                                                                                             4         KMAC
+
+                                                                                             4.1       Overview
+
+                                                                                             The KECCAK Message Authentication Code (KMAC) algorithm is a PRF and keyed hash
+                                                                                             function based on KECCAK. It provides variable-length output, and unlike SHAKE and cSHAKE,
+                                                                                             altering the requested output length generates a new, unrelated output. KMAC has two variants,
+                                                                                             KMAC128 and KMAC256, built from cSHAKE128 and cSHAKE256, respectively. The two
+                                                                                             variants differ somewhat in their technical security properties. Nonetheless, for most
+                                                                                             applications, both variants can support any security strength up to 256 bits of security, provided
+                                                                                             that a long enough key is used, as discussed in Sec. 8.4.1.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-185
+
+
+
+
+                                                                                             4.2       Parameters
+
+                                                                                             Both KMAC functions take the following parameters:
+
+                                                                                                   •    K is a key bit string of any length 7, including zero.
+                                                                                                   •    X is the main input bit string. It may be of any length, including zero.
+                                                                                                   •    L is an integer representing the requested output length 8 in bits.
+                                                                                                   •    S is an optional customization bit string of any length, including zero. If no customization
+                                                                                                        is desired, S is set to the empty string.
+
+                                                                                             4.3       Definition
+
+                                                                                             KMAC concatenates a padded version of the key K with the input X and an encoding of the
+                                                                                             requested output length L. The result is then passed to cSHAKE, along with the requested output
+                                                                                             length L, the name N ="KMAC" = 11010010 10110010 10000010 11000010 9, and the
+                                                                                             optional customization string S.
+
+                                                                                             KMAC128(K, X, L, S):
+                                                                                             Validity Conditions: len(K) < 22040 and 0 ≤ L < 22040 and len(S) < 22040
+
+                                                                                             1. newX = bytepad(encode_string(K), 168) || X || right_encode(L).
+                                                                                             2. return cSHAKE128(newX, L, “KMAC”, S).
+
+
+
+
+                                                                                             7
+                                                                                                 Approved uses of KMAC require the length of K to be at least the required security strength, as discussed in Sec.
+                                                                                                 8.4.1.
+
+                                                                                             8
+                                                                                                 Note that there is a limit of 22040−1 bits of output from this function unless the function is used as a XOF, as
+                                                                                                 discussed in Sec. 4.3.1.
+                                                                                             9
+                                                                                                 Note that in binary representation, bytes are written with the low-order bit first in this document, as specified in
+                                                                                                 Sec. 2.
+
+
+
+                                                                                                                                                        10
+

@@ -1,0 +1,42 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                        Recommendation for RBG Constructions
+       September 2022
+
+2400       •   Since the DRBG is not directly accessible, there is no need for a separate instantiation, so
+2401           there is also no need for the return of a state handle.
+2402       •   The personalization string for the DRBG is “RBG3(XOR).”
+2403   The RBG3(XOR)_DRBG_Instantiate function                 in   Section    6.2.1.1   uses   a   DRBG
+2404   Instantiate_function to seed the Hash_DRBG:
+2405               (status) = Instantiate_function(256, prediction_resistance_flag = FALSE,
+2406                                        personalization_string).
+2407       •   Since the DRBG is not directly accessible, there is no need for a separate instantiation, so
+2408           there is also no need for the return of a state handle.
+2409       •   The DRBG is instantiated at a security strength of 256 bits.
+2410       •   The DRBG is notified that prediction resistance is not required using
+2411           prediction_resistance_flag = FALSE. Since the DRBG will not be accessed directly,
+2412           prediction_resistance will never be requested. Optionally, the implementation could omit
+2413           this parameter.
+2414       •   The personalization string for the DRBG is “RBG3(XOR).” It was provided in the
+2415           RBG3(XOR)_DRBG_Instantiate call.
+2416   Section 6.2.1.1 refers to Section 5.2.1 for further information on instantiating the DRBG.
+2417   The entropy for establishing the security strength (s) of the Hash_DRBG (i.e., where s = 256 bits)
+2418   is requested using the following Get_ES_Bitstring call:
+2419                           (status, entropy_bitstring) = Get_ES_Bitstring(384),
+2420   where 3s/2 = 384 bits of entropy are requested from the entropy source.
+2421   If status = SUCCESS is returned from the Get_ES_Bitstring call, the Hash_DRBG is seeded
+2422   using the entropy_ bitstring and the personalization_string (“RBG3(XOR)”). The internal state is
+2423   recorded (including the 256-bit security strength of the instantiation), and status = SUCCESS is
+2424   returned to the consuming application by the Instantiate_function. The RBG can be used to
+2425   generate full-entropy bits.
+2426   If status = FAILURE is returned from the Get_ES_Bitstring call, status = FAILURE and a Null
+2427   state handle are returned to the consuming application from the Instantiate_function. `The
+2428   Hash_DRBG’s internal state is not established, and the RBG cannot be used to generate bits.
+
+2429   B.5.2. Generation by an RBG3(XOR) Construction
+2430   Assuming that the Hash_DRBG has been instantiated (see Appendix B.4.1), the RBG can be called
+2431   by a consuming application to generate output with full entropy.
+
+
+
+
+                                                        72
+

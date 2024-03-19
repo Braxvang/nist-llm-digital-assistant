@@ -1,0 +1,55 @@
+                                                                                               NIST SP 800-56B REV. 2                          RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                    USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                               and recipient, respectively. The successful completion of the key-confirmation process provides
+                                                                                               party V with a) assurance that party U has derived the same secret Z value, and b) assurance that
+                                                                                               party U has actively participated in the process.
+
+                                                                                                             Party U                                                         Party V
+
+                                                                                                       (PubKeyU, PrivKeyU)                                            (PubKeyV, PrivKeyV)
+
+                                                                                                    Obtain party V’s public key-          PubKeyV
+                                                                                                        establishment key                ←   
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                                                                          PubKeyU                  Obtain party U’s public key-
+                                                                                                                                            →                       establishment key
+
+                                                                                                          (ZU, CU) =                      CU                ZU =    RSASVE.RECOVER(PrivKeyV,
+                                                                                                  RSASVE.GENERATE(PubKeyV)              →                             CU)
+
+                                                                                                            ZV =                          CV                          (ZV, CV) =
+                                                                                                 RSASVE.RECOVER(PrivKeyU, CV)           ←                RSASVE.GENERATE(PubKeyU)
+
+                                                                                                            Z = ZU ZV                                                    Z = ZU ZV
+
+                                                                                                 Compute DerivedKeyingMaterial =                             Compute DerivedKeyingMaterial =
+                                                                                                 MacKey || KeyData and destroy Z                             MacKey || KeyData and destroy Z
+
+                                                                                                             MacTagU =                    MacTagU                        MacTagU =?
+                                                                                                TMacTagBits[MAC(MacKey, MacDataU)]        →             TMacTagBits[MAC(MacKey, MacDataU)]
+
+                                                                                                       Figure 10: KAS2-Party_U-confirmation Scheme (from Party U to Party V)
+                                                                                               Each party first performs the appropriate steps of the KAS2-basic scheme as described in Section
+                                                                                               8.3.2.
+                                                                                               To provide (and receive) key confirmation (as described in Section 5.6.1), both parties set
+                                                                                               EphemDataV = CV, and EphemDataU = CU.
+                                                                                               Party U provides MacTagU to party V (as specified in Section 5.6.1, with P = U and R = V), where
+                                                                                               MacTagU is computed (as specified in Section 5.2.1) on
+                                                                                                              MacDataU = “KC_1_U” || IDU || IDV || CU || CV{ || TextU}.
+                                                                                               Party V (the KC recipient) uses the identical format and values to compute
+                                                                                               TMacTagBits[MAC(MacKey, MacDataU)] and then verify that it matches the MacTagU value provided
+                                                                                               by party U.
+                                                                                               The MAC key used during key confirmation shall be destroyed by party U immediately after the
+                                                                                               computation of MacTagU, and by party V immediately after the verification of the received
+                                                                                               MacTagU or a (final) determination that the received MacTagU is in error.
+                                                                                               Note that CV may be sent before CU, in which case CU and MacTagU may be sent together.
+
+
+                                                                                                                                              85
+

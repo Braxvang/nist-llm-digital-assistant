@@ -1,0 +1,58 @@
+                                                         SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+Since this is the public key, no new security risks are introduced. However, the basic security
+recommendations for configuration files (see Section 8) should be followed. The risk is an attacker may
+be able to change the key material to point to a key that the attacker controls. However, this would
+involve other successful attacks (such as redirecting queries as well) to be fully effective, so it is not
+considered a high risk.
+
+
+Checklist item 51 : Validator administrator must configure one or more trust anchors for each validator
+in the enterprise.
+
+
+
+13.3 Maintaining Trust Anchors
+
+Once the trust anchors are initially configured, the administrator must set up a means to monitor that the
+key is still in use for the give zone, and perform updates as required. Often, zone administrators will
+perform key rollovers (see Section 11.2) on keys that some clients use as trust anchors. Since there is no
+means in DNS for servers to contact clients to inform them their trust anchors are out of date, clients must
+perform their own checks to insure they have an up-to-date list of trust anchors.
+
+The IETF has specified a way for signed zones to signal that a key rollover is underway so clients that
+have the current zone key can successfully migrate to the new key. This method is specified in RFC 5011
+[RFC5011], and some DNSSEC validators that implement this specification can rollover trust anchors in
+an automated fashion.
+
+Validator administrators should be cogent that not every zone uses the rollover method specified in RFC
+5011, and not every implementation can perform automated trust anchor rollovers so regular polling
+should be done to insure that the validator has the most current key installed as a trust anchor. This could
+be done via a normal query for the DNSKEY RRset and look for a new key, or by regularly checking the
+same method the original key was obtained. For example, the DNS root zone key is maintained on
+website 15 that can be routinely checked (manually or via an automated script) for updates.
+
+How often these checks need to be performed is difficult to determine, but some hints may be found the
+TTL and RRSIG validity period of the DNSKEY RRset that contains the key used as the trust anchor.
+Using these values and understanding the timed steps of a key rollover (See section 11.2), a validator
+administrator can calculate the minimum time between checks.
+
+If a key rollover is detected as in progress, or a new key is anounced, validator administrators should
+update the validator configuration file with the new key material. This process may be similar to the
+initial configuration or different, depending on the software used as the validator.
+
+
+Checklist item 52: The validator administrator regularly checks each trust anchor to ensure that it is still
+in use, and updates the trust anchor as necessary.
+
+
+
+
+15
+     https://www.iana.org/dnssec
+
+
+                                                   13-23
+

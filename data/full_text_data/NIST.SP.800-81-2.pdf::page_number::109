@@ -1,0 +1,59 @@
+                                                          SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+11.7.2 Deploying DNSSEC in the Ideal Solution Scenario
+
+In the ideal case (i.e., separate internal zone), DNSSEC deployment can be done independently on both
+the internal and external zones. The external zone can be signed and have a secure delegation from its
+parent zone. The internal zone can be signed using a different set of DNSSEC keys (with the name of the
+internal zone) but does not necessary need a signed delegation from its parent zone (which may not exist).
+It would be sufficient to simply have the internal public key installed as a trust anchor in all the validators
+of the organization. This would be similar to managing any other security credentials for the
+organization.
+
+Since the zones are independent, they can be managed independently. This means that the internal and
+external zones can have different key rollover schedules if needed. However, as this can complicate
+operations, it is recommended that the internal and external zones maintain the same rollover schedules to
+ease operations.
+
+11.7.3 Usual Solution: Same Zone Name with Different Files
+
+In many already existing deployments, it is not possible to create a new subzone or new zone name for
+internal use. There may be pre-established applications or too many users to make such a transition. In
+these cases, the DNS administrator for the zone can still deploy DNSSEC on the external and internal
+zone views, but must take steps in key management to prevent DNSSEC validation failures for internal
+clients and information leakage to external attackers.
+
+In this scenario, the zone and server configuration should be similar to the following. In the external
+zone:
+
+    •   Zone configuration: Similar to the previous scenario. The external zone file (or view) contains
+        only externally accessible hosts such as web, mail and other servers.
+
+    •   Server configuration: The server either has only the external zone file, or has the zone configured
+        as a separate view that is accessible from the entire Internet.
+
+Internal zone:
+
+    •   Zone configuration: Again, similar to the previous scenario. The internal zone file (or view)
+        contains only internal hosts and any internally accessible interfaces to external hosts.
+
+    •   Server configuration: The server either has only the internal zone (or view) or has a separate
+        view with an ACL restricting queries to only internal hosts.
+
+11.7.4 Deploying DNSSEC in the Usual Solution Scenario
+
+DNS administrators need to take some precautions when deploying DNSSEC in this scenario. The
+administrator can choose to use the same key DNSSEC signing keys for both the internal and external
+zones, or choose to use separate keys for both zone files. Either choice has its advantages and drawbacks
+to consider.
+
+If the same key is used for both the internal and external views, the management of they keys are
+simplified (there is only one set). However, it is easier for an attacker, or mis-configured recursive server
+to send back name error messages to internal client queries for valid internal hosts. If this happens, a
+client will receive a valid error message for a host that exists, which will result in a denial of service.
+
+
+                                                    11-11
+

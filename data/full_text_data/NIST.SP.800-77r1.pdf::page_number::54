@@ -1,0 +1,60 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                     GUIDE TO IPSEC VPNS
+
+
+                                                                                              4.1.1     Tunnel Mode and Transport Mode
+
+                                                                                              ESP has two modes: transport and tunnel. In tunnel mode (see Figure 7), a new packet is
+                                                                                              constructed containing the (original) IP packet being sent through the tunnel by: 1) placing an
+                                                                                              ESP header and trailer around the original IP header and its payload; 2) encrypting the original
+                                                                                              header, payload, and ESP trailer; 3) computing an integrity check value (ICV) over the ESP
+                                                                                              header and the encrypted data; 4) placing the ICV at the end of the packet being constructed; and
+                                                                                              5) adding a new IP header to the beginning of the packet. The ICV computation does not include
+                                                                                              the new IP header.
+
+                                                                                              The new IP header lists the endpoints of the ESP tunnel (such as two IPsec gateways) as the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              source and destination of the packet and contains the entire, now-encrypted, original packet as its
+                                                                                              payload. Because of this, tunnel mode can be used with all VPN architectures described in
+                                                                                              Section 2.4. As shown in Figure 7, tunnel mode can encrypt and protect the integrity of both the
+                                                                                              data and the original IP header for each packet. Encrypting the original IP header and its payload
+                                                                                              protects their confidentiality; encrypting the original IP header conceals the nature of the
+                                                                                              communications, such as the actual source or destination of the packet, protocol, and ports used
+                                                                                              that would indicate which application is likely being used. The ICV is used to detect any changes
+                                                                                              to the data over which the ICV is computed.
+
+                                                                                               New IP     ESP Header          Original IP        Original IP data containing   ESP Trailer     ESP Integrity
+                                                                                               Header                         Header             Transport and Application     (ESP padding,   Check Value -
+                                                                                                                                                 Protocol Headers and Data     Next Header)    ICV (variable)
+                                                                                                                                                 (optional TFC padding)
+                                                                                                                              Encrypted
+                                                                                                          Authenticated (Integrity Protection)
+
+                                                                                                                                      Figure 7: ESP Tunnel Mode Packet
+
+                                                                                              ESP tunnel mode is used for gateway-to-gateway deployments, remote access VPNs, and various
+                                                                                              network virtualization deployments. It is also required when the IPsec connection needs to
+                                                                                              traverse a NAT, which rewrites the outer IP address.
+
+                                                                                              ESP transport mode is often used for host-to-host deployments within data centers, local
+                                                                                              networks, and virtual machines where no NAT is deployed. In transport mode (see Figure 8),
+                                                                                              ESP uses the original IP header instead of creating a new one. The ESP payload and trailer are
+                                                                                              encrypted, and an ICV is computed over the ESP header and the encrypted data. Integrity
+                                                                                              protection is not provided for the IP header. The overhead of the transport mode is less than that
+                                                                                              of the tunnel mode because it does not have to create an entire new IP header.
+
+                                                                                              Transport mode is incompatible with NAT. For example, in each TCP packet, the TCP checksum
+                                                                                              is calculated on both the TCP and IP fields, including the source and destination addresses in the
+                                                                                              IP header. If NAT is being used, one or both of the IP addresses are altered, so NAT needs to
+                                                                                              recalculate the TCP checksum. If ESP is encrypting packets, the TCP header is encrypted; NAT
+                                                                                              cannot recalculate the checksum, so NAT fails. This is not an issue in tunnel mode; because the
+                                                                                              entire TCP packet is hidden, NAT will not attempt to recalculate the TCP checksum of the inner
+                                                                                              encrypted packet, only of the outer IP address which is not part of the ESP encryption. However,
+
+
+
+                                                                                                                                                      37
+

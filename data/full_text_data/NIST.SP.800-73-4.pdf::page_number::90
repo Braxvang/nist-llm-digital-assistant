@@ -1,0 +1,60 @@
+Special Publication 800-73-4                                      Interfaces for Personal Identity Verification – Part 2:
+                                                                  PIV Card Application Card Command Interface
+
+word '6A 80'. If the authentication data in the command data field does not match the current value of the
+reference data, but both the authentication data and the new reference data in the command data field of
+the command satisfy the criteria in Section 2.4.3, the PIV Card Application shall return status word
+'63 CX'. If status word '6A 80' is returned, the security status and retry counter associated with the key
+reference shall remain unchanged. 9 If status word '63 CX' is returned, the security status of the key
+reference shall be set to FALSE and the retry counter associated with the key reference shall be
+decremented by one.
+
+If the card command succeeds, then the security status of the key reference shall be set to TRUE and the
+retry counter associated with the key reference shall be set to the reset retry value associated with the key
+reference.
+
+The initial value of the retry counter and the reset retry value associated with the key reference, i.e., the
+number of successive failures (retries) before the retry counter associated with the key reference reaches
+zero, are issuer dependent.
+
+Command Syntax
+
+          CLA                     '00' or '0C' for secure messaging
+          INS                     '24'
+          P1                      '00'
+          P2                      '00' (Global PIN), '80' (PIV Card Application PIN), or '81' (PUK)
+          Lc                      '10'
+                                  Current PIN authentication data concatenated without delimitation
+          Data Field              with the new PIN reference data, both PINs as described in Section
+                                  2.4.3
+          Le                      Absent
+
+
+Response Syntax
+
+           SW1          SW2                                          Meaning
+                                  Reference data change failed, X indicates the number of further
+               '63'     'CX'
+                                  allowed retries or resets
+               '69'     '82'      Security status not satisfied
+               '69'     '83'      Reference data change operation blocked
+            '6A'        '80'      Incorrect parameter in command data field
+            '6A'        '81'      Function not supported
+            '6A'        '88'      Key reference not found
+               '90'     '00'      Successful execution
+
+
+  3.2.3     RESET RETRY COUNTER Card Command
+
+The RESET RETRY COUNTER card command resets the retry counter of the PIN to its initial value and
+changes the reference data. The command enables recovery of the PIV Card Application PIN in the case
+that the cardholder has forgotten the PIV Card Application PIN.
+
+
+9 It is recommended that in this case the authentication data not be compared to the on-card reference data.
+
+
+
+
+                                                                15
+

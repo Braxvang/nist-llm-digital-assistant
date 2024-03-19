@@ -1,0 +1,59 @@
+NIST SP 800-166                                                   DERIVED PIV APPLICATION AND
+                                                                  DATA MODEL TEST GUIDELINES
+
+                      •   The reset retry values for the Derived PIV Application Password
+                          and PUK are recorded.
+                      •   The Derived PIV Application Password’s retry counter and the
+                          PUK’s retry counter are not 0.
+ Test Scenario        1. Send the SELECT command with
+                            • AID == 'A0 00 00 03 08 00 00 20 00 01 00'
+                      2. Send the CHANGE REFERENCE DATA command repeatedly until
+                         after the issuer specified maximum number of password
+                         tries is exceeded with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command will contain an
+                               incorrect, but correctly formatted, password
+                               value, concatenated without delimitation with a
+                               valid new password value. Both passwords should
+                               be padded with 'FF' (if necessary) to complete
+                               the total length of each value to 8 bytes
+                      3. Send the CHANGE REFERENCE DATA command with
+                            • P2, key reference value, is set to ‘80’
+                            • Data field of the command will contain the
+                               correct password value, concatenated without
+                               delimitation with a valid new password value.
+                               Both passwords should be padded with ‘FF’ (if
+                               necessary) to complete the total length of each
+                               value to 8 bytes
+                      Perform Steps 4 and 5 only if the Derived PIV Application
+                      supports changing the PUK with the CHANGE REFERENCE DATA
+                      command.
+                      4. Send the CHANGE REFERENCE DATA command repeatedly until
+                         after the issuer specified maximum number of PUK tries
+                         is exceeded with
+                            • P2, key reference value, is set to '81'
+                            • Data field of the command will contain an
+                               incorrect, but correctly formatted, PUK value,
+                               concatenated without delimitation with a valid
+                               new PUK value
+                      5. Send the CHANGE REFERENCE DATA command with
+                            • P2, key reference value, is set to '81'
+                            • Data field of the command will contain the
+                               correct PUK value, concatenated without
+                               delimitation with a valid new PUK value
+ Expected Result(s)   1. From Step 1, the command returns the application property template
+                         with the status word '90 00'.
+                      2. From Step 2, each time the command returns status word '63 CX'
+                         (where 'X' indicates the number of further allowed retries) and the
+                         retry counter is decremented. The command returns status word '69
+                         83' (reference data change operation blocked) when the maximum
+                         number of tries is exceeded.
+                      3. From Step 3, the command returns status word '69 83' (reference
+                         data change operation blocked).
+                      4. From Step 4, each time the command returns status word '63 CX'
+                         (where 'X' indicates the number of further allowed retries) and the
+                         retry counter is decremented. The command returns status word '69
+
+
+                                            73
+

@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+                Table 9-1. Digital Signature Algorithms, Min. Key Sizes, and Crypto Periods
+
+        Key Type             Digital Signature            Key Size               Crypto Period
+                             Algorithm Suite                                   (Rollover Period)
+ Key-Signing Key (KSK)     RSA-SHA1 (RSA-         2048 bits                 12-24 months (1-2
+                           SHA-256) until 2015                              years)
+                           ECDSA with Curve       f = 224-255 bits          12-24 months (1-2
+                           P-256 or with                                    years)
+                           Curve P-384
+
+ Zone-Signing Key (ZSK)    RSA-SHA1 (RSA-         1024 bits                 1-3 months (30-90 days)
+                           SHA-256) until 2015
+                           ECDSA with Curve       f = 224-255 bits          12-24 months (1-2
+                           P-256 or with                                    years)
+                           Curve P-384
+
+
+
+In the above table, the digital signature algorithm suite is given as both RSA-SHA1 and RSA-SHA256.
+This is because as of the time of writing, RSA-SHA1 is the only algorithm that is both Mandatory for
+implementations and Approved for use in the Federal Government. However, RSA-SHA1 will be phased
+out and replaced by RSA-SHA256 within the Federal Government. It is expected that not all software
+will be updated – especially outside the Federal Government. Because of this, DNS administrators may
+wish to deploy and use both algorithms for a period of time so DNSSEC client software that does not
+understand RSA-SHA256 can still get some protection from DNSSEC. The DNS root zone uses
+RSA/SHA-256 for signing, so deployment of RSA/SHA-256 enabled DNS validators has quickened. It is
+recommended that new DNSSEC deployments (i.e. initial signing) consider using RSA/SHA-256 or ECDSA,
+rather than going through the complicated process of algorithm rollover.
+
+The use of RSA in DNSSEC is approved until the year 2015. By this time, it is expected that Elliptic
+Curve Cryptography (ECC) will be specified in the DNSSEC. USG DNS administrators should plan to
+migrate to the use of ECDSA (or similar) when it becomes available in DNSSEC components. ECC has
+an advantage of having the same precieved strength as RSA with a smaller key size. This means that the
+ZSK can be the same size as the KSK and have a longer cryptoperiod than a 1024 bit RSA ZSK.
+
+9.3.1   Key Pair Generation—Illustrative Example
+
+Every DNSSEC-aware name server implementation should provide a utility program for generating
+asymmetric key pairs (a public-private key pair). The use of one such program, dnssec-keygen (provided
+by BIND 9.X), is illustrated below:
+
+        dnssec-keygen –a algorithm – b bits –n type [options] name
+
+   where algorithm (under –a parameter) can be one of the following:
+
+        •   RSASHA1
+
+        •   RSASHA1-NSEC3-SHA1
+
+        •   DSASHA1
+
+        •   RSASHA256
+
+
+                                                   9-6
+

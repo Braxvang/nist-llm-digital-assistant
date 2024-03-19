@@ -1,0 +1,53 @@
+                                                                          GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+          RFC 6052           IPv6 Addressing of IPv4/IPv6 Translators
+          DNS64: DNS extensions for Network Address Translation from IPv6 Clients to IPv4 Servers66
+The Framework recommends a dual stack coexistence and transition strategy and supports the transition
+plan in RFC 5211, but it describes translation scenarios and guidelines for cases in which the dual stack
+approach may not be a practical medium-term coexistence plan. Two translation mechanisms are being
+defined because stateless and stateful translation have different characteristics, and each may be
+appropriate in certain settings.
+The scenarios differ according to whether or not the IPv4 and IPv6 sides of the translator are on the global
+Internet or on an enterprise or ISP’s network.
+The mapping between IPv4 and IPv6 addresses is either maintained at the translator or conveyed by using
+IPv6 addresses with embedded IPv4 addresses. In the stateless translation mechanism, all address
+mapping is computed algorithmically. The stateful translator also uses algorithmic translation of IPv4 to
+IPv6 addresses, but it maintains a translation table from IPv6 addresses to, for example, a service
+provider’s pool of IPv4 addresses. Other header fields are treated as in SIIT.
+Once the address mappings are defined, perhaps the trickiest aspect of translation is handling DNS
+correctly. Consider, for example, an IPv6-only client accessing an IPv4-only server. The client expects a
+AAAA record, but the server’s DNS knows nothing of this. A new DNS-ALG is being defined to handle
+different possible configurations securely. Two plausible choices, depending on the particular scenario,
+are:
+          For internal use, say a legacy printer pool, simply add the necessary static AAAA records.
+
+          In the general case, the application asks for A and AAAA records, an A record is retrieved,
+           and, assuming none exists, the ALG generates and adds the appropriate AAAA record.
+           Resolvers have to be careful about caching such artificially generated records.
+
+Similar techniques with a few more wrinkles can be applied to make dynamic DNS work as well.
+
+Some applications need special handling during translation. One good example is File Transfer Protocol
+(FTP) passive mode, which works differently in IPv4 and IPv6. It is anticipated that a separate Internet
+Draft will be written to specify how to handle each such case as it arises.
+Two aspects of translation for future study are (1) handling multicast; and (2) sharing IPv4 addresses and
+port numbers for cases where these are in short supply.
+Security has been an important concern in this new design, and security considerations have influenced
+the design of aspects such as the address mappings. No other new security issues have arisen.
+
+
+     6.6.4   TRT
+
+Transport Relay Translator (TRT) is defined by RFC 3142. Rather than simply rewriting headers, TRT
+keeps track of the state of TCP and UDP flows and relies on DNS translation between AAAA and A
+records. DNS translation is defined by RFC 2694, DNS extensions to Network Address Translators
+(DNS-ALG).
+
+66
+      See the current version of the IETF Internet Draft, DNS64: DNS extensions for Network Address Translation from IPv6
+      Clients to IPv4 Servers, Work in Progress.
+
+
+                                                            6-35
+

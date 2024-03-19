@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                      GUIDE TO IPSEC VPNS
+
+
+                                                                                                 2. Create a VPN gateway machine certificate. This certificate must have the full DNS
+                                                                                                    hostname as SAN included with the certificate. Because the gateway has a static IP, a
+                                                                                                    SAN for the IP address is added as well. For maximum compatibility, the EKU attribute
+                                                                                                    for serverAuth is also set.
+
+                                                                                                 3. Configure global VPN server parameters. The global parameters in the configuration
+                                                                                                    files in the /usr/local/etc/strongswan.d/ directory are reviewed. The system
+                                                                                                    administrator decides to set logging to use a file instead of the default syslog.
+
+                                                                                                 4. Configure the VPN server’s IPsec connection and EAP-TLS RADIUS backend. A
+                                                                                                    new configuration file remote-access.conf is created in the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                    /usr/local/etc/swanctl/ipsec.d/ directory. It contains the server’s IKEv2
+                                                                                                    parameters, such as the IKE ID, public IP address, local subnet (0.0.0.0/0 and/or ::0),
+                                                                                                    configuration for DNS servers, lease IP addresses for clients, and tunnel. The radius
+                                                                                                    server is located at IP address 10.10.10.10.
+                                                                                                     # /usr/local/etc/swanctl/ipsec.d/remote-access.conf
+                                                                                                     connections {
+                                                                                                        remote-clients-eap {
+                                                                                                           local_addrs = 192.0.2.1
+                                                                                                           local {
+                                                                                                              auth = pubkey
+                                                                                                              certs = vpn.example.gov.pem
+                                                                                                              id = vpn.example.gov
+                                                                                                           }
+                                                                                                           remote {
+                                                                                                              auth = eap-tls
+                                                                                                           }
+                                                                                                           children {
+                                                                                                               net {
+                                                                                                                    local_ts = 0.0.0.0/0
+                                                                                                                    updown = /usr/local/libexec/ipsec/_updown iptables
+                                                                                                                    esp_proposals = aes256gcm256-ecp256, aes256gcm256-
+                                                                                                     modp2048
+                                                                                                               }
+                                                                                                           }
+                                                                                                           version = 2
+                                                                                                           send_certreq = no
+                                                                                                           proposals = aes256gcm256-prfsha2-ecp256, aes256-sha256-
+                                                                                                     modp2048
+                                                                                                        }
+                                                                                                     }
+
+                                                                                                     pools {
+                                                                                                       connections_pool {
+                                                                                                           addrs = 10.11.0.0/16
+
+
+
+
+                                                                                                                                           108
+

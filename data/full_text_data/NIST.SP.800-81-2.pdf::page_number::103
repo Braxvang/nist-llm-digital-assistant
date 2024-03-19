@@ -1,0 +1,60 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+KSK to keep the DNSKEY RRset response size from growing too large for a UDP packet. This triggers
+the use of TCP, which is requires more network resources for the server to respond to clients.
+
+11.2.5 KSK Key Rollover in a Chained Secure Zone (using the Revoke Bit)
+
+There is a standardized method developed in the IETF to provide a stable means to updating a KSK that
+may or may not be installed in clients as a trust anchor [RFC5011]. Since it is impossible to know if a
+server’s KSK is a trust anchor for a client, it is recommended to use this method to insure that clients
+update their trust anchors.
+
+This KSK rollover method involves a series of timed steps and changing of flag bits in the KSK
+DNSKEY RR, which may be difficult to perform manually. There have been several tools developed to
+automate this process, but the steps are presented below to help administrators understand the process:
+
+    1. The administrator adds the new KSK but does not use it to generate any signatures (similar to
+       pre-publishing during a ZSK rollover.
+
+    2. Wait a pre-calculated time (recommended – 30 days)
+
+    3. Set the Revoke bit (flag) in the outgoing KSK and sign the DNSKEY RRset with both old and
+       new KSK’s. The old key is now revoked and will not be used by clients who understand the
+       revoked bit and the process described in RFC 5011. Have the delegating parent add a new DS
+       with the hash of the new KSK.
+
+    4. Wait a pre-calculated time (recommended – 30 days)
+
+    5. Remove the old KSK and resign using the new KSK only. Contact the delegating parent (if the
+       parent is signed) to delete the corresponding DS RR for the old KSK.
+
+
+
+11.3 Emergency Key Rollovers
+
+An emergency key rollover occurs when one or more of the keys in the zone (ZSK or KSK) have become
+compromised or the private component has been lost and a re-signing needs to occur. These types of
+rollovers are not planned, so there is a greater chance of a break in the chain of authentication if the zone
+administrator needs to perform this type of rollover.
+
+11.3.1 Emergency ZSK Rollover
+
+A DNS administrator needs to perform multiple steps to perform an emergency ZSK rollover in the event
+one (or more) ZSK’s are compromised. This multi-step recovery process is another reason for a zone
+administrator to perform a ZSK rollover continuously. If a zone administrator has the new DNSKEY RR
+already published in the zone as part of the zone key set (the first three steps in the process listed in
+Section 11.1.1), the next step depends on the key that has been compromised.
+
+If the ZSK currently in use has been compromised, the zone administrators can immediately rollover to
+the new key. There is no need to wait for the TTL value to expire because the new key has already been
+published for a period of time. The administrator can simply strip the old RRSIGs from the zone and re-
+sign with the new ZSK earlier than the planned rollover. DNS operation should continue normally after
+this re-signing, with no breaks in the authentication chain.
+
+
+
+                                                    11-5
+

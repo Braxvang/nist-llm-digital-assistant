@@ -1,0 +1,47 @@
+                                                                                               NIST SP 800-56B REV. 2                                      RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                                USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                               Assumptions: The RSA private key is valid.
+                                                                                               Process:
+                                                                                                      1. Initializations:
+                                                                                                               a. nLen = the byte length of n. For this Recommendation, nLen ≥ 256.
+                                                                                                               b. DecryptErrorFlag = False.
+                                                                                                      2. Check for erroneous input:
+                                                                                                               a. If the length of the ciphertext C is not nLen bytes, output an indication of erroneous
+                                                                                                                  input, and exit without further processing.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                                               b. Convert the ciphertext               byte     string    C    to    a    ciphertext     integer     c
+                                                                                                                  (see Appendix B.2):
+                                                                                                                                                    c = BS2I(C).
+                                                                                                               c. If the ciphertext integer c is not such that 1 < c < (n – 1), output an indication of
+                                                                                                                  erroneous input, and exit without further processing.
+                                                                                                      3. RSA decryption:
+                                                                                                               a. Apply RSADP (see Section 7.1.2) to the ciphertext integer c using the private key
+                                                                                                                  (n, d) to produce an integer em:
+                                                                                                                                             em = RSADP((n, d), c). 24
+                                                                                                               b. Convert the integer em to an encoded message EM, a byte string of nLen bytes (see
+                                                                                                                  Appendix B.1):
+                                                                                                                                              EM = I2BS(em, nLen).
+                                                                                                      4. OAEP decoding:
+                                                                                                               a. Apply the selected hash function (see Section 5.1) to compute:
+                                                                                                                                                            HA = H(A).
+                                                                                                                   HA is a byte string of HLen bytes.
+                                                                                                               b. Separate the encoded message EM into a single byte Y, a byte string
+                                                                                                                  maskedMGFSeed′ of HLen bytes, and a byte string maskedDB′ of nLen – HLen – 1
+                                                                                                                  bytes as follows:
+                                                                                                                                   EM = Y || maskedMGFSeed′ || maskedDB′.
+                                                                                                               c. Apply the mask-generation function specified in Section 7.2.2.2 to compute:
+                                                                                                                                  mgfSeedMask′ = MGF(maskedDB′, HLen).
+                                                                                                               d. Let mgfSeed′ = maskedMGFSeed′ ⊕ mgfSeedMask′.
+
+                                                                                               24
+                                                                                                    When the private key is represented in the prime-factor or CRT format, appropriate changes are discussed in Section
+                                                                                                    7.1.2.
+
+                                                                                                                                                          71
+

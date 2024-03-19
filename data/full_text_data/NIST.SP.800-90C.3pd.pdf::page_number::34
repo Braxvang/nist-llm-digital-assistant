@@ -1,0 +1,46 @@
+      NIST SP 800-90C 3pd (Third Public Draft)                         Recommendation for RBG Constructions
+      September 2022
+
+923           Entropy Source Requirements
+924   This Recommendation requires the use of one or more validated entropy sources to provide
+925   entropy for seeding and reseeding a DRBG and for input to the XOR operation in the RBG3(XOR)
+926   construction specified in Section 6.2. In addition to the assumptions and assertions concerning
+927   entropy sources in Section 2.6, the following conditions shall be met when using these entropy
+928   sources:
+929       1. Only validated entropy sources shall be used to provide the entropy bitstring for seeding
+930          and reseeding a DRBG and for providing input to the XOR operation in the RBG3(XOR)
+931          construction.
+932           Non-validated entropy sources may be used by an RBG to provide input for personalization
+933           strings and/or the additional input in DRBG function calls (see Section 2.4.1).
+934       2. Each validated entropy source shall be independent of all other validated or non-validated
+935          entropy sources used by the RBG.
+936       3. The outputs from an entropy source shall not be reused (e.g., the value in the entropy
+937          source is erased after being output).
+938       4. When queried for entropy, the validated entropy sources must respond as follows:
+939               a. The requested output must be returned only if the returned status indicates a
+940                  success. In this case, the ES-output bitstring must contain the requested amount of
+941                  entropy. (Note that the ES-output bitstring may be longer than the amount of
+942                  entropy requested, i.e., the bitstring may not have full entropy.)
+943               b. If an indication of a failure is returned by a validated entropy source as the status,
+944                  an invalid (e.g., Null) bitstring shall be returned as ES_output.
+945       5. If the validated entropy-source components operate continuously regardless of whether
+946          requests are received and a failure is determined, the entropy source shall immediately
+947          report the failure to the RBG (see Section 7.1.2).
+948       6. If a validated entropy source reports a failure (e.g., because of a failed health test), the
+949          entropy source shall not produce output (except possibly for a failure status indication)
+950          until the failure is corrected. The entropy source shall immediately report the failure to the
+951          Get_ES_Bitstring function (see Section 3.1). If multiple validated entropy sources are
+952          used, the report shall identify the entropy source that reported the failure.
+953       7. A detected failure of any entropy source shall cause the RBG to report the failure to the
+954          consuming application and terminate the RBG operation. The RBG must not be returned
+955          to normal operation until the conditions that caused the failure have been corrected and
+956          tested for successful operation.
+
+957           External Conditioning to Obtain Full-Entropy Bitstrings
+958   An RBG3(XOR) construction (see Section 6.2) and a CTR_DRBG without a derivation function
+959   in an RBG2 or RBG3 construction (see Sections 5 and 6) require bitstrings with full entropy from
+960   an entropy source. If the validated entropy source does not provide full-entropy output, a method
+
+
+                                                       21
+

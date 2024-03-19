@@ -1,0 +1,70 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                            Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                               PIV Card Application Card Command Interface
+
+
+
+401          PIV Card Application Card Command Interface
+402   Table 2 lists the card commands surfaced by the PIV Card Application at the card edge of the
+403   ICC when it is the currently selected card application. All PIV Card Application card commands
+404   SHALL be supported by a PIV Card Application. Card commands indicated by a “Yes” in the
+405   Command Chaining column SHALL support command chaining for transmitting a data string
+406   that is too long for a single command, as defined in [ISO7816].
+407                                         Table 2. PIV Card Application card commands
+
+                                                             Contact        Contactless        Security Condition        Command
+               Type                      Name
+                                                            Interface        Interface              for Use              Chaining
+         PIV Card               SELECT                          Yes              Yes                  Always                No
+      Application Card
+       Commands for                                                                            Data Dependent. See           No
+                                GET DATA                        Yes              Yes
+        Data Access                                                                              Table 2, Part 1.
+
+
+                                                                             SM or VCI                                       Yes 2
+                                VERIFY                          Yes                                   Always
+                                                                            (see Note 1)
+         PIV Card               CHANGE                                                                                       Yes 3
+                                                                Yes             VCI                PIN or OCC
+      Application Card          REFERENCE DATA
+       Commands for             RESET RETRY                                                                                  No
+                                                                Yes              No           PIN Unblocking Key
+       Authentication           COUNTER
+                                GENERAL                                         Yes            Key Dependent. See            Yes
+                                                                Yes
+                                AUTHENTICATE                                (See Note 2)         Table 5, Part 1.
+
+
+          PIV Card                                                                            PIV Card Application           Yes
+                                PUT DATA                        Yes              No
+      Application Card                                                                           Administrator
+       Commands for                                                                                                          Yes
+                                GENERATE
+          Credential                                                                          PIV Card Application
+                                ASYMMETRIC                      Yes              No
+      Initialization and                                                                         Administrator
+                                KEY PAIR
+       Administration
+
+408   The PIV Card Application shall return the status word of '6A 81' (Function not supported) when
+409   it receives a card command on the contactless interface marked “No” in the Contactless Interface
+410   column in Table 2. The PIV Card Application may return a different status word (e.g., '69 82') if
+411   the card command can be performed over the contactless interface in support of card
+412   management. The PIV Card Application will only perform the command in support of card
+413   management if the requirements specified in Section 2.9.2 of FIPS 201-2 are satisfied.
+414   Note 1: For SM, OCC and pairing code alone CAN be submitted via secure messaging (SM)
+415   over the contactless interface. All other key references require VCI for communication over the
+416   contactless interface.
+417               Note 2: Cryptographic protocols using private/secret keys that require the “PIN” or
+418               “OCC” security condition SHALL only be used on the contactless interface after a virtual
+
+
+      2
+          The VERIFY command is only required to support command chaining if the PIV Card Application supports OCC.
+      3
+          The CHANGE REFERENCE DATA command is only required to support command chaining if the PIV Card Application supports OCC.
+
+
+
+                                                                       7
+

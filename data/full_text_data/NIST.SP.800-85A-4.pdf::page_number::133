@@ -1,0 +1,66 @@
+NIST SP 800-85A-4                                                             PIV CARD APPLICATION & MIDDLEWARE
+                                                                                       INTERFACE TEST GUIDELINES
+
+                                          •
+                                         P1, algorithm reference, is set to the same value
+                                         as in step 6a
+                                      • P2, key reference, is set to '9B'
+                                      • Data field in the command is to include '82'
+                                         followed by encrypted challenge
+                              7. Test the correct functionality of the digital signature
+                                 key ('9C'):
+                                 7a. Perform step 2) of 2a in C.2.1.1 to verify
+                                       cardholder’s PIV Card Application PIN and repeat step
+                                       3 with P2 set to '9C', P1 (algorithm reference) set
+                                       to '07', '11', or '14' and template '81' in the data
+                                       field containing a hashed message
+                                 7b. Repeat step 3 (without PIN verification). Set P2 to
+                                       '9C', P1 (algorithm reference) to '07', '11', or '14'
+                                       and include template '81' in the data field
+                                       containing a hashed message
+                              8. Repeat step 3 with P2 set to '9D', P1 (algorithm
+                                 reference) set to '07', '11', or '14' and include template
+                                 '81' containing an encrypted key (in case of P1 ='07') or
+                                 template '85' containing the other party’s public key 8 (in
+                                 case of P1 = '11' or '14')
+                              9. Repeat step 3 with P2 set to '9E' (Card Authentication
+                                 key) and P1 (algorithm reference) set to '07' or '11' and
+                                 the template '81' containing a randomly generated
+                                 challenge
+                              10. If the Key History Object is supported:
+                                   Send GET DATA command with
+                                    • Data field of the command containing the tag of the
+                                       Key History Object data object. Retrieve the key
+                                       history’s data elements:
+                                    • If keysWithOnCardCerts = 0 and keysWithOffCardCerts
+                                       > 0
+                                           o   Read the certificate(s) and key references
+                                               (pairs) from the vendor provided URL file.
+                                               For each key reference value in the range
+                                               (0x95 – keysWithOffCardCerts + 1) through
+                                               0x95, verify that the provided URL file
+                                               includes that key reference, issue a
+                                               challenge for that key reference, and verify
+                                               the response using the public key from the
+                                               corresponding certificate from the provided
+                                               URL file
+                                    • If keysWithOnCardCerts > 0 and keyWithOffCardCerts =
+                                       0
+                                           o   For each key reference value in the range
+                                               0x82 through (0x82 + keysWithOnCardCerts –
+                                               1), read the certificates from the card.
+                                               Issue a challenge for each retired private
+                                               key, 9 and verify the response using the
+                                               public key from the corresponding certificate
+
+
+8 Template '85' contains the other party’s public key, a point on Curve P-256 or P-384, encoded as '04' || X || Y,
+
+without the use of point compression, as described in Section 2.3.3 of [SEC1].
+9
+ See Table 7 of SP 800-73-4 Part 1 for the association of certificate BER-TLV tags to corresponding key reference
+values.
+
+
+                                                    C-32
+

@@ -1,0 +1,57 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                       Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                          PIV Card Application Card Command Interface
+
+620   If the authentication data in the command data field does not match the current value of the
+621   reference data, but both the authentication data and the new reference data in the command data
+622   field of the command satisfy the criteria in Section 2.4.3, the PIV Card Application SHALL
+623   return status word '63 CX'. If status word '6A 80' is returned, the security status and retry counter
+624   associated with the key reference SHALL remain unchanged. 9 If status word '63 CX' is returned,
+625   the security status of the key reference SHALL be set to FALSE, and the retry counter associated
+626   with the key reference SHALL be decremented by one.
+627   If the card command succeeds, then the security status of the key reference SHALL be set to
+628   TRUE, and the retry counter associated with the key reference SHALL be set to the reset retry
+629   value associated with the key reference.
+630   The initial value of the retry counter and the reset retry value associated with the key reference
+631   (i.e., the number of successive failures/retries before the retry counter associated with the key
+632   reference reaches zero) are issuer-dependent.
+633   Command Syntax
+                     CLA                        '00' or '0C' for secure messaging
+                     INS                        '24'
+                     P1                         '00'
+                     P2                         '00' (Global PIN), '80' (PIV Card Application PIN), or '81' (PUK)
+                     Lc                         '10'
+                                                Current PIN authentication data concatenated without delimitation
+                     Data Field                 with the new PIN reference data, both PINs as described in Section
+                                                2.4.3
+                     Le                         Absent
+634
+635   Response Syntax
+
+                       SW1           SW2                                      Meaning
+                                                Reference data change failed, X indicates the number of further
+                        '63'         'CX'
+                                                allowed retries or resets
+                         '69'         '82'      Security status not satisfied
+                         '69'         '83'      Reference data change operation blocked
+                        '6A'          '80'      Incorrect parameter in command data field
+                        '6A'          '81'      Function not supported
+                        '6A'          '88'      Key reference not found
+                         '90'         '00'      Successful execution
+
+
+636   3.2.3. RESET RETRY COUNTER Card Command
+637   The RESET RETRY COUNTER card command resets the retry counter of the PIN to its initial
+638   value and changes the reference data. The command enables recovery of the PIV Card
+639   Application PIN if the cardholder forgets it.
+640   The only key reference allowed in the P2 parameter of the RESET RETRY COUNTER
+641   command is '80', the PIV Card Application PIN. The PIV Card Application MAY allow the
+642   reference data associated with other key references to be changed by the PIV Card Application
+643   RESET RETRY but only if the requirements specified in Section 2.9.2 of FIPS 201-2 are
+
+      9
+          It is recommended that in this case the authentication data not be compared to the on-card reference data.
+
+
+
+                                                                                15
+

@@ -1,0 +1,60 @@
+Special Publication 800-73-4       Interfaces for Personal Identity Verification – Part 1: PIV
+                                Card Application Namespace, Data Model and Representation
+
+the PIV Card Application contains any retired key management private keys, but may be present even
+if no such keys are present in the PIV Card Application. For each retired key management private key
+in the PIV Card Application, the corresponding certificate may either be present within the PIV Card
+Application or may only be available from an on-line repository.
+
+The Key History object includes two mandatory fields, keysWithOnCardCerts and
+keysWithOffCardCerts, and one optional field, offCardCertURL. The keysWithOnCardCerts field
+indicates the number of retired private keys within the PIV Card Application for which the
+corresponding certificates are also stored within the PIV Card Application. The
+keysWithOffCardCerts field indicates the number of retired private keys within the PIV Card
+Application for which the corresponding certificates are not stored within the PIV Card Application.
+The numeric values in both keysWithOnCardCerts and keysWithOffCardCerts are represented as
+unsigned binary integers. The offCardCertURL field contains a URL that points to a file containing
+the certificates corresponding to all of the retired private keys within the PIV Card Application,
+including those for which the corresponding certificate is also stored within the PIV Card
+Application. The offCardCertURL field shall be present if the keysWithOffCardCerts value is greater
+than zero and shall be absent if the values of both keysWithOnCardCerts and keysWithOffCardCerts
+are zero. The offCardCertURL field may be present if the keysWithOffCardCerts value is zero but the
+keysWithOnCardCerts value is greater than zero.
+
+The file that is pointed to by the offCardCertURL field shall contain the DER encoding of the
+following data structure:
+
+         OffCardKeyHistoryFile ::= SEQUENCE SIZE (1..20) OF SEQUENCE {
+                keyReference          OCTET STRING (SIZE(1))
+                cert                  Certificate
+         }
+
+where keyReference is the key reference for the private key on the card and cert is the
+corresponding X.509 certificate. 8 The offCardCertURL field shall have the following format:
+
+   "http://" <DNS name> "/" <ASCII-HEX encoded SHA-256 hash of OffCardKeyHistoryFile>
+
+The private keys for which the corresponding certificates are stored within the PIV Card Application
+shall be assigned to the lowest numbered key references reserved for retired key management private
+keys. For example if keysWithOnCardCerts is 5, then the corresponding private keys shall be
+assigned to key references '82', '83', '84', '85', and '86'.
+
+The private keys for which the corresponding certificates are not stored within the PIV Card
+Application shall be assigned to the highest numbered key references reserved for retired key
+management private keys. For example, if keysWithOffCardCerts is 3, then the corresponding private
+keys shall be assigned to key references '93', '94', and '95'.
+
+Private keys do not have to be stored within the PIV Card Application in the order of their age.
+However, if the certificates corresponding to only some of the retired key management private keys
+are available within the PIV Card Application then the certificates that are stored in the PIV Card
+Application shall be the ones that were most recently issued.
+
+
+
+8 The ASN.1 for Certificate may be imported from the ASN.1 module PKIX1Explicit88 in Appendix A.1 of [RFC5280].
+
+
+
+
+                                                          11
+

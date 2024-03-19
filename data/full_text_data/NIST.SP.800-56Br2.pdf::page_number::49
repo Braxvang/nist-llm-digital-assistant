@@ -1,0 +1,52 @@
+                                                                                               NIST SP 800-56B REV. 2                            RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                      USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                               6.3.1 RSAKPG1 Family: RSA Key-Pair Generation with a Fixed Public Exponent
+                                                                                               The RSAKPG1 family of key-pair generation methods consists of three RSA key-pair generators
+                                                                                               where the public exponent has a fixed value (see Section 6.2).
+                                                                                               Three representations are addressed:
+                                                                                                  1. rsakpg1-basic generates the private key in the basic format (n, d);
+                                                                                                  2. rsakpg1-prime-factor generates the private key in the prime-factor format (p, q, d); and
+                                                                                                  3. rsakpg1-crt generates the private key in the Chinese Remainder Theorem format (n, e, d,
+                                                                                                     p, q, dP, dQ, qInv).
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                               An implementation may perform a key-pair validation before the key pair is output from the
+                                                                                               generator. The key-pair validation methods for this family are specified in Section 6.4.1.2.
+
+                                                                                               6.3.1.1 rsakpg1-basic
+                                                                                               rsakpg1-basic is the generator in the RSAKPG1 family where the private key is in the basic format
+                                                                                               (n, d).
+
+                                                                                               Function call: rsakpg1-basic(s, nBits, e)
+                                                                                               Input:
+                                                                                                  1. s: the targeted security strength;
+
+                                                                                                  2. nBits: the intended bit length of the RSA modulus; and
+
+                                                                                                  3. e: a pre-determined public exponent − an odd integer, such that 65,537 ≤ e < 2256.
+
+                                                                                               Process:
+                                                                                                  1. Check the values:
+                                                                                                          a. If s is not in the range [112, 256], output an indication that the targeted security
+                                                                                                             strength is not acceptable, and exit without further processing.
+                                                                                                          b. If s > ES(nBits), output an indication that the modulus length is not adequate for
+                                                                                                             the targeted security strength, and exit without further processing.
+                                                                                                          c. If e is not an odd integer such that 65,537 ≤ e < 2256, output an indication that the
+                                                                                                             exponent is out of range, and exit without further processing.
+                                                                                                  2. Generate the prime factors p and q, as specified in FIPS 186. Note that the routines ensure
+                                                                                                     that p – 1 and q – 1 are relatively prime to e.
+                                                                                                  3. Determine the private exponent d:
+                                                                                                                                      d = e–1 mod LCM(p – 1, q – 1) .
+
+                                                                                                      In the very rare event that d ≤ 2nBits/2, discard the results of all computations and repeat the
+                                                                                                      process, starting at step 2.
+
+                                                                                                  4. Determine the modulus n as n = p × q, the product of p and q.
+
+                                                                                                                                                39
+

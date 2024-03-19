@@ -1,0 +1,58 @@
+                                                              SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+associated with the zone. In response to a DNS query, a DNSSEC-aware authoritative name server serves
+the relevant zone data along with the digital signature of the data. The recipient validates the digital
+signature associated with the received zone data, using the public key of the signer (after establishing trust
+in that public key). This decryption provides the hash of the original stored zone data. The recipient also
+generates a hash (using the same hash function algorithm used by the signer) of the received zone data.
+This computed hash is then compared with the hash retrieved from the digital signature. If the hashes
+match, then the digital signature in the response is considered validated.
+
+9.7       Establishing Trust Chain and Signature Verification (DNSSEC-OP8)
+
+Until all zones become signed zones, there could be a situation in which a zone is signed but its parent is
+not signed. The only point of trust (assurance) for the DNSSEC-aware resolver in this scenario is the
+preconfigured public key of the zone data signer. In the absence of any other source vouching for the
+authenticity of the public key of the signer, the only source the resolver can trust is the zone signer itself,
+assuming that the public key is configured to be trusted. On the other hand, if there is a DNS zone X that
+will vouch for the authenticity of the public key of zone signer child-of-X, the resolver can establish trust
+in zone signer child-of-X through X. The sequence of zones in the DNS tree through which a resolver
+establishes trust in the public key of the signer serving signed zone data is called the chain of trust.
+
+In the example, the chain of trust starts (originates) with DNS site X and ends with the zone data from site
+Y. Usually DNS site X will be the zone that is the immediate parent of zone Y (called the parent zone) in
+the global DNS zone tree. The parent zone vouches for the authenticity of the child zone by digitally
+signing the hash of the public key of the child zone. This hash is stored in a DNS RR called the
+Delegation Signer (DS) RR. The parent zone also must be a signed zone because a nonsigned zone will
+not possess the private key (of a private key/public key pair) to sign the hash of the public key of the child
+zone. Depending on the absence or presence of the chain of trust, a signed zone can be one of the
+following:
+
+      •    Island of security—a zone that is self-signed. The reason it is self-signed is that the zone’s
+           parent is not a signed zone or is unwilling to set up secure delegations and hence cannot vouch for
+           the authenticity of the public key of the child zone. In this instance, there really is no chain of
+           trust.
+
+      •    Chained secure zone—the zone’s parent and possibly one or more of the ancestors up the DNS
+           zone tree that are signed. In this hierarchy of signed zones and the associated hierarchy of
+           configured keys, the resolver usually will choose the key at the zone that is highest in this
+           hierarchy of signed zones as the origin of the chain of trust. The public key of the zone at the
+           origin of the chain of trust is called the trust anchor. In fact, there may be more than one key that
+           is a trust anchor. In other words, the trust anchors refers to the group of keys that are initially
+           trusted by a resolver, which can then be used to build the chain of trust that leads all the way to
+           the public key of the zone whose signatures the resolver wants to verify. If the chain of trust
+           leads all the way up the DNS tree to the root zone, the zone in question is said to be “globally
+           secure”.
+Zone data protection through digital signature service for an island-of-security zone consists of the
+following basic tasks:
+
+      •    Public key/private key pair generation
+
+      •    Secure storage (if necessary, offline from the name server) of the private key
+
+
+
+                                                       9-11
+

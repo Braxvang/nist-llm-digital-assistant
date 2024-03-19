@@ -1,0 +1,55 @@
+                                                                                              NIST SP 800-77 REV. 1                                                         GUIDE TO IPSEC VPNS
+
+
+                                                                                              9.3.4   Testing the Solution
+
+                                                                                              The administrator is at the office, so SSH is used to log in to a third-party host that is neither
+                                                                                              behind the office VPN nor within the private cloud. From that machine, SSH is used to log in to
+                                                                                              the cloud instance VPN server. Now, if the IPsec tunnels fail to come up due to a
+                                                                                              misconfiguration and drop all packets between the two locations, the administrator is not locked
+                                                                                              out from fixing the configuration.
+
+                                                                                                 •    On both ends, start Libreswan: systemctl start ipsec
+                                                                                                 •    On one end, start the IPv4 connection manually: ipsec auto --up cloud-
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      office-ipv4
+                                                                                                 •    If the connection fails, it should show what happened. Consult the Libreswan
+                                                                                                      documentation and Frequently Asked Questions (FAQ) if the error is unclear.
+                                                                                                 •    Once the connection is established, a ping from one of the workstations in the office can
+                                                                                                      be used to test: ping 10.0.2.78.
+                                                                                                 •    Once confirmed to work, a database replication is started to test performance.
+                                                                                                 •    Byte counters on the tunnel are confirmed using the command ipsec
+                                                                                                      trafficstatus
+                                                                                                 •    Next, the IPv6 connection can be brought up and tested: ipsec auto --up cloud-
+                                                                                                      office-ipv6
+
+                                                                                              After the tunnels are confirmed to be working correctly, the configuration is updated to
+                                                                                              automatically start the tunnels when the Libreswan IPsec service starts by changing auto=add
+                                                                                              to auto=start. The IPsec service is enabled to start at bootup on both gateways using the
+                                                                                              command systemctl enable ipsec.
+
+                                                                                              The port forwarding for SSH into the private cloud is disabled using the cloud management tools
+                                                                                              to prevent the virtual machines from being scanned by attackers on the internet. SSH access is
+                                                                                              still possible as long as the connections are made from the office through the VPN connection.
+
+                                                                                              9.3.5   Analysis
+
+                                                                                              A private cloud can be safely accessed remotely by adding a virtual machine acting as a VPN
+                                                                                              gateway. The private cloud can be used and protected just like physical servers at a data center.
+                                                                                              Additionally, by requiring the use of the VPN, remote access control can be further limited to
+                                                                                              legitimate sources and prevent the cloud instances from being susceptible to port scanning
+                                                                                              attacks via port forwarding on the public IP through which the private cloud is reachable.
+
+                                                                                              In the future, the VPN configuration can be extended to connect to other private clouds or other
+                                                                                              data centers. It can also be extended to act as a remote access VPN for developers so they can
+                                                                                              safely connect to the private cloud from their laptops even if not at the office.
+
+
+
+
+                                                                                                                                             115
+

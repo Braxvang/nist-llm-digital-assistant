@@ -1,0 +1,51 @@
+Special Publication 800-85B                                   PIV Data Model Testing Specification
+
+
+Precondition          1.      A valid PIV card is inserted into the contact reader.
+                      2.      A valid PC/SC connection exists between the test application and the
+                              contact reader.
+                      3.      The test application is currently connected to the card application
+                              which is accessible through card handle.
+                      4.      A valid card holder facial image is present on the PIV card.
+Test Steps            1. Set cardHandle := <<valid card handle>>
+                      2. Set OID := <<Card Holder Facial Image
+                         (2.16.840.1.101.3.7.2.96.48)>>
+                      3. Call pivGetData w/
+                         • (IN) cardHandle
+                              • (IN) OID
+                              • (OUT) data
+                      4. Parse the SignerInfo-> signedAttrs field contents from
+                         the CBEFF_SIGNATURE_BLOCK to locate the message digest
+                         attribute (OID=1.2.840.113549.1.9.4) and its
+                         corresponding attribute value
+                      5. Extract the SignerInfo->digestAlgorithm field contents
+                         from the CBEFF_SIGNATURE_BLOCK
+                      6. Using the digest Algorithm obtained in the previous
+                         step, compute the hash over the concatenated
+                         CBEFF_HEADER and the STD_BIOMETRIC_RECORD
+Expected              The value of the hash obtained from the message digest attribute of the
+Result(s)             signedAttrs of the SignerInfo is identical to that obtained after hashing the
+                      concatenated contents of the CHUID, excluding the asymmetric digital
+                      signature field.
+
+
+10.3.1.10 Verify PIV signer distinguished name
+
+Purpose               Confirms that the signedAttrs of the SignerInfo includes the pivSigner-
+                      DN attribute containing the subject name that appears in the X.509
+                      certificate for the entity that signed the biometrics.
+Reference(s)          1.      FIPS201, Section 4.2.2
+                      2.      AS06.03.13
+Precondition          1.      A valid PIV card is inserted into the contact reader.
+                      2.      A valid PC/SC connection exists between the test application and the
+                              contact reader.
+                      3.      The test application is currently connected to the card application
+                              which is accessible through card handle.
+                      4.      A valid card holder facial image is present on the PIV card.
+                      5.      A valid CHUID is present on the PIV card.
+
+
+
+
+                                                                                                Page 101
+

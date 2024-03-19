@@ -1,0 +1,48 @@
+                                                                             GUIDE TO SECURE WEB SERVICES
+
+
+
+The root expression of the example in Figure 3-2 is an All tag, which is used to specify that all of the
+contained expressions must be met by the requester for it to comply with the provider policy. The All tag
+contains the following expressions:
+
+ wsap:UsingAddressing, which specifies that requesters should include WS-Addressing information in
+  the SOAP header.
+ sp:TransportBinding, which specifies that requesters should use TLS to secure the SOAP message
+  and defines the required parameters.
+The sp:TransportBinding element contains an All tag containing two expressions:
+
+ sp:TransportToken, which specifies what type of token the sender must provide. In this example,
+  sp:HttpsToken indicates that senders must provide a client certificate through TLS.
+ sp:AlgorithmSuite specifies what algorithms the sender's TLS library must support. In this example,
+  sp:Basic256Sha256Rsa15, defined by WS-SecurityPolicy, is used to indicate that the Advanced
+  Encryption Standard (AES) algorithm should be used with a key size of 256 bits for symmetric
+  cryptography, the 256-bit Secure Hash Algorithm (SHA) should be used for hashing, and version 1.5
+  of the RSA encryption algorithm for asymmetric cryptography.
+WS-Policy can also be used to describe the parameters necessary when using WS-ReliableMessaging to
+ensure message delivery. Figure 3-3 shows a policy defining an inactivity timeout of 2 seconds, a base
+retransmission interval of 5 seconds using the exponential backoff algorithm and an acknowledgement
+interval of 5 seconds.
+
+    <Policy>
+      <wsrm:RMAssertion>
+        <All>
+          <wsrm:InactivityTimeout Milliseconds=”2000”/>
+          <wsrm:BaseRetransmissionInterval Milliseconds=”5000”/>
+          <wsrm:ExponentialBackoff/>
+          <wsrm:AcknowledgementInterval Milliseconds=”5000”/>
+        </All>
+      </wsrm:RMAssertion>
+    </Policy>
+
+                       Figure 3-3. Sample WS-ReliableMessaging Policy Expression
+
+Receivers have the option of specifying whether senders should use TLS or WS-Security to secure SOAP
+messages. Some receivers may wish to let senders decide which option to support. In this case, the
+ExactlyOne expression would be used to indicate the option in a manner similar to Figure 3-4.
+
+
+
+
+                                                  3-12
+

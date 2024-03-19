@@ -1,0 +1,54 @@
+NIST SP 800-85A-4                                      PIV CARD APPLICATION & MIDDLEWARE
+                                                                INTERFACE TEST GUIDELINES
+
+ Expected Result(s)   The results from this test have the same command responses as in
+                      C.2.1.1 Steps 2, 2a, 2b and 2c, respectively.
+ Postcondition        The card is blocked.
+
+
+C.2.2        CHANGE REFERENCE DATA card command
+
+C.2.2.1        Contact Interface
+ Purpose              Validates that the PIV Card executes the CHANGE REFERENCE
+                      DATA command for the following conditions:
+                      1. Without the proper security condition (PIV Card Application PIN
+                          and (if supported) Global PIN).
+                      2. After the security condition is satisfied.
+                      3. With an incorrect PIN until the retry counter reaches zero.
+                      4. Verify that the CHANGE REFERENCE DATA command does
+                          not change OCC reference data or the pairing code.
+                      5. Ensure that length and format of PIN data is enforced.
+ Reference(s)         1. SP 800-73-4 Part 2, Section 3.2.2,
+                      2. AS05.01, AS05.23 through AS05.27
+ Precondition(s)      1. The reset retry counter values (maximum number of PIN tries
+                          allowed) of the PIV Card Application PIN and Global PIN (if
+                          supported) are recorded.
+                      2. PIV Card Application PIN is recorded.
+                      3. Pairing code (if supported) is recorded.
+                      4. OCC (if supported) is recorded.
+                      5. Global PIN (if supported) is recorded.
+                      6. The IUT is inserted into the contact reader.
+                      7. There exists a valid PC/SC connection between the test system
+                          and the contact reader.
+                      8. No application is currently connected to the PIV Card
+                          Application.
+ Test Scenario        1. Send SELECT card command with
+                         • AID == 'A0 00 00 03 08 00 00 10 00 01 00'
+                      2. Perform step 2 in C.2.1.1 (This step reads the Discovery
+                         Object from the card and parses the PIN usage Policy sub-
+                         element). Perform the test for all test cases that match
+                         the PIN Usage Policy
+                         2a. Test case for the mandatory PIV Card Application PIN
+                              ('80')
+                               1. Send CHANGE REFERENCE DATA card command with
+                                  • P2, key reference value is set to '80'
+                                  • Data field of the command will contain the
+                                     correct PIN value (PIN 1) obtained from the
+                                     vendor, concatenated without delimitation with
+                                     an arbitrary new valid PIN value (PIN 2). Both
+                                     PINs should be padded with 'FF' to complete
+                                     the total length of each value to 8 bytes
+
+
+                                     C-19
+

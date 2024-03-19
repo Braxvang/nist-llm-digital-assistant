@@ -1,0 +1,64 @@
+                                                                                               NIST SP 800-178                                                    COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                    DATA SERVICES: XACML AND NGAC
+
+
+                                                                                               Below is a more concrete example that illustrates the use of delegation chains to select applicable
+                                                                                               policies that are used in combining algorithms for arriving at final access decisions. The example
+                                                                                               gives a Policy Set that consists of four policies:
+
+                                                                                                  •   Policy P1: A Trusted Administrative Policy that gives John (the delegate) the authority to
+                                                                                                      create policies for a situation involving reading of medical records to any user who has
+                                                                                                      the role of Doctor.
+                                                                                                  •   Policy P2: An Untrusted Administration Policy that is issued by John, under the authority
+                                                                                                      of P1, to give Jessica (the delegate) the authority to create policies for a situation
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                                      involving reading of medical records to any user who has the role of Doctor. Because of
+                                                                                                      the matching of delegate of P1 to policy issuer of P2 and the fact that the situations in
+                                                                                                      both policies P1 and P2 are the same, it is obvious that the authority to issue policy P2
+                                                                                                      has come from policy P1. Thus P1 and P2 form a delegation chain.
+                                                                                                  •   Policy P3: An Untrusted Access Policy that is issued by Jeff to give Carol the capability
+                                                                                                      to read medical records.
+                                                                                                  •   Policy P4: An Untrusted Access Policy that is issued by Jessica to give Carol the ability
+                                                                                                      to read medical records. Because of the matching of delegate of P2 to policy issuer of P4
+                                                                                                      and the fact that the situations in both policies P2 and P4 are the same, it is obvious that
+                                                                                                      the authority to issue policy P4 has come from policy P2. Thus P2 and P4 form a
+                                                                                                      delegation chain.
+
+                                                                                               The four policies described above are given in the form of pseudocode below:
+
+                                                                                               <Policy Set>
+                                                                                                  <Policy P1> /* Trusted Administrative Policy */
+                                                                                                      <Target> /*:Attribute-Category :Attribute ID                  :Attribute Value */
+                                                                                                                     :access-subject    :role                         :doctor
+                                                                                                                     :resource          :resource-id                  :medical-records
+                                                                                                                     :action            :action-id                    :read
+                                                                                                                     :delegate          :subject-id                   :john
+                                                                                                      </Target>
+                                                                                                      <Rule R1>
+                                                                                                          Effect: PERMIT
+                                                                                                      </Rule R1>
+                                                                                                </Policy P1>
+
+                                                                                                <Policy P2> /* Untrusted Administrative Policy */
+                                                                                                      <Policy Issuer> john </Policy Issuer>
+                                                                                                      <Target> /*:Attribute-Category   :Attribute ID                :Attribute Value */
+                                                                                                                    :access-subject     :role                        :doctor
+                                                                                                                    :resource           :resource-id                 :medical-records
+                                                                                                                    :action             :action-id                   :read
+                                                                                                                    :delegate           :subject-id                  :jessica
+                                                                                                      </Target>
+                                                                                                      <Rule R2>
+                                                                                                          Effect: PERMIT
+                                                                                                      </Rule R2>
+                                                                                                 </Policy P2>
+
+                                                                                                 <Policy P3> /* Untrusted Access Policy */
+                                                                                                      <Policy Issuer> Jeff </Policy Issuer>
+
+
+                                                                                                                                               19
+

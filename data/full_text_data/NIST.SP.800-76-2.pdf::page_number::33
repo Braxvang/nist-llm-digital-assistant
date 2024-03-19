@@ -1,0 +1,77 @@
+6.3                                        Iris image specification for PIV Cards
+6.3.1                                          General case
+Iris images on PIV Cards shall conform to the requirements expressed in the Table 9 profile of the ISO/IEC 19794-6:2011
+standard. Where required values and practice are not stated, the underlying requirements of the base standard shall
+apply. The profile defines a standard record that contains one or two specialized iris images each of size around 3
+kilobytes. These images shall follow the semantic requirements of Image Type 7 images defined in the standard. The
+objective of these specifications is to afford maximum possible iris accuracy, low storage requirements, and
+corresponding fast read times. These requirements include centering and masking of the eyelid and sclera regions (an
+example is shown in Figure 5, column B). The masked regions can be very efficiently compressed. This affords small
+record sizes and, vitally, preservation of the iris texture.
+
+                                                                       Table 9 − ISO/IEC 19794-6 profile for iris images stored on PIV Cards
+                                           Clause or field of ISO/IEC    ISO/IEC 19794-6
+                                                                                           PIV Conformance                   Remarks
+                                           19794-6
+                                                                         Field   Value     Values Allowed
+1.                                         CBEFF Header                  MF      MV        Patron format PIV                 Multi-field CBEFF Header. Sec. 9.2.
+2.                                         Format identifier             MF      MV        0x49495200                        IIR\0 Four byte format identifier including null terminator.
+3.                                         Version number                MF      MV        0x30323000                        020\0 Second 19794-6 version - not the 2005 standard
+      Iris General Header
+
+
+
+
+4.                                         Length of record              MF      MV        See NOTE 1                        The length (in bytes) of the entire iris image data.
+5.                                         Number of iris                MF      MV        1 or 2                            Number of iris representations that follow. This value would
+                                           representations                                                                   ordinarily be 1. See NOTE 4.
+6.                                         Certification flag            MF      MV        0x00
+7.                                         Number of eyes                MF      MV        1 or 2                            2 if left and right are known present, else
+                                           represented                                                                       1 if left or right is known present.
+                                                                                                                             If camera does not estimate eye label automatically, these
+                                                                                                                             shall be manually assigned.
+Representation 1: Data for the first eye image follows
+8.     Representation Length          MF     MV                                                                              Bytes for this representation including the header + image
+9.     Capture date and time          MF     MV        2011 onwards.                                                         Capture start time in UTC
+10.    Capture device                 MF     MV
+       technology identifier
+11.    Capture device vendor ID MF           MV                                                                              Manufacturer ID
+12.    Capture device type ID         MF     MV                                                                              Vendor assigned make model product ID.
+13.    Quality block                  MF     OIT
+14.    Representation number MF              MIT       1 and then, optionally, 2                                             Representation sequence number
+15.    Eye label                      MF     MIT       1 or 2                                                                Left, right. If camera does not estimate eye label
+                                                                                                                             automatically, these shall be manually assigned.
+16.                                        Image type                    MF      MV        7                                 IMAGE_TYPE_CROPPED_AND_MASKED = 7 (07Hex) i.e., a
+                                                                                                                             cropped and region-of-interest masked, centered, iris image
+      Representation Header + Image Data
+
+
+
+
+                                                                                                                             with (0,6R 0,2R) margins. See NOTE 2
+17.                                        Image format                  MF      MV        10 = 0x0A                         Compression algorithm and encoding shall be mono JPEG
+                                                                                                                             2000. The format shall not be PNG, RAW, or JPEG.
+18.                                        Iris image properties bit     MF      MIT       Bits 1-2:      01 or 10           Horizontal + vertical orientation shall not be undefined
+                                           field                                 MIT       Bits 3-4:      01 or 10
+                                                                                 MV        Bits 5-6:      01                 Scan type shall be progressive.
+                                                                                 MV        Bits 7-8:      01                 Compression history shall be none; i.e., the cropped and
+                                                                                           Bit 1 is the least signif. bit.   masked image shall be prepared from an uncompressed
+                                                                                           Bit 8 is the most signif. bit.    parent image.
+19.                                        Image width, W                MF      MIT       288 ≤ W ≤ 448                     Dimensions ranges, in pixels, are implied by the exact
+20.                                        Image height, H               MF      MIT       216 ≤ H ≤ 336                     [IRISSTD] margin requirements based on iris size.
+21.                                        Bit depth                     MF      MV        8                                 Bit depth in bits per pixel. This shall not be used to indicate
+                                                                                                                             compression level
+22.                                        Range                         MF      OIT                                         Required field; optionally populated.
+23.                                        Roll angle of eye             MF      OIT       ≤ 20                              Camera or software should estimate roll angle. Rotation
+24.                                        Roll angle uncertainty        MF      OIT       ≤5                                should only be applied if angle is > 20 deg.
+25.                                        Iris centre, lowest X         MF      MV        W/2       for W odd, else         These values are redundant for Image type = 7 for which
+26.                                        iris centre, highest X        MF      MV        W/2+1     for W even              image shall be exactly centered. The iris center shall be
+27.                                        Iris centre, lowest Y         MF      MV        H/2       for H odd, else         estimated by the iris localization code, or if necessary by a
+28.                                        Iris centre, highest Y        MF      MV        H/2+1     for H even              human inspector.
+29.                                        Iris diameter, lowest         MF      MIT       D ≥ 160                           These two fields are used to express a normative PIV
+30.                                        Iris diameter, highest        MF      MIT       D ≤ 280                           requirement on iris size. See NOTE 3
+31.                                        Image length                  MF                Approx 3KB for single iris,       Size of the JPEG 2000 encoded image data, in bytes, is limited
+
+
+                                                                                                                                                                                          25
+

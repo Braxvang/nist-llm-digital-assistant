@@ -1,0 +1,51 @@
+NIST SP 800-90A Rev. 1                                                    Recommendation for Random Number
+                                                                           Generation Using Deterministic RBGs
+
+
+    2) prediction_resistance_request: Indicates whether or not prediction resistance is to be
+       provided during the request (i.e., whether or not fresh entropy bits are required)5. Without
+       the explicit prediction resistance request, the entropy input could be provided from either
+       a DRBG with no access to an entropy source (i.e., fresh entropy would not be provided),
+       or the entropy input could be provided by an entropy source or by an RBG with access to
+       an entropy source (i.e., fresh entropy would be provided in these cases).
+        DRBGs that are implemented to always support prediction resistance or to never support
+        prediction resistance do not require this parameter. However, when prediction resistance
+        is not supported, the user of a consuming application must determine whether or not
+        prediction resistance may be required by the application before electing to use such a
+        DRBG implementation.
+        If prediction resistance is not supported, then the prediction_resistance_request input
+        parameter and step 2 of the reseed process is omitted, and reseed process step 4 is
+        modified to omit the prediction_resistance_request parameter.
+        If prediction resistance is always performed, then the prediction_resistance_request input
+        parameter and reseed process step 2 may be omitted, and reseed process step 4 is replaced
+        by:
+            (status, entropy_input) = Get_entropy_input (security_strength, min_length,
+            max_length)
+    3) additional_input: An optional input. The maximum length of the additional_input
+        (max_additional_input_length) is implementation dependent, but shall be less than or
+        equal to the maximum value specified for the given DRBG mechanism (see Section 10).
+        If the input by a consuming application of additional_input is not supported, then the
+        input parameter and step 2 of the reseed process are omitted, and step 5 of the reseed
+        process is modified to remove the additional_input from the parameter list.
+Required information not provided by the consuming application during reseeding (This
+information shall not be provided by the consuming application as an input parameter during the
+reseed request):
+    1. entropy_input: Input bits containing entropy. This input shall not be provided by the
+       DRBG instantiation being reseeded. The maximum length of the entropy_input is
+       implementation dependent, but shall be less than or equal to the specified maximum
+       length for the selected DRBG mechanism (see Section 10).
+  2. Internal state values required by the DRBG for the working_state and administrative
+      information, as appropriate.
+Output to a consuming application after reseeding:
+  1. status: The status returned from the function.
+
+
+
+5 A DRBG may be reseeded by an entropy source or an NRBG, both of which provide fresh entropy. A DRBG
+could also be reseeded by a DRBG that has access to an entropy source or NRBG. The request for prediction
+resistance during reseeding rules out the use of a DRBG that does not have access to either an entropy source or
+NRBG. See [SP 800-90C] for further discussion.
+
+
+                                                      30
+

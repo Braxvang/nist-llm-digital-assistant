@@ -1,0 +1,58 @@
+                                                                                               NIST SP 800-177 REV. 1                                                       TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               �e agency in the process of deploying DKIM (but has conﬁdence in their SPF policy) may wish
+                                                                                               to receive feedback solely on DKIM failures, but does not wish to be inundated with feedback,
+                                                                                               so requests that the policy be applied to a subset of messages received. In this case, the DMARC
+                                                                                               policy would include the fo= option to indicate only DKIM failures are to be reported and a pct=
+                                                                                               value of 10 to indicate that only 1 in 10 email messages should be subjected to this policy (and
+                                                                                               subsequent reporting on a failure). Note that this is not a wise strategy in that it reduces the
+                                                                                               enforcement policy and the completeness of reporting. �e use of the pct value in values other
+                                                                                               than 0 or 100 (i.e., none or full) limits DMARC eﬀectiveness and usefulness of reporting. It is
+                                                                                               also burdensome for receivers to choose that intermediate percentage of mail for testing.
+
+                                                                                                  _dmarc.example.gov 3600 IN TXT “v=DMARC1; p=none; pct=10; fo=d;
+                                                                                                                   ruf=reports@example.gov;“
+
+                                                                                               An agency with several subdomains may wish to have a single unified policy, in which case a
+                                                                                               DMARC RR with the sp= tag is used. In this example, the domain has a policy to reject any mail
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               from a subdomain of example.gov that fails checks, while only quarantining email that failed
+                                                                                               checks from the parent domain.
+
+                                                                                               _dmarc.example.gov 3600 IN TXT “v=DMARC1; p=quarantine; sp=reject;
+                                                                                                                 rua=reports@example.gov;”
+
+                                                                                               Security Recommendation 4-11: Sending domain owners who deploy SPF and/or DKIM
+                                                                                               are recommended to publish a DMARC record signaling to mail receivers the disposition
+                                                                                               expected for messages purporting to originate from the sender’s domain.
+
+                                                                                               4.6.4   DMARC on the Receiver Side
+
+                                                                                               Receivers of email purporting to originate from a given domain will look up the SPF, DKIM and
+                                                                                               DMARC records in the DNS and act on the policies encoded therein. �e recommended
+                                                                                               processing order per [RFC7489] is given below. Note that it is possible that some steps could be
+                                                                                               done in parallel and local policy may alter the order of some steps (i.e., steps 2, 3 and 4).
+
+                                                                                                  1. �e receiver extracts the message-From: address from the message. �is must contain a
+                                                                                                     single, valid address or else the mail is refused as an error.
+                                                                                                  2. �e receiver queries for the DMARC DNS record based on the message-From: address. If
+                                                                                                     none exists, terminate DMARC processing. �is may include queries to any potential
+                                                                                                     parent zone of the sender.
+                                                                                                  3. �e receiver performs DKIM signature checks. If more than one DKIM signature exists
+                                                                                                     in the message, one must verify.
+                                                                                                  4. �e receiver queries for the sending domain's SPF record and performs SPF validation
+                                                                                                     checks.
+                                                                                                  5. �e receiver conducts Identiﬁer Alignment checks between the message-From: and the
+                                                                                                     results of the SPF and DKIM records (if present). It does so by comparing the domain
+                                                                                                     extracted from the message-From: (as in step 2 above) with the domain in the veriﬁed
+
+
+                                                                                                                                              47
+

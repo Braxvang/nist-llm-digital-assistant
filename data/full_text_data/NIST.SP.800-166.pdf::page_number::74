@@ -1,0 +1,56 @@
+NIST SP 800-166                                                  DERIVED PIV APPLICATION AND
+                                                                 DATA MODEL TEST GUIDELINES
+
+                               password value (password 2). Both passwords
+                               should be padded (if needed) with 'FF' to
+                               complete the total length of each value to 8
+                               bytes
+                      3. Send the VERIFY command with
+                            • P1, is set to 'FF'
+                            • P2, key reference value, is set to '80'
+                            • L C and the command data field are absent
+                      4. Send the VERIFY command with
+                            • P1, is set to '00'
+                            • P2, key reference value, is set to '80'
+                            • L C and the command data field are absent
+                      5. Send the VERIFY command with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command will contain the new
+                               password value (password 2 from Step 2), padded
+                               with 'FF' (if necessary) to complete the total
+                               length of the value to 8 bytes
+                      Perform Step 6 only if the Derived PIV Application
+                      supports changing the PUK with the CHANGE REFERENCE DATA
+                      command.
+                      6. Send the CHANGE REFERENCE DATA command with
+                            • P2, key reference value, is set to '81'
+                            • Data field of the command will contain the
+                               correct PUK value, concatenated without
+                               delimitation with an arbitrary new PUK value.
+
+ Expected Result(s)   1. From Step 1, the command returns the application property template
+                         with the status word '90 00'.
+                      2. From Step 2, the command returns status word '90 00'. The
+                         password has now been changed.
+                      3. From Step 3, the command returns status word '90 00' and the
+                         security status of the PIN is reset.
+                      4. From Step 4, the command returns status word '63 CX' where X is
+                         equal to the reset retry value of the Derived PIV Application
+                         Password.
+                      5. Form Step 5, the command returns status word '90 00'
+                      6. From Step 6, the command returns status word '90 00' and the PUK
+                         value has been changed.
+ Postcondition(s)     The Derived PIV Application Password and PUK (if supported) are
+                      changed.
+
+8.3.5.2 Change Reference Data with an Invalid Key Reference
+
+ Test Assertion       TA-08.03.05.02
+ Purpose              Verifies that the Derived PIV Application does not change the password
+                      with the CHANGE REFERENCE DATA command with an invalid key
+                      reference.
+
+
+
+                                           67
+

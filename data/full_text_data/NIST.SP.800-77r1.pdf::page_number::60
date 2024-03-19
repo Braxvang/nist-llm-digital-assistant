@@ -1,0 +1,64 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                 GUIDE TO IPSEC VPNS
+
+
+                                                                                              13:45:34.118804 IP 203.0.113.1 > 198.51.100.1: ICMP echo request, id 27083, seq 2, length
+                                                                                              64
+                                                                                              13:45:34.118850 IP 198.51.100.1 > 203.0.113.1: ICMP echo reply, id 27083, seq 2, length 64
+                                                                                              13:45:39.469941 IP 203.0.113.1.isakmp > 198.51.100.1.isakmp: isakmp: parent_sa
+                                                                                              ikev2_init[I]
+                                                                                              13:45:39.472043 IP 198.51.100.1.isakmp > 203.0.113.1.isakmp: isakmp: parent_sa
+                                                                                              ikev2_init[R]
+                                                                                              13:45:39.481690 IP 203.0.113.1.isakmp > 198.51.100.1.isakmp: isakmp: child_sa
+                                                                                              ikev2_auth[I]
+                                                                                              13:45:39.525826 IP 198.51.100.1.isakmp > 203.0.113.1.isakmp: isakmp: child_sa
+                                                                                              ikev2_auth[R]
+                                                                                              13:45:39.587728 IP 203.0.113.1 > 198.51.100.1: ESP(spi=0xc55ed62b,seq=0x1), length 120
+                                                                                              13:45:39.587773 IP 198.51.100.1 > 203.0.113.1: ESP(spi=0xf6fc7c09,seq=0x1), length 120
+                                                                                              13:45:40.646761 IP 203.0.113.1 > 198.51.100.1: ESP(spi=0xc55ed62b,seq=0x2), length 120
+                                                                                              13:45:40.646800 IP 198.51.100.1 > 203.0.113.1: ESP(spi=0xf6fc7c09,seq=0x2), length 120
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                                            Figure 11: tcpdump Capture of ping, IKE, and ESP Packets
+
+                                                                                              4.2     ESP Encapsulation
+
+                                                                                              ESP packets cannot traverse a NAT device in all circumstances. If an IPsec connection uses
+                                                                                              transport mode, changing the IP address on the packets will invalidate the integrity checks
+                                                                                              imposed by IPsec. The NAT device cannot rewrite the ICV because it does not have access to the
+                                                                                              keying material needed to do so. For all intents and purposes, the NAT device is a malicious
+                                                                                              actor that IPsec protects against.
+
+                                                                                              The ESP protocol has no ports. If multiple clients send ESP from behind the same NAT router, it
+                                                                                              would be difficult to track the ESP packets to the respective clients as they would all have the
+                                                                                              same destination IP—that of the NAT device. While SPI numbers are uniquely generated for
+                                                                                              each IPsec host, there is no guarantee that two hosts behind the same NAT will not ultimately
+                                                                                              pick the same SPI number for an IPsec SA. Furthermore, NAT routers often do not understand or
+                                                                                              translate anything other than the UDP and TCP protocols, causing ESP packets to be dropped by
+                                                                                              the NAT device.
+
+                                                                                              4.2.1     UDP Encapsulation of ESP
+
+                                                                                              To overcome the transport issues of the ESP protocol, ESP can be encapsulated in UDP
+                                                                                              (ESPinUDP). The NAT device can rewrite the IP address of the outer UDP packet and track
+                                                                                              multiple clients by the UDP port number. For historical reasons, 39 when IKE detects a NAT
+                                                                                              during the negotiation, it switches the IKE negotiation from UDP port 500 to UDP port 4500. It
+                                                                                              uses a regular UDP packet header followed by a four-byte header with all zeroes (Non-ESP
+                                                                                              Marker) following the UDP header. Then the IKE header follows.
+
+                                                                                              ESPinUDP also uses port 4500 to ensure that the NAT device only has one NAT mapping for all
+                                                                                              traffic (ESP and IKE). Following the regular UDP packet header, the ESP header follows. The
+                                                                                              first four bytes of the ESP header is the SPI number, which cannot be 0. Thus, an implementation
+                                                                                              receiving a packet on port 4500 can determine whether the packet is an ESPinUDP packet or an
+
+
+                                                                                              39    Some NAT devices tried to be helpful by looking at the SPI and rewriting or multiplexing these, which caused additional
+                                                                                                    errors. The solution was to avoid UDP port 500 completely to avoid any NAT “helper” algorithms. IKEv2 even allows
+                                                                                                    skipping UDP port 500 altogether and using UDP port 4500 for all IKE messages.
+
+
+
+                                                                                                                                                             43
+

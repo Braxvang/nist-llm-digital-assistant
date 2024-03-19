@@ -1,0 +1,57 @@
+                                                                                             NIST SP 800-204                                                            SECURITY STRATEGIES FOR
+                                                                                                                                                        MICROSERVICES-BASED APPLICATION SYSTEMS
+
+                                                                                             Analysis of the client-side service discovery pattern
+
+                                                                                             The client-side option consists of building registry-aware clients. The client queries the service
+                                                                                             registry for the location of all services needed to make requests. It then contacts the target service
+                                                                                             directly. Though simple, this implementation option for service discovery requires the discovery
+                                                                                             logic (querying the service registry) to be implemented for each programming language and/or
+                                                                                             framework that is used for client implementations.
+
+                                                                                             Analysis of the service-side service discovery pattern
+
+                                                                                             The service-side discovery has two implementations: one pattern delegates the discovery logic to
+                                                                                             a dedicated router service set at a fixed location, while the other utilizes a server in front of each
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204
+
+
+
+
+                                                                                             microservice with the functionality of a dynamic Domain Name System (DNS)-resolver (which
+                                                                                             works with a Domain Name System Security Extensions (DNSSSEC) authoritative server)). In
+                                                                                             the dedicated router option, the client makes all service requests to this dedicated router service,
+                                                                                             which in turn queries the service registry for the location of the client-requested service and
+                                                                                             forwards that request to the discovered location. This removes the tight coupling between an
+                                                                                             application service and an infrastructure service such as the service registry service. In the DNS
+                                                                                             resolver pattern, each microservice completes its own service discovery using its built-in DNS
+                                                                                             resolver to query the service registry. The DNS resolver maintains a table of available service
+                                                                                             instances and their endpoint locations (i.e., IP addresses). To keep the table up to date, the
+                                                                                             asynchronous, nonblocking DNS resolver queries the service registry regularly—perhaps every
+                                                                                             few seconds—using DNS Service records (e.g., Service Resource Records (SRV RRs)) for
+                                                                                             service discovery. Since the service discovery function through the DNS resolver runs as a
+                                                                                             background task, the endpoints (URLs) for all peer microservices are instantly available when a
+                                                                                             service instance needs to make a request [2].
+
+                                                                                             A good strategy would be to use a combination of the service-side service discovery pattern
+                                                                                             and the client-side service discovery pattern [9]. The former can be used for providing access
+                                                                                             to all public APIs, while the latter can allow clients to access all cluster-internal interactions.
+
+                                                                                             Centralized versus distributed service registry
+
+                                                                                             In a centralized service registry implementation, all services wishing to publish their service
+                                                                                             register at a single point, and all services seeking these services use the single registry to
+                                                                                             discover them. The security disadvantage of this pattern is the single point of failure [13].
+                                                                                             However, data consistency will not be an issue. In the decentralized service registry, there may
+                                                                                             be multiple service registry instances, and services can register with any of the instances. In the
+                                                                                             short term, the disadvantage is that there will be data inconsistency between the various service
+                                                                                             registries. Eventually, consistency among these various instances of service registry is
+                                                                                             achieved either through broadcasting from one instance to all others or by propagation from
+                                                                                             one node to all others via attached data in a process called piggybacking.
+
+                                                                                             Regardless of the pattern used for service discovery, secure deployment of service discovery
+                                                                                             functions should meet the following service registry configuration requirements.
+
+
+                                                                                                                                              20
+

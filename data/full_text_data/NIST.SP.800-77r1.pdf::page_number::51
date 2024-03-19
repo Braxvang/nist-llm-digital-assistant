@@ -1,0 +1,54 @@
+                                                                                              NIST SP 800-77 REV. 1                                                         GUIDE TO IPSEC VPNS
+
+
+                                                                                                 •   In IKEv1, both endpoints are responsible for retransmissions, which leads to conflicting
+                                                                                                     retransmits and denial-of-service vectors. In IKEv2, only the exchange initiator is
+                                                                                                     responsible for retransmission.
+                                                                                                 •   In IKEv1, the IKE SA can expire while the IPsec SA is still active, which could lead to
+                                                                                                     strange scenarios with DPD. In IKEv2, every IPsec SA has an IKE SA. If the IKE SA
+                                                                                                     expires, all IPsec SAs are terminated as well. This guarantees that every IPsec SA has a
+                                                                                                     functional control channel, which was not the case with IKEv1.
+                                                                                                 •   In IKEv1, rekeying always requires a reauthentication of the two endpoints. Some
+                                                                                                     proprietary extensions allowed rekeying without reauthentication. Reauthentication is not
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                     always desirable, especially with the use of OTPs or hardware tokens that requires the
+                                                                                                     use of a PIN or fingerprint for activation by the user (such as a VPN client) since it would
+                                                                                                     require human interaction to keep the IPsec connection alive. In IKEv2, rekeying and
+                                                                                                     reauthentication are separate processes with their own lifetimes.
+                                                                                                 •   In IKEv1, the transport mode and IP compression are negotiated, and a mismatched
+                                                                                                     configuration would lead to a fatal IKE error. In IKEv2, the initiator can request the
+                                                                                                     transport mode and IP compression, but if the responder does not confirm those requests,
+                                                                                                     the IPsec SA is established in tunnel mode (or without compression).
+                                                                                                 •   In IKEv1, the IKE SA and IPsec SA can use different DH groups during key
+                                                                                                     establishment (i.e., the DH group used to establish the IKE SA can be different from the
+                                                                                                     DH group used to establish the IPsec SA). This is possible because the IKE and IPsec
+                                                                                                     parameters are negotiated in two different message exchanges that take place at different
+                                                                                                     times. In IKEv2, there is only one exchange of parameters, and the first IPsec SA is
+                                                                                                     established using the IKE SA DH group. Subsequent IPsec SAs can perform an
+                                                                                                     additional DH exchange, thus ensuring the property of PFS; that exchange can use a
+                                                                                                     different group. However, when configuring multiple IPsec SAs, there is no guarantee
+                                                                                                     which SA will be brought up first, either through an operator or by on-demand tunnel
+                                                                                                     establishments. Therefore, in IKEv2, the DH group selected should be the same for the
+                                                                                                     IKE SA and IPsec SAs.
+                                                                                                 •   In IKEv1, ESP encapsulation can only happen in UDP. IKEv2 can also use TCP and TLS
+                                                                                                     encapsulation on any port. The TCP/TLS encapsulation cannot be negotiated and must be
+                                                                                                     configured manually or via configuration provisioning. TCP port 4500 is often the default
+                                                                                                     used. This might require updates to firewall rules.
+                                                                                                 •   When migrating from IKEv1 to IKEv2, an upgrade of the algorithms used is strongly
+                                                                                                     recommended. 3DES, MD5, SHA-1, and DH Groups 2 and 5 should not be used. Instead,
+                                                                                                     AES-CBC with HMAC-SHA-2 or AES-GCM with either DH group 14 or an ECDH
+                                                                                                     group (19, 20, or 21) should be used.
+                                                                                                 •   IKEv2 traffic selector negotiations allow a narrowing of the proposed source and
+                                                                                                     destination network ranges. This helps with creating multiple parallel IPsec SAs per
+                                                                                                     traffic flow, which generally improves performance, as hardware (i.e., CPUs and network
+                                                                                                     interface cards [NICs]) can then handle multiple parallel streams at once. It is also used
+                                                                                                     as a method for IP address assignment by the server. A client asks for 0.0.0.0/0, and this
+                                                                                                     proposal is narrowed to the IP address given (e.g., 192.168.1.1/32).
+
+
+                                                                                                                                              34
+

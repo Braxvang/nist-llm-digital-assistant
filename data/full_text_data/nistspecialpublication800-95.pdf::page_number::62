@@ -1,0 +1,69 @@
+                                                                             GUIDE TO SECURE WEB SERVICES
+
+
+
+    <Request>
+      <Subject>
+        <Attribute AttributeId=“urn:oasis:names:tc:xacml:1.0:subject:subject-id”
+         DataType=“urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name”>
+          <AttributeValue>jsmith@users.example.com</AttributeValue>
+        </Attribute>
+        <Attribute AttributeId=“group”
+         DataType=“http://www.w3.org/2001/XMLSchema#string”
+         Issuer=“admin@users.example.com”>
+          <AttributeValue>developers</AttributeValue>
+        </Attribute>
+      </Subject>
+      <Resource>
+        <Attribute AttributeId=“urn:oasis:names:tc:xacml:1.0:resource:resource-id”
+         DataType=“http://www.w3.org/2001/XMLSchema#anyURI”>
+          <AttributeValue>http://server.example.com/code/docs/guide.html</AttributeValue>
+        </Attribute>
+      </Resource>
+      <Action>
+        <Attribute AttributeId=“urn:oasis:names:tc:xacml:1.0:action:action-id”
+         DataType=“http://www.w3.org/2001/XMLSchema#string”>
+          <AttributeValue>read</AttributeValue>
+        </Attribute>
+      </Action>
+      <Environment/>
+    </Request>
+
+                                     Figure 3-12. An XACML Request.
+
+Once the PDP receives the request, it processes the request against the policy provided in Figure 3-11.
+Because jsmith@users.example.com’s group attribute is “developers”, the resulting decision is “permit.”
+This decision is sent to the PEP in the form of an XACML response as shown in Figure 3-13. The PEP
+will then permit jsmith@users.example.com to read http://server.example.com/code/docs/guide.html.
+
+    <Response>
+      <Result>
+        <Decision>Permit</Decision>
+        <Status>
+          <StatusCode Value=“urn:oasis:names:tc:xacml:1.0:status:ok”/>
+        </Status>
+      </Result>
+    </Response>
+
+                                    Figure 3-13. An XACML Response
+
+Access control policies are comprised of Targets and Rules. A Target defines a set of conditions for the
+Subject, Resource, and Action that must be met for a PolicySet, Policy, or Rule to apply to a request. The
+Target is used by the PDP to determine whether or not the request applies to this particular rule. Once an
+applicable policy is found, the Rules are activated. Most Rules consist of an Effect and a Condition. The
+Effect determines what the results of the Condition mean, while the Condition can test that any attribute
+meets a certain requirement.
+
+Attributes are used in XACML to aid in creating access control policies. In essence, attributes refer to
+individual properties of the Subject, Resource, Action, or Environment that are applicable to the access
+request, such as the Subject’s user name or the Environment’s current time. A Policy uses the
+AttributeDesignator and the AttributeSelector to retrieve attributes from a request. The
+AttributeDesignator specifies an attribute with a given name and type that the PDP will retrieve from the
+request or some external source. AttributeSelectors provide an XPath query for resolving the values in
+the request or elsewhere. The attributes received are used in Rules to determine whether or not to grant
+access.
+
+
+
+                                                   3-27
+

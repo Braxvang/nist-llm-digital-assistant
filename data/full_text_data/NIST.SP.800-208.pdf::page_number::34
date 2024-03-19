@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-208                              RECOMMENDATION FOR STATEFUL
+                                                                                                                                         HASH-BASED SIGNATURE SCHEMES
+
+                                                                                                 wots_sk[i] = sk;
+                                                                                               }
+                                                                                               setWOTS_SK(SK, wots_sk);
+
+                                                                                               Initialize SK_PRF with an n-byte string using an approved
+                                                                                               random bit generator [6], where the instantiation of the
+                                                                                               random bit generator supports at least 8n bits of security
+                                                                                               strength;
+                                                                                               setSK_PRF(SK, SK_PRF);
+
+                                                                                               root = treeHash(SK, 0, h / d, ADRS);
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                               setLayerAddress(SK, L);
+                                                                                               setTreeAddress(SK, t);
+                                                                                               setIdx(SK, idx);
+
+                                                                                               // The "root" value in SK needs to be the root of the top-level
+                                                                                               // XMSS tree, as this is the value used when hashing the message
+                                                                                               // to be signed.
+                                                                                               if ( L = d – 1 ) {
+                                                                                                 setRoot(SK, root);
+                                                                                                 SK = L || t || idx || wots_sk || SK_PRF || root || SEED;
+                                                                                               } else {
+                                                                                                 setRoot(SK, getRoot(PK_MT));
+                                                                                                 SK = L || t || idx || wots_sk || SK_PRF || getRoot(PK_MT) || SEED;
+                                                                                               }
+                                                                                               // The public key should be encoded using the XDR for
+                                                                                               // xmssmt_public_key in Appendix C.3 of [1] with the additions
+                                                                                               // specified in Appendix B.3 of this document.
+                                                                                               PK = OID || root || SEED;
+                                                                                               return PK;
+
+                                                                                             Algorithm 12': XMSS'_sign
+
+                                                                                               Input: Message M
+                                                                                               Output: signature Sig
+
+                                                                                               idx_sig = getIdx(SK);
+                                                                                               setIdx(SK, idx_sig + 1);
+                                                                                               L = getLayerAddress(SK);
+                                                                                               t = getTreeAddress(SK);
+                                                                                               ADRS = toByte(0, 32);
+                                                                                               ADRS.setLayerAddress(L);
+                                                                                               ADRS.setTreeAddress(t);
+
+                                                                                               if ( L > 0 ) {
+                                                                                                 // M must be the n-byte root from an XMSS public key
+                                                                                                 byte[n] r = 0; // n-byte string of zeros
+
+                                                                                                                            25
+

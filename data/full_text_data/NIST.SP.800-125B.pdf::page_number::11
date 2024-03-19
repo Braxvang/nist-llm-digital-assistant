@@ -1,0 +1,57 @@
+NIST SP 800-125B                                                 SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                    FOR VM PROTECTION
+
+
+2.2     Using Virtual Switches
+
+Another approach to segmentation is to connect VMs with different sensitivity levels to different virtual
+switches within a single virtualized host. The isolation of traffic between VMs of different sensitivity
+levels can be achieved by connecting the appropriate virtual and physical switches to each other with their
+traffic going through one of the virtualized host’s pNICs. Finally, the traffic flow between the physical
+switches has to be regulated through the usual mechanisms, such as a firewall.
+
+2.2.1    Advantages
+
+Segmenting VMs using virtual switches as opposed to hosting them in different virtualized hosts
+promotes better utilization of virtualized host resources while still maintaining ease of configuration.
+Further, by design, all hypervisor architectures prevent direct connections between virtual switches within
+a hypervisor platform, thus providing the necessary isolation.
+
+2.2.2    Disadvantages
+
+There should be as many virtual switches in a virtualized host as there are applications/workloads of
+different sensitivity levels; this may lead to inefficient use of virtual switches. The flexibility in VM
+migration may be hampered due to non-availability of ports in the virtual switches of the same sensitivity
+level (based on the sensitivity level of the migrating VM) in the target host.
+
+2.2.3    Distributed Virtual Switches
+
+The constraints and limitations on VM migration outlined in Sections 2.2.2 and 2.3.2, as well as the
+network span limitation outlined in Section 2.3.2, do not exist if distributed virtual switches are deployed
+in the virtualized infrastructure instead of standalone virtual switches. A distributed virtual switch
+abstracts many individual, host-level virtual switches into a single large virtual switch that spans multiple
+hosts. Consequently, port groups associated with virtual switches become distributed virtual port groups
+that span virtualized hosts, thus ensuring consistent virtual network configuration across all hosts,
+especially those within the same cluster.
+
+2.3     Using Virtual Firewalls
+
+When Internet-facing applications (especially web applications) are run on (non-virtualized) physical
+hosts, a separate subnet called a Demilitarized Zone (DMZ) is usually created using physical firewalls.
+Similarly, when VMs hosting web servers running Internet-facing applications are deployed on a
+virtualized host, they can be isolated and run in a virtual network segment that is separated from a virtual
+network segment that is connected to the enterprise’s internal network. Just as two firewalls – one facing
+the internet and the other protecting the internal network – are used in a physical network, two firewalls
+are used inside a virtualized host to create the virtual network equivalent of a DMZ. The major difference
+in the case of a virtualized host is that the firewalls have to run in a virtual network, so they are virtual
+software-based firewalls run on dedicated (usually hardened) VMs. A configuration for a DMZ inside a
+virtualized host is shown in Figure 1.
+
+Figure 1 shows three virtual switches, VS-1, VS-2, and VS-3, inside the virtualized host. The uplink port
+of VS-1 is connected to the physical NIC pNIC-1, which is connected to a physical switch in the external
+network. Similarly, the uplink port of VS-3 is connected to the physical NIC pNIC-2, which is connected
+to a physical switch in the data center’s internal network. The firewall appliances running in VM1 and
+VM4 play the roles of Internet-facing firewall and internal firewall, respectively. VM1 acts as the traffic
+
+                                                      4
+

@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+When a DNSSEC-aware caching name server receives a query from a non-security-aware resolver, it
+serves either secure or insecure data from its cache. Because this query is non-security aware, DNSSEC
+RR types are not included in the response; so only normal DNS processing applies.
+
+DNSSEC-aware resolvers receive either secure or insecure data from the DNSSEC-aware caching server
+with a bit set in the header of the DNS response. This header bit is the Authenticated Data (AD) bit,
+which signals that the RRsets in the response passed all security checks performed by the caching name
+server. Depending on that server’s security posture, the client may choose to accept this response or
+perform its own set of security checks.
+
+In some cases, a client may want data that has been deemed bogus by a caching name server. In this case,
+the client sends a query with the Checking Disabled (CD) bit set in the DNS message header [RFC4035].
+This tells the DNSSEC-aware caching name server to respond with bogus data from the BAD cache, not
+an error message. The client system must then perform its own security checks on the response RRsets. In
+these types of responses, the server does not set the AD bit, indicating that the response has not passed all
+security checks performed by the server.
+
+9.8       Additional Protection Measures for DNS Query/Response
+
+DNSSEC specifications for protection of DNS query/response transactions cover the following
+communications:
+
+      •    DNS responses from remote authoritative name servers to local (enterprise) resolving name
+           servers
+
+      •    DNS responses from remote caching name servers to local resolving name servers.
+Because most of the queries in DNS originate from stub resolvers (on behalf of client software requiring
+Internet resource access) protection for the DNS response message must be extended to the stub resolver
+to the resolving name server path as well. The protection approach for this path (also called the DNS last
+hop or last mile) is determined by the nature of the stub resolver and how the network is set up.
+
+Stub resolvers can be non-DNSSEC aware, DNSSEC-aware nonvalidating, and DNSSEC-aware
+validating. Most of the stub resolvers deployed today are non-DNSSEC aware. In other words, not only
+do they not have the capability to verify signatures associated with returned RRSets, they also cannot
+make a distinction between an authenticated (signature verified) response and a nonauthenticated
+response (passed through by their local resolving name servers). To have complete end-to-end protection
+for DNS query/response, the minimal requirement for these types of stub resolvers is that they should
+have the capability to perform origin authentication and data integrity for responses coming down the
+channel connecting them to the resolving name server providing DNS name resolution service for them.
+This capability can be installed in these types of stub resolvers with the HMAC approach specified in
+TSIG (as HMACs are implemented for protecting zone transfer and dynamic update transactions).
+Alternatively, the enterprise can provide this capability through other network security mechanisms, such
+as IP Security (IPsec). Guidance on how to set up IPsec protected connections between clients and a
+recursive caching server is beyond the scope of this document. Whatever mechanism is used for channel
+security of the last hop (resolving name server to stub resolver), this capability should be present in
+DNSSEC-aware nonvalidating stub resolvers as well, in addition to non-DNSSEC aware stub resolvers. A
+DNSSEC-aware nonvalidating stub resolver can leverage this trusted path to examine the setting of the
+AD bit in the message header of a response message it receives. These types of stub resolvers can then
+use this flag bit as a hint to find out whether the resolving name server was able to successfully validate
+the signatures for all of the data in the Answer and Authority sections of the response.
+
+
+                                                    9-14
+

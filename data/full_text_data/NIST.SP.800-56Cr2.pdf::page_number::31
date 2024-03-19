@@ -1,0 +1,52 @@
+                                                                                               NIST SP 800-56C REV. 2                                 RECOMMENDATION FOR KEY DERIVATION METHODS
+                                                                                                                                                                   IN KEY ESTABLISHMENT SCHEMES
+
+
+                                                                                                       the same hash function, hash) shall be the PRF used by the KDF in key expansion.
+                                                                                                      and
+                                                                                                   b. If either AES-128-CMAC, AES-192-CMAC, or AES-256-CMAC is used for randomness
+                                                                                                      extraction, then the PRF used by the KDF in key-expansion shall be AES-128-CMAC
+                                                                                                      (i.e., the CMAC mode of AES-128).
+                                                                                               •   The OtherInput provided during the key-derivation request shall provide the salt for the
+                                                                                                   randomness-extraction step (see Section 5.1 for additional details), and the requisite inputs
+                                                                                                   (other than the key-derivation key) for m calls to the PRF-based KDF used for key expansion.
+                                                                                                   In particular, for i = 1, .., m, OtherInput shall include (subject to the stated conditions):
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Cr2
+
+
+
+
+                                                                                                   a. Li – A positive integer that indicates the length (in bits) of the secret keying material to be
+                                                                                                      derived during the i-th call to the PRF-based KDF. (See the description of L in Section
+                                                                                                      5.1 for additional details.)
+                                                                                                   b. {IVi} – A bit string included (if required) for use as an initial value for the i-th call to the
+                                                                                                      PRF-based KDF; the IVi values shall be included in OtherInput if and only if the chosen
+                                                                                                      PRF-based KDF is operating in Feedback Mode. (See the description of IV in Section 5.1
+                                                                                                      for additional details.)
+                                                                                                   c. FixedInfoi – The FixedInfo data to be employed during the i-th call to the PRF-based KDF.
+                                                                                                      (See the description of FixedInfo in Section 5.1 for details.)
+                                                                                               •   The values of FixedInfo1 , FixedInfo2 , … , and FixedInfom shall be (pairwise) distinct. (See
+                                                                                                   Section 7.5, item 2 in [SP 800-108].)
+                                                                                               •   The derived keying material, DerivedKeyingMaterial1, DerivedKeyingMaterial2, … , and
+                                                                                                   DerivedKeyingMaterialm shall not be output until all m of the bit strings have been
+                                                                                                   successfully computed. If an error occurs during randomness extraction or key expansion, then
+                                                                                                   this key-derivation method shall not output any derived keying material.
+
+                                                                                               To incorporate m key-expansion operations into an extract-then-expand key-derivation procedure,
+                                                                                               the process and output specified in Section 5.1 are modified as follows:
+
+                                                                                               Process:
+                                                                                               [Randomness Extraction]
+                                                                                                   1. Call MAC( salt, Z, …) to obtain KDK or an error indicator; if an error occurs, output an
+                                                                                                      error indicator and exit from this process without performing steps 2 and 3.
+                                                                                               [Key Expansion]
+                                                                                                   2. For i = 1 to m, do the following:
+                                                                                                          2.1   Call KDF( KDK, Li, {IVi,} FixedInfoi) to obtain DerivedKeyingMateriali or an error
+                                                                                                                indicator (see [SP 800-108] for details). If an error occurs, output an error
+                                                                                                                indicator and exit this process without performing any of the remaining actions (in
+                                                                                                                particular, omit step 3).
+                                                                                                   3. For i = 1 to m, do the following:
+
+
+                                                                                                                                                23
+

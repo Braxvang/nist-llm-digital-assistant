@@ -1,0 +1,55 @@
+                                 NIST Special Publication 800-38F
+
+
+For this reason, TKW is not recommended for new applications.
+
+Given repeated attempts, of course, the adversary can increase the probability that a randomly-
+generated string will eventually be accepted as a valid ciphertext. The system or protocol that
+implements the authenticated-decryption function should monitor and, if necessary, limit the
+number of unsuccessful verification attempts for each key.
+
+A.4    Forgeries of Extremely Long Messages
+The motivation for the limits on the length of the plaintext in Sec. 5.3 is the following
+observation on the unwrapping function, due to John Kelsey of NIST: if S is extremely long,
+about 267 semiblocks, and if T and U are semiblock strings of equal length, it is likely that
+
+      MSB64d(W-1(S||T)) = MSB64d(W-1(S||U))                                                    (1)
+
+for some positive integer d.
+
+Equation 1 will hold if six pairs of suitable intermediate values coincide within the two
+invocations of the unwrapping function in the equation. Each pair of coinciding values is called a
+collision.
+
+In particular, let S be a semiblock string of length m, and let T and U be distinct semiblocks. Let
+A1, A2, …, A6m be the semiblocks defined within Algorithm 2 for W-1(S||T), and let B1, B2, …, B6m
+be the corresponding semiblocks for W-1(S||U). Let i1, i2, …, i6 be indices that satisfy the
+following “collision conditions”:
+
+      0 < i1 < m,                          Ai1 = Bi1,
+      i1+m < i2,                           Ai2 = Bi2,
+      i2+m < i3,                           Ai3 = Bi3,
+      i3+m < i4,                           Ai4 = Bi4,
+      i4+m < i5,                           Ai5 = Bi5,
+      i5+m < i6 ≤ 6m, and                  Ai6 = Bi6.
+
+These conditions imply that collisions will occur at many other intermediate values, e.g., Aj = Bj
+for each index j such that 5m < j < i6, or 4m < j < i5, etc; collisions will also occur at these indices
+for the R values that are defined in Algorithm 2. For i1, these colliding R values are part of the
+output of the unwrapping function, as described in Equation 1 with d = i1.
+
+The first semiblock of the output of the unwrapping function determines whether a purported
+ciphertext will pass the integrity check within the authenticated-decryption function. Therefore,
+if S||T is a given ciphertext for KW, then the modified ciphertext S||U will also pass the integrity
+check, provided that the collision conditions are satisfied. In other words, if six suitable
+collisions occur, S||U will be a successful forgery. Moreover, the first i1-1 semiblocks of the
+resulting plaintext will be identical to the plaintext from which S||T was generated.
+
+For KWP, S||U would also be a successful forgery if the collision conditions are satisfied and if
+no padding octets were appended to the plaintext during the generation of S||T.
+
+
+
+
+                                                  20
+

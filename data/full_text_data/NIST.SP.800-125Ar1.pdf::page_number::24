@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                                       SECURITY RECOMMENDATIONS FOR
+                                                                          SERVER-BASED HYPERVISOR PLATFORMS
+
+The most common memory migration technique adopted in most hypervisors is called pre-copy. In this
+approach, memory pages belonging to the VM are transferred to the destination host while the VM continues
+to run on the source host [5]. Memory pages modified during migration are sent again to the destination to
+ensure memory consistency. During this phase, the exact state of all the processor registers currently operating
+on the VM are also transferred, and the migrating VM is suspended on the source host. Processor registers at
+the destination are modified to replicate the state at the source, and the newly migrated VM resumes its
+operation. Storage migration is provided by a feature that allows admins to move a VM's file system from one
+storage location to another without downtime. This storage migration can even take place in situations where
+there is no VM migration. For example, a VM may continue to run on the host server while the files that make
+up the VM are moved among storage arrays or Logical Unit Numbers (LUNs).
+
+In the process described above, the memory and processor-state migration functions are inherent aspects of
+hypervisor design. The storage migration function is an integral part of storage management and is applicable
+to both virtualized and non-virtualized infrastructures. The network state is maintained after a VM migration
+because each VM carries its own unique MAC address, and the migration process places some restrictions on
+the migration target (e.g., the source and target host should be on the same VLAN). Hence, from the security
+protection point of view, the only aspects to consider are proper authentication and a secure network path for
+the migration process.
+
+Security Recommendation HY-SR-13: During VM live migration, a secure authentication protocol
+must be employed; the credentials of the administrator performing the migration are passed only to the
+destination host; the migration of memory content and processor state takes place over a secure network
+connection; and a dedicated virtual network segment is used in both source and destination hosts for
+carrying this traffic.
+
+6.3 VM Monitoring and Security Policy Enforcement
+
+Since VMs are prime sources of threats to the hypervisor, continuous monitoring of the state of VMs and the
+traffic going in and out of those VMs is necessary for: (a) controlling the type of traffic, (b) intrusion detection
+and prevention, and (c) detecting viruses and other malware. This function can be accomplished in two ways:
+
+     •    VM-based Security Monitoring and Intervention Solution
+     •    Security Monitoring and Intervention by a Hypervisor Module with enforcement of traffic rules
+          at the point of a VM or at the virtual network object level (i.e., Virtual Switch's Port/Port Group)
+
+In a VM-based Security Monitoring and Intervention approach, software or a software-agent (i.e., a security
+tool) is run inside a VM to monitor security-relevant events. This approach is similar to running host-based
+IDS. The advantage of this approach is that it provides good visibility and good context analysis for the code
+running within the VM. However, because of the dependency of the security tool on the underlying Guest
+OS, any attack on the latter will also disable the function of the security tool, thus disabling the
+countermeasure. Another disadvantage of running the security tool as a virtualized workload is the
+performance impact it will have on itself and other application workloads running on that VM.
+
+Virtual Network-based Security Monitoring can come in two forms:
+
+  (a) A dedicated security appliance for protecting each VM;
+  (b) A security appliance that runs in the virtual network and can protect
+      multiple VMs inside the hypervisor host.
+
+
+
+
+                                                         17
+

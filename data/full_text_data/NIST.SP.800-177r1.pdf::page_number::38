@@ -1,0 +1,58 @@
+                                                                                               NIST SP 800-177 REV. 1                                                         TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               4     Authenticating a Sending Domain and Individual Mail Messages
+
+                                                                                               4.1   Introduction
+
+                                                                                               RFC 5322 deﬁnes the Internet Message Format (IMF) for delivery over the Simple Mail Transfer
+                                                                                               Protocol (SMTP) [RFC5321], but in its original state any sender can write any envelope-From:
+                                                                                               address in the header (see Section 2.3.3). �is envelope-From: address can however be
+                                                                                               overridden by malicious senders or enterprise mail administrators, who may have organizational
+                                                                                               reasons to rewrite the header, and so both [RFC 5321] and [RFC 5322] deﬁned From: addresses
+                                                                                               can be aligned to some arbitrary form not intrinsically associated with the originating IP address.
+                                                                                               In addition, any man in the middle attack can modify a header or data content. New protocols
+                                                                                               were developed to detect these envelope-From: and message-From: address spooﬁng or
+                                                                                               modiﬁcations.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               Sender Policy Framework (SPF) [RFC4408] uses the Domain Name System (DNS) to allow
+                                                                                               domain owners to create records that associate the envelope-From: address domain name with
+                                                                                               one or more IP address blocks used by authorized MTAs. It is then a simple matter for a
+                                                                                               receiving MTA to check a SPF TXT record in the DNS. �is check would conﬁrm the purported
+                                                                                               sender of a message is in the listed approved sending MTA is indeed authorized to transmit email
+                                                                                               messages for the domain listed in the envelope-From: address. Mail messages that do not pass
+                                                                                               this check may be marked, quarantined or rejected. SPF is described in subsection 4.4 below.
+
+                                                                                               �e DomainKeys Identiﬁed Mail (DKIM) [RFC6376] protocol allows a sending MTA to
+                                                                                               digitally sign selected headers and the body of the message with a RSA signature and include the
+                                                                                               signature in a DKIM header that is attached to the message prior to transmission. �e DKIM
+                                                                                               signature header ﬁeld includes a selector, which the receiver can use to retrieve the public key
+                                                                                               from a record in the DNS to validate the DKIM signature over the message. So, validating the
+                                                                                               signature assures the receiver that the message has not been modiﬁed in transit – other than
+                                                                                               additional headers added by MTAs en route which are ignored during the validation. Use of
+                                                                                               DKIM also ties the email message to the domain publishing the public key, regardless of the
+                                                                                               From: address (which could be diﬀerent). DKIM is detailed in subsection 4.5.
+
+                                                                                               Deploying SPF and DKIM may curb illicit activity against a sending domain, but the sender gets
+                                                                                               no indication of the extent of the beneﬁcial (or otherwise) eﬀects of these policies. Sending
+                                                                                               domain owners may choose to construct pairwise agreements with selected recipients to
+                                                                                               manually gather feedback, but this is not a scalable solution. �e Domain-based Message
+                                                                                               Authentication, Reporting and Conformance protocol (DMARC) [RFC7489] institutes such a
+                                                                                               feedback mechanism, to let sending domain owners know the proportionate eﬀectiveness of their
+                                                                                               SPF and DKIM policies, and to signal to receivers what action should be taken in various
+                                                                                               individual and bulk attack scenarios. After setting a policy to advise receivers to deliver,
+                                                                                               quarantine or reject messages that fail both SPF and DKIM, email receivers then return DMARC
+                                                                                               aggregate and/or failure reports of email dispositions to the domain owner, who can review the
+                                                                                               results and potentially reﬁne the policy. DMARC is described in subsection 4.6.
+
+                                                                                               While DMARC can do a lot to curb spooﬁng and phishing (Section 3.1.6 above), it does need
+                                                                                               careful conﬁguration. Intermediaries that forward mail have many legitimate reasons to rewrite
+
+                                                                                                                                               25
+

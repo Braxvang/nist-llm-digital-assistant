@@ -1,0 +1,53 @@
+Practical Combinatorial Testing
+________________________________________________________________
+pn = vin, and Rj is one of the possible results. The output of this step is a set of
+counterexamples that show how the SUT can reach the claimed result Rj from a given set
+of inputs.
+
+The example in the following sections illustrates how these counterexamples are converted
+into tests. Other approaches to determining the correct output for each test can also be
+used. For example, in some cases we can run a model checker in simulation mode,
+producing expected results directly rather than through a counterexample.
+
+       The completed tests can be used to validate correct operation of the system for
+interaction strengths up to some pre-determined level t. Depending on the system type and
+level of effort, we may want to use pairwise (t=2) or higher strength, up to t=6 way
+interactions. We do not claim this guarantees correctness of the system, as there may be
+failures triggered only by interaction strengths greater than t. In addition, some of the
+parameters are likely to have a large number of possible values, requiring that they be
+abstracted into equivalence classes. If the abstraction does not faithfully represent the
+range of values for a parameter, some flaws may not be detected by equivalence classes
+used.
+
+9.2   Access Control System Example
+
+        Here we present a small example of a very simple access control system. The rules
+of the system are a simplified multi-level security system, given below, followed by a step­
+by-step construction of tests using a fully automated process.
+
+        Each subject (user) has a clearance level u_l, and each file has a classification level,
+f_l.    Levels are given as 0, 1, or 2, which could represent levels such as Confidential,
+Secret, and Top Secret. A user u can read a file f if u_l ≥ f_l (the “no read up” rule), or
+write to a file if f_l ≥ u_l (the “no write down” rule).
+
+Thus a pseudo-code representation of the access control rules is:
+
+       if u_l >= f_l & act = rd then GRANT;
+       else if f_l >= u_l & act = wr then GRANT;
+       else DENY;
+
+Tests produced will check that these rules are correctly implemented in a system.
+
+9.2.1 SMV Model
+
+    This system is easily modeled in SMV as a simple two-state finite state machine. The
+START state merely initializes the system (line 8, Figure 27), with the rule above used to
+evaluate access as either GRANT or DENY (lines 9-13). For example, line 9 represents
+the first line of the pseudo-code above: in the current state (always START for this simple
+model), if u_l ≥ f_l then the next state is GRANT. Each line of the case statement is
+examined sequentially, as in a conventional programming language. Line 12 implements
+the “else DENY” rule, since the predicate “1” is always true. SPEC clauses given at the
+
+
+48
+

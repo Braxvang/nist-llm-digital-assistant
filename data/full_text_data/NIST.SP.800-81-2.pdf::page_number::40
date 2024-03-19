@@ -1,0 +1,57 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+    •   ID Guessing and Query Prediction. In this type of attack, the attacker guesses the ID field in
+        the header of the DNS request message (because this field is only 16 bits long, brute force
+        guessing is possible) and possibly the QNAME and QTYPE (owner name and RRType,
+        respectively). The attacker then injects bogus data into the network as a response by spoofing a
+        name server.
+
+    •   Responses Accumulated from a Compromised Authoritative Name Server. A compromised
+        authoritative name server is directed by a controlling adversary to send out bogus responses to
+        queries from resolving name servers.
+The impacts on a system serviced by a resolving name server that has a poisoned cache are as follows:
+
+    •   Denial of Service. If some crucial RRs such as address records (A RRs) are forged, the system
+        that requires this information can never establish connectivity with the intended node.
+
+    •   Client Redirection through Cache Poisoning. Client redirection is performed by selective
+        poisoning of DNS RRs whose RDATA element contains a name. Examples of such RRs are
+        CNAME, NS, and MX. The name resolution (i.e., IP address) information for these names is
+        found in a set of additional information (or glue records when discussing a delegation response).
+        Normally the resolving name server obtains these necessary A/AAAA RRs through follow-up
+        queries (also called triggered queries). The responses flowing into the network from these follow-
+        up queries present yet another opportunity for the attacker to insert bogus records. First the
+        attacker can introduce arbitrary names of the attacker’s choosing in the RDATA portion of
+        selected RRs; then the attacker can insert the IP addresses of servers (chosen by the attacker) in
+        associated glue records that are transmitted as an answer to follow-up queries. This type of attack
+        on two sets of related responses is called a name chaining attack. The overall effect of poisoning
+        the cache of a resolving name server this way is to misdirect several clients who are making use
+        of the services of that resolving name server. Redirecting the users to nodes of the attacker’s
+        choosing may enable the attacker to capture sensitive information such as passwords.
+6.1.2   Removal of Some RRs
+
+Apart from injecting bogus or forged data in a response, an attacker also could remove RRs from a
+response. This action might result in a name resolution query failure and consequent denial of service.
+
+6.1.3   Incorrect Expansion Rules Applied to Wildcard RRs
+
+Many zones use wildcard RRs to economize on the volume of data in the zone file. The wildcard patterns
+are used for synthesizing RRs on the fly in generating responses for name resolution queries. (The
+synthesis rules are outlined in section 4.3.2 of IETF RFC 1034 [RFC1034].) If synthesis rules are applied
+incorrectly in a name server, the RRs associated with resources existing in an organization may not be
+generated and made available in a DNS response. This fault also results in denial of service.
+
+6.1.4   Protection Approach for DNS Query/Response Threats—DNSSEC
+
+The underlying feature in the major threat associated with DNS query/response (i.e., forged response or
+response failure) is the integrity of DNS data returned in the response. Hence, the security objective is to
+verify the integrity of each response received. An integral part of integrity verification is to ensure that
+valid data has originated from the right source. Establishing trust in the source is called data origin
+authentication. Hence, the security objectives—and consequently the security services—that are required
+
+
+
+                                                    6-2
+

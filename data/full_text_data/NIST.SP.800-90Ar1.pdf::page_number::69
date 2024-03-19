@@ -1,0 +1,44 @@
+NIST SP 800-90A Rev. 1                                               Recommendation for Random Number
+                                                                      Generation Using Deterministic RBGs
+
+
+   2. L = len (input_string)/8.                  Comment: L is the bitstring representation of the
+                                                 integer resulting from len (input_string)/8. L shall
+                                                 be represented as a 32-bit integer.
+   3. N = number_of_bits_to_return/8.            Comment: N is the bitstring representation of the
+                                                 integer resulting from number_of_bits_to_return/8.
+                                                 N shall be represented as a 32-bit integer.
+                                                 Comment: Prepend the string length and the
+                                                 requested length of the output to the input_string.
+   4. S = L || N || input_string || 0x80.
+                                                 Comment: Pad S with zeros, if necessary.
+   5. While (len (S) mod outlen) ≠ 0, do
+               S = S || 0x00.
+                                                 Comment: Compute the starting value.
+   6. temp = the Null string.
+   7. i = 0.                                     Comment: i shall be represented as a 32-bit integer,
+                                                 i.e., len (i) = 32.
+   8. K = leftmost (0x00010203...1D1E1F, keylen).
+   9. While len (temp) < keylen + outlen, do
+         9.1     IV = i || 0outlen - len (i).    Comment: The 32-bit integer representation of i is
+                                                 padded with zeros to outlen bits.
+         9.2     temp = temp || BCC (K, (IV || S)).
+         9.3     i = i + 1.
+                                                 Comment: Compute the requested number of bits.
+   10. K = leftmost (temp, keylen).
+   11. X = select (temp, keylen+1, keylen+outlen).
+   12. temp = the Null string.
+   13. While len (temp) < number_of_bits_to_return, do
+         13.1 X = Block_Encrypt (K, X).
+         13.2 temp = temp || X.
+   14. requested_bits = leftmost (temp, number_of_bits_to_return).
+   15. Return (SUCCESS, requested_bits).
+10.3.3         BCC and Block_Encrypt
+
+Block_Encrypt is used for convenience in the specification of the BCC function. This function
+is not specifically defined in this Recommendation, but has the following meaning:
+
+
+
+                                                      60
+

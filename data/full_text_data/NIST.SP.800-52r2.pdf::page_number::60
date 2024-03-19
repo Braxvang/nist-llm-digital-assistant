@@ -1,0 +1,53 @@
+NIST SP 800-52 REV. 2                                             GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+Appendix D—RSA Key Transport
+
+RSA key transport is a key exchange mechanism where the premaster secret is chosen by the
+client, encrypted with the server’s public key, and sent to the server. It is available in TLS
+versions 1.0 through 1.2, but it is not supported by TLS 1.3. While it is a convenient method for
+key exchange when the server’s certificate contains an RSA public key, this method has several
+drawbacks:
+
+      1. The client has sole responsibility for the premaster secret generation. If the client does
+         not have sufficient entropy to generate the premaster secret, the security of the session
+         will suffer.
+      2. It does not enable forward secrecy.
+      3. The padding scheme that TLS uses for this operation has a known vulnerability that
+         requires TLS implementations to perform attack mitigation.
+
+For these reasons, this guideline does not recommend cipher suites that use RSA key transport
+for key exchange (see Section 3.3.1).
+
+Perfect forward secrecy (see Footnote 20) is often a security goal, as it prevents the compromise
+of long-term keys from enabling the decryption of sessions. The only way to achieve this
+property in TLS is to use a key exchange mechanism that relies on ephemeral parameters (i.e.,
+cipher suites that contain DHE or ECDHE) as specified in RFC 5246 [25].
+
+RSA key-transport using PKCS #1 v1.5 is vulnerable to Bleichenbacher oracle attacks. RFC
+5246 contains steps to mitigate the attacks by processing incorrectly formatted messages in a
+manner indistinguishable from the processing of properly-formatted messages (see [25], Section
+7.4.7.1). The mitigation techniques are not always effective in practice (for examples, see [14]).
+
+D.1        Transition Period
+
+While these guidelines do not recommend cipher suites using RSA key transport, there may be
+circumstances in practice where RSA key transport is needed. For example, if an agency uses a
+network appliance for regulatory or enterprise security purposes that only functions with these
+cipher suites, then these cipher suites may need to be enabled. It is recommended that agencies
+transition to a new method to meet their needs as soon as it is practical.
+
+If RSA key transport is needed while a new traffic inspection strategy is being developed, only
+RSA key transport cipher suites from the following list may be used. See Section 3.3.1.1 for
+general information on preference order.
+
+      •   TLS_RSA_WITH_AES_128_CCM (xC0, x9C)
+      •   TLS_RSA_WITH_AES_256_CCM (xC0, x9D)
+      •   TLS_RSA_WITH_AES_128_CCM_8 (xC0, xA0)
+      •   TLS_RSA_WITH_AES_256_CCM_8 (xC0, xA1)
+      •   TLS_RSA_WITH_AES_128_CBC_SHA (x00, x2F)
+      •   TLS_RSA_WITH_AES_256_CBC_SHA (x00, x35)
+      •   TLS_RSA_WITH_AES_128_CBC_SHA256 (x00, 3C)
+
+                                                   51
+

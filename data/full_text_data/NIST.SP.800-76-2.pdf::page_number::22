@@ -1,0 +1,78 @@
+                                          Clause title and/or field name                  INCITS 378-2004  PIV Conformance
+                                          (Numbers in parentheses are [MINUSTD]           Field or Value                           Informative Remarks
+                                                                                                           Values Allowed
+                                          clause numbers)                                 content Required
+     23.                                  Y (vertical) resolution (6.4.10)                MF        MV     197
+     24.                                  Number of Finger Views (6.4.11)                 MF        MV     2                       Once each for primary and secondary
+     25.                                  Reserved Byte (6.4.12)                          MF        MV     0
+     26.                                  Finger View Header (6.5.1)                      NC               A
+     27.                                  Finger Position (6.5.1.1)                       MF        MV     MIT
+     28.                                  View Number (6.5.1.2)                           MF        MV     0                       See Note 10
+                            View header
+
+
+
+
+     29.                                  Impression Type (6.5.1.3)                       MF        MV     0 or 2                  Plain live or non-live scan images.
+                                                                                                           20,40,60,80,100,
+     30.                                  Finger Quality (6.5.1.4)                        MF        MV                             See Note 6
+           K finger views
+
+
+
+
+                                                                                                           254, 255
+                                                                                                                                   M minutiae data records follow. If only M
+     31.                                  Number of Minutiae (6.5.1.5)                    MF        MV         0 ≤ M ≤ 128         ≤ 10 minutiae are found re-enrollment
+                                                                                                                                   should be attempted.
+     32.       Minutiae Type (6.5.2.1)                                                    MF        MV         01b, 10b, or 00b    See Note 1
+                            M minutiae
+
+
+
+
+     33.       Minutiae Position (6.5.2.2)                                                MF        MV         MIT                 See Note 7
+     34.       Minutiae Angle (6.5.2.3)                                                   MF        MV         MIT                 See Note 8
+     35.       Minutiae Quality (6.5.2.4)                                                 MF        MV         MIT                 This may be populated.
+     36.       Extended Data Block Length (6.6.1.1)                                       MF        MV         0                   See Note 9
+     37.       CBEFF Signature Block                                                      MF        MV                             See Section 9.3 of this document
+     END OF TABLE
+
+
+                Acronym                                                  Meaning
+                MF     mandatory field                                   [MINUSTD] requires a field shall be present in the FMR
+                MV     mandatory value                                   [MINUSTD] requires a meaningful value for a field
+                NC     normative content                                 [MINUSTD] gives normative practice for PIV. Such clauses do not define a field in the FMR.
+                A      as required                                       For PIV, value or practice is as normatively specified in [MINUSTD].
+                MIT    mandatory at time of                              For PIV, mandatory value that shall be determined at the time the record is instantiated and
+                       instantiation                                     shall follow the practice specified in [MINUSTD]
+
+
+NORMATIVE NOTES:
+1.         [MINUSTD] requires that each stored minutia have a type associated with it. For PIV, the mandatory card
+           templates shall contain minutiae of type ridge ending or ridge bifurcation. These types are defined in [MINUSTD,
+           5.3.{2,3}]. Other types of minutiae, such as trifurcations and crossovers, shall not be included in PIV Card
+           templates. However, for those minutiae where it is not possible to reliably distinguish between a ridge ending
+           and a bifurcation, the category of "other" shall be assigned and encoded using bit values 00b. The angle and
+           location for a minutia of type "other" should be the angle and location that would have applied to the
+           corresponding ridge ending or bifurcation depending on which one the encoding algorithm determines to be the
+           most likely for that particular minutiae. This is a common characteristic of "inked" impressions that exhibit ridge
+           endings being converted to bifurcations and vice-versa due to over- or under-inking in the image.
+2.         The second paragraph of [MINUSTD, 6.4.2] refers both to an ASCII space and "three ASCII numerals" mentioned
+           in the first paragraph. The practice of using an ASCII space character as the first character of the version number
+           shall be followed: " 20\0" i.e., 0x20323000.
+3.         The length of the entire record shall fit within the container size limits specified in [800-73]. These limits apply to
+           the entire CBEFF wrapped and signed entity, not just the [MINUSTD] record.
+4.         Both fields ("Owner" and "Type") of the CBEFF Product Identifier of [MINUSTD, Clause 6.4.4] shall be non-zero.
+           The two most significant bytes shall identify the vendor, and the two least significant bytes shall identify the
+           version number of that supplier's minutiae detection algorithm.
+5.         The Capture Equipment ID shall be reported. Its use may improve interoperability.
+6.         The quality value shall be that computed for the parent image using [NFIQ] and reported here as Q = 20*(6 -
+           NFIQ). A value of "255" shall be assigned when fingerprints are temporarily unusable for matching. A value of
+           "254" shall be assigned when the fingerprints are permanently unusable.
+7.         All coordinates and angles for minutiae shall be recorded with respect to the original finger image. They shall not
+           be recorded with respect to any sub-image(s) created during the template creation process.
+
+
+                                                                                                                                                                               14
+

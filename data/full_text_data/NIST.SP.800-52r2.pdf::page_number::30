@@ -1,0 +1,59 @@
+NIST SP 800-52 REV. 2                                                              GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+default hash function in the PRF is SHA-256. TLS 1.3 replaces the PRF with the HMAC-based
+Extract-and-Expand Key Derivation Function (HKDF), described in RFC 5869 [37].
+
+Also note that in TLS versions prior to 1.2, the use of SHA-1 is considered acceptable for
+signing ephemeral keys and for client authentication using digital signatures. This is due to the
+difficulty for a third party to cause a collision that is not detected.
+
+Other than the SHA-1 exception listed for specific instances above, all cryptography used shall
+provide at least 112 bits of security. All server and client certificates shall contain public keys
+that offer at least 112 bits of security. All server and client certificates and certificates in their
+certification paths shall be signed using key pairs that offer at least 112 bits of security and
+SHA-224 or a stronger hashing algorithm. All ephemeral keys used by the client and server shall
+offer at least 112 bits of security. All symmetric algorithms used to protect the TLS data shall
+use keys that offer at least 112 bits of security.
+
+The FIPS 140 validation certificate for the cryptographic module used by the server shall
+indicate that the random bit generator (RBG) has been validated in accordance with the SP 800-
+90 series [8, 48, 66]. 22
+
+The server random value, sent in the ServerHello message, contains a 4-byte timestamp 23 value
+and 28-byte random value in TLS versions 1.0, 1.1, and 1.2, and contains a 32-byte random
+value in TLS 1.3. The validated random number generator shall be used to generate the random
+bytes of the server random value. 24 The validated random number generator should be used to
+generate the 4-byte timestamp of the server random value.
+
+3.4      TLS Extension Support
+
+Several TLS extensions are described in RFCs. This section contains recommendations for a
+subset of the TLS extensions that the federal agencies shall, should, or should not use as they
+become prevalent in commercially available TLS servers and clients.
+
+System administrators must carefully consider the risks of supporting extensions that are not
+listed as mandatory. Only extensions whose specifications have an impact on security are
+discussed here, but the reader is advised that supporting any extension can have unintended
+security consequences. In particular, enabling extensions increases the potential for
+implementation flaws and could leave a system vulnerable. For example, the Heartbleed bug [70]
+was a flaw in an implementation of the heartbeat extension [64]. Although the extension has no
+
+
+
+22 Validation will include compliance with SP 800-90C once it is available.
+
+
+23 The timestamp value does not need to be correct in TLS. It can be any 4-byte value unless otherwise restricted by higher-level
+
+      or application protocols.
+
+24 TLS 1.3 implementations include a downgrade protection mechanism embedded in the random value that overwrites the last
+
+      eight bytes of the server random value with a fixed value. When negotiating TLS 1.2, the last eight bytes of the server
+      random will be set to 44 4F 57 4E 47 52 44 01. When TLS 1.1 or below is negotiated, the last eight bytes of the random
+      value will be set to 44 4F 57 4E 47 52 44 00. This overwrite is independent of the validated random bit generator.
+
+
+                                                                21
+

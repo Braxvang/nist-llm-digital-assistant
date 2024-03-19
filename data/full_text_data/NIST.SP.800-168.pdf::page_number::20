@@ -1,0 +1,56 @@
+Appendix 2: Approximate longest common substring
+
+The basic idea of the approximate longest common substring metric (aLCS) is not to compare files
+byte-by-byte but rather block-by-block. To identify the blocks, we apply the rolling hash from
+ssdeep. Our settings aim at having blocks of ≈ 80 bytes. Instead of comparing blocks bytewise,
+each one is hashed and compared using the 64-bit FNV-1a hash [8]. Besides the hash value, we
+also store the entropy and length for each block in a final linear list called alcs-digest; a reference
+implementation is publicly available.1
+
+Let La denote the absolute longest common substring of two alcs-digests. Comparing two alcs­
+digests is equal to comparing two linear lists. If the hash of an item on list A has the same value as
+the hash of an item on list B, we are convinced that La is greater than or equal to the length of the
+blocks corresponding to the hashes. If two consecutive items on list A have the same hash values as
+two consecutive items on list B, we sum up the length of both blocks to receive La. Of course, the
+usage of hash functions implies the possibility of false positives. Nevertheless, this is an easy and
+fast method to get a good estimation of the longest common substring.
+
+Implementation details. The tool is implemented in C and proceeds in three steps: reading, hashing
+and comparing, which are declared in the main function. Because it is a command line tool, it can
+be executed by ./aLCS <dir> .
+
+First, all files in dir are read. Out of the file names, we create “hash-tasks” which are added to a
+thread pool. A hash-task contains the path to a file and denotes “hash file”. Depending on the
+number of threads, these tasks are processed. Once all alcs-digests are created, we perform an all­
+against-all comparison. Therefore, we create compare-tasks (compare file1 against file2 ) which are
+again added to the thread pool. The output is printed to the standard output.
+
+The reference implementation has three main settings configurable in header/config.h.
+MIN_LCS is the minimum La length which is printed to stdio and is by default 0 (all comparisons
+are printed). The THREAD_POOL_QUEUE_SIZE is the length of the queue and should be
+fileamount × (fileamount − 1)
+                             /2. NUMTHREADS is the number of threads which should be equal to the number
+of cores.
+
+Verification of ground truth. To verify the correctness of our approximate longest common
+substring, we compared the results against LCS for a subset of t5. In order to do this, we
+implemented a parallelized LCS tool written in C++.2 The output is a summary file structured
+similarly to our aLCS output: file1 | file2 | LCS. A small, ruby script is used to compare the
+LCS- summary and aLCS-summary.
+
+Our subset consists of 201 randomly selected files. We compare these files using aLCS as well as
+                                               ሺଶ଴଴ሻ୶ሺଶ଴ଵሻ
+LCS and finally compare both summaries. All         ଶ
+                                                           ൌ 20, 100 comparisons yield alcs scores
+in the correct range, i.e., 0 ≤ alcs ≤ lcs.
+
+
+
+
+    1 https://www.dasec.h-da.de/staff/breitinger-frank/#downloads (last accessed 2013-05-09).
+
+
+    2 https://www.dasec.h-da.de/staff/breitinger-frank/#downloads (last accessed 2013-05-09).
+
+                                                       13
+

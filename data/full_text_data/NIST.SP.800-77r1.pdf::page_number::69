@@ -1,0 +1,52 @@
+                                                                                              NIST SP 800-77 REV. 1                                                           GUIDE TO IPSEC VPNS
+
+
+                                                                                                    •    IKE to IPsec:
+                                                                                                            o Add, update, or remove an IPsec SA state
+                                                                                                            o Add, update, or remove an IPsec SA policy
+                                                                                                            o Get IPsec SA information (byte counters, idleness)
+                                                                                                            o Request a list of supported IPsec cryptographic algorithms
+                                                                                                    •    IPsec to IKE:
+                                                                                                            o Packet notification (with source/destination packet header information)
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                            o Invalid SPI notification (IPsec packet received without matching SA with SPI)
+                                                                                                            o IPsec SA deleted (due to max life or max counter)
+
+                                                                                              5.2       Example of Establishing an IPsec Connection Using IKE
+
+                                                                                              In this example, the goal is to establish an IPsec connection that provides encryption and
+                                                                                              integrity protection services between endpoints A and B. The IPsec architecture is gateway-to-
+                                                                                              gateway; endpoint A uses gateway A on network A, and endpoint B uses gateway B on network
+                                                                                              B. If an IKE SA is not already in place, a packet will trigger the establishment of an IKE SA. In
+                                                                                              IKEv2, this is accompanied by the establishment of an IPsec SA as well:
+                                                                                                    1. Endpoint A creates and sends a regular (non-IPsec) packet that has a destination address
+                                                                                                       of endpoint B.
+                                                                                                    2. Network A routes the packet to gateway A.
+                                                                                                    3. Gateway A matches the packet’s characteristics against those in its SPD. It determines
+                                                                                                       that the packet should be protected by encryption and integrity protection through ESP.
+                                                                                                       Because the SPD entry does not have a pointer to the SAD, it knows that no IPsec SA is
+                                                                                                       currently established.
+                                                                                                    4. Gateway A initiates an IKE SA negotiation with Gateway B. At the end of the
+                                                                                                       negotiation, the IKE SA has been established along with all of the parameters and keying
+                                                                                                       material required for the IPsec SA.
+                                                                                                    5. The parameters specify that ESP tunnel mode will be used and that it will provide
+                                                                                                       encryption and integrity protection. A pair of unidirectional IPsec SAs is created for the
+                                                                                                       ESP tunnel and added to the SAD. The IPsec SAs are attached to the SPD entries. Each
+                                                                                                       SA provides protection only for traffic going in one direction.
+                                                                                                    6. Gateway A can finish processing the packet sent by endpoint A in step 1.
+                                                                                                    7. Gateway A modifies the packet so that it is protected in accordance with the SA
+                                                                                                       parameters. It creates a new IP header that uses gateway A’s IP address as the source IP
+                                                                                                       address and gateway B’s IP address as the destination IP address. It sets the IP protocol to
+                                                                                                       ESP and fills in the SPI number. It encrypts the original IP packet and includes this as the
+                                                                                                       payload for this packet based on the encryption key of the SAD entry. It calculates and
+                                                                                                       adds the integrity ICV to the ESP payload data based on the integrity key (or AEAD
+                                                                                                       encryption key) of the SAD entry. Gateway A then sends the packet to Gateway B.
+
+
+
+                                                                                                                                                52
+

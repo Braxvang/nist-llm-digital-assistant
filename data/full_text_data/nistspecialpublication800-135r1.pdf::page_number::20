@@ -1,0 +1,49 @@
+                              NIST SP 800-135, Revision 1
+
+
+
+
+Denote engineLength and passwordlen to be the lengths (in bytes) of an
+snmpEngineID and a password, respectively.
+
+Let N = 1048576 / passwordlen  .
+
+Expanded_password = the leftmost 1048576 bytes of the string of N repetitions of
+the password.
+
+Derived_password = SHA-1 (Expanded_password). The Derived_password is the
+output of hashing the Expanded_password by SHA-1.
+
+Let Shared_key to be the key that the user shares with the authoritative SNMP engine
+with ID snmpEngineID. The Shared_key is generated as follow:
+
+Shared_key = SHA-1(Derived_password || snmpEngineID || Derived_password).
+
+The USM KDF is approved when the following conditions are satisfied:
+      (1) It is performed in the context of the SNMP protocol.
+      (2) SHA-1 (as specified in FIPS 180-3) is used in the key localization function.
+
+5.5      Trusted Platform Module (TPM) Key Derivation Function
+Version 1.2 of the Trusted Platform Module is specified in the TPM Main
+Specification Parts 1, 2 and 3 ([TPM Principles], [TPM Structures] and [TPM
+Commands], respectively). It uses a SHA-1 HMAC-based Pseudorandom Function
+(PRF) in its KDF to generate keying material for transport sessions between the TPM
+and an application running on another processor.
+To protect the integrity of communications, a session key, SKEY, is derived from a
+secret authorization value, Auth, that is a secret key shared between the TPM and the
+application. An HMAC-PRF is used to produce the SKEY as follows:
+         SKEY = HMAC (Auth, Nonce_even || Nonce_odd), where Nonce_even and
+         Nonce_odd are non-secret values created by the random number generators
+         on the TPM and the application, respectively.
+Additional technical details for the variables in the functions are provided in Part 3 of
+the TPM Main Specification.
+SKEY is used as an HMAC key to provide data integrity for communications during
+the session. Further keys may be derived from SKEY to provide encryption of parts of
+the session.
+The TPM KDF is approved when the following conditions are satisfied:
+      (1) The TPM KDF is performed in the context of a TPM session (i.e. performed
+          between a TPM and an application with a shared authorization value.)
+
+
+                                            17
+

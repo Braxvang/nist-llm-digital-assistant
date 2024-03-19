@@ -1,0 +1,61 @@
+      NIST SP 800-73pt3-5 ipd (Initial Public Draft)                                          Interfaces for Personal Identity Verification: Part 3
+      September 2023                                                                                                              PIV Client API
+
+
+
+221           Client Application Programming Interface
+222   Table 1 lists the entry points on the PIV client API. This section references object identifiers
+223   (OIDs), which are defined and can be found in SP 800-73-5 Part1, Table 3.
+224                               Table 1. Entry points on PIV client application programming interface
+
+                                                           Type                                    Name
+                                                                             pivMiddlewareVersion
+                                               Entry Points for
+                                               Communication                 pivConnect
+
+                                                                             pivDisconnect
+
+                                                                             pivSelectCardApplication
+
+                                                                     pivEstablishSecureMessaging
+                                               Entry Points for Data
+                                               Access                pivLogIntoCardApplication
+
+                                                                             pivGetData
+
+                                                                             pivLogoutOfCardApplication
+
+                                               Entry Points for
+                                               Cryptographic                 pivCrypt
+                                               Operations
+                                               Entry Points for              pivPutData
+                                               Credential
+                                               Initialization and            pivGenerateKeyPair
+                                               Administration
+
+225   If both the PIV Middleware and the PIV Card support secure messaging, then all non-card
+226   management functionality 1 of the PIV Card MAY be accessed over either the contact or
+227   contactless interface of the card. In order to perform non-card management functionality that
+228   would otherwise be limited to the contact interface, the client application must first establish a
+229   virtual contact interface by calling the pivEstablishSecureMessaging function and using the
+230   pivLogIntoCardApplication function to submit the pairing code to the card. 2 If the client
+231   application does not have another means of determining whether communication with the PIV
+232   Card is over a contact or contactless interface, it MAY use the pivGetData function to attempt to
+233   read a mandatory data object (e.g., such as the X.509 Certificate for PIV Authentication or the
+234   security object) that has an access rule for read of “Always.” However, that is only accessible
+235   over the contact and virtual contact interfaces (see SP 800-73-5 Part1, Table 2). If the return code
+236   from pivGetData is PIV_SECURITY_CONDITIONS_NOT_SATISFIED, then the communication with
+237   the card is over a contactless interface.
+
+
+
+
+      1
+          Only the pivPutData and pivGenerateKeyPair API functions perform card management functionality.
+      2
+          As noted in Part 1, Section 5.5, the pairing code does not need to be submitted if the Bit 3 of the first byte of the PIN Usage Policy is set to one.
+
+
+
+                                                                                4
+

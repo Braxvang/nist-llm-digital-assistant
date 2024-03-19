@@ -1,0 +1,52 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                          Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                             PIV Card Application Card Command Interface
+
+814   SHALL verify that the subject is in possession of the corresponding private key (see [SP800-
+815   56A, Section 5.6.2.2.3.2] and [SP800-57, Section 8.1.5.1.1.2] for discussions on methods to
+816   obtain assurance of private-key possession).
+
+817   4.1.6. Key Derivation
+818   The session keys SHALL be derived in Steps C7 and H10 of the protocol using the key
+819   derivation function from [SP800-56A, Section 5.8.1], with the auxiliary function H being the
+820   hash function specified as the KDF hash in Table 18, the length of the keying material to be
+821   derived (len) being 512 bits for CS2 and 1024 bits for CS7, and OtherInfo being constructed
+822   using the following concatenation format:
+       Cipher
+                                                                         OtherInfo
+       Suite ID
+       CS2        0x04 || 0x09 || 0x09 || 0x09 || 0x09 || 0x08 || ID sH || 0x01 || CB H || 0x10 || T 16 (Q eH ) || 0x08 || ID sICC ||
+                  0x10 || N ICC || 0x01 || CB ICC
+       CS7        0x04 || 0x0D || 0x0D || 0x0D || 0x0D || 0x08 || ID sH || 0x01 || CB H || 0x10 || T 16 (Q eH ) || 0x08 ||
+                  ID sICC || 0x18 || N ICC || 0x01 || CB ICC
+
+823   For Q eH , the coordinates of the ephemeral public key are converted from field elements to byte
+824   strings (as specified in [SP800-56A, Appendix C.2]), Field-Element-to-Byte String Conversion,
+825   and concatenated (with x first) to form a single byte string. The first 16 bytes from this byte
+826   string are included in OtherInfo.
+
+827   4.1.7. Key Confirmation
+828   Key confirmation SHALL be performed in Steps C9 and H12 of the protocol by the generation
+829   of AuthCryptogram ICC in accordance with Sections 5.9.1.1 and 6.2.2.3 of [SP800-56A].
+830   AuthCryptogram ICC SHALL be computed as CMAC(MacKey, MacLen, MacData p ), where
+831   MacKey is SK CFRM , MacLen is 128 bits, and MacData p is "KC_1_V" || ID sICC || ID sH || Q eH .
+832   "KC_1_V" is a 6-byte ASCII string ('4B 43 5F 31 5F 56'). For Q eH , the coordinates of the
+833   ephemeral public key are converted from field elements to byte strings (as specified in [SP800-
+834   56A, Appendix C.2]), Field-Element-to-Byte String Conversion, and concatenated (with x first)
+835   to form a single byte string. CMAC is a cipher-based message authentication code from
+836   [SP800-38B], where the block cipher is AES.
+
+837   4.1.8. Command Interface
+838   The following command interface SHALL be used for the key establishment protocol.
+839   Command Syntax
+                CLA                    '00'
+                INS                    '87'
+                                       Algorithm reference ('27' or '2E'), as specified in the 0xAC tag of the
+                P1
+                                       application property template
+                P2                     '04' (PIV Secure Messaging key).
+                Lc                     Length of data field
+
+
+
+                                                                    28
+

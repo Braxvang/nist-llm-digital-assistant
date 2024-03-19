@@ -1,0 +1,1599 @@
+1              NIST Special Publication
+2               NIST SP 800-157r1 ipd
+
+
+3    Guidelines for Derived Personal
+4        Identity Veriﬁcation (PIV)
+5                        Credentials
+
+
+6                                  Initial Public Draft
+
+
+
+
+7                                      Hildegard Ferraiolo
+8                                     Andrew Regenscheid
+9                                         James L. Fenton
+
+
+
+10             This publication is available free of charge from:
+11              https://doi.org/10.6028/NIST.SP.800-157r1.ipd
+
+
+
+
+12
+13                                          NIST Special Publication
+14                                           NIST SP 800-157r1 ipd
+
+15              Guidelines for Derived Personal
+16                  Identity Veriﬁcation (PIV)
+17                                  Credentials
+18                                                                   Initial Public Draft
+
+
+19                                                                         Hildegard Ferraiolo
+20                                                                        Andrew Regenscheid
+21                                                                 Computer Security Division
+22                                                          Information Technology Laboratory
+
+23                                                                                James L. Fenton
+24                                                                              Altmode Networks
+
+
+
+25                                           This publication is available free of charge from:
+26                                            https://doi.org/10.6028/NIST.SP.800-157r1.ipd
+
+27                                                                                    January 2023
+
+
+
+
+28
+
+
+
+29                                                                     U.S. Department of Commerce
+30                                                                      Gina M. Raimondo, Secretary
+
+31                                                      National Institute of Standards and Technology
+32   Laurie E. Locascio, NIST Director and Under Secretary of Commerce for Standards and Technology
+33   Certain commercial entities, equipment, or materials may be identified in this document
+34   in order to describe an experimental procedure or concept adequately. Such identification
+35   is not intended to imply recommendation or endorsement by the National Institute of
+36   Standards and Technology, nor is it intended to imply that the entities, materials, or
+37   equipment are necessarily the best available for the purpose.
+38   There may be references in this publication to other publications currently under
+39   development by NIST in accordance with its assigned statutory responsibilities. The
+40   information in this publication, including concepts and methodologies, may be used by
+41   federal agencies even before the completion of such companion publications. Thus, until
+42   each publication is completed, current requirements, guidelines, and procedures, where
+43   they exist, remain operative. For planning and transition purposes, federal agencies may
+44   wish to closely follow the development of these new publications by NIST.
+45   Organizations are encouraged to review all draft publications during public comment
+46   periods and provide feedback to NIST. Many NIST cybersecurity publications, other than
+47   the ones noted above, are available at https://csrc.nist.gov/publications.
+
+48   Authority
+
+49   This publication has been developed by NIST in accordance with its statutory
+50   responsibilities under the Federal Information Security Modernization Act (FISMA)
+51   of 2014, 44 U.S.C. § 3551 et seq., Public Law (P.L.) 113-283. NIST is responsible
+52   for developing information security standards and guidelines, including minimum
+53   requirements for federal information systems, but such standards and guidelines shall
+54   not apply to national security systems without the express approval of appropriate federal
+55   officials exercising policy authority over such systems. This guideline is consistent with
+56   the requirements of the Office of Management and Budget (OMB) Circular A-130.
+57   Nothing in this publication should be taken to contradict the standards and guidelines
+58   made mandatory and binding on federal agencies by the Secretary of Commerce under
+59   statutory authority. Nor should these guidelines be interpreted as altering or superseding
+60   the existing authorities of the Secretary of Commerce, Director of the OMB, or any other
+61   federal official. This publication may be used by nongovernmental organizations on a
+62   voluntary basis and is not subject to copyright in the United States. Attribution would,
+63   however, be appreciated by NIST.
+
+64   NIST Technical Series Policies
+
+65   Copyright, Fair Use, and Licensing Statements
+66   NIST Technical Series Publication Identifier Syntax
+67   Publication History
+
+68   Approved by the NIST Editorial Review Board on YYYY-MM-DD [will be added upon
+69   final publication]
+
+70   How to Cite this NIST Technical Series Publication
+
+71   Ferraiolo H, Regenscheid A, Fenton JL (2023) Guidelines for Derived Personal Identity
+72   Verification (PIV) Credentials. (National Institute of Standards and Technology,
+73   Gaithersburg, MD), NIST Special Publication (SP) 800-157r1 ipd. https://doi.org/10.
+74   6028/NIST.SP.800-157r1.ipd
+
+75   Author ORCID iDs
+
+76   Hildegard Ferraiolo: 0000-0002-7719-5999
+77   Andrew Regenscheid: 0000-0002-3930-527X
+78   James L. Fenton: 0000-0002-2344-4291
+
+79   Public Comment Period
+
+80   January 10, 2023 - March 24 April 21, 2023
+
+81   Submit Comments
+
+82   mailto:piv comments@nist.gov
+83   All comments are subject to release under the Freedom of Information Act
+84   (FOIA).
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+85    Reports on Computer Systems Technology
+
+86    The Information Technology Laboratory (ITL) at the National Institute of Standards and
+87    Technology (NIST) promotes the U.S. economy and public welfare by providing technical
+88    leadership for the Nation’s measurement and standards infrastructure. ITL develops
+89    tests, test methods, reference data, proof of concept implementations, and technical
+90    analyses to advance the development and productive use of information technology. ITL’s
+91    responsibilities include the development of management, administrative, technical, and
+92    physical standards and guidelines for the cost-effective security and privacy of other
+93    than national security-related information in federal information systems. The Special
+94    Publication 800-series reports on ITL’s research, guidelines, and outreach efforts in
+95    information system security, and its collaborative activities with industry, government,
+96    and academic organizations.
+
+97    Abstract
+
+98    This recommendation provides technical guidelines for the implementation of standards-
+99    based, secure, reliable credentials that are issued by federal departments and agencies
+100   to individuals who possess and prove control of their valid PIV Card. These credentials
+101   can be either public key infrastructure (PKI)-based like the PIV Card or non PKI-based
+102   but verified by the individual’s home agency. The scope of this document includes
+103   requirements for the initial issuance and maintenance of these credentials, certificate
+104   policies as applicable, cryptographic specifications, technical specifications for permitted
+105   authenticator types, and the command interfaces for removable implementations of such
+106   PKI-based credentials.
+
+107   Keywords
+
+108   authentication; credentials; derived PIV credentials; electronic authentication; electronic
+109   credentials; mobile devices; personal identity verification; PIV
+
+110   Note to Reviewers
+
+111   Public draft SP 800-157r1 Guidelines for Derived Personal Identity Verification (PIV)
+112   Credentials expands the use of derived PIV credentials beyond mobile devices to include
+113   non-PKI-based phishing resistant multi-factor credentials. The draft details the expanded
+114   set of derived PIV credentials in a variety of form factors and authenticator types as
+115   envisioned in OMB Memoranda M-19-22, M-22-09, and subsequently outlined in
+116   FIPS 201-3. The cross-domain and interagency use of these credentials is provided by
+117   federation protocols outlined in public draft SP 800-217 Guidelines for PIV Federation.
+118   Both documents are closely aligned with draft release SP 800-63-4 Digital Identity
+119   Guidelines. NIST hopes that the draft document enables a close alignment with new
+
+
+                                                   i
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+120   and emerging digital authentication and federation technologies employed in the federal
+121   government, while maintaining a strong security posture.
+122   NIST is specifically interested in comments on and recommendations for the following
+123   topics:
+124     1. Are the new controls for issuance, use, maintenance, and termination of non-PKI-
+125        based derived PIV credentials clear and practical to implement?
+126     2. Are phishing-resistant authenticators available to meet agency use cases as well as
+127        the requirements for derived PIV authentication?
+128     3. Are the new controls sufficient to provide comparable assurance to PIV Cards and
+129        other derived PIV credentials?
+130   Reviewers are encouraged to comment on all or part of both SP 800-157r1 and SP 800-
+131   217. NIST requests that all comments be submitted by 11:59pm Eastern Time on March
+132   24, 2023. Please submit your comments to piv comments@nist.gov. NIST will review
+133   all comments and make them available at the NIST Computer Security Resource Center
+134   (CSRC) website. Commenters are encouraged to use the comment template provided on
+135   the NIST Computer Security Resource Center website.
+
+
+
+
+                                                 ii
+      NIST SP 800-157r1 ipd                              Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+136   Call for Patent Claims
+
+137   This public review includes a call for information on essential patent claims (claims
+138   whose use would be required for compliance with the guidance or requirements in this
+139   Information Technology Laboratory (ITL) draft publication). Such guidance and/or
+140   requirements may be directly stated in this ITL Publication or by reference to another
+141   publication. This call also includes disclosure, where known, of the existence of pending
+142   U.S. or foreign patent applications relating to this ITL draft publication and of any
+143   relevant unexpired U.S. or foreign patents.
+144   ITL may require from the patent holder, or a party authorized to make assurances on its
+145   behalf, in written or electronic form, either:
+146      a) assurance in the form of a general disclaimer to the effect that such party does not
+147         hold and does not currently intend holding any essential patent claim(s); or
+148     b) assurance that a license to such essential patent claim(s) will be made available
+149        to applicants desiring to utilize the license for the purpose of complying with the
+150        guidance or requirements in this ITL draft publication either:
+151            i. under reasonable terms and conditions that are demonstrably free of any unfair
+152               discrimination; or
+153           ii. without compensation and under reasonable terms and conditions that are
+154               demonstrably free of any unfair discrimination.
+155   Such assurance shall indicate that the patent holder (or third party authorized to make
+156   assurances on its behalf) will include in any documents transferring ownership of patents
+157   subject to the assurance, provisions sufficient to ensure that the commitments in the
+158   assurance are binding on the transferee, and that the transferee will similarly include
+159   appropriate provisions in the event of future transfers with the goal of binding each
+160   successor-in-interest.
+161   The assurance shall also indicate that it is intended to be binding on successors-in-interest
+162   regardless of whether such provisions are included in the relevant transfer documents.
+163   Such statements should be addressed to: mailto:piv comments@nist.gov.
+
+
+
+
+                                                   iii
+      NIST SP 800-157r1 ipd                              Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+164   Table of Contents
+165   1. Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        1
+166      1.1. Background . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         1
+167      1.2. Purpose and Scope . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          2
+168      1.3. Audience . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       3
+169      1.4. Requirements Notation and Conventions . . . . . . . . . . . . . . . . . . .            3
+170      1.5. Document Structure . . . . . . . . . . . . . . . . . . . . . . . . . . . . .           4
+171      1.6. Key Terminology . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .          4
+172   2. Lifecycle Activities and Related Requirements . . . . . . . . . . . . . . . .               5
+173      2.1. Derived PIV Credential Lifecycle Activities . . . . . . . . . . . . . . . . . .        5
+174      2.2. Initial Issuance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     6
+175            2.2.1. PKI-based Derived PIV Credential Issuance . . . . . . . . . . . . .            8
+176            2.2.2. Non-PKI-based Derived PIV Credential Issuance . . . . . . . . . .              8
+177      2.3. Maintenance . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        9
+178            2.3.1. PKI-based Derived PIV Credential Maintenance . . . . . . . . . .               9
+179            2.3.2. Non-PKI-based Derived PIV Credential Maintenance . . . . . . . .               9
+180      2.4. Invalidation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+181            2.4.1. PKI-based Derived PIV Credential Invalidation . . . . . . . . . . . 10
+182            2.4.2. Non-PKI-based Derived PIV Credential Invalidation . . . . . . . . 10
+183   3. Technical Requirements . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+184      3.1. PKI-based Derived PIV Credentials . . . . . . . . . . . . . . . . . . . . . . 11
+185            3.1.1. Certiﬁcate Policies for Derived PIV Credentials . . . . . . . . . . . 11
+186            3.1.2. Cryptographic Speciﬁcations . . . . . . . . . . . . . . . . . . . . . 11
+187            3.1.3. Allowable Authenticator Types . . . . . . . . . . . . . . . . . . . . 12
+188            3.1.4. Activation Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+189      3.2. Non-PKI-based Derived PIV Credentials . . . . . . . . . . . . . . . . . . . 13
+190            3.2.1. Allowable Authenticator Types . . . . . . . . . . . . . . . . . . . . 13
+191            3.2.2. Cryptographic Speciﬁcations . . . . . . . . . . . . . . . . . . . . . 13
+192            3.2.3. Activation Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+193      3.3. Binding Derived PIV Credentials . . . . . . . . . . . . . . . . . . . . . . . 14
+
+                                                    iv
+      NIST SP 800-157r1 ipd                             Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+194   References . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+195   Appendix A. Digital Signature and Key Management Keys . . . . . . . . . . 17
+196   Appendix B. Data Model and Interfaces for Removable or Wireless PKI-based
+197     Hardware Cryptographic Devices . . . . . . . . . . . . . . . . . . . . . . . . 18
+198        B.1. Derived PIV Application Data Model and Representation . . . . . . . . . . 18
+199             B.1.1. Derived PIV Application Identiﬁer . . . . . . . . . . . . . . . . . . 18
+200             B.1.2. Derived PIV Application Data Model Elements . . . . . . . . . . . 18
+201             B.1.3. Derived PIV Application Data Objects Representation . . . . . . . 21
+202             B.1.4. Derived PIV Application Data Types and Their Representation . . 21
+203             B.1.5. Derived PIV Authentication Mechanisms . . . . . . . . . . . . . . 22
+204        B.2. Derived PIV Application Token Command Interface . . . . . . . . . . . . . 23
+205             B.2.1. Authentication of an Individual . . . . . . . . . . . . . . . . . . . . 24
+206   Appendix C. Example Issuance Processes . . . . . . . . . . . . . . . . . . . . 25
+207        C.1. Example Issuance of a Derived PIV Credential at AAL2 . . . . . . . . . . 25
+208        C.2. Example Binding of a Derived PIV Credential at AAL3 . . . . . . . . . . . 26
+209   Appendix D. Glossary . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+210   Appendix E. Acronyms and Abbreviations . . . . . . . . . . . . . . . . . . . . 28
+211   Appendix F. Change Log . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+
+
+212   List of Tables
+213   1.        Mapping of Data Objects . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+214   2.        Mapping of Key Types . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+
+
+215   List of Figures
+216   1.        PKI-based derived PIV credential lifecycle activities . . . . . . . . . . . . .     5
+217   2.        Non-PKI-based derived PIV credential lifecycle activities . . . . . . . . . .       6
+
+
+
+
+                                                    v
+      NIST SP 800-157r1 ipd                          Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+218   Acknowledgments
+
+219   The authors, Hildegard Ferraiolo and Andrew Regenscheid of the National Institute
+220   of Standards and Technology (NIST) and James Fenton of Altmode Networks, wish
+221   to thank their colleagues who reviewed drafts of this document and contributed to its
+222   technical content and development. The authors would like to also acknowledge the past
+223   contributions of David Cooper, Salvatore Francomacaro, William Burr, Sarbari Gupta,
+224   and Jason Mohler. Special thanks to Jonathan Gloster of HII-Mission Technologies for
+225   significant support in the revision of this document and to Isabel Van Wyk of NIST for
+226   much appreciated editing assistance.
+
+
+
+
+                                                vi
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+227   1.   Introduction
+228   This section is informative.
+229   [FIPS 201] specifies a common set of identity credentials to satisfy the requirements of
+230   [HSPD-12] in a smart card form factor known as the Personal Identity Verification (PIV)
+231   Card. This publication is a companion document to FIPS 201 that specifies the use of
+232   additional common identity credentials, known as derived PIV credentials, that are issued
+233   by a federal department or agency and may be used when the use of a PIV Card is not
+234   practical. Consistent with the goals of HSPD-12, derived PIV credentials are designed to
+235   serve as a Federal Government-wide standard for a secure and reliable identity credential
+236   that supports interoperability across agencies.
+
+237   1.1. Background
+238   FIPS 201 originally required that the PIV credential and associated keys be stored in a
+239   PIV Card. While the use of the PIV Card for electronic authentication works well with
+240   many traditional desktop and laptop computers, it is not well-suited to other devices, such
+241   as mobile devices. In response to the growing use of mobile endpoints within the Federal
+242   Government, FIPS 201-2 permitted the issuance of additional PKI-based credentials,
+243   referred to as derived PIV credentials, for which the corresponding private key is stored
+244   in a cryptographic module within a mobile device, such as a smartphone. PKI-based
+245   derived PIV credentials use the Federal PKI Infrastructure to securely establish the
+246   binding between the credential and the PIV identity account. PKI-based derived PIV
+247   credentials are typically integrated into user endpoints, such as mobile devices, although
+248   they are not limited to use in these devices.
+249   In order to provide additional flexibility for federal departments and agencies, FIPS 201-3
+250   expands the set of credentials beyond those that are PKI-based and broadens their use
+251   to other types of devices in addition to mobile devices. The technical details for the
+252   expanded set of derived PIV credentials is specified in this revision of SP 800-157 (SP
+253   800-157, Revision 1) in a variety of form factors. Non-PKI-based derived PIV credentials
+254   are authenticators (as defined in [SP800-63B]) that may be separate from the endpoint
+255   being authenticated and, if so, are connected to the endpoint for that purpose. Since there
+256   is no PKI infrastructure to validate and supply attributes for non-PKI-based derived PIV
+257   credentials, non-PKI-based derived PIV credentials are always used to authenticate to the
+258   home agency of the PIV cardholder from which the cardholder’s PIV identity account
+259   is accessed. When access to the PIV identity account is needed outside of the home
+260   agency — particularly when a non-PKI-based derived PIV credential is presented in
+261   authentication — federation allows connection across security domains as detailed in
+262   [SP800-217].
+263   Derived PIV credentials leverage the current investment in the PIV infrastructure
+264   for electronic authentication and build upon the solid foundation of the well-vetted
+265   and trusted identity of the PIV cardholder as represented in the PIV identity account,
+
+                                                  1
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+266   achieving substantial cost savings by leveraging the identity proofing results that were
+267   already performed to issue PIV Cards. This document provides technical guidelines for
+268   the implementation of derived PIV credentials.
+
+269   1.2. Purpose and Scope
+270   This document provides guidelines for cases in which the use of PIV Cards is deemed
+271   impractical for authentication. This guideline specifies the use of authenticators with
+272   alternative form factors to the PIV Card that may be inserted into endpoints, such as USB
+273   authenticators, authenticators that are connected wirelessly to endpoints, or authenticators
+274   that are embedded in endpoints. Authenticators used as derived PIV credentials must
+275   meet the requirements for either hardware or software cryptographic authenticators. The
+276   use of alternative form factors greatly improves the usability of electronic authentication
+277   to remote IT resources while simultaneously maintaining the goals of HSPD-12 for
+278   common identification that is secure, reliable, and has government-wide interoperability.
+279   The purpose of the derived PIV credential is to provide PIV-enabled authentication
+280   services on alternative endpoints in order to authenticate the credential holder to remote
+281   systems.
+282   To achieve interoperability with the PIV infrastructure and its applications, two
+283   approaches to derived PIV credentials have been selected:
+284      1. Use of public key infrastructure (PKI) technology. PKI-based derived PIV
+285         credentials rely on the same infrastructure as that used for authentication with a
+286         PIV Card.
+287      2. Use of non-PKI-based authenticators. When non-PKI-based authenticators are used,
+288         derived PIV credentials are only used to authenticate with the home agency of the
+289         associated PIV Card. Interoperability with other agencies is achieved through the
+290         use of federation protocols, as specified in [SP800-217].
+291   The derived PIV credentials specified in this document are issued at authentication
+292   assurance level (AAL) 2 or 3.
+293   Derived PIV credentials are based on the general concept of post-enrollment authenticator
+294   binding in [SP800-63B], which leverages identity proofing and vetting associated with
+295   an existing subscriber account using current and valid authenticators to bind additional
+296   authenticators to that account. Identity proofing and vetting processes do not have to be
+297   repeated to issue a derived PIV credential. Instead, the user proves possession and control
+298   of a valid PIV Card to bind a derived PIV credential to their PIV identity account. While
+299   the PIV Card may be used as the basis for issuing other types of derived credentials, the
+300   issuance of these other credentials is outside of the scope of this document.
+301   Derived PIV credentials are:
+302       • Issued based on possession and control of the PIV Card,
+
+                                                   2
+      NIST SP 800-157r1 ipd                             Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+303       • Represented in the PIV identity account at the home agency, and
+304       • Issued in accordance with this document.
+305   This document provides technical guidelines on:
+306       • The primary lifecycle activities for the derived PIV credential — initial issuance,
+307         maintenance, and termination — and the requirements for each activity to ensure
+308         security and
+309       • The derived PIV credential, including cryptographic specifications, types of
+310         implementation that are permitted, mechanisms for activation and use of the
+311         credential, and certificate policies if applicable.
+312   This publication also includes an informative annex that provides recommendations for
+313   the inclusion of digital signature and key management keys on devices that host a derived
+314   PIV credential.
+
+315   1.3. Audience
+316   This document is intended for stakeholders who will be responsible for procuring,
+317   designing, implementing, and managing deployments of derived PIV credentials for
+318   mobile devices and other endpoints.
+
+319   1.4. Requirements Notation and Conventions
+320   This standard uses the following typographical conventions in text:
+321       • Specific terms in CAPITALS represent normative requirements. When these same
+322         terms are not in CAPITALS , the term does not represent a normative requirement.
+323            – The terms “ SHALL ” and “ SHALL NOT ” indicate requirements to be strictly
+324              followed in order to conform to the publication and from which no deviation is
+325              permitted.
+326            – The terms “ SHOULD ” and “ SHOULD NOT ” indicate that among several
+327              possibilities, one is recommended as particularly suitable without mentioning
+328              or excluding others, that a certain course of action is preferred but not
+329              necessarily required, or that (in the negative form) a certain possibility or
+330              course of action is discouraged but not prohibited.
+331            – The terms “ MAY ” and “ NEED NOT ” indicate a course of action permissible
+332              within the limits of the publication.
+333            – The terms “ CAN ” and “ CANNOT ” indicate a possibility and capability —
+334              whether material, physical, or causal — or, in the negative, the absence of that
+335              possibility or capability.
+
+
+
+                                                  3
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+336   1.5. Document Structure
+337   This document is organized as follows. Each section is labeled as either normative (i.e.,
+338   mandatory for compliance) or informative (i.e., not mandatory).
+339       • Section 2 describes derived PIV credential lifecycle activities and related
+340         requirements. This section is normative.
+341       • Section 3 describes the technical requirements for implementing derived PIV
+342         credentials. This section is normative.
+343       • Appendix A contains guidance on digital signature and key management keys. This
+344         appendix is informative.
+345       • Appendix B provides detailed interface requirements for PKI-based removable
+346         (non-embedded) and PKI-based wireless hardware implementations. This
+347         appendix is normative for implementation of PKI-based derived PIV credentials
+348         on removable (non-embedded) or wireless hardware cryptographic tokens.
+349       • Appendix C provides example issuance processes for derived PIV credentials. This
+350         appendix is informative.
+351       • Appendix D contains a glossary of selected terms used in this document. This
+352         appendix is informative.
+353       • Appendix E defines acronyms and other abbreviations used in this document. This
+354         appendix is informative.
+355       • Appendix F provides a list of changes made to this document since its initial release.
+356         This appendix is informative.
+
+357   1.6. Key Terminology
+358   Certain key PIV terms have assigned meanings within the context of this document. The
+359   term PIV cardholder refers to a person who possesses a valid PIV Card, regardless of
+360   whether they have been issued a derived PIV credential. The term applicant refers to a
+361   PIV cardholder who has applied for but not yet been issued a derived PIV credential, and
+362   the term subscriber refers to a PIV cardholder to whom a derived PIV credential has been
+363   issued.
+
+
+
+
+                                                   4
+      NIST SP 800-157r1 ipd                                                                          Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+364   2.       Lifecycle Activities and Related Requirements
+365   This section is normative.
+366   The lifecycle activities for a derived PIV credential are initial issuance, maintenance, and
+367   termination. At a more detailed level, the lifecycle activities for PKI-based and non-PKI-
+368   based derived PIV credentials differ considerably from each other. This section describes
+369   these lifecycle activities and provides requirements and recommendations as appropriate.
+370   Issuers of derived PIV credentials SHALL document the process for each of the lifecycle
+371   activities described below. In accordance with [HSPD-12], the reliability of the derived
+372   PIV credential issuer SHALL be established through an official accreditation process.
+
+373   2.1. Derived PIV Credential Lifecycle Activities
+374   The derived PIV credential lifecycle consists of the three classes of activities described
+375   above. The activities that take place at the manufacturer during fabrication and pre-
+376   personalization of the authenticator (as applicable) are not considered part of this lifecycle
+377   model. Figure 1 presents the PKI-based derived PIV credential activities alongside the
+378   PIV Card lifecycle activities. Figure 2 presents the corresponding lifecycle activities for
+379   non-PKI-based derived PIV credentials.
+                                                                                                          PKI-based
+                      PIV Card Lifecycle                                                         Derived PIV Credential (DPC)
+                                                                                                           Lifecycle
+                                                                                                                                                     Start
+            PIV Card Request
+
+                                                                                  PIV Identity
+       ID Proofing & Registration                                                  Account
+                                                                                                                                               DPC Request
+                                     Reissuance
+
+
+            PIV Card Issuance                                                                                                                 PIV PKI-AUTH*
+                                    Updates
+
+
+                                                                                                                   Rekey/
+       PKI Credential Issuance                                                                                                                 DPC Issuance
+                                                                                                                   Modification
+
+
+                                                   PIV Card                                                   DPC
+             PIV Card Usage                                                                                                                     DPC Usage
+                                                  Maintenance                                              Maintenance
+
+                                    Revoke certificates or zeroize private keys                      Revoke DPC or zeroize private key
+           PIV Card Termination                                                                                                              DPC Termination              End
+
+
+                                                                                                                                             *Authentication with
+                                                                                                                                         PIV Authentication certificate
+
+
+
+                                    Figure 1. PKI-based derived PIV credential lifecycle activities
+
+380   The lifecycle of a derived PIV credential begins with the issuance of a derived PIV
+381   credential on an approved device or authenticator associated with the applicant. This
+382   may be part of the process of issuing a PIV Card or a subsequent process. Mobile devices
+383   with derived PIV credentials are managed as described in [SP800-124].
+384   The maintenance activities for a PKI-based derived PIV credential are the same as
+385   for other X.509 public key certificates. Certificate re-key is typically used to replace
+
+                                                                                                 5
+      NIST SP 800-157r1 ipd                                                                          Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+                                                                                                       Non-PKI-based
+                     PIV Card Lifecycle                                                          Derived PIV Credential (DPC)
+                                                                                                           Lifecycle
+                                                                                                                                                       Start
+           PIV Card Request
+                                                                                  PIV Identity
+                                                                                   Account/
+       ID Proofing & Registration                                                 Home IdP                                                       DPC Request
+                                    Reissuance
+                                                                                                           Au
+                                                                                                              th   ent
+                                                                                                                      ica
+                                                                                                                           tor
+          PIV Card Issuance                                                                               Au                     bin
+                                                                                                                                    din         PIV PKI-AUTH*
+                                    Updates                                                                  the                       g
+                                                                                                                nti
+                                                                                                                   ca
+                                                                                                                         tio
+                                                                                                                            n
+        PKI Credential Issuance                                                                                                                  DPC Issuance
+
+
+                                                  PIV Card
+            PIV Card Usage                                                                                                                        DPC Usage
+                                                 Maintenance
+
+                                    Revoke certificates or zeroize private keys                         Invalidate authenticator
+         PIV Card Termination                                                                                                                  DPC Termination              End
+
+
+                                                                                                                                               *Authentication with
+                                                                                                                                           PIV Authentication certificate
+
+
+
+                             Figure 2. Non-PKI-based derived PIV credential lifecycle activities
+
+
+386   a certificate that is nearing expiration. Certificate modification is used to replace a
+387   certificate if information about the subscriber that appears in the certificate, such as their
+388   name, needs to be changed.
+389   While non-PKI-based derived PIV credentials are not typically re-keyed and do not
+390   contain PII about the subscriber, they may require maintenance, such as replacing the
+391   activation secret or biometric factor used to activate the physical authenticator. Instead
+392   of re-keying, the current non-PKI-based derived PIV credential SHALL be invalidated
+393   and the initial issuance process (except for the device or authenticator approval process)
+394   repeated to bind a new derived PIV credential. When a non-PKI-based derived PIV
+395   credential is lost, stolen, or damaged, the issuer SHALL invalidate the credential to
+396   prevent its further use.
+397   When an authenticator that contains the private key corresponding to a PKI-based derived
+398   PIV credential is lost, stolen, or damaged, the issuer SHALL prevent further use of the
+399   affected credential by either collecting and destroying the associated private key or by
+400   revoking the associated certificate. These processes are described in Sec. 2.4. If the
+401   subscriber becomes ineligible to possess a PIV Card, all derived PIV credentials for that
+402   subscriber are revoked or otherwise invalidated.
+
+403   2.2. Initial Issuance
+404   The issuance of a derived PIV credential is an instance of the post-enrollment binding
+405   of an authenticator described in [SP800-63B]. Issuance SHALL be performed in
+406   accordance with the requirements that apply to cryptographic authenticators as well as
+407   the requirements in this section. The term issuance is used in cases where the device or
+408   authenticator is provided to the subscriber as well as when the device or authenticator is
+
+                                                                                                 6
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+409   already in the subscriber’s possession. Appendix C provides sample issuance processes
+410   for derived PIV credentials.
+411   Derived PIV credentials SHALL be issued only by the home agency of the associated
+412   PIV identity account. Derived PIV credentials SHALL be issued only to devices (such as
+413   mobile devices) or authenticators that are approved by the home agency. Agencies MAY
+414   establish blanket approvals for particular device types or MAY individually authorize
+415   specific devices or authenticators for issuance and use by a cardholder. Authorization
+416   policies for issuance SHALL be documented by each issuer.
+417   Derived PIV credentials MAY be issued remotely or in person. At the time of issuance,
+418   the applicant SHALL authenticate to the derived PIV credential issuer using their PIV
+419   Card. This authentication SHALL be performed using the PKI-AUTH authentication
+420   mechanism described in Sec. 6.2.3.1 of [FIPS201]. This authentication MAY be
+421   performed remotely. In addition to authenticating the cardholder, performing the PKI-
+422   AUTH authentication mechanism verifies that the applicant is currently eligible to
+423   possess a PIV Card. All derived PIV credentials SHALL be issued in accordance with
+424   [SP800-63B] Sec. 6.1.2.1.
+425   All derived PIV credentials for use at AAL3 SHALL be issued in accordance with the
+426   following additional requirements. The applicant SHALL identify themself using a
+427   biometric sample that can be verified against their PIV Card or against the biometric
+428   information in their enrollment record. If the issuance process consists of two or more
+429   transactions, the applicant SHALL identify themself using a biometric sample that can
+430   be verified against either their PIV Card or against a biometric that was recorded in a
+431   previous transaction. The issuer SHALL retain the biometric sample used to verify the
+432   applicant for future reference.
+433   After the applicant has been authenticated, a derived PIV credential MAY be issued and
+434   associated with the cardholder’s PIV identity account. The newly issued derived PIV
+435   credential SHALL be represented in the cardholder’s PIV identity account.
+436   When a new derived PIV credential is associated with a PIV identity account, the issuer
+437    SHALL promptly notify the PIV cardholder of the binding of a derived PIV credential
+438   through an independent means that would not afford an attacker the opportunity to
+439   interfere with the notification. More than one independent notification method MAY
+440   be used to ensure prompt receipt by the cardholder.
+441   Derived PIV credentials SHALL meet the requirements for authentication assurance
+442   level (AAL) 2 or 3 specified in [SP800-63B]. Derived PIV credentials that meet AAL3
+443   requirements also fulfill the requirements of AAL2 and can be used in circumstances that
+444   require authentication at AAL2. All derived PIV credentials at both AAL2 and AAL3
+445    SHALL meet the requirements for phishing resistance defined in [SP800-63B] Sec. 5.2.5.
+
+446   This guideline does not preclude the issuance of multiple derived PIV credentials to the
+447   same applicant on the basis of the same PIV Card. This could increase the risk that one of
+
+                                                  7
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+448   the derived PIV credentials will be lost/stolen without the loss being reported or that the
+449   subscriber will inappropriately provide one of them to someone else. Accordingly, issuers
+450    MAY place a limit on the number of active derived PIV credentials that a subscriber may
+451   have.
+
+452   2.2.1. PKI-based Derived PIV Credential Issuance
+453   Issuance of a PKI-based derived PIV credential requires the generation of a public/private
+454   keypair followed by the creation of a corresponding authentication certificate by the
+455   CSP. For a derived PIV credential capable of being used at AAL3, the keypair SHALL
+456   be generated in the device (authenticator or endpoint) that will house the derived PIV
+457   credential. The device SHALL send the certificate signing request that contains the
+458   public key to the CSP, which SHALL return an X.509 authentication certificate that
+459    SHALL be stored on the credential. The CSP SHALL retain a copy of the issued
+460   certificate for use should revocation be required. For a derived PIV credential that is
+461   issued for use only at AAL2, the same procedure MAY be used, or the CSP MAY
+462   generate a keypair and corresponding certificate and send the certificate and private key
+463   to the device over an authenticated protected channel for installation. The CSP SHALL
+464   immediately and securely delete its copy of the private key.
+465   The private key SHALL be stored on the device in a manner that makes it accessible
+466   only upon entry of the correct activation secret or presentation of a biometric factor that
+467   matches a stored biometric image or template. This SHALL be accomplished either
+468   through the use of strong access controls for the stored private key or through decryption
+469   of the private key using an encryption key that is derived from the activation secret.
+
+470   2.2.2. Non-PKI-based Derived PIV Credential Issuance
+471   The applicant SHALL be provided with or supply an approved physical authenticator
+472   for the highest AAL that the derived PIV credential will be used to authenticate. If the
+473   authenticator is not directly provided by the issuer (i.e., the home agency), the issuer
+474    SHALL verify that the authenticator’s characteristics (e.g., single-factor or multi-factor)
+475   meet the requirements of [SP800-63B] for the highest authentication assurance level at
+476   which it will be used (AAL2 or AAL3), including [FIPS140] requirements.
+477   The issuance process for a multi-factor authenticator SHALL prompt the applicant to
+478   establish a memorized secret or biometric activation factor (or both) for the authenticator
+479   and successfully authenticate using that authenticator. The issuance process with a single-
+480   factor authenticator SHALL prompt the applicant to register a memorized secret that
+481   meets the requirements of [SP800-63B] Sec. 5.1.1 and that will be verified along with the
+482   physical authenticator in the authentication process.
+
+
+
+
+                                                   8
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+483   2.3. Maintenance
+484   The maintenance activities required for derived PIV credentials depend on the type of
+485   derived PIV credential (PKI-based or non-PKI-based) being used. Maintenance activities
+486   include rekeying, modification of certificates, and replacement of an activation factor
+487   (biometric or memorized secret) as appropriate.
+488   Derived PIV credentials are unaffected when the subscriber replaces their PIV Card with
+489   a new one (reissuance) or when the PIV Card is lost, stolen, or damaged. The ability for
+490   the subscriber to use a derived PIV credential is especially useful while waiting for a
+491   new PIV Card to be issued. In such circumstances, the subscriber continues to be able
+492   to use the derived PIV credential to gain logical access to remote federally controlled
+493   information systems from their endpoint.
+494   Updating the activation data (biometric or memorized secret, such as a PIN) or resetting
+495   the activation retry count for a derived PIV credential SHALL be performed in
+496   accordance with Sec. 3.1.4 for PKI-based derived PIV credentials or Sec. 3.2.3 for non-
+497   PKI-based derived PIV credentials.
+
+498   2.3.1. PKI-based Derived PIV Credential Maintenance
+499   PKI-based derived PIV credentials require typical maintenance activities applicable
+500   to asymmetric cryptographic credentials, including rekeying and modification. These
+501   activities MAY be performed either remotely or in person and SHALL be performed
+502   in accordance with the certificate policy under which the derived PIV authentication
+503   certificate is issued. When certificate rekeying or modification is performed remotely
+504   for a derived PIV credential, communication between the issuer and the cryptographic
+505   module in which the derived PIV authentication private key is stored SHALL only occur
+506   over mutually authenticated secure sessions between tested and validated cryptographic
+507   modules.
+508   Some maintenance activities for the subscriber’s PIV Card may trigger corresponding
+509   maintenance activities for the derived PIV credential since the derived PIV credential will
+510   need to be reissued if any information about the subscriber that appears in the credential
+511   changes. For example, if the subscriber’s PIV Card is reissued as a result of a change in
+512   the subscriber’s name and the subscriber’s name appears in the derived PIV authentication
+513   certificate, a new derived PIV authentication certificate with the new name SHALL be
+514   issued and the previous certificate invalidated.
+
+515   2.3.2. Non-PKI-based Derived PIV Credential Maintenance
+516   The maintenance activities for non-PKI-based derived PIV credentials are somewhat
+517   simpler than for PKI-based derived PIV credentials since the former do not contain
+518   information about the cardholder and do not carry a specific expiration date. Identity
+519   information SHALL be maintained in the PIV identity account and SHALL be updated
+520   when needed.
+
+                                                  9
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+521   Updating a separate memorized secret used with a single-factor authenticator for use
+522   at AAL2 SHALL be performed in a mutually authenticated protected session with the
+523   home agency. The update SHALL require the entry of the current memorized secret
+524   used for activation. If resetting the memorized secret is required because the subscriber
+525   has forgotten the memorized secret or has reached the retry limit, it SHALL be done in
+526   accordance with Sec. 3.2.3.
+
+527   2.4. Invalidation
+528   When an authenticator associated with a derived PIV credential is compromised (e.g.,
+529   lost, stolen, or damaged), that derived PIV credential SHALL be invalidated as described
+530   below.
+531   All derived PIV credentials associated with a given PIV Card SHALL be invalidated
+532   when the associated PIV identity account is terminated, typically due to the cardholder’s
+533   loss of PIV Card eligibility. Issuers of derived PIV credentials SHALL continuously
+534   monitor the associated PIV identity account to determine its termination status. Meeting
+535   this requirement is simplified because the subject’s PIV Card, cardholder eligibility, and
+536   all derived PIV credentials are maintained in one account — the PIV identity account —
+537   and maintained by the home agency.
+538   The issuer of the derived PIV credential SHALL NOT solely rely on tracking the
+539   revocation status of the PIV authentication certificate as a means of tracking the
+540   termination status of the PIV Card. This is because there are situations in which the PIV
+541   authentication certificate is not revoked even though the PIV Card has been terminated
+542   and subsequently replaced with a new card. This may happen, for example, when a
+543   terminated PIV Card is collected and either zeroized or destroyed by an agency. In this
+544   case and in accordance with [FIPS201], the corresponding PIV authentication certificate
+545   does not need to be revoked.
+
+546   2.4.1. PKI-based Derived PIV Credential Invalidation
+547   If the derived PIV authentication private key was created and stored on a hardware
+548   module that does not permit export of the private key and the token is collected and
+549   either zeroized or destroyed, then the derived PIV authentication certificate SHOULD be
+550   revoked. In all other cases, the derived PIV authentication certificate SHALL be revoked.
+
+551   2.4.2. Non-PKI-based Derived PIV Credential Invalidation
+552   Non-PKI-based derived PIV credentials are always directly verified by the home agency
+553   of the associated PIV Card. Therefore, termination of a non-PKI-based derived PIV
+554   credential SHALL be accomplished by invalidating the reference to the associated
+555   authenticator in the PIV identity account so that the authenticator cannot be used to
+556   authenticate to the home agency. Separate hardware-based authenticators MAY be
+557   collected from the subscriber, but this is not required.
+
+                                                  10
+      NIST SP 800-157r1 ipd                               Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+558   3.   Technical Requirements
+559   This section is normative.
+560   This section describes technical requirements for both PKI-based and non-PKI-based
+561   derived PIV credentials and associated authenticators.
+562   While the following sections focus on credential and authenticator requirements, the
+563   verifier is required to meet the corresponding verifier requirements in [SP800-63B] Sec.
+564   5.1.
+
+565   3.1. PKI-based Derived PIV Credentials
+566   A PKI-based derived PIV credential is a derived PIV authentication certificate, which is
+567   an X.509 public key certificate that has been issued in accordance with the requirements
+568   of this document and [COMMON]. All derived PIV credentials created under previous
+569   revisions of these guidelines are PKI-based and remain valid implementations under this
+570   revision of SP 800-157. Additional requirements for PKI-based derived PIV credentials
+571   that are removable or wireless are found in Appendix B.
+572   Authentication using PKI-based derived PIV credentials SHALL include a check to
+573   determine that the authentication certificate is valid and current (e.g., that the certificate is
+574   unexpired and not revoked).
+
+575   3.1.1. Certiﬁcate Policies for Derived PIV Credentials
+576   Derived PIV authentication certificates SHALL be issued under either the id-fpki-
+577   common-derived-pivAuth-hardware policy (satisfying [SP800-63B] AAL3) or the
+578   id-fpki-common-derived-pivAuth policy (satisfying AAL2) of [COMMON]. All
+579   derived PIV credentials SHALL be deemed to satisfy [SP800-63A] IAL3 since that is the
+580   identity proofing and issuance level associated with the PIV Card and bound to the PIV
+581   identity account.
+582   Derived PIV authentication certificates SHALL comply with the Derived PIV
+583   Authentication Certificate profile in [PROF].
+584   The expiration date of a derived PIV authentication certificate is based on the certificate
+585   policy of the issuer. There is no requirement to align the expiration date of a derived PIV
+586   authentication certificate with the expiration date of the PIV authentication certificate or
+587   the expiration of the PIV Card. However, in many cases, aligning the expiration dates will
+588   simplify lifecycle management.
+
+589   3.1.2. Cryptographic Speciﬁcations
+590   The cryptographic algorithm and key size requirements for the derived PIV authentication
+591   certificates and private keys are the same as the requirements for the PIV authentication
+592   certificate and private key, as specified in [SP800-78].
+
+                                                     11
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+593   For derived PIV authentication certificates issued under id-fpki-common-pivAuth-
+594   derived-hardware (AAL3), the derived PIV authentication key pair SHALL be
+595   generated within a hardware cryptographic module that meets the requirements of
+596   [SP800-63B] Sec. 4.2.2, including being validated to [FIPS140] Level 2 or higher with
+597   Level 3 physical security to protect the derived PIV authentication private key while in
+598   storage and not permitting export of the private key.
+599   For derived PIV authentication certificates issued under id-fpki-common-pivAuth-
+600   derived (AAL2), the derived PIV authentication key pair SHALL be generated within a
+601   cryptographic module that has been validated to [FIPS140] Level 1 or higher. If the key
+602   pair is generated outside of the authenticator itself, the private key SHALL be transferred
+603   via an authenticated protected channel as defined in [SP800-63B], and the authenticator
+604    SHALL meet the requirements of [SP800-63B] Sec. 4.2.2, including being validated to
+605   [FIPS140] Level 1 or higher.
+
+606   3.1.3. Allowable Authenticator Types
+607   Phishing-resistant multi-factor cryptographic authenticators SHALL be used for PKI-
+608   based derived PIV authentication. A multi-factor cryptographic device authenticator as
+609   specified in [SP800-63B] Sec. 5.1.9.1 SHALL be used for derived PIV authentication
+610   at AAL3. Either a multi-factor cryptographic device authenticator or a multi-factor
+611   cryptographic software authenticator as specified in [SP800-63B] Sec. 5.1.8.1 SHALL be
+612   used for derived PIV authentication at AAL2.
+
+613   3.1.4. Activation Data
+614   Activation of the derived PIV authenticator using a memorized secret SHALL meet the
+615   requirements of [SP800-63B] Sec. 5.2.11. Activation using a biometric characteristic
+616    SHALL meet the requirements of [SP800-63B] Sec. 5.2.3. Unlocking the device that
+617   houses a derived PIV authenticator (e.g., mobile phone) SHALL NOT be considered
+618   activation of the authenticator. Separate entry of the activation secret or presentation
+619   of a biometric factor SHALL be performed to use the authenticator. The same secret or
+620   biometric factor used to unlock the device MAY be used to activate the authenticator.
+621   If the memorized secret used for activation or the biometric activation factor needs to
+622   be changed, entry of the current memorized secret SHALL be required to change the
+623   value. If the activation secret has been forgotten or the permitted number of consecutive
+624   wrong attempts has been reached, the home agency SHALL be required to input the PIN
+625   unblocking key (PUK). If the PUK is not implemented by the authenticator or cannot
+626   be provided, either the authenticator certificates SHALL be revoked or the associated
+627   private keys SHALL be destroyed or zeroized. A new derived PIV credential MAY then
+628   be obtained.
+
+
+
+
+                                                  12
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+629   3.2. Non-PKI-based Derived PIV Credentials
+630   When used, non-PKI-based credentials SHALL be used to authenticate only to the home
+631   agency of the associated PIV Card.
+
+632   3.2.1. Allowable Authenticator Types
+633   Phishing-resistant multi-factor or single-factor cryptographic authenticators SHALL be
+634   used for non-PKI-based derived PIV authentication. A multi-factor cryptographic device
+635   authenticator as specified in [SP800-63B] Sec. 5.1.9.1 or a single-factor cryptographic
+636   device authenticator as specified in [SP800-63B] Sec. 5.1.7.1 SHALL be used for derived
+637   PIV authentication at AAL3. Either a cryptographic device authenticator or a multi-factor
+638   cryptographic software authenticator as specified in [SP800-63B] Sec. 5.1.8.1 or a single-
+639   factor cryptographic software authenticator as specified in [SP800-63B] Sec. 5.1.6.1
+640    SHALL be used for derived PIV authentication at AAL2. All single-factor authenticators
+641    SHALL be used in conjunction with a memorized secret that meets the requirements of
+642   [SP800-63B] Sec. 5.1.1.1.
+
+643   3.2.2. Cryptographic Speciﬁcations
+644   Authenticators used as non-PKI-based derived PIV credentials SHALL meet the
+645   cryptographic requirements specified in [SP800-63B] Sec. 5.1 for the corresponding
+646   authenticator type.
+
+647   3.2.3. Activation Data
+648   Activation of a multi-factor authenticator being used as a derived PIV credential using a
+649   memorized secret SHALL meet the requirements of [SP800-63B] Sec. 5.2.11. Activation
+650   using a biometric characteristic SHALL meet the requirements of [SP800-63B]
+651   Sec. 5.2.3. Unlocking the device that houses the authenticator (e.g., mobile phone)
+652    SHALL NOT be considered activation of the authenticator. Separate entry of the
+653   activation secret or presentation of a biometric factor SHALL be performed to use the
+654   authenticator. The same activation secret or biometric factor used to unlock the device
+655    MAY be used to activate the authenticator.
+
+656   If the memorized secret used for activation or the biometric activation factor needs to be
+657   changed, entry of the current activation secret SHALL be required to change the value.
+658   If the activation secret has been forgotten or the permitted number of consecutive wrong
+659   attempts has been reached, the activation secret and attempt counter MAY be reset by
+660   centralized management by the home agency. If centralized reset is not available, the
+661   authenticator SHALL be reset and require re-binding to the PIV identity account, as
+662   described in Sec. 3.3.
+
+
+
+
+                                                  13
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+663   3.3. Binding Derived PIV Credentials
+664   Binding a derived PIV credential to a PIV identity account can be accomplished through
+665   a connection to a PIV-authenticated endpoint, a direct connection to the PIV Card, or the
+666   use of the external authenticator binding procedure, as described in [SP800-63B] Sec.
+667   6.1.2.4. In all cases, binding SHALL require the use of the PIV-AUTH authentication
+668   mechanism specified in [FIPS201].
+
+
+
+
+                                                 14
+      NIST SP 800-157r1 ipd                          Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+669   References
+670   [COMMON] Federal Public Key Infrastructure Policy Authority (2021) X.509
+671   Certificate Policy for the U.S. Federal PKI Common Policy Framework. (Federal CIO
+672   Council), Version 2.2 [or as amended]. Available at https://www.idmanagement.gov/docs/
+673   fpki-x509-cert-policy-common.pdf
+674   [FIPS140] National Institute of Standards and Technology (2019) Security Requirements
+675   for Cryptographic Modules. (U.S. Department of Commerce, Washington, DC), Federal
+676   Information Processing Standards Publication (FIPS) 140-3 [or as amended]. https:
+677   //doi.org/10.6028/NIST.FIPS.140-3
+678   [FIPS201] National Institute of Standards and Technology (2022) Personal Identity
+679   Verification (PIV) of Federal Employees and Contractors. (U.S. Department of
+680   Commerce, Washington, DC), Federal Information Processing Standards Publication
+681   (FIPS) 201-3 [or as amended]. https://doi.org/10.6028/NIST.FIPS.201-3
+682   [HSPD-12] Bush, GW (2004) Policy for a Common Identification Standard for Federal
+683   Employees and Contractors. (The White House, Washington, DC), Homeland Security
+684   Presidential Directive HSPD-12. Available at https://www.dhs.gov/homeland-security-
+685   presidential-directive-12
+686   [PROF] Federal Public Key Infrastructure Policy Authority (2021) X.509 Certificate
+687   and Certificate Revocation List (CRL) Profiles. (Federal CIO Council), Version 2.1 [or
+688   as amended]. Available at https://www.idmanagement.gov/docs/fpki-x509-cert-profile-
+689   common.pdf
+690   [SP800-63A] Temoshok D, Abruzzi C, Fenton JL, Galluzzo R, LaSalle C, Lefkovitz N,
+691   Regenscheid A (2022) Digital Identity Guidelines: Enrollment and Identity Proofing.
+692   (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special
+693   Publication (SP) NIST SP 800-63A-4 ipd [or as amended]. https://doi.org/10.6028/NIST.
+694   SP.800-63a-4.ipd
+695   [SP800-63B] Temoshok D, Fenton JL, Choong YY, Lefkovitz N, Regenscheid A, Richer
+696   JP (2022) Digital Identity Guidelines: Authentication and Lifecycle Management.
+697   (National Institute of Standards and Technology, Gaithersburg, MD), NIST Special
+698   Publication (SP) NIST SP 800-63B-4 ipd [or as amended]. https://doi.org/10.6028/NIST.
+699   SP.800-63b-4.ipd
+700   [SP800-73] Cooper DA, Ferraiolo H, Mehta K, Francomacaro S, Chandramouli R,
+701   Mohler J (2015) Interfaces for Personal Identity Verification. (National Institute of
+702   Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-73-4
+703   [or as amended]. https://doi.org/10.6028/NIST.SP.800-73-4
+704   [SP800-78] Polk WT, Dodson DF, Burr WE, Ferraiolo H, Cooper DA (2015)
+705   Cryptographic Algorithms and Key Sizes for Personal Identity Verification. (National
+
+                                                15
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+706   Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP)
+707   800-78-4 [or as amended]. https://doi.org/10.6028/NIST.SP.800-78-4
+708   [SP800-79] Ferraiolo H, Chandramouli R, Ghadiali N, Mohler J, Shorter S (2015)
+709   Guidelines for the Authorization of Personal Identity Verification Card Issuers (PCI) and
+710   Derived PIV Credential Issuers (DPCI). (National Institute of Standards and Technology,
+711   Gaithersburg, MD), NIST Special Publication (SP) 800-79-2 [or as amended]. https:
+712   //doi.org/10.6028/NIST.SP.800-79-2
+713   [SP800-124] Souppaya M, Scarfone K (2013) Guidelines for Managing the Security
+714   of Mobile Devices in the Enterprise. (National Institute of Standards and Technology,
+715   Gaithersburg, MD), NIST Special Publication (SP) 800-124r1 [or as amended]. https:
+716   //doi.org/10.6028/NIST.SP.800-124r1
+717   [SP 800-217] Ferraiolo H, Regenscheid A, Richer JP (2023) Guidelines for the Use of
+718   Personal Identity Verification (PIV) Credentials with Federation (National Institute of
+719   Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-217
+720   ipd [or as amended]. https://doi.org/10.6028/NIST.SP.800-217.ipd
+
+
+
+
+                                                 16
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+721   Appendix A.      Digital Signature and Key Management Keys
+722   This appendix is informative.
+723   In addition to the PIV authentication keys, [FIPS201] also requires each PIV Card to
+724   have a digital signature key and a key management key unless the cardholder does not
+725   have a government-issued email account at the time of credential issuance. A subscriber
+726   who has been issued a derived PIV credential may also need a digital signature and key
+727   management key.
+728   For most subscribers, it will be necessary to store a copy of the PIV Card’s key
+729   management private key and certificate in the keystore that hosts the derived PIV
+730   credential. Similarly, copies of some or all of the PIV Card’s retired key management
+731   private keys and certificates should be stored in the derived PIV credential keystore.
+732   Neither [FIPS201] nor [COMMON] precludes a key management private key from being
+733   used on more than one device (e.g., the PIV Card and a derived PIV credential keystore)
+734   as long as all of the requirements of the policy under which the key management
+735   certificate was issued are satisfied. This means that in order to use a copy of a key
+736   management private key in a [FIPS140] Level 1 software cryptographic module, the
+737   corresponding certificate would have to be issued under a certificate policy, such
+738   as id-fpki-common-policy, that does not require the use of a [FIPS140] Level 2
+739   hardware cryptographic module. This should be taken into account at the time that the
+740   key management certificate that will be placed on the PIV Card is issued. Key recovery
+741   mechanisms are encouraged for key management keys that will be used on derived PIV
+742   credential keystores.
+743   As the digital signature key on a PIV Card cannot be copied, a new digital signature
+744   private key will need to be generated and a corresponding certificate will need to be
+745   issued for the derived PIV credential keystore. The issuance of this private key and
+746   certificate is independent of the issuance of the PIV Card. As the certificate policies
+747   associated with digital signature certificates in [COMMON] (id-fpki-common-policy,
+748   id-fpki-common-hardware, and id-fpki-common-High) are not limited to use with
+749   PIV Cards, a digital signature certificate for a derived PIV credential keystore may be
+750   issued under one of these policies as long as all of the policy requirements are satisfied.
+
+
+
+
+                                                  17
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+751   Appendix B.      Data Model and Interfaces for Removable or Wireless PKI-based
+752                    Hardware Cryptographic Devices
+753   This appendix is normative.
+754   This appendix provides data model and interface requirements for PKI-based derived
+755   PIV applications that are implemented on removable or wireless hardware cryptographic
+756   tokens.
+
+757   B.1. Derived PIV Application Data Model and Representation
+758   The data model and representation requirements for derived PIV applications are based
+759   on the requirements for PIV Card applications, as described in [SP800-73] Part 1. The
+760   specifications for the mandatory and optional data objects listed below are the same as the
+761   specifications for the corresponding data objects on a PIV Card application, as described
+762   in [SP800-73] Part 1.
+
+763   B.1.1. Derived PIV Application Identiﬁer
+764   The application identifier (AID) of the derived PIV application SHALL be (in
+765   hexadecimal):
+766    A0 00 00 03 08 00 00 20 00 01 00
+767   The derived PIV application can be selected as the current application on the removable
+768   hardware cryptographic token by providing the full AID listed above or by providing the
+769   right truncated version, as follows (hexadecimal):
+770    A0 00 00 03 08 00 00 20 00
+
+771   B.1.2. Derived PIV Application Data Model Elements
+772   The derived PIV application SHALL contain the following mandatory interoperable data
+773   object:
+774   X.509 Certificate for Derived PIV Authentication
+775      The read access control rule for the X.509 certificate for derived PIV authentication
+776      and the PKI cryptographic function access rule for the corresponding private key
+777      are as described for the X.509 certificate for PIV authentication in Sec. 3.1.3 of
+778      [SP800-73] Part 1.
+779   The following data objects MAY also be present:
+780   X.509 Certificate for Digital Signature
+781      The read access control rule for the X.509 certificate for digital signature and the PKI
+782      cryptographic function access rule for the corresponding private key are as described
+783      in Sec. 3.2.1 of [SP800-73] Part 1.
+
+
+                                                  18
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+784   X.509 Certificate for Key Management
+785      The read access control rule for the X.509 certificate for key management and the PKI
+786      cryptographic function access rule for the corresponding private key are as described
+787      in Sec. 3.2.2 of [SP800-73] Part 1.
+
+788   Discovery Object
+789      The requirements for the discovery object are as described in Sec. 3.3.2 of [SP800-73]
+790      Part 1, except for the following:
+791          • References to “PIV card application AID” are replaced by “derived PIV
+792            application AID.”
+793          • References to “PIV card application PIN” are replaced by “derived PIV
+794            activation secret.”
+795          • The first byte of the PIN usage policy SHALL be set to 0x40 to indicate that
+796            the virtual contact interface (VCI) is not implemented, 0x48 to indicate that a
+797            pairing code is required to establish a VCI, or 0x4C to indicate that no pairing
+798            code is required to establish a VCI. This also means that neither the global
+799            PIN nor the on-card biometric comparison (OCC) satisfies the access control
+800            rules for command execution and data object access within the derived PIV
+801            application.
+
+802   Key History Object
+803      Up to 20 retired key management private keys MAY be stored in the derived
+804      PIV application. The Key History Object SHALL be present in the derived PIV
+805      application if the derived PIV application contains any retired key management
+806      private keys but MAY be present even if no such keys are present in the derived PIV
+807      application. The requirements for the key history object are as described in Sec. 3.3.3
+808      of [SP800-73] Part 1, except for the following:
+809          • References to keysWithOnCardCerts SHOULD be interpreted as keys for which
+810            the corresponding certificate is populated within the derived PIV application.
+811          • References to keysWithOffCardCerts SHOULD be interpreted as keys for which
+812            the corresponding certificate is not populated within the derived PIV application.
+813          • References to offCardCertURL SHOULD be interpreted as a URL that points
+814            to a file containing the certificates that correspond to all of the retired key
+815            management private keys within the derived PIV application, including those for
+816            which the corresponding certificate is stored within the derived PIV application.
+
+817   Retired X.509 Certificates for Key Management
+818      The read access control rules for the retired X.509 certificates for key management
+819      and the PKI cryptographic function access rules for corresponding private keys are as
+820      described in Sec. 3.3.4 of [SP800-73] Part 1.
+
+                                                  19
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+821   Security Object
+822      The security object SHALL be present in the derived PIV application if the discovery
+823      object, the key history object, or the optional pairing code reference data container
+824      is present. The requirements for the security object are as described in Sec. 3.1.7 of
+825      [SP800-73] Part 1, except for the following:
+826         • The security object for a derived PIV application is signed using a private key
+827           whose corresponding public key is contained in a PIV content signing certificate
+828           that satisfies the requirements for certificates used to verify signatures on
+829           cardholder unique identifiers (CHUID), as specified in Sec. 4.2.1 of [FIPS201].
+830         • The signature field of the Security Object, tag 0xBB, SHALL include the derived
+831           PIV credential issuer’s certificate.
+832         • All unsigned data objects (i.e., the discovery object, the key history object, and
+833           the pairing code reference data container) within the derived PIV application
+834            SHALL be included in the security object.
+
+
+835   Secure Messaging Certificate Signer
+836      Derived PIV credential applications that support the virtual contact interface (VCI)
+837      capability SHALL include the secure messaging certificate signer object described in
+838      Sec. 3.3.7 of [SP800-73] Part 1.
+
+839   Pairing Code Reference Data Container
+840      Derived PIV credential applications that support the virtual contact interface (VCI)
+841      using a pairing code SHALL include the pairing code reference data container
+842      described in Sec. 3.3.8 of [SP800-73] Part 1.
+
+
+
+
+                                                 20
+      NIST SP 800-157r1 ipd                               Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+843   B.1.2.1.   Derived PIV Application Data Object Containers and Associated Access
+844              Rules
+845   Section 3.5 of [SP800-73] Part 1 provides the container IDs and access rules for the
+846   mandatory and optional data objects for a derived PIV application with the following
+847   mappings:
+
+                                  Table 1. Mapping of Data Objects
+
+       Derived PIV Application Data Object              PIV Card Application Data Object
+       X.509 Certificate for Derived PIV                X.509 Certificate for PIV Authentication
+       Authentication
+       Security Object                                  Security Object
+       X.509 Certificate for Digital Signature          X.509 Certificate for Digital Signature
+       X.509 Certificate for Key Management             X.509 Certificate for Key Management
+       Discovery Object                                 Discovery Object
+       Key History Object                               Key History Object
+       Retired X.509 Certificate for Key                Retired X.509 Certificate for Key
+       Management [1:20]                                Management [1:20]
+       Secure Messaging Certificate Signer              Secure Messaging Certificate Signer
+       Pairing Code Reference Data Container            Pairing Code Reference Data Container
+
+
+848   The detailed data model specifications for each of the data objects of the derived PIV
+849   application are the same as the specifications for the corresponding data objects (mapped
+850   per Table 1) of the PIV Card application as described in Appendix A of [SP800-73] Part 1,
+851   except for the following:
+852       • The security object for the derived PIV application is optional. It is required if the
+853         optional discovery object, the optional key history object, or the optional pairing
+854         code reference data container is present.
+855       • The minimum capacity for the security object container SHALL be 3000 bytes in
+856         order to allow space for the derived PIV credential issuer’s certificate.
+
+857   B.1.3. Derived PIV Application Data Objects Representation
+858   The ASN.1 object identifiers (OID) and “basic encoding rules – tag length value” (BER-
+859   TLV) tags for the mandatory and optional data objects within the derived PIV application
+860   are the same as for the corresponding data objects (mapped per Table 1) of the PIV Card
+861   application, as described in Sec. 4 of [SP800-73] Part 1.
+
+862   B.1.4. Derived PIV Application Data Types and Their Representation
+863   This appendix provides a description of the data types used in the derived PIV application
+864   command interface.
+
+                                                   21
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+865   B.1.4.1. Derived PIV Application Key References and Security Conditions of Use
+866   Key references are assigned to keys and secrets of the derived PIV application. Table
+867   6-1 of [SP800-78] and Table 4 of [SP800-73] Part 1 define the key reference values that
+868   SHALL be used on the derived PIV application interfaces with the following mappings:
+
+                                   Table 2. Mapping of Key Types
+
+               Derived PIV Key Type                     PIV Key Type
+               Derived PIV Activation Secret            PIV Card Application PIN
+               Activation Secret Unblocking Key         PIN Unblocking Key
+               Derived PIV Authentication Key           PIV Authentication Key
+               Derived PIV Token Management Key         Card Management Key
+               Digital Signature Key                    Digital Signature Key
+               Key Management Key                       Key Management Key
+               Retired Key Management Key               Retired Key Management Key
+               Derived PIV Secure Messaging Key         PIV Secure Messaging Key
+
+
+869   The key reference specifications in Sec. 5.1 of [SP800-73] Part 1 are applicable to the
+870   corresponding keys included in the derived PIV application (mapped per Table 2), except
+871   for the following:
+872       • References to “PIV Card application” are replaced with “derived PIV application.”
+873       • References in the “Security Condition for Use” column to “PIN or OCC” are
+874         replaced with “derived PIV activation secret.”
+
+875   B.1.4.2. Derived PIV Application Cryptographic Algorithm and Mechanism Identiﬁers
+876   The algorithm identifiers for the cryptographic algorithms that MAY be recognized on
+877   the derived PIV application interfaces are the symmetric and asymmetric identifiers
+878   specified in Table 6-2 and Table 6-3 of [SP800-78]. The cryptographic mechanism
+879   identifiers that MAY be recognized on the derived PIV application interfaces are those
+880   specified in Table 5 of [SP800-73] Part 1.
+
+881   B.1.4.3. Derived PIV Application Status Words
+882   The status words that MAY be returned on the derived PIV application command
+883   interface are as specified in Sec. 5.6 of [SP800-73] Part 1.
+
+884   B.1.5. Derived PIV Authentication Mechanisms
+885   The derived PIV application supports the following validation steps:
+886       • Credential validation (CredV) is established by verifying the certificates retrieved
+887         from the derived PIV application and checking the validity and revocation status of
+888         these certificates.
+
+                                                 22
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+889       • Derived PIV application holder validation (HolderV) is established when the
+890         authenticator holder proves knowledge of the derived PIV activation secret
+891         associated with the derived PIV credential that contains valid and unrevoked
+892         certificates.
+893   The derived PIV application facilitates a single authentication mechanism, which is a
+894   cryptographic challenge and response authentication protocol that uses the derived PIV
+895   authentication private key as described in Appendix B.1.2 of [SP800-73] Part 1 with the
+896   following translations:
+897       • References to “PIV application” are replaced with “derived PIV application.”
+898       • References to “PIV auth certificate” are replaced with “derived PIV authentication
+899         certificate.”
+900       • References to “PIV Card app ID” are replaced with “derived PIV application ID.”
+901   The authentication can also be performed wirelessly over a virtual contact interface (VCI)
+902   if a VCI has been established with the derived PIV application.
+
+903   B.2. Derived PIV Application Token Command Interface
+904   This appendix contains the technical specifications for the command interface to the
+905   derived PIV application surfaced by the card edge of the integrated circuit card (ICC) that
+906   represents the removable hardware cryptographic token. The command interface for the
+907   derived PIV application SHALL implement all of the card commands supported by the
+908   PIV Card application as described in [SP800-73] Part 2, which include:
+909       • SELECT
+910       • GET DATA
+911       • VERIFY
+912       • CHANGE REFERENCE DATA
+913       • RESET RETRY COUNTER
+914       • GENERAL AUTHENTICATE
+915       • PUT DATA
+916       • GENERATE ASYMMETRIC KEY PAIR
+917   The specifications for the token command interface SHALL be the same as the
+918   specifications for the corresponding card edge commands for a PIV Card as described
+919   in [SP800-73] Part 2, except for the following deviations:
+920       • References to “PIV Card application” are replaced with “derived PIV application.”
+921       • References to “PIV data objects” are replaced with “derived PIV data objects.”
+
+                                                  23
+      NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+922       • References to “PIV authentication key” are replaced with “derived PIV
+923         authentication key.”
+924       • The derived PIV activation secret SHALL satisfy the criteria specified in Appendix
+925         B.2.1 of this document rather than Sec. 2.4.3 of [SP800-73] Part 2.
+926       • In Appendix A:
+927           – References to “PIV Card application administrator” are replaced with “derived
+928             PIV application administrator.”
+929           – References to “card management key” are replaced with “derived PIV token
+930             management key.”
+931   The token platform SHALL support a default selected application, which is the selected
+932   application that immediately following a cold or warm reset. This default application may
+933   be the derived PIV application or another application.
+
+934   B.2.1. Authentication of an Individual
+935   Knowledge of a memorized secret (specifically the derived PIV activation secret) is the
+936   means by which an individual can be authenticated to the derived PIV application.
+937   The derived PIV activation secret SHALL be between 6 and 8 bytes in length. If the
+938   actual length of the derived PIV activation secret is less than 8 bytes, it SHALL be
+939   padded to 8 bytes with 0xFF when presented to the token command interface. The 0xFF
+940   padding bytes SHALL be appended to the actual value of the secret. The bytes that
+941   comprise the derived PIV activation secret SHALL be limited to values 0x30 – 0x39,
+942   0x41 – 0x5A, and 0x61 – 0x7A: the ASCII values for the decimal digits ‘0’ – ‘9’; upper
+943   case characters ‘A’ – ‘Z’; and lower case characters ‘a’ – ‘z’. For example,
+944       • Actual derived PIV activation secret: “Part21” or (hexadecimal) 50 61 72 74 32
+945         31
+946       • Padded derived PIV activation secret presented to the card command interface
+947         (hexadecimal): 50 61 72 74 32 31 FF FF
+948 The derived PIV application SHALL enforce the minimum length requirement of 6 bytes
+949 for the derived PIV activation secret (i.e., SHALL verify that at least the first 6 bytes of
+950 the value presented to the card command interface are in the range 0x30 – 0x39, 0x41
+951 – 0x5A, or 0x61 – 0x7A) as well as the other formatting requirements specified in this
+
+952 section.
+
+
+
+
+                                                 24
+      NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+      January 2023
+
+
+953   Appendix C.      Example Issuance Processes
+954   This appendix is informative.
+955   The issuance process for a derived PIV credential varies depending on whether the
+956   derived PIV credential is being issued at AAL2 or AAL3. Section 2.2 specifies the
+957   requirements for initial issuance. This appendix provides two example issuance processes
+958   that satisfy those requirements: one at AAL2 and another at AAL3.
+
+959   C.1. Example Issuance of a Derived PIV Credential at AAL2
+960   The following is an example of a PKI-based derived PIV credential.
+961   An employee requires a mobile device for work. The mobile device is ordered, and a
+962   request for the issuance of a derived PIV credential is submitted to the agency’s approval
+963   authority.
+964   Following receipt of the device and approval, the employee starts the binding process
+965   remotely — such as from their home — by visiting a derived PIV credential website
+966   operated by or on behalf of their PIV Card’s home agency. The website requires TLS
+967   client authentication using the PIV authentication certificate on the employee’s PIV Card.
+968   The employee performs this step from a desktop computer since they cannot use their PIV
+969   Card on a mobile device. By requiring and validating a PIV Authentication certificate
+970   when connecting to the website, the server authenticates the employee and verifies
+971   that the employee is still eligible to possess a PIV Card. If the employee successfully
+972   authenticates to the server, the issuer generates and displays a binding secret to the
+973   employee.
+974   The employee then runs a provisioning application on the mobile device. The application
+975   asks the employee to identify themself and enter the binding secret that was previously
+976   provided from the desktop website to create an activation secret, which will subsequently
+977   be used to authenticate to the cryptographic module. The application generates a key
+978   pair within the device’s cryptographic module and submits the binding secret and
+979   newly generated public key to the PIV issuer as part of a certificate request. The PIV
+980   issuer authenticates the employee by verifying that the binding secret in the certificate
+981   request matches the one that it previously issued and forwards the public key to the CA,
+982   which signs and issues the derived PIV credential (i.e., the derived PIV authentication
+983   certificate). The provisioning application loads the derived PIV authentication certificate
+984   on the mobile device. The PIV Card issuer enters information about the new derived PIV
+985   credential into the subscriber’s PIV identity account. The cardholder is notified of the
+986   binding of the new derived PIV credential.
+987   Normative requirements for this process are given in [SP800-63B] Sec. 6.1.2.4 and in
+988   Sec. 2.2 of this document.
+
+
+
+                                                  25
+       NIST SP 800-157r1 ipd                             Derived PIV Credentials (Initial Public Draft)
+       January 2023
+
+
+989    C.2. Example Binding of a Derived PIV Credential at AAL3
+990    An employee requires a derived PIV credential to access a relying party using one or
+991    more endpoints that do not accommodate the direct use of a PIV Card. The employee
+992    requests a non-PKI-based authenticator capable of authentication at AAL3 and approval
+993    to use that authenticator as a derived PIV credential. The request is approved by the
+994    agency’s approval authority.
+995    After receiving the approval and authenticator, the employee starts the binding process
+996    by authenticating with their PIV Card at a derived PIV credential website operated by
+997    or on behalf of the PIV cardholder’s home agency. The employee additionally provides
+998    a biometric sample that can be verified against their PIV Card. The website requires
+999    TLS client authentication using the PIV authentication certificate on the employee’s PIV
+1000   Card. The employee then inserts (connects) the authenticator to be used as a derived
+1001   PIV credential and registers (binds) that credential, including establishing a second
+1002   authentication factor (activation secret or biometric characteristic) if that has not already
+1003   been done. The website determines whether the authenticator meets AAL3 requirements.
+1004   Upon successful registration, the subscriber’s key and appropriate metadata are stored
+1005   for use by the home agency’s endpoint for non-PKI-based PIV authentication. The PIV
+1006   Card issuer enters information about the new derived PIV credential into the subscriber’s
+1007   PIV identity account. The cardholder is notified of the binding of the new derived PIV
+1008   credential.
+1009   If the authenticator uses verifier name binding as described in [SP800-63B] Sec. 5.2.5.2,
+1010   the website used to register the authenticator has to share the same domain name as will
+1011   be used by the home agency to authenticate the subscriber so that the same keys are used
+1012   for registration and authentication.
+
+
+
+
+                                                    26
+       NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+       January 2023
+
+
+1013   Appendix D.      Glossary
+1014   This appendix is informative.
+1015   Selected terms used in the guideline are defined below. All other significant technical
+1016   terms used within this document are defined in other key documents, including [FIPS201],
+1017   [SP800-63A], [SP800-63B], and [SP800-73].
+1018   applicant
+1019   A PIV cardholder who has applied for but has not yet been issued a derived PIV
+1020   credential.
+
+1021   derived PIV application
+1022   A standardized application based on the PIV Card’s PIV application that resides on a
+1023   removable or wireless hardware cryptographic token. It hosts a PKI-based derived PIV
+1024   credential and associated mandatory and optional elements.
+
+1025   home agency
+1026   The government agency responsible for maintaining the PIV identity account and issuing
+1027   a PIV Card. While another agency may perform the enrollment and identity proofing
+1028   process in some cases, the home agency is responsible for monitoring ongoing eligibility
+1029   and initiating termination if appropriate.
+
+1030   PKI-based derived PIV credential
+1031   An X.509 derived PIV authentication certificate, which is issued in accordance with the
+1032   requirements specified in this document where the PIV authentication certificate on the
+1033   applicant’s PIV Card serves as the original credential. The derived PIV credential is an
+1034   additional common identity credential under HSPD-12 and FIPS 201 that is issued by a
+1035   federal department or agency.
+
+1036   non-PKI-based derived PIV credential
+1037   An authenticator that has been bound to a PIV identity account at a subscriber’s home
+1038   agency and that can be used for federated authentication to applications as an alternative
+1039   to the subscriber’s PIV Card.
+
+1040   subscriber
+1041   A PIV cardholder to whom a derived PIV credential has been issued.
+
+1042   verifier
+1043   An entity that verifies the claimant’s identity by verifying the claimant’s possession and
+1044   control of one or more authenticators using an authentication protocol. To do this, the
+1045   verifier needs to confirm the binding of the authenticators with the subscriber account and
+1046   check that the subscriber account is active.
+
+                                                   27
+       NIST SP 800-157r1 ipd                            Derived PIV Credentials (Initial Public Draft)
+       January 2023
+
+
+1047   Appendix E.      Acronyms and Abbreviations
+1048   This appendix is informative.
+1049   Selected abbreviations used in this guideline are defined below.
+1050   AAL
+1051   Authentication Assurance Level
+
+1052   AID
+1053   Application Identifier
+
+1054   ASCII
+1055   American Standard Code for Information Interchange
+
+1056   CA
+1057   Certificate Authority
+
+1058   CHUID
+1059   Cardholder Unique Identifier
+
+1060   CSP
+1061   Cetificate Service Provider
+
+1062   ICC
+1063   Integrated Circuit Card
+
+1064   FIPS
+1065   Federal Information Processing Standard
+
+1066   OCC
+1067   On-Card (biometric) Comparison
+
+1068   PIN
+1069   Personal Identification Number
+
+1070   PIV
+1071   Personal Identity Verification
+
+1072   PKI
+1073   Public Key Infrastructure
+
+
+
+                                                   28
+       NIST SP 800-157r1 ipd            Derived PIV Credentials (Initial Public Draft)
+       January 2023
+
+
+1074   TLS
+1075   Transport Layer Security
+
+1076   VCI
+1077   Virtual Contact Interface
+
+
+
+
+                                   29
+       NIST SP 800-157r1 ipd                           Derived PIV Credentials (Initial Public Draft)
+       January 2023
+
+
+1078   Appendix F.     Change Log
+1079   This appendix is informative. It provides an overview of the changes to SP 800-157 since
+1080   its initial release.
+1081       • Throughout — Removed restrictions to only use derived PIV credentials on mobile
+1082         devices
+1083       • Sections 1.1, 1.2 — Allowed binding of non-PKI-based derived PIV credentials at
+1084         AAL2 and AAL3
+1085       • Sections 1.2, 2.1, 2.2, 3.1, 3.2, C — Changed assurance levels from LOA to AAL
+1086       • Sections 1.4, 2.2 — Removed relationship to obsolete OMB memoranda
+1087       • Section 2.1 — Added lifecycle of non-PKI-based derived PIV credentials
+1088       • Sections 2.2.1, 2.2.2 — Added detail on issuance for PKI and non-PKI-based
+1089         derived PIV credentials
+1090       • Sections 2.3.1, 2.3.2 — Added detail on maintenance for PKI and non-PKI-based
+1091         derived PIV credentials
+1092       • Sections 2.4, 2.4.1, 2.4.2 — Added invalidation detail, replacing linkage with PIV
+1093         Card
+1094       • Section 3.1, 3.2 — Reorganized sections into PKI and non-PKI-based derived PIV
+1095         credential requirements
+1096       • Section 3.1.3 — Removed specific physical details for authenticators
+1097       • Sections 3.1.4, 3.2.3 — Referenced SP 800-63B for activation requirements
+1098       • Section 3.3 — Added reference to binding requirements in SP 800-63B
+1099       • Appendix B.1.2, B.1.3 — Added secure messaging and VCI capabilities for
+1100         removable and wireless authenticators
+1101       • Appendix C.1 — Added reference to issuance requirements in SP 800-63B
+1102       • Appendix C.2 — Updated existing PIV credential issuance example and added
+1103         example of issuance of non-PKI-based derived PIV credentials
+
+
+
+
+                                                  30
+

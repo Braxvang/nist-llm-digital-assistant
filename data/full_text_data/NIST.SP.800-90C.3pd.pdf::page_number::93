@@ -1,0 +1,41 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                      Recommendation for RBG Constructions
+       September 2022
+
+2652   Two alternative derivation functions are specified in Appendices C.3.2 and C.3.3. Appendix C.3.1
+2653   discusses the keys and constants for use with the alternative derivation functions specified in
+2654   Appendices C.3.2 and C.3.3.
+
+2655   C.3.1. Derivation Keys and Constants
+2656   Both of the derivation methods specified in Appendices C.3.2 and C.3.3 an AES derivation key
+2657   (df_Key) whose length shall meet or exceed the instantiated security strength of the DRBG
+2658   instantiation.
+2659   The df_Key may be set to any value and may be the current value of a key used by the DRBG.
+2660   These alternative methods use three 128-bit constants C1, C2 and C3, which are defined as:
+2661            C1 = 000000...00
+2662            C2 = 101010...10
+2663            C3 = 010101...01
+2664   The value of B used in Appendices C.3.2 and C.3.3 depends on the length of the AES derivation
+2665   key (df_Key). When the length of df_Key = 128 bits, then B = 2. Otherwise, B = 3.
+
+2666   C.3.2.       Derivation Function Using CMAC
+2667   CMAC is a block-cipher mode of operation specified in [SP800-38B]. The CMAC_df derivation
+2668   function is specified as follows:
+2669   CMAC_df:
+2670   Input: bitstring input_string, integer number_of_bits_to_return.
+2671   Output: bitstring Z.
+2672   Process:
+2673       1. Let C1, C2, C3 be 128-bit blocks defined as 000000...0, 101010...10, 010101...01,
+2674          respectively.
+2675       2. Get df_Key.       Comment: See Appendix C.3.1.
+2676       3. Z = the Null string.
+2677       4. For i = 1 to B:
+2678       Z = Z || CMAC(df_Key, Ci || input_string).
+2679       5. Z = leftmost (Z, number_of_bits_to_return).
+2680       6. Return(Z).
+
+2681   C.3.3.       Derivation Function Using CBC-MAC
+2682   This CBC-MAC derivation function shall only be used when the input_string has the following
+2683   properties:
+
+                                                        80
+

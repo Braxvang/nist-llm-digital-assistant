@@ -1,0 +1,61 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                    Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                       PIV Card Application Card Command Interface
+
+           Step #                          Description                                                                   Comment
+           H4       Check that CB ICC is 0x00                                                      Verify that the card executed the protocol in
+                                                                                                   accordance with the parameters specified in
+                                                                                                   Step H1. Return an authentication error if check
+                                                                                                   fails.
+           H5       Verify C ICC signature and subject public key                                  Verify signature on C ICC and, using standards-
+                                                                                                   compliant PKI path validation, validate the
+                                                                                                   content signing certificate needed to verify the
+                                                                                                   signature on C ICC . 14,15 Verify that the domain
+                                                                                                   parameters of the subject public key in C ICC are
+                                                                                                   the same as the domain parameters for Q eH by
+                                                                                                   checking the Algorithm OID in the
+                                                                                                   CardHolderPublicKey data object (see Table
+                                                                                                   19). Return an authentication error if either
+                                                                                                   verification fails.
+           H6       ID sICC = T 8 (SHA256(C ICC ))                                                 ID sICC — the leftmost 8 bytes of the SHA-256
+                                                                                                   hash of C ICC — is used as an input for session
+                                                                                                   key derivation.
+           H7       Extract Q sICC from C ICC
+           H8       Z = ECC_CDH (d eH , Q sICC )                                                   Compute the shared secret Z using the ECC
+                                                                                                   CDH primitive [SP800-56A, Section 5.7.1.2].
+           H9       Zeroize d eH                                                                   Destroy the ephemeral private key generated in
+                                                                                                   Step H2.
+           H10      SK CFRM || SK MAC || SK ENC || SK RMAC =                                       Compute the key confirmation key and the
+                                                    KDF(Z, len, OtherInfo)                         session keys. See Section 4.1.6.
+           H11      Zeroize Z                                                                      Destroy the shared secret generated in Step H8.
+           H12      Check that AuthCryptogram ICC equals                                           Perform key confirmation by verifying the
+                      CMAC(SK CFRM , "KC_1_V" || ID sICC || ID sH || Q eH )                        authentication cryptogram, as described in
+                                                                                                   Section 4.1.7. Return an authentication error if
+                                                                                                   verification fails.
+           H13      Zeroize SK CFRM                                                                Destroy the key confirmation key derived in
+                                                                                                   Step H10.
+
+
+777   4.1.2. PIV Card Application Protocol Steps
+778                                         Table 16: Protocol Steps for PIV Card Application
+
+           Step #                          Description                                                                Comment
+           C1       ID sICC = T 8 (SHA256(C ICC ))                                                 ID sICC — the leftmost 8 bytes of the SHA-256
+                                                                                                   hash of C ICC — is used as an input for session
+                                                                                                   key derivation. (Note that ID sICC is static and
+                                                                                                   MAY be pre-computed off-card.)
+
+
+
+
+      14
+         If the public key needed to verify the signature on CICC appears in an Intermediate CVC, then verify the signatures on both CICC and the
+      Intermediate CVC and — using standards-compliant PKI validation — validate the content signing certificate needed to verify the signature on
+      the Intermediate CVC.
+      15
+         Validation of the content signing certificate does not need to be performed at the time of signature verification if the certificate has been
+      previously validated or if the public key needed to verify the signature on CICC has been previously obtained from a trusted source.
+
+
+
+                                                                             23
+

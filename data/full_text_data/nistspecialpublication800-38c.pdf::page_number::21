@@ -1,0 +1,52 @@
+Appendix B: Length of the MAC
+
+The length, Tlen, of the MAC within CCM is an important security parameter. The role of this
+parameter in providing authentication assurance is outlined in Section B.1, and guidance in the
+selection of Tlen is given in Section B.2.
+
+B.1       Authentication Assurance
+
+The decryption-verification process determines whether a purported ciphertext input is, in fact, a
+ciphertext, i.e., the output of the generation-encryption process with the given key, associated
+data string, and nonce. The basis of the CCM authentication assurance is the scarcity of
+ciphertexts, which suggests that an attacker, i.e., a party without access to the key or to the
+generation-encryption process, cannot easily generate a ciphertext. Therefore, any purported
+ciphertext that passes the decryption-verification process was probably generated legitimately.
+
+For any purported ciphertext that is at least Tlen bits long, the rightmost Tlen bits correspond to
+an encrypted MAC, and the remaining bits correspond to an encrypted payload. The decryption-
+verification process checks the correctness of the MAC for the payload, the associated data
+string, and the nonce. Depending on the result, the output is either the error message INVALID
+or the payload. The nature of the authentication assurance, in turn, depends on the output:
+
+      •   If the output is INVALID, then the payload and the associated data string cannot both be
+          authentic, i.e., they cannot have originated from a source that executed the generation-
+          encryption process on them with the given nonce to produce the purported ciphertext.
+
+      •   If the output is the payload, then the design of the mode provides assurance that the
+          payload and the associated data are authentic. This assurance, however, is not absolute:
+          an attacker can generate a ciphertext with a certain probability.
+
+In the second case, the scarcity of ciphertexts and, thus, the expected probability that an attacker
+can guess a ciphertext, is regulated by the size of Tlen. In particular, the probability is no greater
+than 1 in 2Tlen that a single inauthentic purported ciphertext will pass the decryption-verification
+process with a given associated data string and nonce. Of course, an attacker may attempt to
+present many purported ciphertexts to the decryption-verification process and thereby increase
+the probability that at least one of them will turn out to be a true ciphertext.
+
+Moreover, an attacker may be able to choose the purported ciphertext in such a way as to control
+every bit of the corresponding payload, as described in [9]. * Therefore, if the output of the
+
+*
+  In particular, given a single valid ciphertext, and the corresponding payload and nonce, the attacker chooses any set
+of bits to flip in the payload and flips the corresponding set of bits in the ciphertext. The attacker then tries to induce
+the decryption-verification process to reuse the associated counter blocks with the altered ciphertext. When the
+counter blocks are generated as in Appendix A, this step is equivalent to inducing the decryption-verification
+process to reuse the nonce. In principle, a system could monitor the nonces that are presented to the decryption-
+verification process to facilitate some defense against this attack, but such monitoring may not be feasible in
+practice.
+
+
+
+                                                           15
+

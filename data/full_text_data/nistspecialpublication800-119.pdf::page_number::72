@@ -1,0 +1,58 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+    Unlike IPv4, IPv6 does not have broadcast addresses. Instead, IPv6 uses optimizations like the
+     Solicited Node multicast groups and the all routers multicast addresses, which make better use of
+     network resources than broadcast.
+
+    In IPv6, multicast is used with ICMPv6 for infrastructure applications like neighbor discovery and
+     autoconfiguration on local links.
+
+    IPv6 multicast addresses have new capabilities such as scope and embedded unicast prefixes. In
+     general, IPv6 extensions to multicast have been added to make multicast more useful over internets.
+
+    Multicasting is managed with ICMPv6 message types collectively called MLD instead of IGMP.
+    4.2.3   Multicast Security Ramifications
+
+IPv6 routers, packet filters, firewalls, and tunnel endpoints need to enforce multicast scope boundaries.
+Firewalls should inspect all source IPv6 addresses and filter any packets with a multicast source address.
+Furthermore, firewalls in Layer 3 mode should never forward link-layer multicast packets.
+
+Attackers may take advantage of well-known multicast addresses to find hidden resources such as routers
+or particular servers. These addresses need to be blocked at the appropriate places according to local
+security policy.
+
+Denial of service attacks may use multicast to amplify bandwidth consumption or attempt to exhaust
+other resources. So-called reflector attacks may send packets with a source address of the target of attack
+and a multicast destination address, to try to get all multicast receivers to respond to the target. These
+attacks need to be intercepted and dropped.
+
+IPsec coverage for multicast is incomplete. If a multicast group has more than one sender, the replay
+protection mechanism does not work. More importantly, IKE is a unicast UDP protocol that only works
+between two parties, so automated key management for multicast IPsec is lacking. For additional details
+about using IPsec with IPv6 multicast, see Section 5.3.3.
+
+Attacks on the MLD protocol include denial of service, causing unwanted traffic to be delivered, and
+downgrading capabilities from MLDv2 to MLDv1. By properly enforcing the unicast scope and hop
+count rules for MLD, these attacks can be confined to a local link.
+
+Forging Protocol Independent Multicast (PIM) messages can cause unwanted traffic to be sent to replace
+the role of designated routers (RFC 5294). IPsec can be used for cryptographic protection of these
+messages. Cryptographically protecting PIM messages (RFC 5796) also stops many denial-of-service
+attacks. Other precautions include limiting the set of neighbors from which Join, Prune, Assert, and Hello
+messages are accepted. Routers should check that a valid Hello message was received first and that source
+addresses are legal for the interfaces on which they are received. See also RFC 4609 for a list of
+suggestions for rate limiting PIM messages, in particular, the inter-domain multi-source discovery
+protocol (MSDP).
+
+Issues concerning how link-local ICMPv6 multicast traffic used for neighbor discovery and
+autoconfiguration can be secured are covered in Section 5.4.
+
+    4.2.4   Unresolved Aspects of IPv6 Multicast
+
+IPsec and IKE were not designed with multicast security in mind, and three important unresolved aspects
+of multicast security are related to IPsec and key management for IPsec.
+
+
+                                                    4-9
+

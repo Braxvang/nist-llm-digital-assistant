@@ -1,0 +1,57 @@
+Special Publication 800-73-4                            Interfaces for Personal Identity Verification – Part 2:
+                                                        PIV Card Application Card Command Interface
+
+            Command                                Response                               Comment
+                                      87 82 05 91 01 <bytes 1 – 251 of       The response includes the tag,
+                                      ENC R2 > 61 00                         length, and padding indicator
+                                                                             bytes of the BER-TLV encoded
+                                                                             encrypted response data along
+                                                                             with the first 251 bytes of the
+                                                                             encrypted response, and an
+                                                                             indicator that at least 256 bytes
+                                                                             of additional data is available.
+                                                                             The padding indicator is '01' to
+                                                                             indicate that padding was
+                                                                             applied.
+00 C0 00 00 00                                                               Request the next 256 bytes of the
+                                                                             response.
+                                      <bytes 252 – 507 of ENC R2 > 61        Return the next 256 bytes of the
+                                      00                                     response.
+…                                     …
+00 C0 00 00 A3                                                               Request the final 163 bytes of the
+                                                                             response.
+                                      <bytes 1276 – 1424 of ENC R2 >         Return the final 163 bytes of the
+                                      99 02 90 00 8E 08 T 8 (T R-MAC,2 )     response, including the BER-
+                                      90 00                                  TLV encoded status word for the
+                                                                             command and the BER-TLV
+                                                                             encoded R-MAC.
+At this point the VERIFY command could be used to submit the PIV Card Application PIN to the PIV
+Card Application. However, in this example, for illustrative purposes only, a VERIFY command is sent to
+the card without a data field in order to retrieve the current value of the retry counter associated with the
+PIV Card Application PIV.
+0C 20 00 80 0A 8E 08                                                         The VERIFY command is used
+T 8 (T C-MAC,3 ) 00                                                          to retrieve the number of further
+                                                                             retries allowed for the PIV Card
+                                                                             Application PIN.
+                                      99 02 63 C3 8E 08 T 8 (T R-MAC,3 )     The PIV Card Application
+                                      90 00                                  indicates that 3 further retries are
+                                                                             allowed ('63 C3').
+The VERIFY command is used to submit the PIV Card Application PIN to the PIV Card Application.
+Other than the key reference and the PIN value, the command and response are the same as when using
+the VERIFY command to submit the pairing code.
+For the command, ENC C4 is the result of encrypting the PIN value along with the padding bytes using an
+IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 04'), and T C-MAC,4 is computed using
+T C-MAC,3 as the MCV. [Note that the encryption counter used to generate the IV was incremented as a
+result of the previous VERIFY command even though no encryption was performed for that command.]
+For the response, T R-MAC,4 is computed using T R-MAC,3 as the MCV.
+0C 20 00 80 1D 87 11 01 ENC C4                                               The VERIFY command is used
+8E 08 T 8 (T C-MAC,4 ) 00                                                    to submit the PIV Card
+                                                                             Application PIN to the card.
+                                      99 02 90 00 8E 08 T 8 (T R-MAC,4 )     The card responds that the
+                                      90 00                                  command has been successfully
+                                                                             executed.
+Now that a virtual contact interface has been established and the PIV Card Application PIN has been
+
+
+                                                       49
+

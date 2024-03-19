@@ -1,0 +1,57 @@
+                                                            SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+8.        Guidelines for Securing DNS Transactions
+
+Section 6 outlines threats, security objectives, and protection approaches for various DNS transactions.
+This section provides the steps involved in implementing those approaches, as well as operational best
+practices that go with those implementations. The DNS protocol protection approaches in Table 6-1 are
+aggregated, indexed by type of approach, and elaborated here as follows:
+
+      •    Restricting Transaction Entities Based on IP Address. In this type of implementation, the
+           DNS name servers and clients participating in a DNS transaction are restricted to a trusted set of
+           hosts by specifying their IP addresses in appropriate access control statements provided by the
+           name server software. The protection provided by these IP-based access control statements can be
+           circumvented by attacks such as IP spoofing. Hence, this solution is not recommended as the sole
+           protection mechanism for DNS query/response, zone transfer, and dynamic update transactions
+           that have high threat impact. However, for the DNS NOTIFY transaction, where the only threat is
+           spurious notification (which may not even trigger a zone transfer), an access control based on IP
+           address will suffice. Although this solution is not recommended generally, a description of the
+           mechanics of access control using IP addresses is provided in Section 8.1 because the same
+           statements are used to identify hosts based on named keys while implementing transaction
+           protection using hash-based message authentication codes. This approach has been implemented
+           for all DNS transactions.
+
+      •    Transaction Protection through Hash-Based Message Authentication Codes (TSIG
+           Specification). In this approach, transaction protection is enabled through generation and
+           verification of hash-based message authentication codes (HMAC). Because these codes are
+           embedded within a special RR of RRType TSIG, the specifications that outline protection of
+           DNS transactions using HMAC are called TSIG in the DNS community. TSIG specifications are
+           described in RFC 2845 and 3007 [RFC2845], [RFC3007]. Application of TSIG specifications for
+           protection of zone transfer and dynamic update transactions is described in Section 8.2.
+
+      •    Transaction Protection through Asymmetric Digital Signatures (DNSSEC Specification).
+           This approach, which goes by the name DNS security extensions (DNSSEC), is described
+           through a family of RFCs [RFC4033], [RFC4034], and [RFC4035]. The core services provided
+           by DNSSEC are data origin authentication and integrity protection. DNSSEC is used mainly for
+           securing DNS information obtained from DNS query/response transactions. The deployment
+           issues in DNSSEC are described in Section 9.
+8.1       Restricting Transaction Entities Based on IP Address
+
+Some DNS name server implementations, such as BIND 9.x, provide access control statements through
+which it is possible to specify hosts that can participate in a given DNS transaction. The hosts can be
+identified by their IP address or IP subnet reference (called IP prefix) in these statements.
+
+The list containing these IP addresses and/or IP prefixes is called an address match list. (An address
+match list can be made up of other things besides IP addresses and IP prefixes, as described in Section
+8.1.1). The address match list is used as an argument in various access control statements that are
+available for use in BIND configuration files. There are separate access control statements for each type
+of DNS transaction. The syntax of the various access control statements and the DNS transaction for
+which each is used are given in Table 8.1.
+
+
+
+
+                                                      8-1
+

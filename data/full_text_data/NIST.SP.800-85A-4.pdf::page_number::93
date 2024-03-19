@@ -1,0 +1,55 @@
+NIST SP 800-85A-4                                         PIV CARD APPLICATION & MIDDLEWARE
+                                                                   INTERFACE TEST GUIDELINES
+
+ Target                 pivCrypt
+ Reference(s)           1. SP 800-73-4 Part 3, Section 3.3.1
+                        2. AS04.01, AS04.02A-R4, AS04.08
+ Precondition(s)        1. The client application owns a connection to the Card Application
+                           accessible through cardHandle.
+                        2. The client application has successfully executed the
+                           pivSelectCardApplication command.
+ Test Steps             1. Set cardHandle := <<valid cardHandle>>
+                        2. Set keyReference := <<'9B'>>
+                        3. Set algorithmIdentifier := <<'00', '03', '08', '0A', or
+                           '0C'>>
+                        4. Set algorithmInput := <<Use the Dynamic Authentication
+                           Template format (Table 7 of SP 800-73-4 Part 2) to request
+                           a challenge and then to encode an encrypted response in
+                           the next call>>
+                        5. Create algorithmOutput reference
+                        6. Call pivCrypt with
+                           • (IN) cardHandle
+                           • (IN) algorithmIdentifier
+                           • (IN) keyReference
+                           • (IN) algorithmInput
+                           • (IN) inputLength
+                           • (OUT) algorithmOutput
+                           • (INOUT) outputLength
+ Expected Result(s)     1. The first call returns with status_word of PIV_OK with the
+                           algorithmOutput carrying the challenge from the card.
+                        2. The second call returns the status_word of PIV_OK.
+ Postcondition(s)       The client application is authenticated to the PIV Card Application.
+                        The PIV Card Application updated its application security status.
+
+
+B.9.2           Test Assertions for Error Conditions
+B.9.2.1       Identify and Handle an Invalid cardHandle
+ Purpose              Ensure the PIV Middleware can detect invalid card handles.
+ Target               pivCrypt
+ Reference(s)         1. SP 800-73-4 Part 3, Section 3.3.1
+                      2. AS04.08
+ Precondition(s)      1. The client application owns a connection to the PIV Card
+                         Application accessible through cardHandle.
+                      2. The client is logged into the PIV Card Application.
+ Test Steps           1. Set cardHandle := <<an invalid cardHandle>>
+                        2. Set keyReference := <<a recognized key reference>>
+                        3. Set algorithmIdentifier := <<a recognized Algorithm
+                           Identifier>>
+                        4. Set algorithmInput := <<byte sequence compatible with the
+                           chosen algorithm identifier AND keyReference>>
+                        5. Create algorithmOutput reference
+
+
+
+                                         B-27
+

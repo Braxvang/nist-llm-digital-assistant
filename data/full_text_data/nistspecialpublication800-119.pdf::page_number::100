@@ -1,0 +1,54 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+    1. Obtain the new prefix and DNS reverse zone. Plan how sub-prefixes will be allocated to links.
+       Shorten DNS TTLs and DHCP licenses. List critical services and applications and then test each
+       one to discover all of the places where addresses will need to be updated.
+    2. Update DNS records. This can be done centrally or delegated to individual systems that use
+       dynamic DNS. In any event, it needs to be coordinated with updates to addresses on interfaces.
+    3. Configure routers and network infrastructure services with the new prefix in parallel with
+       continued use of the old prefix. DHCPv6 prefix delegation can be used to distribute sub-prefixes
+       to links. Check that routing protocols, DNS, DHCPv6, firewalls and packet filters, intrusion
+       detection systems, and any other infrastructure components are working properly with the new
+       prefix before advertising it outside its network.
+    4. Allocate addresses with the new prefix to interfaces on hosts with stateless address
+       autoconfiguration, DHCPv6, or manual procedures. Check that the new prefix is working
+       correctly.
+After this step stabilizes, the network should be working correctly with both prefixes. The rest of the
+process consists of removing the old prefix.
+
+    5. Begin using the new prefix. Phase the old prefix out of internal and external DNS servers. Allow
+       individual systems to switch to the new prefix asynchronously. This spreads the load on systems
+       like dynamic DNS. Individual systems may need to run certain scripts or tools to complete their
+       reconfiguration. Applications may have to be forced to reset their address caches. Utilities can
+       check where the old prefix is still being used.
+    6. RAs then deprecate the old prefix by setting the preferred lifetime of link prefixes and addresses
+       with the old prefix to zero.
+    7. Once sessions using the old prefix complete, it is removed from the routing infrastructure, DNS,
+       anything that depends on DNS, and any other configuration files. The old prefix may be
+       reclaimed by whoever allocated it. The DNS reverse zone may be deleted and its delegation
+       removed. All timers, in particular DNS TTLs, can be reset to their normal values.
+Two of the more difficult cases involve systems controlled by another administrative entity (such as an
+external DNS server) and manually configured devices.
+
+RFC 4192 and drafts proposing updates to it continue with advice on various topics from software
+development to routing protocols on how to make renumbering go easier:
+
+   Applications should not ignore the DNS’s TTL values.
+
+   Routers should not rely on manual configuration but should either use DNS (correctly!) or provide an
+    integrated capability for renumbering.
+
+   Care must be taken in updating BGP not to cause routing outages or route flaps that propagate
+    throughout the network. See RFC 4192, Section 3.4.
+
+   Using the Stream Control Transmission Protocol (SCTP) may be a good choice for critical
+    applications that need to keep running during renumbering, because it allows dynamic changes in an
+    endpoint’s IP addresses.
+
+   For MIPv6, renumbering at the visited site can be handled as if the mobile moved to a new location,
+    and it can learn of renumbering at the home site with the MPS and MPA ICMPv6 messages.
+
+
+                                                   4-37
+

@@ -1,0 +1,45 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+       4. Key = 0keylen.                     Comment: keylen bits of zeros.
+       5. V = 0blocklen.                     Comment: blocklen bits of zeros.
+       6. (Key, V) = CTR_DRBG_Update (seed_material, Key, V).
+       7. reseed_counter = 1.
+       8. Return (V, Key, reseed_counter).
+10.2.1.3.2     Instantiation When a Derivation Function is Used
+
+When instantiation is performed using this method, the entropy input may or may not have full
+entropy; in either case, a nonce is required.
+Let df be the derivation function specified in Section 10.3.2. When instantiation is performed
+using this method, a nonce is required, whereas using the method in Section 10.2.1.3.1 does not
+require a nonce, since full entropy is provided when using that method.
+The following process or its equivalent shall be used as the instantiate algorithm for this DRBG
+mechanism:
+   CTR_DRBG_Instantiate_algorithm (entropy_input, nonce, personalization_string,
+     security_strength):
+       1. entropy_input: The string of bits obtained from the randomness source.
+       2. nonce: A string of bits as specified in Section 8.6.7.
+       3. personalization_string: The personalization string received from the consuming
+          application. Note that the length of the personalization_string may be zero.
+       4. security_strength: The security strength for the instantiation. This parameter is
+          optional for CTR_DRBG, since it is not used.
+   Output:
+       1. initial_working_state: The initial values for V, Key, and reseed_counter (see Section
+          10.2.1.1).
+   CTR_DRBG Instantiate Process:
+       1. seed_material = entropy_input || nonce || personalization_string.
+                                             Comment: Ensure that the length of the
+                                             seed_material is exactly seedlen bits.
+       2. seed_material = df (seed_material, seedlen).
+       3. Key = 0keylen.                     Comment: keylen bits of zeros.
+                 blocklen
+       4. V = 0             .                Comment: blocklen bits of zeros.
+       5. (Key, V) = CTR_DRBG_Update (seed_material, Key, V).
+       6. reseed_counter = 1.
+       7. Return (V, Key, reseed_counter).
+
+
+
+                                                53
+

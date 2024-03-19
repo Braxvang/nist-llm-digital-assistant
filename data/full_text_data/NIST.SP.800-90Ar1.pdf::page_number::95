@@ -1,0 +1,48 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+B.4 CTR_DRBG Example Without a Derivation Function
+
+This example of CTR_DRBG is the same as the previous example except that a derivation
+function is not used (i.e., full entropy is always available). As in Appendix B.3, the CTR_DRBG
+uses AES-128. The reseed and prediction resistance capabilities are available. Both a
+personalization string and additional input are supported. A total of five internal states are
+available. For this implementation, the functions and algorithms are written as separate routines.
+AES_ECB_Encrypt is the Block_Encrypt function (specified in Section 10.3.3) that uses AES-
+128 in the ECB mode.
+The internal state contains the values for V, Key, reseed_counter, and security_strength, where V
+and Key are strings, and all other values are integers. Since prediction resistance is known to be
+supported, there is no need for prediction_resistance_flag in the internal state.
+In accordance with Table 3 in Section 10.2.1, security strengths of 112 and 128 bits may be
+supported. The definitions are the same as those provided in Appendix B.3, except that to be
+compliant with Table 3, the maximum size of the personalization_string is 256 bits. In addition,
+the maximum size of any additional_input is 256 bits (i.e., len (additional_input ≤ seedlen)).
+B.4.1      The CTR_DRBG_Update Function
+
+The update function is the same as that provided in Appendix B.3.1.
+B.4.2      Instantiation of CTR_DRBG Without a Derivation Function
+
+The instantiate function (CTR_DRBG_Instantiate_function) is the same as that provided in
+Appendix B.3.2, except for the following:
+   •    Step 2 is replaced by:
+        If (len (personalization_string) > 256), then Return (“Personalization_string too long”,
+        −1).
+   •    Step 6 is replaced by :
+        instantiation_nonce = Null.
+The instantiate algorithm (CTR_DRBG_Instantiate_algorithm) is the same as that provided in
+Appendix B.3.2, except that steps 1 and 2 are replaced by:
+   temp = len (personalization_string).
+   If (temp < 256), then personalization_string = personalization_string || 0256-temp.
+   seed_material = entropy_input ⊕ personalization_string.
+
+B.4.3      Reseeding a CTR_DRBG Instantiation Without a Derivation Function
+
+The reseed function (CTR_DRBG_Reseed_function) is the same as that provided in Appendix
+B.3.3, except that step 3 is replaced by:
+        If (len (additional_input) > 256), then Return (“additional_input too long”).
+
+
+
+
+                                                86
+

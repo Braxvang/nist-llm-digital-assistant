@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                  GUIDE TO IPSEC VPNS
+
+
+                                                                                                        hardware can transmit 100 gigabits per second (Gbps), or about 150 million packets per
+                                                                                                        second, meaning that the 32-bit sequence number space would be exhausted in 30
+                                                                                                        seconds. It would be impractical to rekey an IPsec SA every 30 seconds, so IPsec-v3 [24]
+                                                                                                        introduced ESNs. If negotiated with IKE, the IPsec SA is installed with 64-bit sequence
+                                                                                                        numbers. The ESP wire format is unchanged, however, and only the lower 32 bits of the
+                                                                                                        sequence number are transmitted in the ESP packet. Each endpoint keeps track of the
+                                                                                                        higher 32-bit value and performs all integrity calculations based on the entire 64-bit
+                                                                                                        sequence number. 38
+
+                                                                                              The next part of the packet is the payload. It is composed of the encrypted payload data and the
+                                                                                              IV, which is not encrypted. This is helpful in deterring traffic analysis. The IV is used during
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              encryption. Its value is different in every packet, so if two packets have the same content, the
+                                                                                              inclusion of the IV will cause the encryption of the two packets to have different results. This
+                                                                                              makes ESP less susceptible to cryptanalysis.
+
+                                                                                              To obfuscate the length and frequency of information sent over IPsec, the protocol allows for
+                                                                                              sending dummy data called traffic flow confidentiality (TFC) padding. TFC padding can be
+                                                                                              added to the unencrypted data before encryption, or it can be injected as a whole new packet with
+                                                                                              padding only being encrypted to a certain size between real encrypted data transmissions. An
+                                                                                              observer cannot tell if TFC is enabled and, more importantly, can no longer make any reasonable
+                                                                                              assumptions based on packet size or frequency. One common deployment of TFC is to pad all
+                                                                                              packets to the maximum MTU value, resulting in all sent ESP packets having the exact same
+                                                                                              length. This would increase the amount of encrypted data sent, so on links where transmission
+                                                                                              costs depend on the amount of data sent (e.g., LTE/5G), there is a cost associated with using
+                                                                                              TFC.
+
+                                                                                              The third part of the packet is the ESP trailer, which contains at least two fields and may
+                                                                                              optionally include one more:
+
+                                                                                                   •    ESP Padding. An ESP packet may optionally contain padding, which is additional bytes
+                                                                                                        of data that make the packet larger and are discarded by the packet’s recipient. Because
+                                                                                                        ESP uses block ciphers for encryption, padding may be needed so that the encrypted data
+                                                                                                        is an integral multiple of the block size. Padding may also be needed to ensure that the
+                                                                                                        ESP trailer ends on a multiple of four bytes.
+                                                                                                   •    ESP Padding Length. This number indicates the length of the padding in bytes. The
+                                                                                                        Padding Length field is mandatory.
+                                                                                                   •    Next Header. In tunnel mode, the outer (original) IP header is followed by an inner
+                                                                                                        (new) IP header. The next payload is thus an IP packet, so the Next Header value is set to
+                                                                                                        four, indicating IP-in-IP (one IP packet tunneled in another IP packet). In transport mode,
+
+
+
+
+                                                                                              38   It is assumed that an application would notice a packet loss of 232 packets, which would lead the hosts to use a different
+                                                                                                   high-order 32-bit value and fail the integrity check of the packet. [52] does specify a method of coping with such an unusual
+                                                                                                   situation.
+
+
+
+                                                                                                                                                             40
+

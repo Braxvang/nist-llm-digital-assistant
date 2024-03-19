@@ -1,0 +1,53 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                  Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                     PIV Card Application Card Command Interface
+
+1166   Response 3
+                   Data Field           {second and last part of signature}
+                   SW1-SW2              '90 00' (Status word)
+
+
+1167   A.4.2. ECDSA
+1168   The following example illustrates signature generation with ECDSA using ECC: Curve P-256
+1169   (i.e., algorithm identifier '11'). Command chaining is not used in this example, as the hash value
+1170   fits into the data field of the command. Padding does not apply to ECDSA.
+1171   Command — GENERAL AUTHENTICATE
+                   CLA                  '00'
+                   INS                  '87'
+                   P1                   '11'
+                   P2                   '9C'
+                   Lc                   Length of data field
+                   Data Field           '7C' – L1 { '82' '00' '81' L2 {hash value of message}}
+                   Le                   '00'
+
+1172   Response
+                                        '7C' – L1 {'82' L2 (r,s)}, where
+                                             • (r,s) is DER-encoded with the following ASN.1 structure:
+                                                 Ecdsa-Sig-Value ::= SEQUENCE {
+                                                         r INTEGER,
+                   Data Field
+                                                         s INTEGER }
+                                             • L1 is the length of tag '82' TLV structure
+                                             • L2 is the length of the DER-encoded Ecdsa-Sig-Value
+                                                 structure
+                   SW1-SW2              '90 00' (Status word)
+
+
+1173   A.5.    Key Establishment Schemes With the PIV Key Management Key
+1174   FIPS 201 specifies a public key pair and associated X.509 Certificate for Key Management. The
+1175   key management key (KMK) is further defined in SP 800-78, which defines two distinct key
+1176   establishment schemes for the KMK:
+1177       1. RSA key transport and
+1178       2. Elliptic Curve Diffie-Hellman (ECDH) key agreement.
+1179   The use of the KMK for RSA key transport and ECDH key agreement is discussed in
+1180   Appendices A.5.1 and A.5.2, respectively.
+
+1181   A.5.1. RSA Key Transport
+1182   In general, RSA transport keys are used to establish symmetric keys, where a sender encrypts a
+1183   symmetric key with the receiver’s public key and sends the encrypted key to the receiver. The
+1184   receiver decrypts the encrypted key with the corresponding private key. The decrypted
+1185   symmetric key is subsequently used by both parties to protect further communication between
+
+
+
+                                                               44
+

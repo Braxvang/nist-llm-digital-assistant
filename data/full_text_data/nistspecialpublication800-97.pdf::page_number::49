@@ -1,0 +1,68 @@
+                                                 ESTABLISHING WIRELESS ROBUST SECURITY NETWORKS: A GUIDE TO IEEE 802.11I
+
+
+
+provides replay prevention, ensures that the lifetime of an AES key (the per session temporal key, TK) is
+longer than any possible STA-AP association.
+
+                                                                  Ciphertext MPDU
+                      PN                                                                                                               TK
+                                   MAC Header        CCM Header                           Encrypted Data                A2, Priority
+                                                                                                                            MIC
+             48-bit
+                                                                       A2, Priority
+
+                              PN                                       PN
+
+
+
+
+                                                                            Construct
+                                                                             Nonce
+
+
+
+
+                                                            Construct AAD
+
+
+
+                                                                     AAD           Nonce                   Data
+ Out-of-sequence
+      packet                                                                                                             TK
+                       PN check
+                                                                                   CCM Decryption             AES
+                                                                                                                         128-bit
+
+                                                                                                       K=16, M=8, L=2
+                   MPDU
+                   Okay
+                                    MAC Header                                          Data
+
+                                                                     plaintext MPDU
+
+
+                                       Figure 4-8. CCMP Decapsulation Block Diagram
+
+
+
+
+4.3.2.2 CCMP Decapsulation and Processing
+
+CCMP decapsulation is used to recover and decrypt a transmitted frame. The key steps of CCMP
+decapsulation are depicted in Figure 4-8 and summarized briefly as follows:
+
+    1. The encrypted frame is parsed to re-construct the AAD and the nonce. The AAD is formed from
+       the frame header.
+    2. The nonce is formed from the PN plus the A2 (transmit address) and Priority fields.
+    3. CCM uses the Temporal key, AAD, nonce, MIC, and encrypted payload to recover the plaintext
+       data and to verify the MIC. If the MIC integrity check fails, CCM will not return the plaintext.
+    4. The received frame header and the plaintext data are concatenated to form the plaintext frame.
+    5. The PN in the frame is validated against the PN maintained for the session. If the PN received is
+       not greater than the session PN, the frame is simply discarded; this check prevents replay attacks.
+
+
+
+
+                                                                  4-13
+

@@ -1,0 +1,59 @@
+                                                                                               NIST SP 800-56C REV. 2                                 RECOMMENDATION FOR KEY DERIVATION METHODS
+                                                                                                                                                                   IN KEY ESTABLISHMENT SCHEMES
+
+
+                                                                                               5     Two-Step Key Derivation
+
+                                                                                               This section specifies an approved (two-step) extraction-then-expansion key-derivation
+                                                                                               procedure. Like the one-step key-derivation functions described in Section 4, the input to this two-
+                                                                                               step procedure includes the shared secret Z; L, a positive integer indicating the desired length (in
+                                                                                               bits) of the output keying material; and other information (as determined by the particular
+                                                                                               implementation of the key-establishment scheme and/or key-derivation method). In contrast to the
+                                                                                               one-step methods, a salt value is required to be included as part of the input.
+
+                                                                                               The extraction-then-expansion key-derivation procedure is pictured in Figure 1.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Cr2
+
+
+
+
+                                                                                                                         Z                  L, {IV,} FixedInfo
+
+
+
+                                                                                                                   Randomness        KDK          Key
+                                                                                                     salt           Extraction                  Expansion              DerivedKeyingMaterial
+
+
+
+                                                                                                                  Figure 1: The Extraction-then-Expansion Key-Derivation Procedure
+
+
+
+                                                                                               The first (randomness-extraction) step uses either HMAC (as defined in [FIPS 198]) or AES-
+                                                                                               CMAC (as defined in [SP 800-38B]). In either case, there are two inputs: salt, which serves as a
+                                                                                               MAC key and the shared secret, Z, which serves as the “message.” The resulting MAC output is
+                                                                                               used as a key-derivation key, KDK. The use of the KDK shall be restricted to the execution of the
+                                                                                               key-expansion step of the (two step) key-derivation procedure in which the KDK is extracted from
+                                                                                               Z. In particular, its value shall not be an output of the extraction-then-expansion key-derivation
+                                                                                               procedure.
+                                                                                               The second (key-expansion) step uses the key-derivation key, KDK, along with the integer L and
+                                                                                               other appropriate data as the input to a PRF-based key-derivation function specified in [SP 800-
+                                                                                               108]. The output returned by that key-derivation function is either secret keying material (in the
+                                                                                               form of DerivedKeyingMaterial, a bit string of length L) or an error indicator.
+
+                                                                                               5.1   Specification of Key-Derivation Procedure
+
+                                                                                               The extraction-then-expansion key-derivation procedure is specified as follows:
+                                                                                               Function call: KDM( Z, OtherInput).
+
+                                                                                               Options for the Auxiliary MAC Algorithm:
+                                                                                                 The MAC algorithm employed for randomness extraction shall be either an implementation of
+                                                                                                 HMAC as defined in [FIPS 198], based on an approved hash function, hash (i.e., HMAC-
+                                                                                                 hash), or an implementation of AES-CMAC as defined in [SP 800-38B] (i.e., AES-N-CMAC
+                                                                                                 for N = 128, 192, or 256). In either case, the (untruncated) output of the MAC algorithm is
+                                                                                                 used as the key-derivation key for subsequent key expansion. Tables 4 and 5 in Section 5.2
+
+
+                                                                                                                                                17
+

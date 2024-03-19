@@ -1,0 +1,58 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                     Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                        PIV Card Application Card Command Interface
+
+                    Name                               Comment                                  Format      Size (in bytes)
+            N ICC                PIV Card Application nonce. See Table 18 for the length.       Binary     16 or 24 bytes
+
+            SK CFRM              Key confirmation key used to compute authentication                       16 or 32 bytes
+                                 cryptogram. See Table 18 for the length.
+            SK MAC , SK RMAC ,   Secure messaging session keys. See Table 18 for                           16 or 32 bytes
+            SK ENC               encryption or MAC session key length.
+            T 8 (Data)           Leftmost 8 bytes of Data.                                      Binary     8 bytes
+            T 16 (Data)          Leftmost 16 bytes of Data.                                     Binary     16 bytes
+            KDF(Z, len,          Key Derivation Function (KDF) specified in Section 4.1.6.      N/A        N/A
+            OtherInfo)
+            ECC_CDH              Elliptic curve cryptography cofactor Diffie-Hellman (ECC       N/A        N/A
+                                 CDH) primitive, as specified in [SP800-56A, Section
+                                 5.7.1.2].
+            OtherInfo            Input parameters to the KDF. See Section 4.1.6.                N/A        N/A
+            len                  The length (in bits) of the secret keying material to be       N/A        N/A
+                                 generated using the KDF (len = 512 for cipher suite 2 and
+                                 1024 for cipher suite 7).
+            CB ICC               Protocol control byte returned by the PIV Card                 Binary     1 byte
+            CB H                 Protocol control byte sent by client application (host)        Binary     1 byte
+
+
+
+781   4.1.4. Cipher Suite
+782   This document specifies two cipher suites (see Table 18) that MAY be used for key
+783   establishment and secure messaging: one that provides 128 bits of channel strength and one that
+784   provides 192 bits of channel strength. If the PIV Card Application supports the VCI and either
+785   the digital signature key ('9C'), the key management key ('9D'), or one of the retired key
+786   management keys ('82' – '95') is an ECC (Curve P-384) key, then PIV Card Application SHALL
+787   only support cipher suite CS7. Otherwise, the PIV Card Application MAY support either CS2 or
+788   CS7.
+789                                    Table 18. Cipher suite for PIV secure messaging
+
+                Cipher suite properties               128 bit channel strength       192 bit channel strength
+       Cipher Suite ID                               CS2                            CS7
+       Algorithm Identifier (P1)                     '27'                           '2E'
+       Key confirmation and session keys             AES 128                        AES 256
+       (SK CFRM , SK MAC , SK RMAC , SK ENC )
+       C ICC signature                               ECDSA with SHA-256             ECDSA with SHA-384
+                                                     using an ECDSA (Curve P-       using an ECDSA (Curve P-
+                                                     256) key                       384) key
+       C ICC public key                              ECDH (Curve P-256)             ECDH (Curve P-384)
+       KDF hash                                      SHA-256                        SHA-384
+       Nonce (N ICC )                                16 bytes                       24 bytes
+
+
+790   4.1.5. Card Verifiable Certificates
+791   Table 19 specifies the format for the secure messaging CVC, C ICC . Table 20 specifies the
+792   format for the optional Intermediate CVC.
+
+
+
+
+                                                                25
+

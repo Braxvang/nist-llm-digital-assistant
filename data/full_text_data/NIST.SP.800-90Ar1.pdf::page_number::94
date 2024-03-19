@@ -1,0 +1,42 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+       8. (status, pseudorandom_bits, V, Key, reseed_counter) =
+          CTR_DRBG_Generate_algorithm (V, Key, reseed_counter,
+          requested_number_of_bits, additional_input).
+       9. If (status = “Reseed required”), then
+           9.1     reseed_required_flag = 1.
+           9.2     Go to step 7.
+       10. Update the internal state.
+           10.1 internal_state (state_handle).V = V.
+           10.2 internal_state (state_handle).Key = Key.
+           10.3 internal_state (state_handle).reseed_counter = reseed_counter.
+           10.4 internal_state (state_handle).security_strength = security_strength.
+       11. Return (“Success”, pseudorandom_bits).
+   CTR_DRBG_Generate_algorithm:
+       Input: bitstring (V, Key), integer (reseed_counter, requested_number_of_bits) bitstring
+              additional_input.
+       Output: string status, bitstring (returned_bits, V, Key), integer reseed_counter.
+       Process:
+           1. If (reseed_counter > 100 000), then Return (“Reseed required”, Null, V, Key,
+              reseed_counter).
+           2. If (additional_input ≠ Null), then
+                       2.1 additional_input = Block_Cipher_df (additional_input, 256).
+                       2.2   (Key, V) = CTR_DRBG_Update (additional_input, Key, V).
+                 Else additional_input = 0256.
+           3. temp = Null.
+           4. While (len (temp) < requested_number_of_bits) do:
+                 4.1    V = (V + 1) mod 2128.
+                 4.2    output_block = AES_ECB_Encrypt (Key, V).
+                 4.3    temp = temp || output_block.
+           5. returned_bits = leftmost (temp, requested_number_of_bits)
+           6.    (Key, V) = CTR_DRBG_Update (additional_input, Key, V)
+           7. reseed_counter = reseed_counter + 1.
+           8. Return (“Success”, returned_bits, V, Key, reseed_counter).
+
+
+
+
+                                                  85
+

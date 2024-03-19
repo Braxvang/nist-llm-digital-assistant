@@ -1,0 +1,65 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                             Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                PIV Card Application Card Command Interface
+
+
+
+743            Secure Messaging
+744   If a PIV Card Application implements the optional secure messaging protocol for non-card
+745   management operations, it SHALL be implemented as specified in this section. Secure
+746   messaging is initiated through the use of a key establishment protocol. The key establishment
+747   protocol defined here is a one-way authentication protocol that authenticates the PIV Card
+748   Application to the client application and establishes a set of session keys that MAY be
+749   subsequently used to protect the communication channel between the two parties. 13 PIV Cards
+750   MAY implement a different secure messaging protocol for card management operations. Such a
+751   protocol is outside of the scope of this document. However, if it is to be used for remote post-
+752   issuance updates, it SHALL satisfy the requirements of [FIPS201, Section 2.9.2].
+753   Section 4.1 describes the key establishment protocol used to support secure messaging in the PIV
+754   Card Application. Section 4.2 describes the use of secure messaging to protect the commands
+755   and responses sent between the client application and the PIV Card Application.
+
+756                 Key Establishment Protocol
+757   The key establishment protocol for the PIV Card Application uses the One-Pass Diffie-Hellman,
+758   C(1e, 1s, ECC CDH) Scheme from [SP800-56A] in a manner that is based on a simplified profile
+759   of OPACITY with Zero Key Management [ANSI504-1], as depicted in below.
+760                                     Table 14: Key Establishment Protocol for PIV Card Application
+
+                   Client Application (H)                                                                     PIV Card Application (ICC)
+           CB H = 0x00              H1                      CB H || ID sH
+           Generate an ephemeral key pair (d eH ; Q eH )    || Q eH
+           from the domain          H2
+           parameters specified in the response to the
+           SELECT command
+           Send CB H || ID sH || Q eH        H3
+                                                                                                           ID sICC = T 8 (SHA256(C ICC ))      C1
+                                                                                                           CB ICC = CB H & 'F0' C2
+                                                                                                           Check that CB ICC is 0x00           C3
+                                                                                                           Verify that Q eH is a valid public key for the
+                                                                                                           domain        C4
+                                                                                                           parameters of Q sICC
+                                                                                                           Z = ECC_CDH(d sICC , Q eH )         C5
+                                                                                                           Generate nonce N ICC C6
+                                                                                                           SK CFRM || SK MAC || SK ENC || SK RMAC =
+                                                                                                           KDF(Z, len, OtherInfo)              C7
+                                                                                                           Zeroize Z C8
+                                                                                                           AuthCryptogram ICC =                C9
+                                                            CB ICC ||                                                    CMAC(SK CRFM , “KC_1_V” ||
+                                                            N ICC ||                                       ID sICC || ID sH || Q eH )
+                                                            AuthCrypto                                     Zeroize SK CFRM            C10
+                                                            gram ICC ||                                    Return CB ICC || N ICC || AuthCryptogram ICC ||
+                                                            C ICC                                          C ICC         C11
+           Check that CB ICC is 0x00         H4
+           Verify C ICC signature and subject public key
+                        H5
+           ID sICC = T 8 (SHA256(C ICC ))    H6
+           Extract Q sICC from C ICC         H7
+           Z = ECC_CDH(d eH , Q sICC )       H8
+           Zeroize d eH            H9
+
+
+      13
+           The protocol does not provide forward secrecy.
+
+
+
+                                                                            21
+

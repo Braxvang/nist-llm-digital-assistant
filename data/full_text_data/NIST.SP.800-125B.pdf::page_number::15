@@ -1,0 +1,56 @@
+NIST SP 800-125B                                                    SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                       FOR VM PROTECTION
+
+
+            addition to confidentiality and integrity assurances (referred to earlier) provided by logical
+            separation of network traffic, different quality of service (QoS) rules can be applied to different
+            VLANs (depending upon the type of traffic carried), thus providing availability assurance as
+            well.
+2.4.1      Advantages
+
+Network segmentation using VLANs is more scalable than approaches using virtual firewalls (Section
+2.3). This is due to the following:
+
+      •    The granularity of VLAN definition is at the port level of a virtual switch. Since each virtual
+           switch can support around 64 ports, the number of network segments that can be defined inside a
+           single virtualized host is much more than what is practically possible using firewall VMs.
+      •    Network segments can extend beyond a single virtualized host (unlike the segment defined using
+           virtual firewalls) since the same VLAN ID can be assigned to ports of virtual switches in different
+           virtualized hosts. The total number of network segments that can be defined in the entire data
+           center is around 4000 (since the VLAN ID is 12 bits long).
+
+2.4.2      Disadvantages
+
+Major disadvantages of achieving network segmentation using VLANs include the following:
+
+      •    The configuration of the ports in the physical switch (and their links) attached to a virtualized
+           host must exactly match the VLANs defined on the virtual switches inside that virtualized host.
+           This results in tight coupling between the virtual and physical network. The consequence is that
+           the port configuration of the physical switches has to be frequently updated since the VLAN
+           profile of the attached virtualized host may frequently change from VM migrations, VM-hosted
+           application changes, and other reasons. More specifically, the MAC address to VLAN ID
+           mapping in the physical switches may go out of synch, resulting in some packets being flooded
+           through all ports of the physical switch. This results in increased workload on the hypervisors due
+           to processing unnecessary packets.
+      •    The capability to define a network segment spanning virtualized hosts may spur administrators to
+           create a VLAN segment with a large span for providing greater VM mobility (for load balancing
+           and availability reasons). This phenomenon, called VLAN sprawl, may result in more broadcast
+           traffic for the data center as a whole, and it also has the potential to introduce a configuration
+           mismatch between the VLAN profile of virtualized hosts and their associated physical switches
+           (discussed earlier).
+      •    The number of VLAN segments that can be defined is limited to just over 4000 (due to the 12-bit
+           namespace for VLAN IDs), so it is not a straightforward process to scale up a VLAN deployment
+           for a large data center.
+      •    There are some production scenarios where VLANs may span across sites. Because of the rigid
+           need to maintain identical VLAN IDs at the multiple sites, VLAN bridging may have to be
+           deployed. VLAN bridging may be easy to configure initially, but maintaining the configuration in
+           response to changes in network profiles may become a costly and/or error-prone process.
+
+2.5       Using Overlay-Based Virtual Networking
+
+In overlay-based virtual networking, isolation is realized by encapsulating an Ethernet frame received
+from a VM. Various encapsulation schemes (or overlay schemes) can be used, including Virtual Extended
+
+
+                                                        8
+

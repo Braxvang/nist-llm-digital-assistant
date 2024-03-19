@@ -1,0 +1,67 @@
+GUIDELINES FOR SECURING RFID SYSTEMS
+
+
+
+ If the application environment precludes access to an on-line tag password database (e.g., mobile
+  readers in remote locations), then the implementing organization may need to take simplifying
+  measures, such as assigning the same password to multiple tags. In cases such as these, the
+  compromise of a single password could compromise the integrity of the entire system.
+ RFID passwords can be obtained through brute force methods (i.e., cycling through all possible
+  passwords) when the tag technology is limited to short passwords. 49
+ RFID passwords can be revealed through power analysis attacks on some types of passive tags. 50
+5.3.1.2 Keyed-Hash Message Authentication Code (HMAC)
+
+Control: Both the reader and the tag share a common secret key that can be used in combination with a
+hash algorithm to provide one-way or mutual authentication between tag and reader. When HMAC is
+applied to messages, it also ensures the integrity of data in the messages. HMAC is specified in FIPS
+Publication 198. 51 HMAC supports any cryptographic hash algorithm, but Federal agencies must use one
+of the secure hash algorithms (SHA) specified in FIPS Publication 180-2. 52 HMAC is not specified in any
+RFID standard, but it is available in proprietary designs.
+
+Applicability: Applications in which passwords are considered to offer an inadequate authentication
+mechanism, perhaps because the risk of eavesdropping is high. Applications that require evidence of a
+tag’s authenticity.
+
+Benefits: The advantages of HMAC relative to password authentication include that HMAC:
+
+ Provides evidence of tag’s authenticity, 53
+
+49
+     For example, EPC Class-1 Generation-1 UHF tags support a maximum password length of 8-bits, which enables only 256
+     possible passwords. An adversary can cycle through 256 passwords in a matter of seconds. EPC Class-1 Generation-2 tags
+     support 32-bit passwords and, therefore, 232 possible passwords, which is sufficient if the passwords are randomly
+     generated. However, if the binary password is based on American Standard Code for Information Interchange (ASCII)
+     characters, then the actual number of possible passwords may be much smaller. For example, the ASCII representation of a
+     4-digit decimal number (a common length for personal identification numbers) is 32-bits, but results in only 10,000 possible
+     combinations, a number certainly vulnerable to brute force attacks. Tags typically do not lock-out readers after a certain
+     number of incorrect guesses, which means a determined adversary can continue to guess the password as long as the tag
+     remains within the operating range of the adversary’s reader.
+50
+     The power analysis attack (also called a side channel attack) is based on the fact some passive tags use different levels of
+     power depending on how close the password provided is to the actual password. For instance, if the first bit in a password is
+     incorrect, the tag uses less energy than it would if the eighth bit is incorrect, given how the algorithm is hard-coded into the
+     tag’s circuitry. These power differences are detected in the backscatter to the reader, but it requires that the adversary be
+     reasonably close to the tag to get effective measurements. If such measurements are possible, an adversary can determine
+     the password much more quickly than by using a brute force method. Lab experiments proved that someone could crack the
+     8-bit password protection found on EPC Class-1 Generation-1 tags in one minute. For more information, see Y. Oren and
+     A. Shamir, "Power Analysis of RFID Tags," discussed at the Cryptographers Panel of the Fifteenth RSA Conference, San
+     Jose, 2006.
+51
+     The FIPS HMAC is a generalization of HMAC described in H. Krawczyk, M. Bellare, and R. Canetti, "HMAC: keyed-
+     hashing for message authentication," Internet Engineering Task Force, Request for Comments (RFC) 2104, February 1997
+     and American Bankers Association, "Keyed Hash Message Authentication Code," American National Standards Institute
+     (ANSI) X9.71, Washington, D.C., 2000.
+52
+     The specified algorithms are SHA-1, SHA-256, SHA-384, and SHA-512. While SHA-1 offers the lowest level of assurance
+     and is not recommended for use in digital signatures beyond 2010, it is likely most applicable to RFID systems due to its
+     greater computational efficiency relative to the other algorithms. See NIST Special Publication 800-57, Recommendation
+     on Key Management, Part 1 for additional information.
+53
+     The evidence of tag or item authenticity is provided by authenticating a tag to a reader, which can be accomplished when the
+     tag computes and returns an HMAC using a random challenge provided by the reader. Mutual authentication is also
+     possible if both tag and reader provide challenges to each other. Passwords, on the other hand, typically only are used to
+     authenticate readers to tags, thereby protecting the tag against rogue commands. If the tag were to authenticate itself to a
+
+
+                                                               5-12
+

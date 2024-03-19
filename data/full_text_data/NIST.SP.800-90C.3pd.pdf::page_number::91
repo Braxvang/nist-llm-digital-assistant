@@ -1,0 +1,49 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                        Recommendation for RBG Constructions
+       September 2022
+
+2586   the RBG3(RS)_state_handle obtained during instantiation (see Appendix B.6.1) and using a
+2587   Generate_function call:
+2588                     (status, returned_bits) = Generate_function(RBG3(RS)_state_handle, n,
+2589                                  prediction_resistance_request, additional_input).
+2590   Note that the security strength parameter (256) was omitted since its value has been hard coded.
+2591   Requirement 2 in Section 6.3.2 requires that the DRBG be reseeded whenever a request for
+2592   generation by a directly accessible DRBG follows a request for generation by the RBG3(RS)
+2593   construction. For this example, the internal state includes an indication about whether the last use
+2594   of the DRBG was as part of the RBG3(RS) construction or was directly accessible. If the
+2595   Generate_function (above) does not include a request for prediction resistance (e.g.,
+2596   prediction_resistance_request was not set to TRUE), then the DRBG will be reseeded anyway
+2597   using the entropy source before generating output if the previous use of the DRBG was part of the
+2598   RBG3(RS) construction.
+
+2599   B.6.4. Reseeding a DRBG
+2600   When operating as part of the RBG3(RS) construction, the Reseed_function is invoked one or
+2601   more times to produce full-entropy output when the RBG3(RS)_Generate function is invoked by
+2602   a consuming application.
+2603   When operating as part of the RBG2(P) construction (the directly accessible DRBG), the DRBG
+2604   is reseeded 1) if explicitly requested by the consuming application, 2) automatically whenever a
+2605   generation with prediction resistance is requested during a direct access of the DRBG (see
+2606   Appendix B.6.3), 3) whenever the previous use of the DRBG was by the RBG3(RS)_Generate
+2607   function (see Appendix B.6.2), or 4) automatically during a Generate_function call at the end of
+2608   the seedlife of the RBG2(P) construction (see the Generate_function specification in [SP800-
+2609   90A]).
+2610   The Reseed_function call is:
+2611                       status = Reseed_function(RBG3(RS)_state_handle, additional_input).
+2612        •     The state_handle is RBG3(RS)_state handle, and
+2613        •     additional_input is optional. 38
+2614   The DRBG is reseeded with a security strength of 256 bits as follows:
+2615                                    (status, entropy_bitstring) = Get_ES_Bitstring(256).
+2616   If status = SUCCESS is returned by Get_ES_Bitstring, entropy_bitstring consists of at least 256
+2617   bits containing at least 256 bits of entropy. Status = SUCCESS is returned to the calling application
+2618   by the Reseed_function.
+
+
+       38
+         Note that when the RBG3(RS) Generate function uses a Hash_DRBG, HMAC_DRBG, or CTR_DRBG with no derivation function and Method
+       A, whereby 64 bits of additional entropy are required to produce output_len bits with full entropy (see Section 7.3.1,.2.1, step 3.1), the additional
+       64 bits of entropy obtained in step 3.1.1 is provided to the Generate_function (in step 3.1.3) with prediction requested. In Section 9.3 of SP 800-
+       90A, the Generate_function reseeds the DRBG when prediction resistance is requested using entropy from the entropy source and any additional
+       input that is provided – the additional 64 bits of entropy, in this case.
+
+
+                                                                               78
+

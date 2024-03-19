@@ -1,0 +1,59 @@
+                                                                     SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+runs the name server software.
+Checklist item 14: The TSIG key used to sign messages between a pair of servers should be specified in
+the server statement of both transacting servers to point to each other. This is necessary to ensure that
+both the request message and the transaction message of a particular transaction are signed and hence
+secured.
+
+
+
+In each of the configuration files of the pair of servers that share a secret key in a zone, the name of the
+key to be used for all communication between them must be specified (via the server statement in BIND
+configuration files).
+
+8.2.6       Securing Zone Transfers using TSIG
+
+The pair of servers participating in zone transfer transactions must be instructed to use the key defined
+using the key statement (Section 8.2.2). This pair generally consists of a primary name server and a
+secondary name server. The primary name server is configured to accept zone transfer requests only from
+secondary name servers that send MACs using the named key along with a zone transfer request message.
+The configuration is accomplished by using the allow-transfer substatement of the zone statement. A
+sample allow-transfer substatement that specifies that the primary name server should only allow zone
+transfer requests for the example.com zone from name servers that use the ns1-ns2.example.com key is as
+follows:
+
+            zone “example.com” {
+                 type master;
+                 file “zonedb.example.com”;
+                 allow-transfer { key {ns1-ns2.example.com.}; };
+            };
+
+The secondary name server is instructed to use the key ns1-ns2.example.com in the zone transfer request
+to the primary name server (with IP address 192.249.249.1) using the server statement shown in Section
+8.2.3.
+
+In NSD, the syntax is similar, but there is a special requirement if no TSIG key is to be used. The zone
+option “provide-xfer” is used to indicate which IP addresses can request a zone transfer for this zone on
+this server:
+
+            zone:
+                     type: master;
+                     file “zonedb.example.come”;
+                     provide-xfer: 192.68.0.1 ns1-ns2.example.com.
+                     provide-xfer: 192.68.0.2 NOKEY
+
+8.2.7       Securing Dynamic Updates Using TSIG or SIG(0)
+
+Dynamic update restrictions based on TSIG keys can be specified in BIND 8.2 and later versions 9 by
+using the allow-update substatement of the zone statement. The arguments to this statement are the
+
+9
+    As mentioned earlier, Micosoft Server does not use TSIG for dynamic update, but uses IPSec instead. See:
+     http://technet.microsoft.com/en-us/library/cc753751.aspx
+
+
+                                                              8-15
+

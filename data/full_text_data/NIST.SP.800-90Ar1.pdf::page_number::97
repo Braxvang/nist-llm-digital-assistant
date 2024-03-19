@@ -1,0 +1,50 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+                              Appendix C: (Informative)
+                             DRBG Mechanism Selection
+Almost no application or system designer starts with the primary purpose of generating good
+random bits. Instead, the designer typically starts with a goal that he wishes to accomplish, then
+decides on cryptographic mechanisms, such as digital signatures or block ciphers that can help
+him achieve that goal. Typically, as the requirements of those cryptographic mechanisms are
+better understood, he learns that random bits will need to be generated, and that this must be
+done with great care so that the cryptographic mechanisms will not be weakened. At this point,
+there are three things that may guide the designer's choice of a DRBG mechanism:
+   a. He may already have decided to include a set of cryptographic primitives as part of his
+      implementation. By choosing a DRBG mechanism based on one of these primitives, he
+      can minimize the cost of adding that DRBG mechanism. In hardware, this translates to
+      lower gate count, less power consumption, and less hardware that must be protected
+      against probing and power analysis. In software, this translates to fewer lines of code to
+      write, test, and validate.
+       For example, a module that generates RSA signatures has an available hash function, so a
+       hash-based DRBG mechanism (e.g., Hash_DRBG or HMAC_DRBG) is a natural
+       choice.
+   b. He may already have decided to trust a block cipher, hash function, or keyed hash
+      function to have certain properties. By choosing a DRBG mechanism based on similar
+      properties, he can minimize the number of algorithms he has to trust.
+       For example, an AES-based DRBG mechanism (i.e., CTR_DRBG using AES) might be
+       a good choice when a module also provides encryption with AES. Since the security of
+       the module is dependent on the strength of AES, the module's security is not made
+       dependent on any additional cryptographic primitives or assumptions.
+   c. Multiple cryptographic primitives may be available within the system or consuming
+      application, but there may be restrictions that need to be addressed (e.g., code size or
+      performance requirements).
+       For example, a module with support for both hash functions and block ciphers might use
+       the CTR_DRBG if the ability to parallelize the generation of random bits is needed.
+The DRBG mechanisms specified in this Recommendation have different performance
+characteristics, implementation issues, and security assumptions.
+
+C.1 Hash_DRBG
+
+Hash_DRBG is based on the use of an approved hash function in a counter mode similar to the
+counter mode specified in [SP 800-38A]. For each generate request, the current value of V (a
+secret value in the internal state) is used as the starting counter that is iteratively changed to
+generate each successive outlen-bit block of requested output, where outlen is the number of bits
+in the hash function output block. At the end of the generate request, and before the
+pseudorandom output is returned to the consuming application, the secret value V is updated in
+order to prevent backtracking.
+
+
+                                                88
+

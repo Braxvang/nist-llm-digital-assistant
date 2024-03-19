@@ -1,0 +1,58 @@
+               The Technical Specification for the Security Content Automation Protocol (SCAP): SCAP Version 1.2
+
+
+
+CPE entry is that a “pass” result indicates software was installed, the second policy recommendation’s
+rule would violate this. This can be corrected by using the @con:negate attribute, a Boolean attribute
+that inverts the rule result. The second rule could check for the software being installed and then negate
+that result, thus giving a result consistent in meaning with the first rule. For rules that cannot have their
+interpretations preserved through the use of the @con:negate attribute, an alternative is to have a CCE
+entry corresponding to the recommendation. Rules that do not use <xccdf:ident> elements have no
+such restrictions.
+
+4.5.2   Mapping OVAL Results to XCCDF Results
+When evaluating an <xccdf:Rule> element that references an OVAL Definition, the
+<xccdf:rule-result> element SHALL be used to capture the result of this evaluation. This result
+SHALL be determined by evaluating the referenced OVAL Definition on a target host. The result value
+of an individual <xccdf:check> SHALL be mapped from the OVAL Definition result produced
+during evaluation. The corresponding <xccdf:rule-result/xccdf:result> value is then
+computed based on the result values of all relevant <xccdf:check> elements. (Normally only a single
+<xccdf:check> element is needed, but where an <xccdf:complex-check> element is used,
+there may be multiple results that must be combined, as outlined in the XCCDF specification.) While the
+OVAL specification permits limiting result status reporting, SCAP-conformant content SHALL include
+full status reporting, including Error, Unknown, Not Applicable, Not Evaluated, True, and False.
+Content consumers SHALL apply the mapping illustrated in Table 21 when deriving <xccdf:check>
+results from OVAL Definition processing. The corresponding result value SHALL be recorded based on
+the @class attribute of the OVAL Definition where applicable.
+                   Table 21 - Deriving XCCDF Check Results from OVAL Definition Results
+
+                       OVAL Definition Result                     XCCDF Check Result
+                       error                                      error
+                       unknown                                    unknown
+                       not applicable                             notapplicable
+                       not evaluated                              notchecked
+                        Definition Class  Definition Result
+                        compliance         true
+                        vulnerability      false                  Pass
+                        inventory          true
+                        patch              false
+                        Definition Class   Definition Result
+                        compliance           false
+                        vulnerability        true                 Fail
+                        inventory            false
+                        patch                true
+
+The mappings in Table 21 are specific to each OVAL Definition class. For example, if an OVAL
+compliance class definition is processed and OVAL returns a result of “true”, the content consumer is
+conveying the fact that the system was found to be compliant with that check and therefore returns a
+“pass” result for that check. A similar definition for a vulnerable condition will return results of “false” if
+that vulnerability was not found on the examined devices, resulting in a “pass” from the XCCDF check.
+Negations of check results or their combination in complex-checks may result in additional modification
+before the final corresponding <xccdf:rule-result/xccdf:result> value is known.
+If the <xccdf:Rule> element under evaluation has an <xccdf:check-content-ref> element
+with the @name attribute omitted and an <xccdf:check> element with its @multi-check attribute
+
+
+
+                                                      37
+

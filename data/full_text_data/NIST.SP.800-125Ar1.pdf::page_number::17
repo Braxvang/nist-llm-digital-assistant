@@ -1,0 +1,58 @@
+NIST SP 800-125A REV. 1                                                          SECURITY RECOMMENDATIONS FOR
+                                                                             SERVER-BASED HYPERVISOR PLATFORMS
+
+
+
+3. SECURITY RECOMMENDATION FOR OVERALL PLATFORM INTEGRITY
+
+Configuration changes, module version changes, and patches affect the content of the hypervisor platform
+components such as BIOS, hypervisor kernel, and back-end device drivers running in the kernel. To ensure
+that each of these components that are part of the hypervisor stack can be trusted, it is necessary to check
+their integrity through a hardware-rooted attestation scheme that provides assurance of boot integrity.
+Checking integrity is done by cryptographically authenticating the hypervisor components that are launched.
+This authentication verifies that only authorized code runs on the system. Specifically, in the context of the
+hypervisor, the assurance of integrity protects against tampering and low-level targeted attacks such as root
+kits. If the assertion of integrity is deferred to a trusted third party that fulfills the role of trusted authority, the
+verification process is known as trusted attestation. Trusted attestation provides assurance that the code of the
+hypervisor components has not been tampered with. In this approach, trust in the hypervisor’s components is
+established based on trusted hardware. In other words, a chain of trust from hardware to hypervisor is
+established with the initial component called the root of trust. This service can be provided by a
+hardware/firmware infrastructure of the hypervisor host that supports boot integrity measurement and the
+attestation process. In short, a measured launch environment (MLE) is needed in the hypervisor host.
+
+Some hardware platforms provide support for MLE with firmware routines for measuring the identity (usually
+the hash of the binary code) of the components in a boot sequence. An example of a hardware-based
+cryptographic storage module that implements the measured boot process is the standards-based Trusted
+Platform Module (TPM), which has been standardized by the Trusted Computing Group (TCG) [4]. The
+three main components of a TPM are: (a) Root of Trust for Measurement (RTM) – makes integrity
+measurements (generally a cryptographic hash) and converts them into assertions, (b) Root of Trust for Integrity
+(RTI) - provides protected storage, integrity protection, and a protected interface to store and manage
+assertions, and (c) Root of Trust for Reporting (RTR) - provides a protected environment and interface to
+manage identities and sign assertions. The RTM measures the next piece of code following the boot sequence.
+The measurements are stored in special registers called Platform Configuration Registers (PCRs).
+
+The measured boot process is briefly explained here using TPM as an example. The measured boot process
+starts with the execution of a trusted immutable piece of code in the BIOS, which also measures the next piece
+of code to be executed. The result of this measurement is extended into the PCR of the TPM before the control
+is transferred to the next program in the sequence. Since each component in the sequence in turn measures
+the next before handing off control, a chain of trust is established. If the measurement chain continues through
+the entire boot sequence, the resultant PCR values reflect the measurement of all components.
+
+The attestation process starts with the requester invoking, via an agent on the host, the TPM Quote command.
+It specifies an Attestation Identity Key (AIK) to perform the digital signature on the contents of the set of
+PCRs that contain the measurements of all components in the boot sequence to quote and a cryptographic
+nonce to ensure freshness of the digital signature. After receiving the signed quotes, the requester validates
+the signature and determines the trust of the launched components by comparing the measurements in the
+TPM quote with known good measurements.
+
+The MLE can be incorporated in the hypervisor host as follows:
+
+•   The hardware hosting the hypervisor is established as a root-of-trust, and a trust chain is established from
+    the hardware through the BIOS and to all hypervisor components.
+•   For the hardware consisting of the processor and chipset to be established as the root-of-trust and to build
+    a chain of trust, it should have a hardware-based module that supports an MLE. The outcome of launching
+    a hypervisor in MLE-supporting hardware is a measured launch of the firmware, BIOS, and either all or
+    a key subset of hypervisor (kernel) modules, thus forming a trusted chain from the hardware to the
+    hypervisor.
+                                                           10
+

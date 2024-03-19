@@ -1,0 +1,58 @@
+NIST SP 800-166                                                                       DERIVED PIV APPLICATION AND
+                                                                                      DATA MODEL TEST GUIDELINES
+
+                                    3. Send the VERIFY command with
+                                          • P2, key reference value, is set to '80'
+                                          • Data field of the command will contain the
+                                             correct Derived PIV Application Password,
+                                             padded with 'FF' (if necessary) to complete
+                                             the total length of the value to 8 bytes
+                                    4. Send the GENERAL AUTHENTICATE command
+                                          • CLA is set to:
+                                              1. '00' if command chaining is not needed or
+                                                 '10' if command chaining is used. (The
+                                                 last chain of the command sets CLA to
+                                                 '00')
+                                          • P1, algorithm reference, is set to '07',
+                                             '11', or '14'.
+                                             P2, key reference, is set to '9D' indicating
+                                             the key management key
+                                          • Data field in the command is to include one
+                                             of the following:
+                                             1. If P1 = '07', the template '81' contains
+                                             an encrypted key
+                                             2. If P1 = '11' or '14', the template '85'
+                                             contains the other party’s public key. 21
+                                    5. Verify the response obtained in Step 4 using the
+                                       subject public key from the certificate obtained in
+                                       Step 2.
+ Expected Result(s)                 1. From Step 1, the command returns the application property
+                                       template with the status word '90 00'.
+                                    2. From Step 2, the command returns the requested data object
+                                       along with the status word '90 00'.
+                                    3. From Step 3, the command returns status word '90 00'
+                                    4. From Step 4, for algorithm reference '07', the command returns
+                                       the transported key with status word '90 00'. For algorithm
+                                       reference '11' or '14', the command returns the shared secret Z 22
+                                       with status word '90 00'.
+                                    5. From Step 5, the private key corresponds to the public key
+                                       contained in the certificate. For algorithm reference '07', the
+                                       test tool application’s copy of the plaintext key corresponds to
+                                       the one received in the response to Step 4 from the token. For
+                                       algorithm reference '11' or '14', the shared secret returned in
+                                       Step 4 matches the shared secret computed off token.
+
+
+
+
+21
+   Template '85' contains the other party’s public key, a point on Curve P-256 or P-384, encoded as '04' || X || Y,
+without the use of point compression, as described in Section 2.3.3 of [SEC1].
+22
+   Z is the X coordinate of point P as defined in [SP800-56A], Section 5.7.1.2
+
+
+
+
+                                                         122
+

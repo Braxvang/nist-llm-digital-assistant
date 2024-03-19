@@ -1,0 +1,48 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                       Recommendation for RBG Constructions
+       September 2022
+
+1252   4.3.1. Instantiating a Sub-DRBG
+1253   Instantiation of the sub-DRBG is requested (e.g., by a consuming application) using the
+1254   Instantiate_function discussed in Section 2.8.1.1 and [SP800-90A].
+1255                                   (status, sub-DRBG_state_handle) =
+1256          Instantiate_function(s, prediction_resistance_flag = FALSE, personalization_string),
+1257   where s is the requested security strength for the (target) sub-DRBG (note that s must be no greater
+1258   than the security strength of the RBG1 construction). 15
+1259   The (target) sub-DRBG is instantiated as follows:
+1260        1. When the sub-DRBG uses CTR_DRBG without a derivation function, s + 128 bits 16 shall
+1261           be obtained from the RBG1 construction as follows:
+1262                    (status, randomness-source_input) = Generate_function(RBG1_state_handle, s +
+1263                    128, s, prediction_resistance_request = FALSE, additional_input).
+1264        2. When the sub-DRBG uses any other DRBG (including a CTR_DRBG with a derivation
+1265           function), 3s/2 bits shall be obtained from the RBG1 construction as follows:
+1266                     (status, randomness-source_input) = Generate_function(RBG1_state_handle, 3s/2,
+1267                                 s, prediction_resistance_request = FALSE, additional_input).
+
+1268   4.3.2. Requesting Random Bits
+1269   Pseudorandom bits may be requested from a sub-DRBG using the following call (see Section
+1270   2.8.1.2):
+1271                (status, returned_bits) = Generate_function(sub_DRBG_state_handle,
+1272        requested_number_of_bits, requested_security_strength, prediction_resistance_request =
+1273                                       FALSE, additional_input),
+1274   where sub_DRBG_state_handle (if used) was returned by the Instantiate_function (see Sections
+1275   2.8.1.1 and 4.3.1).
+
+1276              Requirements
+
+1277   4.4.1. RBG1 Requirements
+1278   An RBG1 construction being instantiated has the following testable requirements (i.e., testable by
+1279   the validation labs):
+1280        1. An approved DRBG from [SP800-90A] whose components are capable of providing the
+1281           targeted security strength for the RBG1 construction shall be employed.
+
+
+       15
+          The implementation is required to check the requested security strength (for the sub-DRBG) against the security strength recorded in the internal
+       state of the RBG1’s DRBG (see SP 800-90A).
+       16
+          For AES, the block length is 128 bits, and the key length is equal to the security strength s. SP 800-90A requires the randomness input from the
+       randomness source to be (key length + block length) bits when a derivation function is not used.
+
+
+                                                                               33
+

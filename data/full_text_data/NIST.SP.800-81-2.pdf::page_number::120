@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+trust anchor will not be able to validate the responses about external services and vice-versa (using the
+external zone key as a trust anchor will result in validation failures for internal DNS zone responses).
+
+In these cases, it may be necessary for a mobile systems to configure its valiadator when migrating from
+the enterprise to an external network and vice-versa. Or, if the enterprise network is trusted, the mobile
+host can rely on the enterprise validator when on the enterprise network, and perform its own validation
+when on external networks. Ideally, network administrators can avoid this problem by using alternative
+names for internal and external zones, thus having different trust anchors.
+
+If the mobile host cannot perform its own validation, it must have a secure tunnel back to the enterprise
+network and use an enterprise managed validator. Many enterprises already have a means for mobile
+hosts to access internal resources (like file servers, etc.); a validating recursive server should be added as
+one of the services provided to mobile hosts through a secure channel.
+
+
+13.2 Establishing Initial Trust Anchors
+
+Each DNSSEC validator must have one or more public keys stored locally to use in building
+authentication chains. These public keys are often referred to as trust anchors. There is nothing
+particularly special about a trust anchor to anyone other than the client that has configured it as a trusted
+public key.
+
+Since DNSSEC validation builds upon the DNS hierarchy for trust, the public key for the DNS root zone
+and TLD’s are more valuable because they can (assuming a fully signed DNS domain tree), be used to
+validate the widest number of nodes (thus a larger portion of the domain name space) and thus provide
+coverage for a wider range of DNS responses. Validator administrators should identify the set of keys
+they believe they would need to provide DNSSEC validation for the segments of the name space deemed
+most important. For most administrators, this would be the DNS root zone key, but may possible include
+one or more TLD keys (such as the keys for their local ccTLD or similar). Administrators should obtain
+the public keys (usually the KSK) in a trusted manner (e.g., a SSL secure webpage) and configure the key
+(or in some cases, a hash of the key) in the implementation specific manner. In BIND, trusted keys are
+configured using the “trusted-keys” statement in the named configuration file. The format for these keys
+are:
+
+<zone name>      <flags> <protocol> <algorithm> <base 64 encoded key material>;
+
+Where the <flags>, <protocol> and <algorithm> numbers are taken from the DNSKEY RDATA values.
+So that in the named configuration file, an example root key would appear as:
+
+        trusted-keys {
+        “.”    257 3 8 “AwEAAagAIKlVZrpC6Ia7gEzahOR+9W29eux
+                        hJhVVLOyQbSEW0O8gcCjFFVQUTf6v58fLjw
+                        Bd0YI0EzrAcQqBGCzh/RStIoO8g0NfnfL2M
+                        TJRkxoXbfDaUeVPQuYEhg37NZWAJQ9VnMVD
+                        xP/VHL496M/QZxkjf5/Efucp2gaDX6RS6CX
+                        poY68LsvPVjR0ZSwzz1apAzvN9dlzEheX7I
+                        CJBBtuA6G3LQpzW5hOA2hzCTMjJPJ8LbqF6
+                        dsV6DoBQzgul0sGIcGOYl7OyQdXfZ57relS
+                        Qageu+ipAdTTJ25AsRTAoub8ONGcLmqrAmR
+                        LKBP1dfwhYB4N7knNnulqQxA+Uk1ihz0=”;
+         };
+
+
+
+                                                    13-22
+

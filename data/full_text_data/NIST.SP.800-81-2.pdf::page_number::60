@@ -1,0 +1,61 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+8.1.3       Restricting Zone Transfer in NSD
+
+NSD has a similar set of tools to restrict zone transfers to only a chosen set of slave servers. Like BIND,
+the administrator should learn and use the options available in the NSD configuration file. There is no
+way to create access control lists (ACLs), but an administrator can list the individual IP address of slave
+servers in the zone statements in the NSD configuration file.
+
+In the configuration file, the provide-xfr statement is used in the zone statement block of the nsd.conf file
+much like a combined masters statement and allow-transfer statement in BIND configuration files:
+
+            zone:
+                      #allow transfer from subnet
+                      provide-xfr: 169.192.85.0/24
+                      #prevent transfer from specific IP address in block
+                      provide-xfr: 169.192.85.66 BLOCKED
+
+Only one IP address should appear in a provide-xfr statement, but the address can be an entire subnet.
+The provide-xfr statement allows transfers; all other transfer requests are rejected by default.
+
+8.1.4       Restricting Zone Transfer in Windows Server
+
+Microsoft Windows DNS Server can also restrict zone transfers based on different criteria for increased
+operational security. Administrators can deny all zone transfer requests, or restrict zone transfers to a set
+of server (the servers in the NS set for example). Microsoft's TechNet Library 5 contains the current
+information on how to use the administrator tools to restrict zone transfers.
+
+8.1.5       Restricting Dynamic Update Transaction Entities
+
+Dynamic updates on a zone file can be directed only to the copy of the zone file that resides on the
+primary name server for the zone (i.e., where the master zone file resides). By default, dynamic update is
+turned off in both BIND 8 and BIND 9. Dynamic updates are enabled or restricted by using one of the
+following two statements in BIND:
+
+       •    allow-update
+
+       •    update-policy (available only in BIND 9 versions).
+These statements can be specified only at the zone level, not at the server level. Hence, these statements
+are substatements within the zone statement. The allow-update substatement enables specification of
+dynamic update restrictions based on IP addresses and a shared secret (also called a TSIG key 6). The use
+of the allow-update statement using IP addresses alone is addressed in this section. The use of the allow-
+update statement using TSIG keys is described in Section 8.2.6.
+
+The update-policy statement enables specification of dynamic update restrictions based on TSIG keys
+only, but it enables specification of update restrictions at a finer level of granularity. The allow-update
+substatement implies update access rights to all records of a zone; the update-policy substatement can be
+used to restrict update access rights to one or more designated RRTypes (e.g., A RRs).
+
+
+5
+    http://technet.microsoft.com/en-us/library/cc771652.aspx
+6
+    The term TSIG Key (while commonly used) is not technically correct, as it refers to a shared secret string and not a
+        cryptographic key.
+
+
+                                                                 8-8
+

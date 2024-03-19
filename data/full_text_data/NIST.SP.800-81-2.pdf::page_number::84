@@ -1,0 +1,56 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+    •   Publication of the public key by incorporation of the DNSKEY RR in the zone file
+
+    •   Generation of digital signatures for zone data (zone signing).
+Additional tasks are involved for a chained secure zone. To be part of the chain of trust, the zone has to
+inform its parent of its public key (KSK-public) securely (through out-of-DNS channel means). The
+parent then creates a hash of the public key of its child and stores it in the parent zone in a new RR called
+a DS RR [RFC4034]. Or the child zone can generate its own DS RRset and upload that to its parent zone
+for inclusion in the parent zone. It also signs this DS RR by generating a RRSIG RR. Practical conditions
+dictate, however, that the keys periodically have to be changed because any key can be broken with
+sufficient computing power. In a chained secure zone, whenever a zone changes its KSK, its parent has to
+be notified of the new key. The parent then has to add or generate a new DS RR and sign it again. To
+reduce the administrative burden involved, a common strategy is to use another key pair, the KSK. The
+KSK is used for signing only the DNSKEY RRSet; all of the other authoritative RRsets in the zone file
+are signed with the ZSK. The KSK is the key that is published to the parent. The parent will generate (or
+simply add) the DS RR and a RRSIG RR using the parent’s own ZSK. The KSK is used less frequently to
+only sign the DNSKEY RRset and hence needs to be changed less frequently. There may be situations,
+however, in which either because of the manageable frequency of key rollovers (key change) or the
+criticality of DNS information served by the zone, administrators may not use two distinct key pairs for
+the ZSK and KSK.
+
+In summary, the additional tasks that take place in a chained secure zone are as follows:
+
+    •   Secure transmission of the KSK or DS by a secure zone to its parent. This transmission is
+        accomplished out of band and may not involve any DNS transactions.
+
+    •   The parent stores the child’s KSK in a special keyset file directory, generates a hash of the key,
+        and stores the hash in a DS RR. The parent also generates the digital signature (RRSIG RR) for
+        this DS RR and includes it with the other delegation information. OR The parent adds the DS to
+        its zone database after the child uploads the DS RRset.
+The zone whose signed response needs to be verified (i.e., the target zone) is the leaf node of the chain of
+trust. The pre-requisite for this operation is to establish trust in the ZSK of the zone. The trust in a zone’s
+ZSK is established through the following operations:
+
+    •   Authenticated referral from the parent
+
+    •   Authenticating the KSK of the child zone.
+To understand authenticated referral from the parent, it is necessary to look at the normal DNS referral
+process. In the normal DNS query, a zone that does not have authoritative information pertaining to a
+query for a domain name in a child zone provides a hint or referral by providing the NS RRSet and
+associated additional information (RRs that contain the IP addresses for servers provided in the NS
+RRSet). In normal DNS query processing, following this referral is an acceptable processing step. This
+process is insufficient, however, from the point of view of establishing a chain of trust; the information
+about the NS RRSet and associated glue RRs (or any other additional information) cannot be considered
+authentic because they are not signed with the public key of the authoritative source (i.e., the child zone).
+To enable authentication of this referral information, the parent provides the cryptographic hint through
+the DS RR.
+
+
+
+
+                                                     9-12
+

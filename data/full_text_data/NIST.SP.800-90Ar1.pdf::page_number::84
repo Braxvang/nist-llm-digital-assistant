@@ -1,0 +1,43 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+   Input: integer (state_handle, requested_no_of_bits, requested_security_strength,
+          prediction_resistance_request), bitstring additional_input.
+   Output: string status, bitstring pseudorandom_bits.
+   Process:
+                                             Comment: Check the validity of the state_handle.
+       1. If ((state_handle < 0) or (state_handle > 9) or (state (state_handle) = {Null, Null, 0,
+          0, 0})), then Return (“State not available for the state_handle”, Null).
+       2. Get the internal state values.
+           2.1 V = internal_state (state_handle).V.
+           2.2 C = internal_state (state_handle).C.
+           2.3 reseed_counter = internal_state (state_handle).reseed_counter.
+           2.4 security_strength = internal_state (state_handle).security_strength.
+           2.5 prediction_resistance_flag = internal_state
+               (state_handle).prediction_resistance_flag.
+                                             Comment: Check the validity of the other input
+                                             parameters.
+       3. If (requested_no_of_bits > 5000) then Return (“Too many bits requested”, Null).
+       4. If (requested_security_strength > security_strength), then Return (“Invalid
+          requested_security_strength”, Null).
+       5. If (len (additional_input) > 512), then Return (“additional_input too long”, Null).
+       6. If ((reseed_counter > 100 000) or (prediction_resistance_request = 1)), then
+           6.1   status = Hash_DRBG_Reseed_ function (state_handle,
+                 prediction_resistance_request, additional_input).
+           6.2 If (status ≠ “Success”), then Return (status, Null).
+           6.3 Get the new internal state values that have changed.
+                 7.3.1 V = internal_state (state_handle).V.
+                 7.3.2 C = internal_state (state_handle).C.
+                 7.3.3 reseed_counter = internal_state (state_handle).reseed_counter.
+           6.4 additional_input = Null.
+                                             Comment: Steps 7 to 15 provide the rest of the
+                                             generate algorithm. Note that in this
+                                             implementation, the Hashgen routine specified in
+                                             Section 10.1.1.4 is provided inline as steps 8 to 12.
+       7. If (additional_input ≠ Null), then do
+           7.1 w = Hash (0x02 || V || additional_input).
+
+
+                                                  75
+

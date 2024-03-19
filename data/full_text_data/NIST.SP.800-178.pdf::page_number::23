@@ -1,0 +1,61 @@
+                                                                                               NIST SP 800-178                                                      COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                      DATA SERVICES: XACML AND NGAC
+
+
+                                                                                               A few examples include:
+
+                                                                                                     •    If Alice is denied access to document X: inform her manager via email that Alice tried to
+                                                                                                          access document X.
+                                                                                                     •    If a user is denied access to a file: inform the user why the access was denied.
+                                                                                                     •    If a user is approved to view document X: watermark the document “DRAFT” before
+                                                                                                          delivery.
+
+                                                                                               A common use of an obligation applied after an access request is approved is for auditing and
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                               logging user access events.
+
+                                                                                               It should be noted that the functionality to accommodate the directives of an obligation or advice
+                                                                                               is outside of the scope of XACML and must be implemented and executed by an application-
+                                                                                               specific PEP.
+
+                                                                                               3.4       Example Policies
+
+                                                                                               Consider the following two example XACML Policy specifications. For purposes of maintaining
+                                                                                               the same semantics as XACML, the same element names are used, but Policies and Rules are
+                                                                                               specified in pseudocode (instead of exact XACML syntax) for purposes of enhanced readability.
+                                                                                               A more formal XACML treatment of the first Policy (Policy 1) is included in Appendix C.
+
+                                                                                               Policy 1 applies to “All read or write accesses to medical records by a doctor or intern” (the
+                                                                                               Target of the Policy) and includes three rules. As such, the Policy is considered “applicable”
+                                                                                               whenever a subject with a role of “doctor” or “intern” issues a request to read or write the
+                                                                                               “medical-records” resource. The Rules do not refine the Target, but describe the conditions
+                                                                                               under which read or write requests from doctors or interns to medical records can be allowed.
+                                                                                               Rule 1 will deny any access request (read or write) if the ward in which the doctor or intern is
+                                                                                               assigned is not the same ward where the patient is located. Rule 2 explicitly denies “write”
+                                                                                               access requests to interns under all conditions. Rule 3 permits read or write access to medical-
+                                                                                               records for “doctor”, regardless of Rule 1, if an additional condition is met. This additional
+                                                                                               condition pertains to patients in critical status. Since the intent of the Policy is to allow access
+                                                                                               under these critical situations, a policy combining algorithm of “permit-overrides” is used, while
+                                                                                               still denying access if only the conditions stated in Rule 1 or Rule 2 apply.
+
+                                                                                               <Policy PolicyId = “Policy 1” rule-combining-algorithm=”permit-overrides”>
+                                                                                                            // Doctor Access to Medical Records //
+                                                                                                    <Target>
+                                                                                                       /* :Attribute-Category    :Attribute ID     :Attribute Value */
+                                                                                                                :access-subject      :Role                  :doctor
+                                                                                                                :access-subject      :Role                  :intern
+                                                                                                                :resource            :Resource-id           :medical-records
+                                                                                                                :action              :Action-id             :read
+                                                                                                                :action              :Action-id             :write
+                                                                                                     </Target>
+
+                                                                                                          <Rule RuleId = “Rule 1” Effect=”Deny”>
+                                                                                                                 <Condition>
+                                                                                                               Function: string-not-equal
+
+                                                                                                                                                  11
+

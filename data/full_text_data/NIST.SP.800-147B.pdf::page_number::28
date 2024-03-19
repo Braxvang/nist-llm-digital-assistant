@@ -1,0 +1,45 @@
+          This publication is available free of charge from http://dx.doi.org/10.6028/NIST.SP.800-147B
+
+                                                                       BIOS PROTECTION GUIDELINES FOR SERVERS
+authenticates the BIOS update image. If the image is authentic, then the SP, which continues to have write
+access to the system flash even after host OS boot, can then perform the flash update via interaction with
+the SPI controller of the system flash.
+
+In this example, the system BIOS contains its own verification component of the RTU, which
+authenticates the remainder of the system BIOS each boot. This verification component resides in the
+system flash and will be labeled the RTU-V for the purposes of describing this update mechanism. The
+RTU-V is given control of the host side at system reset. System reset also unlocks all of the SPI flash
+sectors. Within the system flash, the RTU-V is lockable, independently of the remainder of system BIOS.
+The RTU-V is also updatable as follows: Similar to update mechanism example 2, the RTU-V update
+occurs upon reboot and is updated by the RTU-V itself. It communicates with the SP to check for a
+candidate RTU-V update image. If one exists, it is read from the SP into host memory and performs
+authentication. If the image authenticates, the RTU-V does the update of the RTU-V portion of the BIOS
+flash ROM via interaction with the SPI flash controller. At completion of the RTU-V update, the RTU-V
+forces a system reset and restarts execution from the new image.
+
+If the SP indicated that no candidate RTU-V update image existed, or if the candidate RTU-V update
+image failed verification, the RTU-V locks until reset the RTU-V sectors of the flash via interactions with
+the SPI controller. When the lock is set, the access to this SPI sector lock register becomes read-only so
+that the “lock until reset” setting itself cannot be modified. This sector lock is done prior to exiting the
+RTU-V (e.g., before execution of the rest of BIOS).
+
+Because the system flash regions containing BIOS code are not lockable and are subject to modification
+by malicious code, the RTU-V authenticates the remainder of system BIOS. The remainder of the system
+BIOS is kept in separate flash sectors in the system flash. If authentication passes, the RTU-V passes
+control to the remainder of the system BIOS. In this example, the remainder of system BIOS does not
+lock the flash sectors containing the remainder of the system BIOS. A possible reason for not locking the
+flash sectors may be to simplify access to those sectors by the BIOS RTU at runtime. Another possible
+reason would be that a portion of these sectors need to be writeable at runtime and the sector locking
+granularity is not sufficient to lock the BIOS without also locking the area that needs to be writeable.
+
+If authentication of the BIOS fails, it is not executed. Instead, the RTU-V communicates with the BIOS
+RTU on the SP to inform it of the failure. The SP must then access an authentic BIOS image previously
+stored in the SP environment (possibly from the previous authenticated BIOS update), authenticate it and
+perform the flash update. The SP then forces a system reset to restart the RTU-V which will subsequently
+authenticate and execute the remainder of system BIOS.
+
+
+
+
+                                                     D-2
+

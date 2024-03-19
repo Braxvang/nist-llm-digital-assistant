@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                        GUIDE TO IPSEC VPNS
+
+
+                                                                                              tried to support “IPsec passthrough.” This feature caused more harm than good, and by moving
+                                                                                              to a new port, the IPsec passthrough modifications performed by NAT devices were avoided.
+
+                                                                                              Currently, no NAT devices perform IPsec passthrough. Once an IPsec SA has been negotiated,
+                                                                                              the hosts will also enable UDP or TCP encapsulation of ESP packets to facilitate traversing the
+                                                                                              NAT over a single port. This avoids two problems. The first problem is that NAT devices
+                                                                                              commonly only support UDP and TCP, meaning that IPsec (ESP) packets would not be dropped
+                                                                                              by some NAT devices. The second problem is that the NAT device needs to keep a port mapping
+                                                                                              between the internal device’s ports that are used and how these ports are mapped onto the NAT
+                                                                                              device’s public-facing ports. It is easiest if a device behind the NAT device only needs one port
+                                                                                              mapping for IKE and IPsec (ESP) traffic. The host behind NAT will also send one-byte
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              keepalive packets to ensure that the NAT device does not expire its NAT port mapping if the
+                                                                                              VPN does not produce any traffic for some time. Otherwise, if the remote IPsec host starts
+                                                                                              sending traffic towards the NAT device, the NAT device would no longer remember which
+                                                                                              internal device to forward that traffic to, and the IPsec connection would no longer function.
+
+                                                                                              Some cloud providers issue an ephemeral or semi-static public IP address to some virtual
+                                                                                              machines inside their cloud. The virtual machines are deployed with only an internal [41] IP
+                                                                                              address. The cloud infrastructure uses NAT to translate the public IP address to the virtual
+                                                                                              machine’s private IP address. This NAT will also trigger the NAT traversal mechanism of IKE.
+                                                                                              This poses another problem. If the IPsec tunnel is configured with the public IP address as the
+                                                                                              tunnel endpoint, the virtual machine cannot create packets with its public IP address as the
+                                                                                              source address, since this public IP address is not configured on the machine itself. Packets
+                                                                                              received after decryption are dropped because the operating system is not looking for packets
+                                                                                              with the public IP address. A common workaround is for such virtual machines to configure the
+                                                                                              public IP address on one of their network interfaces.
+
+                                                                                              3.5   IKE Fragmentation
+
+                                                                                              IKE packets can be larger than the common ethernet MTU of 1500 bytes. If these packets are
+                                                                                              sent over the network, they will most likely be fragmented. Too often, those fragments will be
+                                                                                              dropped by a firewall, and the host will fail to receive the fragments for reassembly. This
+                                                                                              problem is avoided by using IKE fragmentation, which fragments the packets at the application
+                                                                                              layer instead of the network layer.
+
+                                                                                              IKEv2 fragmentation is specified in RFC 7383 [42]. The main difference with the IKEv1
+                                                                                              vendor-specific implementations of fragmentation is that IKEv2 fragments are encrypted. This
+                                                                                              makes it harder for an attacker to interfere. Note that while the fragments are encrypted, the
+                                                                                              fragments are not (yet) authenticated because the IKE exchange has not yet completed. Once all
+                                                                                              fragments have been received, the original IKE packet can be reconstructed and processed as if it
+                                                                                              was received in one packet.
+
+                                                                                              IKEv2 fragmentation is supported for every exchange type except IKE_SA_INIT. Typically,
+                                                                                              only the IKE_AUTH exchange requires fragmentation, since that exchange includes the X.509
+                                                                                              certificates. These certificates can be larger than 1500 bytes, especially when using RSA public
+                                                                                              keys that use a key size of 2048 bits or more.
+
+
+
+                                                                                                                                             30
+

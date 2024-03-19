@@ -1,0 +1,61 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+(a set of RRs with the same owner name, class, and RRType). The digital signature and its associated
+information (ID of the key used, start and expiry dates for the signature, etc.) are encapsulated in a special
+RR of RRType RRSIG (Resource Record Signature). The actual key string and associated information
+about the public key that is to be used to verify the signature (in RRSIG) are given in a special RRType
+DNSKEY. Another RRType, NSEC (Next Secure), is used to list RRTypes (in canonical order
+[RFC4034]) available for a given domain (owner name), and a signature (RRSIG RR) for that RRType is
+generated to provide authenticated proof of nonexistence to queries for any nonexistent RRType in that
+domain. In addition, there is an optional RRType DS (Delegation Signer) in case a zone wants to
+vouchsafe the authenticity of the public key of its child zone. In other words, the DS RR carries the
+signature for the RR that contains the (hash) public key of the child zone. The detailed syntax for each of
+these additional RRTypes introduced by DNSSEC specification is specified in RFC 4034 [RFC4034].
+The most important of these is the RRSIG RR because it contains the actual signature string.
+
+The RRSIG RR, like any other RR, contains the owner name, TTL, class, RRType, and RDATA fields.
+The digital signature and all its associated information are contained within the RDATA field. The layout
+of the RDATA field in the RRSIG RR, with all subfields, is shown in Figure 9-1. A brief description of
+each subfield follows.
+
+                    RRType Covered                             Algorithm Code             Labels
+                                                Original TTL
+                                            Signature Expiration
+                                             Signature Inception
+                        Key Tag                                          Signer’s Name
+                                             Encoded Signature
+
+
+
+
+                                  Figure 9-1. RRSIG RR’s RDATA Field Layout
+
+
+
+The “RRType Covered” field is the type of RRSet for which this RRSIG holds the signature. The
+“Algorithm Code” field is a code integer assigned to represent a given cryptographic algorithm used to
+generate the signature. The “Labels” and “Original TTL” fields are the number of labels (number of
+labels in the FQDN) and the TTL value of the RRSet this signature covers. The “Signature Expiration”
+and “Signature Inception” values are absolute time values that span the signature validity period—the
+time period for which this RRSIG is considered valid for the zone. The “Key Tag” and “Signer’s Name”
+fields are the hash and FQDN of the DNSKEY RR that the client needs to validate the signature, and the
+final field is the encoded signature itself.
+
+A zone that contains the additional RRs along with the regular RRs is called a signed zone. A name server
+that hosts these signed zones and includes the appropriate signatures (i.e., the corresponding RRSIGs)
+along with requested RRs in its response is called a DNSSEC-aware name server.
+
+9.2.2   Verify Signature
+
+The response coming from a signed zone is called a signed response. A resolver that has the capability to
+verify signatures in a signed response is called a DNSSEC-aware validating resolver. Before a resolver
+can verify the signature associated with RRsets (in the response) of a zone using the public key of the
+zone (sent along with the response), it has to establish trust in that public key. In DNSSEC this
+requirement is addressed by having the resolver go through a subprocess called building a trusted chain.
+
+
+
+                                                     9-2
+

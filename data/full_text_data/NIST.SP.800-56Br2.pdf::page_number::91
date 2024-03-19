@@ -1,0 +1,56 @@
+                                                                                               NIST SP 800-56B REV. 2                              RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                        USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                                  Each party has obtained (or will obtain) assurance that the other party is (or was) in possession
+                                                                                                  of the private key corresponding to their public key that was used during the key-agreement
+                                                                                                  transaction, as specified in Section 6.4.2.3.
+                                                                                               This assumption recognizes the possibility that assurance of private-key possession may be
+                                                                                               provided/obtained by means of key confirmation performed as part of a particular KAS2
+                                                                                               transaction.
+
+                                                                                               8.3.2 KAS2-basic
+                                                                                               Figure 8 depicts the typical flow for the KAS2-basic scheme. The parties exchange secret values
+                                                                                               that are concatenated to form the mutually determined shared secret to be input to the key-
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                               derivation method.
+                                                                                               Party U shall execute the following key-agreement steps in order to a) establish a mutually
+                                                                                               determined shared secret Z with party V, and b) derive secret keying material from Z.
+
+                                                                                                                   Party U                                                    Party V
+
+                                                                                                          (PubKeyU, PrivKeyU)                                          (PubKeyV, PrivKeyV)
+
+                                                                                                       Obtain party V’s public key-            PubKeyV
+                                                                                                           establishment key                  ←   
+
+                                                                                                                                               PubKeyU              Obtain party U’s public key-
+                                                                                                                                                 →                   establishment key
+
+                                                                                                          (ZU, CU) =                             CU                        ZU =
+                                                                                                   RSASVE.GENERATE(PubKeyV)                    →             RSASVE.RECOVER(PrivKeyV, CU)
+
+                                                                                                                  ZV =                           CV                      (ZV, CV) =
+                                                                                                  RSASVE.RECOVER(PrivKeyU, CV)                 ←              RSASVE.GENERATE(PubKeyU)
+
+                                                                                                               Z = ZU || ZV                                                 Z = ZU || ZV
+
+                                                                                                  Compute DerivedKeyingMaterial                                  Compute DerivedKeyingMaterial
+                                                                                                         and destroy Z                                                  and destroy Z
+
+                                                                                                                                      Figure 8: KAS2-basic Scheme
+                                                                                               Actions: Party U generates a shared secret and derives secret keying material as follows:
+                                                                                                  1.     Use the RSASVE.GENERATE operation in Section 7.2.1.2 to generate a secret value ZU and
+                                                                                                        a corresponding ciphertext CU using party V’s public key-establishment key PubKeyV.
+                                                                                                  2.     Send the ciphertext CU to party V.
+                                                                                                  3. Receive a ciphertext CV from party V. If CV is not available, return an error indicator
+                                                                                                     without performing the remaining actions.
+                                                                                                  4. Use the RSASVE.RECOVER operation in Section 7.2.1.3 to recover ZV from the ciphertext
+                                                                                                     CV using the private key-establishment key PrivKeyU. If the call to RSASVE.RECOVER
+
+                                                                                                                                                  81
+

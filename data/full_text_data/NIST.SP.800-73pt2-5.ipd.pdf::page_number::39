@@ -1,0 +1,55 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                     Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                        PIV Card Application Card Command Interface
+
+                                     '7C' L1 { '81' L2 { CB H || ID sH || Q eH } '82 00' }, where CB H is 0x00,
+                                     ID sH is an 8-byte client application identifier as described in Section
+                Data Field
+                                     4.1.3, and Q eH is an ephemeral public key encoded as 04 || X || Y, as
+                                     specified in the “Value” column of Table 13.
+                Le                   '00'
+
+840   Response Syntax
+                Data Field           '7C' L1 { '82' L2 { CB ICC || N ICC || AuthCryptogram ICC || C ICC } }
+                SW1-SW2              Status word
+841
+                 SW1         SW2                                   Meaning
+                                     Successful execution, where SW2 encodes the number of response
+                  '61'       'xx'
+                                     data bytes still available
+                  '6A'       '80'    Incorrect parameter in command data field
+                  '6A'       '86'    Incorrect parameter in P1 or P2
+                   '90'      '00'    Successful execution
+
+
+842           Secure Messaging
+843   PIV secure messaging is used to protect the integrity and confidentiality of the PIV data being
+844   transmitted between the card and the relying system. PIV secure messaging SHALL be provided
+845   using symmetric session keys derived through the key establishment protocol defined Section
+846   4.1.
+847   Once session keys are established and the card is authenticated as specified in Section 4.1,
+848   subsequent communication with the card CAN be performed using secure messaging by setting
+849   bits b3 and b4 of the CLA byte of the command APDU to 1, resulting in a '0C' or '1C' CLA byte.
+850   If bits b3 and b4 of the CLA byte are set, then both the command and the response SHALL be
+851   encrypted and integrity protected, as described in this section. If the PIV Card Application
+852   CANNOT encrypt and integrity protect the response (e.g., because it does not support secure
+853   messaging or no session keys have been established), the PIV Card Application SHALL return
+854   an error (see Section 4.2.7). In the case of command chaining, if bits b3 and b4 of the CLA are
+855   set in any command in the chain, then they SHALL be set in every command in the chain.
+856   When secure messaging is used, the data field of the card command (or response) is encrypted
+857   first and then a message authentication code (MAC) is applied to the entire command (or
+858   response). When command (or response) chaining is required, the encryption and MAC are
+859   applied to the entire message and the result is then fragmented into separate command (or
+860   response) data fields.
+861   In order to ensure that message reordering or replay attacks CAN be detected, a 16-byte MAC
+862   chaining value (MCV) is used. For the first command, and for the first response, sent after
+863   successful completion of the key establishment protocol the MCV consists of 16 bytes of '00'.
+864   For each subsequent command the MCV is the 16-byte MAC value computed on the previous
+865   command, and for each subsequent response the MCV is the 16-byte MAC value computed on
+866   the previous response. The MCV is included as part of the message over which the MAC value
+867   for each command (or response) is computed.
+868   The SK ENC session key SHALL be used to encrypt the command data field and response data
+869   field, as described in Section 4.2.2. The SK MAC session key SHALL be used to add integrity to
+
+
+                                                                29
+

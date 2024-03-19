@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              6.3   Debugging IKE Configurations
+
+                                                                                              The method for debugging IKE and IPsec configurations depends on the specific
+                                                                                              implementation. For new configurations that are not working properly, the first step should be
+                                                                                              for both endpoint administrators to verify the configuration options that they believe they have
+                                                                                              agreed upon. A checklist with the most common options to review can be found in Appendix A.
+                                                                                              A mismatch between basic IKE or IPsec parameters is most often the cause for new IPsec
+                                                                                              configurations not establishing properly.
+
+                                                                                              Using a network monitoring tool such as tcpdump is not very useful for capturing and debugging
+                                                                                              the IKE negotiation because only information from the first IKE_SA_INIT exchange can be
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              inspected, and the visible information only contains the DH groups. It is therefore unlikely that a
+                                                                                              misconfiguration can be detected at this point. All further captured IKE packets are encrypted, so
+                                                                                              they will not provide any additional information to diagnose the problem. It will be more helpful
+                                                                                              to enable additional logging or debugging. Remember to disable these settings again after the
+                                                                                              problem is resolved; otherwise, large amounts of logging information will continuously be
+                                                                                              produced.
+
+                                                                                              If an administrator controls both endpoints that will be configured for IPsec, it is often the case
+                                                                                              that this administrator is located behind one of the gateways and is using a secure remote login
+                                                                                              tool, such as a web interface or SSH connection, to configure the remote endpoint. If a
+                                                                                              configuration mistake is made or a partial configuration is accidentally activated, the IPsec hosts
+                                                                                              will drop all non-IPsec traffic and lock out the administrator’s remote session. To prevent this
+                                                                                              problem, use a third host to indirectly log in to the remote IPsec endpoint for configuration.
+
+                                                                                              6.4   Common Configuration Mistakes
+
+                                                                                              The HMAC integrity algorithm may be implemented with three different hash functions: SHA-
+                                                                                              256, SHA-384, and SHA-512. SHA-2 means different things for different vendors. Some
+                                                                                              vendors use SHA-2 to mean only SHA2-256, while others mean it to be all variants of the SHA-
+                                                                                              2 family.
+
+                                                                                              Care should be taken with sending DPD/liveness probes too often. If the remote client is a device
+                                                                                              that might enter sleep mode, it may not be able to respond to such probes. Another issue arises
+                                                                                              when the device’s link is congested while the IPsec connection is idle. This will trigger
+                                                                                              DPD/liveness probes that could be dropped due to traffic congestion. If repeatedly dropped,
+                                                                                              these packets will trigger a false positive warning about the remote IPsec endpoint connection
+                                                                                              being lost, causing the server to terminate the IKE and IPsec SAs and resulting in more packets
+                                                                                              to re-establish the VPN on an already congested link. Do not set DPD/liveness probes to values
+                                                                                              under one minute, which is in accordance with the recommendation in [23].
+
+                                                                                              PFS and DH group negotiation issues can be tricky to diagnose. In IKEv2, the first IPsec SA is
+                                                                                              established with the IKE SA establishment, and it does not really use a separate DH key
+                                                                                              exchange for PFS (unlike IKEv1). Any mismatch in the DH group will only become apparent
+                                                                                              during a rekey message exchange hours later.
+
+
+
+
+                                                                                                                                              56
+

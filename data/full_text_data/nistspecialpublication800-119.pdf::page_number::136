@@ -1,0 +1,57 @@
+                                                                 GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+next header numbers, ICMPv6 message types, or port numbers for TCP or UDP over IPv6. The reason is
+that the IPv6 header and addresses are not visible to the router; they are part of the packet payload, which
+is the functional intent of any tunneling process.
+
+Network administrators must understand that IPv6 tunneling may be taking place without their
+knowledge. Strategic deployment of network devices capable of detecting and filtering IPv6 traffic is
+essential. IPv4 can tunnel IPv6 traffic through security controls and violate normal access control
+policies. In effect, the IPv6 over IPv4 tunnel becomes a backdoor into the network. Figure 6-2 illustrates
+the relationship between IPv6 tunnels and the existing IPv4 network.
+
+                 Dual Stack IPv4/IPv6 LAN
+                                                                       Dual Stack IPv4/IPv6 LAN
+
+
+
+
+                                               IPv4
+                                            Internet or
+                 Dual Stack                   IPv4                      Dual Stack
+                Edge Router                 Backbone                   Edge Router
+
+
+                           IPv4 Firewall                    IPv4 Firewall
+
+
+                                      = IPv6 over IPv4 Tunnel Transparent to Firewalls
+
+                  Figure 6-2. IPv6 over IPv4 Tunnels Transparent to the IPv4 Infrastructure
+
+IPv6 over IPv4 tunneling protocols themselves are visible to edge devices such as routers and firewalls,
+even if those devices cannot apply security to encapsulated IPv6 traffic. For this reason, IPv4 access
+control lists and firewalls should block well-known tunneling protocols and ports or ensure that these
+protocols are destined to an IPv6-capable firewall. Of course, this raises the question of whether an attack
+could get through the IPv6 firewall with, for example, a type 0 routing header. A firewall which meets
+the USGv6 Profile 21 should be able to block type 0 routing headers. Many firewalls can block IPv4
+protocol 41 (used in the 6over4, ISATAP [Intra-Site Automatic Tunnel Addressing Protocol], and 6to4
+tunnel protocols). Network and security administrators should confirm that their infrastructure
+appropriately filters protocol 41 by verifying security device configurations and evaluating existing
+traffic.
+
+Blocking protocol 41 with access control lists or firewalls does not prevent tunneling IPv6 over IPv4
+UDP tunnels such as Teredo. It is hard to identify and filter all Teredo traffic. Teredo uses a well-known
+outbound UDP port 3544 to locate Teredo servers; simply blocking port UDP 3544 does not guarantee
+that Teredo traffic is blocked, because it is easy to change the port assignment. A more effective
+technique is to use an Intrusion Detection and Prevention System (IDPS) that can identify the protocols to
+block regardless of the port assignment.
+
+Tunnels encapsulating IPv6 in SSL/TLS or IPsec are more problematic. Because the payload may be
+encrypted, no mechanism exists that can inspect the traffic. Organizations must possess the decryption
+keys on the inspection device or terminate tunnels in front of the security devices and evaluate plain text.
+
+
+                                                     6-14
+

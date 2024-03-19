@@ -1,0 +1,60 @@
+                                      ESTABLISHING WIRELESS ROBUST SECURITY NETWORKS: A GUIDE TO IEEE 802.11I
+
+
+
+example, a 104-bit WEP key with a 24-bit IV becomes a 128-bit RC4 key. Ideally, larger key sizes
+translate to stronger protection, but the cryptographic technique used by WEP has known flaws that are
+not mitigated by longer keys.
+
+Most attacks against WEP encryption have been based on IV-related vulnerabilities. For example, the IV
+portion of the RC4 key is sent in cleartext, which allows an eavesdropper that monitors and analyzes a
+relatively small amount of network traffic to recover the key by taking advantage of the IV value
+knowledge, the relatively small 24-bit IV key space, and a weakness in the way WEP implements the
+RC4 algorithm. Also, WEP does not specify precisely how the IVs should be set or changed; some
+products use a static, well-known IV value or reset to zero. If two messages have the same IV, and the
+plaintext of either message is known, it is relatively trivial for an attacker to determine the plaintext of the
+second message. In particular, because many messages contain common protocol headers or other easily
+guessable contents, it is often possible to identify the original plaintext contents with minimal effort.
+Even traffic from products that use sequentially increasing IV values is still susceptible to attack. There
+are less than 17 million possible IV values; on a busy WLAN, the entire IV space may be exhausted in a
+few hours. When the IV is chosen randomly, which represents the best possible generic IV selection
+algorithm, by the birthday paradox two IVs already have a 50% chance of colliding after about 212 frames.
+
+Another possible threat against confidentiality is network traffic analysis. Eavesdroppers might be able to
+gain information by monitoring which parties communicate at what times. Also, analyzing traffic
+patterns can aid in determining the content of communications; for example, short bursts of activity might
+be caused by terminal emulation or instant messaging, while steady streams of activity might be generated
+by video conferencing. More sophisticated analysis might be able to determine the operating systems in
+use based on the length of certain frames. Other than encrypting communications, IEEE 802.11, like
+most other network protocols, does not offer any features that might thwart network traffic analysis, such
+as adding random lengths of padding to messages or sending additional messages with randomly
+generated data.
+
+3.2.3   Data Integrity
+
+WEP performs data integrity checking for messages transmitted between STAs and APs. WEP is
+designed to reject any messages that have been changed in transit, such as by a man-in-the-middle attack.
+WEP data integrity is based on a simple encrypted checksum—a 32-bit cyclic redundancy check (CRC-
+32) computed on each payload prior to transmission. The payload and checksum are encrypted using the
+RC4 key stream and transmitted. The receiver decrypts them, recomputes the checksum on the received
+payload, and compares it with the transmitted checksum. If the checksums are not the same, the
+transmitted data frame has been altered in transit, and the frame is discarded.
+
+Unfortunately, CRC-32 is subject to bit flipping attacks, which means that an attacker knows which CRC-
+32 bits will change when message bits are altered. WEP attempts to counter this problem by encrypting
+the CRC-32 to produce an integrity check value (ICV). The creators of WEP believed that an enciphered
+CRC-32 would be less subject to tampering. However, they did not realize that a property of stream
+ciphers such as WEP’s RC4 is that bit flipping survives the encryption process—the same bits flip
+whether or not encryption is used. Therefore, the WEP ICV offers no additional protection against bit
+flipping.
+
+Integrity should be provided by a cryptographic checksum rather than a CRC. Also known as keyed
+hashes or message authentication codes (MAC), cryptographic checksums prevent bit flipping attacks
+because they are designed so that any change to the original message results in significant and
+unpredictable changes to the resulting checksum. CRCs are generally more efficient computationally
+
+
+
+
+                                                      3-5
+

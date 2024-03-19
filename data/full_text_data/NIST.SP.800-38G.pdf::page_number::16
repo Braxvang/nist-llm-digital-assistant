@@ -1,0 +1,57 @@
+NIST SP 800-38G                                               METHODS FOR FORMAT-PRESERVING ENCRYPTION
+
+
+For the encryption function in Figure 1, the rounds are indexed from 0 to 3. The input data (and
+output data) for each round are two strings of characters—which will be numerals for FF1 and
+FF3. The lengths of the two strings are denoted by u and v, and the total number of characters is
+denoted by n, so that u+ v = n. During Round i, the round function, denoted by FK, is applied to
+one of the input strings, denoted by Bi, with the length n, the tweak T, and the round number i as
+additional inputs. (In Figure 1, this triple (n, T, i) of additional inputs is indicated within the
+dotted rectangles, with the appropriate values for i). The result is used to modify the other string,
+denoted by Ai, via modular addition4, indicated by +, on the numbers that the strings represent5.
+The string that represents the resulting number is named with a temporary variable, Ci. The
+names of the two parts are swapped for the next round, so that the modified Ai, i.e., Ci, becomes
+Bi+1, and Bi becomes Ai+1.
+
+The rectangles containing the two parts of the data have different sizes in order to illustrate that,
+u cannot equal v if n is odd. In such cases, the round function is constructed so that the lengths of
+its input and output strings depend on whether the round number index, i, is even or odd.
+
+The Feistel structure for decryption is almost identical to the Feistel structure for encryption.
+There are three differences: 1) the order of the round indices is reversed; 2) the roles of the two
+parts of the data in the round function are swapped as follows: along with n, T, and i, the input to
+FK is Ai+1 (not Bi), and the output is combined with Bi+1 (not Ai) to produce Ai (not Bi+1); and
+3) modular addition (of the output of FK to Ai) is replaced by modular subtraction (of the output
+of FK from Bi +1).
+4.6    Component Functions
+
+This section gives algorithms for the component functions that are called in the specifications of
+                                                                              m
+FF1 and FF3. The conversion functions NUMradix(X), NUM(X), and STR radix(x) are defined in
+Sec. 4.2, including examples, and they are specified in Algorithms 1-3 below. These functions
+support the ordering convention for the numeral [bit] strings in FF1, namely, that the first (i.e.,
+left-most) numeral [bit] of the string is the most-significant numeral [bit].
+
+In FF3, the numeral strings follow the opposite ordering convention, as do the byte strings for the
+                                                m
+block cipher. In order to adapt NUMradix(X), STRradix (x), and CIPHK (X) for the FF3 specifications,
+the functions REV(X) and REVB(X) are defined in Sec. 4.2 and specified in Algorithms 4 and 5.
+
+The PRF(X) function, specified in Algorithm 6, essentially invokes the Cipher Block Chaining
+encryption mode [11] on the input bit string and returns the final block of the ciphertext; this
+function is the pseudorandom core of the Feistel round function for FF1.Encrypt and
+FF1.Decrypt.
+
+In order to simplify the specifications of NUM(X), REVB(X), and PRF(X), the byte or block strings
+in Algorithms 2, 5, and 6 are represented as bit strings.
+
+
+4
+  For some applications of the Feistel structure—but not FF1 and FF3—the + operation may be a different reversible
+operation on strings that preserves their length; for example, the FFX specification [1] supports an option for
+character-wise addition.
+5
+  The ordering convention for interpreting strings as numbers is different for FF3 than for FF1.
+
+                                                       11
+

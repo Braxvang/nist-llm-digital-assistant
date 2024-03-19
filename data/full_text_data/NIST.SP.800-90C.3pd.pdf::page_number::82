@@ -1,0 +1,44 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                         Recommendation for RBG Constructions
+       September 2022
+
+2310   B.4.1. Instantiation of an RBG2 Construction
+2311   The DRBG in the RBG2 construction is instantiated using an Instantiate_function call (see
+2312   Section 2.8.1.1):
+2313       (status) = Instantiate_function (256, prediction_resistance_flag = TRUE, “RBG2 42”).
+2314       •   Since there is only a single instantiation, a state_handle is not used for this example.
+2315       •   Using “prediction_resistance_flag = TRUE”, the RBG is notified that prediction resistance
+2316           may be requested in subsequent Generate_function calls.
+2317       •   The personalization string to be used for this example is “RBG2 42.”
+2318   The entropy for establishing the security strength (s) of the DRBG (i.e., s = 256 bits) is requested
+2319   using the following Get_ES_Bitstring call to the entropy source (see Section 2.8.2.2 and item 2
+2320   in Section 5.2.1):
+2321                           (status, entropy_bitstring) = Get_ES_Bitstring(384),
+2322   where 3s/2 = 384 bits of entropy are requested from the entropy source.
+2323   If status = SUCCESS is returned from the Get_ES_Bitstring call, the HMAC_DRBG is seeded
+2324   using entropy_bitstring, and the personalization_string is “RBG2 42.” The internal state is
+2325   recorded (including the security strength of the instantiation), and status = SUCCESS is returned
+2326   to the consuming application by the Instantiate_function.
+2327   If status = FAILURE is returned from the Get_ES_Bitstring call, then the internal state is not
+2328   created, status = FAILURE and a Null state handle are returned by the Instantiate_function to
+2329   the consuming application, and the RBG cannot be used to generate bits.
+
+2330   B.4.2. Generation in an RBG2 Construction
+2331   Assuming that the RBG has been successfully instantiated (see Appendix B.4.1), pseudorandom
+2332   bits are requested from the RBG by a consuming application using the Generate_function call as
+2333   specified in Section 2.8.1.2:
+2334      (status, returned_bits) = Generate_function(requested_number_of_bits, security_strength,
+2335                            prediction_resistance_request, additional input).
+2336       •   Since there is only a single instantiation of the HMAC_DRBG, a state_handle was not
+2337           returned from the Instantiate_function (see Appendix B.4.1) and is not used during the
+2338           Generate_function call.
+2339       •   The requested_security_strength may be any value that is less than or equal to 256 (the
+2340           instantiated security strength recorded in the HMAC_DRBG’s internal state).
+2341       •   prediction_resistance_request = TRUE if prediction resistance is requested and FALSE
+2342           otherwise.
+2343       •   Additional input is optional.
+2344   If prediction resistance is requested, a reseed of the HMAC_DRBG is requested by the
+2345   Generate_function before the requested bits are generated (see Appendix B.4). If status =
+
+
+                                                        69
+

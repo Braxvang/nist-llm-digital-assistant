@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                             GUIDE TO IPSEC VPNS
+
+
+                                                                                              communications for later decryption using quantum computers. This problem is not unique to
+                                                                                              IKE. Other encryption protocols, such as TLS, suffer from the same problem. It is expected that
+                                                                                              in the near future, quantum-resistant algorithms will be standardized and deployed for IKE, TLS,
+                                                                                              and other protocols. Until then, some deployments of IKE and IPsec might use post-quantum
+                                                                                              pre-shared keys (PPKs) to strengthen the current algorithms against potential future attacks using
+                                                                                              quantum computers.
+
+                                                                                              With the exception of IKEv1 using a very strong PSKs, all IKEv1 and IKEv2 configurations are
+                                                                                              vulnerable to quantum computers. IKEv2 supports PPKs [43] as a countermeasure. For the
+                                                                                              purpose of defending against quantum computers, the PPK works similarly to the PSK in IKEv1
+                                                                                              in that the PPK is mixed into the key derivation process in addition to the DH values. The PPK
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              must be a cryptographically strong random key and is exchanged out of band. PPKs are
+                                                                                              identified by a static or ephemeral PPK Identity. This can be used to protect the identity of the
+                                                                                              connecting clients and facilitate the use of OTPs as the source of the PPK.
+
+                                                                                              IKEv2 allows the gradual migration of a network from not using PPK to using PPK. First, some
+                                                                                              hosts are configured with PPK, and when two hosts both support PPK and have each other’s
+                                                                                              PPK ID with corresponding PPK, the hosts will use the PPK as an additional input to create the
+                                                                                              KEYMAT and SKEYSEED that are used as input to the PRFs that generate the keying material
+                                                                                              for the IKE and IPsec SAs. Once all hosts support PPK, their configurations can be updated to
+                                                                                              mandate PPK.
+
+                                                                                              While this protects the IPsec SAs (since their key material derivation depends on the PPK), the
+                                                                                              initial IKE SA DH process is not protected by the PPK and can still be broken by a quantum
+                                                                                              computer. This will lead to a loss of privacy of the IKE identities and other information
+                                                                                              exchanged during the initial IKE Exchange, such as the traffic selectors used for the first IPsec
+                                                                                              SA. This can be prevented if the IKE implementation allows for setting up a childless IKE SA
+                                                                                              (without IPsec) and then immediately rekeying the IKE SA. This rekeyed IKE SA is protected by
+                                                                                              the PPK, and IPsec SAs can then be set up using this new IKE SA without exposing any
+                                                                                              information to adversaries with quantum computers.
+
+                                                                                              PPKs shall have at least 128 bits of entropy.
+
+                                                                                              3.8   IKE Redirect
+
+                                                                                              The IKE Redirect [44] notify payload allows an IPsec server to send a redirection request to
+                                                                                              connecting or connected VPN clients. This can be used to reduce the load of overloaded IPsec
+                                                                                              servers or to take a server out of use (for instance, to update its operating system). Redirected
+                                                                                              clients must use the same credentials they were originally using before being redirected. A
+                                                                                              redirection message includes an IP address or DNS name of the forwarding VPN that the VPN
+                                                                                              client will need to initiate a connection with.
+
+                                                                                              Redirected messages sent in IKE_AUTH are only processed after both ends have authenticated
+                                                                                              each other. This allows a server to only send specific clients to another server (e.g., all clients of
+                                                                                              a certain customer in a multi-tenant deployment or some individual power users generating a lot
+
+
+
+
+                                                                                                                                                32
+

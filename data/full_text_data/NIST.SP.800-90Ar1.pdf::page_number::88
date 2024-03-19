@@ -1,0 +1,42 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+           2.1    V = internal_state (state_handle).V.
+           2.2    Key = internal_state (state_handle).Key.
+           2.3    security_strength = internal_state (state_handle).security_strength.
+           2.4    reseed_counter = internal_state (state_handle).reseed_counter.
+                                             Comment: Check the validity of the rest of the input
+                                             parameters.
+       3. If (requested_no_of_bits > 7500), then Return (“Too many bits requested”, Null).
+       4. If (requested_security_strength > security_strength), then Return (“Invalid
+          requested_security_strength”, Null).
+                                             Comment: Invoke the generate algorithm.
+       5. (status, pseudorandom_bits, V, Key, reseed_counter) =
+          HMAC_DRBG_Generate_algorithm (V, Key, reseed_counter,
+          requested_number_of_bits).
+       6. If (status = “Reseed required”), then Return (“DRBG can no longer be used. A new
+          instantiation is required”, Null).
+       7. Update the changed state values.
+           7.1 internal_state (state_handle).V = V.
+           7.2 internal_state (state_handle).Key = Key.
+           7.3 internal_state (state_handle).reseed_counter = reseed_counter.
+       8. Return (“Success”, pseudorandom_bits).
+HMAC_DRBG_Generate_algorithm:
+   Input: bitstring (V, Key), integer (reseed_counter, requested_number_of_bits).
+   Output: string status, bitstring (pseudorandom_bits, V, Key), integer reseed_counter.
+   Process:
+       1   If (reseed_counter ≥ 10 000), then Return (“Reseed required”, Null, V, Key,
+           reseed_counter).
+       2. temp = Null.
+       3   While (len (temp) < requested_no_of_bits) do:
+           3.1   V = HMAC (Key, V).
+           3.2   temp = temp || V.
+       4. pseudorandom_bits = leftmost (temp, requested_no_of_bits).
+       5. (Key, V) = HMAC_DRBG_Update (Null, Key, V).
+       6. reseed_counter = reseed_counter + 1.
+       7. Return (“Success”, pseudorandom_bits, V, Key, reseed_counter).
+
+
+                                                79
+

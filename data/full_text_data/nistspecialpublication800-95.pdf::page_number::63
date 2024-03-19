@@ -1,0 +1,59 @@
+                                                                             GUIDE TO SECURE WEB SERVICES
+
+
+
+3.5.4.2 Using XACML
+
+XACML does not have the inherent ability to control access to anything. It is used to provide an access
+control policy and to determine whether or not a requested action is allowed. The policy and requested
+action can be anything from read-access of a particular element in an XML file to a request for entry
+through a physical door. When using XACML in a Web service or Web application, it is important to
+understand that the application itself must be the PEP. All requests for information from the client or
+requester service must be translated into an access request. In many implementations, XACML is used
+solely for authentication, in which case only the authentication request needs to be translated while all
+subsequent requests would be allowed. As mentioned earlier, the PEP needs to send XACML requests to
+the PDP. The PDP will take the XACML request and determine the appropriate XACML response to
+send to the PEP, which will then grant or deny the request.
+
+Because there is no mechanism for transmitting XACML over a network in the XACML specification,
+SAML is traditionally used to transmit requests, responses, and attributes over a network. SAML was
+designed for the secure exchange of authentication and authorization information, but not for performing
+the actual decisions. This makes it a perfect match for transmitting XACML information over a network.
+The PEP converts the XACML request into a SAML query and sends it to the PDP. The PDP converts
+the SAML query into an XACML request and processes the request against the XACML policy. The
+XACML response is converted into a SAML response and sent back to the PEP, which converts it back
+into an XACML response. SAML does not provide message confidentiality—only message integrity. If
+any of the data being transmitted is sensitive, it must be transmitted using SSL/TLS or WS-Security. If
+the SAML protocol is being used without SSL/TLS, all SAML messages must be signed appropriately.
+
+The XACML v2.0 specification only supports a configuration where the PDP and PEP are on the same
+system. There is no standard specified for transmitting XACML policies, requests, or responses over a
+network. SAML is designed for the secure transmission of security attributes, which are used by
+XACML to determine whether or not to grant access. To this end, SAML v2.0 includes an XACML
+binding.
+
+Because XACML can be used over a variety of languages and platforms, tools for generating XACML
+policies can be used for any application and platform that supports XACML, unlike current policy
+generators that only work with a specific application.
+
+3.5.5   Role of XML Schema in Implementing Access Control
+
+While not developed specifically for access control, XML schemas can be effective for controlling access
+to Web services. XML parsing libraries often support validating XML documents against a defined XML
+Schema. Because XML Schemas can rigidly define the types of data and format of XML elements, they
+can be used to prevent the Web service from processing invalid requests. For example, the SOAP XML
+Schema could be modified by a Web service developer to only allow portTypes that match a particular
+regular expression. All other requests would not pass through the XML validator and would not reach the
+Web service. In addition, the XML parser could be configured to use a different XML Schema based on
+the identity of the remote Web service, which would not require the developer to implement the necessary
+authorization functionality in the Web service itself. In fact, use of XML Schema-based access control
+could prove to be more powerful than programmatic access control since many malicious SOAP requests
+would not reach the application code. One of the drawbacks of using XML Schema validation for access
+control is that it could put a heavy load on the system, because Schema validation is processor-intensive;
+this could lead to a degradation of service.
+
+
+
+
+                                                  3-28
+

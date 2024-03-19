@@ -1,0 +1,55 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                 Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                    PIV Card Application Card Command Interface
+
+1107   Appendix A. Examples of the Use of the GENERAL AUTHENTICATE Command
+
+1108   A.1.     Authentication of the PIV Card Application Administrator
+1109   The PIV Card Application Administrator is authenticated by the PIV Card Application using a
+1110   challenge-response protocol. A challenge retrieved from the PIV Card Application is encrypted
+1111   by the client application and returned to the PIV Card Application associated with key reference
+1112   '9B', which is the key reference of the PIV Card Application Administration key. The PIV Card
+1113   Application decrypts the response using this reference data and the algorithm associated with the
+1114   key reference (e.g., AES-128 – ECB, algorithm identifier '08'). If this decrypted value matches
+1115   the previously provided challenge, then the security status indicator of the PIV Card Application
+1116   Administration key is set to TRUE within the PIV Card Application.
+1117   Table 22 shows the GENERAL AUTHENTICATE card commands sent to the PIV Card
+1118   Application to realize this particular challenge-response protocol.
+1119                          Table 22. Authentication of PIV Card Application Administrator
+
+                        Command                         Response                           Comment
+              '00 87 08 9B 04 7C 02 81 00                                    The client application requests a
+              00'                                                            challenge from the PIV Card
+                                                                             Application.
+                                              '7C 0A 81 08 01 02 03 04 05    The challenge ('01 02 03 04 05 06
+                                              06 07 08 90 00'                07 08') returned to client application
+                                                                             by the PIV Card Application.
+              '00 87 08 9B 0C 7C 0A 82 08                                    The client application returns the
+              88 77 66 55 44 33 22 11'                                       encryption of the challenge ('88 77
+                                                                             66 55 44 33 22 11') referencing
+                                                                             algorithm '08' and key reference '9B'
+                                                                             [SP800-78, Tables 8 and 9].
+                                              '90 00'                        The PIV Card Application indicates
+                                                                             successful authentication of PIV
+                                                                             Card Application Administrator after
+                                                                             decrypting '88 77 66 55 44 33 22 11'
+                                                                             using the referenced algorithm and
+                                                                             key and getting '01 02 03 04 05 06
+                                                                             07 08'.
+
+
+1120   A.2.     Mutual Authentication of Client Application and Card Application
+1121   The PIV Card Application Administrator and the PIV Card Application authenticate each other
+1122   using a challenge-response protocol. A witness retrieved from the PIV Card Application is
+1123   decrypted by the client application and returned to the PIV Card Application associated with key
+1124   reference '9B', the key reference of the PIV Card Application Administration key. The command
+1125   includes the decrypted witness and a challenge for the PIV Card Application. The PIV Card
+1126   Application verifies that the decrypted witness matches the value that it encrypted to create the
+1127   witness. If it does, then the security status indicator of the PIV Card Application Administration
+1128   key is set to TRUE within the PIV Card Application, and the PIV Card Application encrypts the
+1129   challenge that it received from the client application and returns the result. The witness and
+1130   challenge are encrypted and decrypted using the same the key and algorithm. Table 23 shows the
+
+
+
+                                                              40
+

@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-189                                            RESILIENT INTERDOMAIN TRAFFIC EXCHANGE:
+                                                                                                                                                                BGP SECURITY & DDOS MITIGATION
+
+                                                                                             The various types of unauthorized prefix originations described above are called prefix hijacks or
+                                                                                             false origin announcements. The unauthorized announcement of a prefix longer than the
+                                                                                             legitimate announcement is called a sub-prefix hijack. The consequences of such adverse actions
+                                                                                             can be serious and include denial-of-service, eavesdropping, misdirection to imposter servers (to
+                                                                                             steal login credentials or inject malware), or defeat of IP reputation systems to launch spam
+                                                                                             email. There have been numerous incidents involving prefix hijacks in recent years. There are
+                                                                                             several commercial services and research projects that track and log anomalies in the global BGP
+                                                                                             routing system [BGPmon] [ThousandEyes] [BGPStream] [ARTEMIS]. Many of these sites
+                                                                                             provide detailed forensic analyses of observed attack scenarios.
+
+                                                                                             2.2   AS Path Modification
+
+                                                                                             BGP messages carry a sequence of AS numbers that indicates the “path” of interconnected
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-189
+
+
+
+
+                                                                                             networks over which data will flow. This “AS_PATH” [RFC4271] data is often used to
+                                                                                             implement routing policies that reflect the business agreements and peering policies that have
+                                                                                             been negotiated between networks. BGP is also vulnerable to modification of the AS_PATH
+                                                                                             information that it conveys. As an example, a malicious AS which receives a BGP update may
+                                                                                             illegitimately remove some of the preceding ASes in the AS_PATH attribute of the update to
+                                                                                             make the path length seem shorter. When the update modified in this manner is propagated, the
+                                                                                             ASes upstream can be deceived to believe that the path to the advertised prefix via the adversary
+                                                                                             AS is shorter. By doing this, the adversary AS may seek to illegitimately increase its revenue
+                                                                                             from its customers, or may be able to eavesdrop on traffic that would otherwise not transit
+                                                                                             through their AS.
+
+                                                                                             Another example of maliciously modifying a BGP update is when an adversary AS replaces a
+                                                                                             prefix in a received update with a more-specific prefix (subsumed by the prefix) and then
+                                                                                             forwards the update to neighbors. This attack is known as a Kapela-Pilosov attack [Kapela-
+                                                                                             Pilosov]. Only the prefix is replaced by a more-specific prefix, but the AS path is not altered. In
+                                                                                             BGP path selection, a more-specific prefix advertisement wins over a less-specific prefix
+                                                                                             advertisement. This means that ASes on the internet would widely accept and use the adversary
+                                                                                             AS’s advertisement for the more-specific prefix. The exceptions are the ASes that are in the AS
+                                                                                             path from the adversary to the prefix. These exception ASes reject any advertisements that they
+                                                                                             may receive for the more-specific prefix because they detect their own AS number in the AS
+                                                                                             path. This is called avoidance of loop detection and is a standard practice in BGP. Thus, the data
+                                                                                             path from the adversary AS to the prefix (i.e., the network in consideration) remains intact (i.e.,
+                                                                                             unaffected by the malicious more-specific advertisement). The net result of this attack is very
+                                                                                             serious. The adversary would be able to force almost all traffic for the more-specific prefix to be
+                                                                                             routed via their AS. Thus, they can eavesdrop on the data (destined for the more-specific prefix)
+                                                                                             while channeling it back to the legitimate destination to avoid detection.
+
+                                                                                             2.3   Route Leaks
+
+                                                                                             Previously, it was noted that the interconnections of networks on the internet are dictated by
+                                                                                             contracted business relationships that express the policies and procedures for the exchange of
+                                                                                             control and data traffic at each point of interconnection. Such peering policies often specify
+                                                                                             limits on what routing announcements will be accepted by each party. Often these policies reflect
+                                                                                             a customer, transit provider, and/or lateral peer business relationship between networks.
+
+                                                                                                                                              4
+

@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                   GUIDE TO IPSEC VPNS
+
+
+                                                                                              6        Troubleshooting IPsec VPNs
+
+                                                                                              This section provides information on troubleshooting IPsec VPNs.
+
+                                                                                              6.1      IKE Policy Exceptions
+
+                                                                                              Some IKE and IPsec interactions need careful attention to prevent the two subsystems from
+                                                                                              interfering with each other. Usually, these are handled by the IKE implementation. If an IPsec
+                                                                                              implementation insisted that all communication between two hosts be encrypted with IPsec,
+                                                                                              those two hosts would never be able to send non-IPsec packets, including IKE packets. Without
+                                                                                              allowing IKE packets, no IPsec SA can be negotiated and installed, and the two hosts would
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              never be able to communicate. Similarly, if one host crashes and restarts, it needs to be able to
+                                                                                              send IKE packets that are not IPsec-encrypted, yet the remote endpoint still has a policy that only
+                                                                                              allows encrypted traffic to be received.
+
+                                                                                              To work around this, IPsec implements a policy exception for UDP port 500 and 4500 packets
+                                                                                              and will skip processing these via the regular SPD processing. If the kernel does not override
+                                                                                              IKE packets for IPsec processing, the IKE daemon needs to have a policy specifically for the
+                                                                                              IKE ports used with the highest preference—higher than the IPsec SA processing policy
+                                                                                              preference. If TCP is used, UDP ports 500 and 4500 also need to have such a policy exception.
+                                                                                              Practically all IKE daemons perform this task on startup.
+
+                                                                                              6.2      IPv6 Neighbor Discovery Policy Exception
+
+                                                                                              A more subtle requirement is the need to exclude IPv6 neighbor discovery. If two hosts in the
+                                                                                              same subnet have established an IPsec SA over IPv6, and one of these hosts crashes and reboots,
+                                                                                              that host will send an unencrypted neighbor host discovery ICMP packet in an attempt to find the
+                                                                                              other host on the local network. If the host that did not crash drops the unencrypted ICMP
+                                                                                              packet, the two hosts will not be able to set up a new IPsec SA. If the host that did not crash
+                                                                                              performs DPD, it might find out in a few minutes that it needs to renegotiate the IPsec SA.
+                                                                                              Otherwise, communication will be blocked until the IPsec SA rekey or expiry timer runs out.
+                                                                                              This could be an outage that lasts anywhere from 1-8 hours. Unfortunately, not all IKE daemons
+                                                                                              and IPsec implementations install the IPv6 neighbor discovery policy exception. The
+                                                                                              recommendation is to test this scenario when using a new IKE/IPsec implementation. 45
+
+                                                                                              If a kernel receives a packet with an SPI for which it has no IPsec SA, it can send a message to
+                                                                                              the IKE process containing the IP address of the host that sent the IPsec packet. Such an IKE
+                                                                                              process may be able to recognize the peer based on its (static) IP address and initiate a new IKE
+                                                                                              exchange to try to set up a new IPsec SA that replaces the obsoleted IPsec SA on the host that
+                                                                                              did not crash. Not all kernels implement this mechanism to inform the IKE process.
+
+
+
+
+                                                                                              45    To emulate rather than actually crash a host, it is enough to send the IKE daemon a KILL signal, preventing it from telling
+                                                                                                    the other side that it is shutting down and then restarting the IKE service.
+
+
+
+                                                                                                                                                              55
+

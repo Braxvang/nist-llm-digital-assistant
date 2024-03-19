@@ -1,0 +1,48 @@
+To prove that the server is actually the owner of the public key (called the public host key
+in the protocol), the server generates a digital signature using its private key (called the
+private host key in the protocol) on H (i.e., data that is known by both the client and the
+server). If the client can verify the digital signature using the public host key, then the
+client has assurance that the server is the owner of the public key. However, the identity
+of the server has not been verified unless the public host key is verified by the client
+before the signature on H is verified.
+
+Verifying the public host key is performed by 1) comparing the server name and its
+public host key against a database of trusted server names and public host keys, or 2)
+using the public host key certificate (i.e., the server’s public key certificate), or 3) using
+an out-of-band verification method using DNSSEC upon initiating SSH TLP46. A
+verification of the association between the public host key and the server name is
+essential to the security of the SSH connection. If the connection is not verified, then the
+connection is subject to a man-in-the-middle attack; details of this vulnerability are
+addressed in [RFC 4251]. Therefore, the association of a public host key (i.e., the server’s
+key) to a server name shall be verified for every TLP session, and the TLP shall fail if
+the verification fails.
+          When the first method of server authentication is used, and it is the only method
+           available for the client, the protocol shall continue only when a match is found.
+           Note that the protocol does not explicitly require the connection to fail when the
+           public host key is not verified, however; this Recommendation requires a
+           discontinuation of the protocol in this case.
+          For the second method, the TLP specified in [RFC 4253] allows the client to
+           either a) accept the presented public key certificate without verification of the
+           association between the public key and the server name, or b) verify the certificate
+           and continue only if the public host key is verified (see Section 2 for details on
+           how to verify a public key in a public key certificate). For Federal Government
+           use, option b) shall be used; that is, when this second method is used, the protocol
+           shall not continue unless the server’s certificate has been successfully verified.
+          When an out-of-band verification method using DNSSEC is used (method three),
+           the server’s identity and public key shall not be accepted unless the fingerprint
+           (hash value) of the public host key matches a fingerprint of the public key in the
+           “SSHFP” resource record(s) of the server. “SSHFP” resource record(s) shall be
+           verified before the fingerprint is accepted as a legitimate fingerprint. See [RFC
+           4255] for details about this method.
+Other server-authentication methods may be defined later for the protocol.
+It is important to note that the key exchange specified in [RFC 4253, Sec. 8] contains a
+Diffie-Hellman primitive specified in [SP 800-56A] that generates a shared secret. In [SP
+800-56A], a complete key-agreement scheme contains a specific key-derivation method
+(e.g., a key-derivation function) that uses the shared secret to derive keying material. In
+SSH, the shared secret is provided, instead, to the key-derivation function specified in
+
+46
+     Details of the DNSSEC can be found in [RFC 4255].
+
+                                                   66
+

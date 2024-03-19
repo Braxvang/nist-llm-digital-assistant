@@ -1,0 +1,58 @@
+                                                                                                NIST SP 800-126 REV. 3                                     THE TECHNICAL SPECIFICATION FOR SCAP VERSION 1.3
+
+
+
+                                                                                               specifications do not formally define how to designate a particular data stream, benchmark, etc. in these
+                                                                                               cases, it is expected that products will implement these capabilities in a proprietary way.
+
+                                                                                               4.3     XCCDF Processing
+                                                                                               The following requirements and recommendations pertain to content consumers processing XCCDF
+                                                                                               benchmark and tailoring components from an SCAP source data stream.
+
+                                                                                               4.3.1     CPE Applicability Processing
+                                                                                               CPEs referenced in an <xccdf:platform> element directly or by a <cpe2:fact-ref> contained
+                                                                                               within a referenced <cpe2:platform-specification> element SHALL be evaluated as follows
+                                                                                               to determine their presence on a machine:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-126r3
+
+
+
+
+                                                                                                     1. The CPE SHALL be matched against all CPEs in all of the dictionaries referenced by the
+                                                                                                        <ds:data-stream> element. All CPEs that return an EQUAL or SUPERSET result as
+                                                                                                        defined in CPE Name Matching [CPE-M] SHALL be used in evaluating the
+                                                                                                        <xccdf:platform> or <cpe2:fact-ref>.
+                                                                                                     2. Either a list of CPEs found on the target asset SHALL be known before the scan, or a list SHALL
+                                                                                                        be generated. If a previously known list is used, it SHALL be equivalent to a newly generated list.
+                                                                                                        To generate the list, the <cpe2_dict:check> element data associated with the found
+                                                                                                        <cpe2_dict:cpe-item> elements SHALL be evaluated against the target using the
+                                                                                                        referenced OVAL inventory class definition. If a <cpe2_dict:check> returns “pass”, then
+                                                                                                        the corresponding CPE SHALL be added to the list of CPEs found on the target.
+                                                                                                     3. The list of CPEs found on the target asset, along with the <xccdf:platform> or
+                                                                                                        <cpe2:platform-specification> SHALL be used as input to the CPE Applicability
+                                                                                                        Language [CPE-L] algorithm to determine the XCCDF Benchmark applicability to the target
+                                                                                                        asset.
+
+                                                                                               4.3.2     Checking System Usage
+                                                                                               If an XCCDF component has multiple <xccdf:check-content-ref> elements, then check
+                                                                                               processing SHALL be performed according to [XCCDF:7.2.3.5.1] with the following changes:
+                                                                                                     1. For each <xccdf:check-content-ref> element, a content consumer either SHALL
+                                                                                                        attempt to retrieve the document referenced by the <ds:component-ref> element that is
+                                                                                                        referenced directly by the <xccdf:check-content-ref> element’s @href attribute, or it
+                                                                                                        SHALL resolve the @href attribute within the context of the XML Catalog specified as part of
+                                                                                                        the <ds:component-ref> element used to reference this benchmark. If not resolvable, the
+                                                                                                        next available <xccdf:check-content-ref> element SHALL be evaluated. If none of the
+                                                                                                        <xccdf:check-content-ref> elements are resolvable, then the result of the rule
+                                                                                                        evaluation SHALL be the XCCDF “notchecked” status and processing of the check SHALL end.
+                                                                                                     2. Once a resolvable <xccdf:check-content-ref> element is found, then checking system
+                                                                                                        processing SHALL proceed. When evaluating a rule, an <xccdf:rule-
+                                                                                                        result/xccdf:message> with the @severity attribute value of “info” SHALL be
+                                                                                                        generated, indicating the <xccdf:check-content-ref> @href attribute and @name
+                                                                                                        attribute, if provided.
+                                                                                               Content consumers SHALL implement checking systems supported by SCAP as defined in Section
+                                                                                               3.2.4.2. Content consumers MAY implement checking systems that are not supported by SCAP. If a tool
+
+
+
+                                                                                                                                                    31
+

@@ -1,0 +1,58 @@
+                                                         SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+
+    •   Wait the TTL of the zone’s DNSKEY RRset.
+
+    •   Remove the old, outgoing ZSK from the DNSKEY RRset to reduce the size of the DNSKEY RRset in
+        responses.
+
+    •   Re-sign the DNSKEY RRSet with the new ZSK.
+It might be in the DNS administrator’s best interest to perform a ZSK rollover continuously. The
+administrator can perform the first three steps and wait indefinitely before deleting the old DNSKEY
+from the key set, even continuing to sign the zone with the old DNSKEY when the RRSIGs in the zone
+expire. This procedure allows the administrator to perform an emergency key rollover more efficiently
+(see below).
+
+
+Zones that pre-publish the new public key should observe the following:
+
+Checklist item 31: The secure zone that pre-publishes its public key should do so at least one TTL period
+before the time of the key rollover.
+
+Checklist item 32: After removing the old public key, the zone should generate a new signature (RRSIG
+RR), based on the remaining keys (DNSKEY RRs) in the zone file.
+
+
+In rolling over the KSK, the secure zone may not know which resolvers have stored the public key as a
+trust anchor. If the network administrator has an out-of-band method of contacting resolver administrators
+that have stored the public key as a trust anchor (such as e-mail), the network administrator should send
+out appropriate warnings and set up a trusted means of disseminating the new trust anchor. Otherwise, the
+DNS administrator can do nothing except pre-publish the new KSK with ample time to give resolver
+administrators enough time to learn the new KSK.
+
+11.2.2 Key Rollover in a Chained Secure Zone
+
+A globally secure zone uses two sets of keys: the ZSK and the KSK.
+
+11.2.3 ZSK Key Rollover in a Chained Secure Zone
+
+The operations involved in a ZSK rollover in a globally secure zone are no different from those in a ZSK
+key rollover in a locally secure zone. (See Section 11.2.)
+
+11.2.4 KSK Key Rollover in a Chained Secure Zone (Manually without Revoke Bit)
+
+The KSK (KSK-public) is the key for which the secure parent of a secure zone provides trust. It provides
+this trust by using a new RR type called the DS RR, which contains the hash of the child’s KSK. The
+delegating parent signs this DS RR with its own ZSK. When a zone changes its KSK, the trust
+relationship between itself and its parent will be broken. To maintain this trust relationship, the zone
+making the KSK rollover must:
+
+    •   Generate a new KSK and add it to the zone key set
+
+    •   Sign the zone key set with the new KSK as well as the old KSK (the key about to expire)
+
+
+                                                  11-3
+

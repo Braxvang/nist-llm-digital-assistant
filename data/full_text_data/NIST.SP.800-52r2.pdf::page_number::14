@@ -1,0 +1,54 @@
+NIST SP 800-52 REV. 2                                           GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+symmetric keys and establish other session parameters, such as extensions. The negotiated set of
+cryptographic algorithms is called the cipher suite.
+
+Alerts are used to convey information about the session, such as errors or warnings. For example,
+an alert can be used to signal a decryption error (decrypt_error) or that access has been denied
+(access_denied). Some alerts are used for warnings, and others are considered fatal and lead to
+immediate termination of the session. A close_notify alert message is used to signal the normal
+termination of a session. Like all other messages after the handshake protocol is completed, alert
+messages are encrypted (and optionally compressed in TLS versions prior to TLS 1.3).
+
+Details of the handshake, change cipher spec (in TLS versions prior to 1.3), and alert protocols
+are outside the scope of these guidelines; they are described in RFC 5246 [25] and RFC 8446
+[57].
+
+2.2   Shared Secret Negotiation
+
+The client and server establish keying material during the TLS handshake protocol. The
+derivation of the premaster secret depends on the key exchange method that is agreed upon and
+the version of TLS used. For example, when Diffie-Hellman is used as the key-exchange
+algorithm in TLS 1.2 and earlier versions, the client and server send each other their parameters,
+which are then used to compute the premaster secret. The premaster secret, along with random
+values exchanged by the client and server in the hello messages, is used in a pseudorandom
+function (PRF) to compute the master secret. In TLS 1.3, the master secret is derived by
+iteratively invoking an extract-then-expand function with previously derived secrets. The master
+secret is used to derive session keys, which are used by the negotiated security services to protect
+the data exchanged between the client and the server, thus providing a secure channel for the
+client and the server to communicate.
+
+The establishment of these secrets is secure against eavesdroppers. When the TLS protocol is
+used in accordance with these guidelines, the application data, as well as the secrets, are not
+vulnerable to attackers who place themselves in the middle of the connection. The attacker
+cannot modify the handshake messages without being detected by the client and the server
+because the Finished message, which is exchanged after security parameter establishment,
+provides integrity protection for the entire exchange. In other words, an attacker cannot modify
+or downgrade the security of the connection by placing itself in the middle of the negotiation.
+
+2.3   Confidentiality
+
+Confidentiality is provided for a communication session by the negotiated encryption algorithm
+for the cipher suite and the encryption keys derived from the master secret and random values,
+one for encryption by the client (the client write key) and another for encryption by the server
+(the server write key). The sender of a message (client or server) encrypts the message using the
+appropriate derived encryption key; the receiver uses the same (independently derived) key to
+decrypt the message. Both the client and server know these keys and decrypt the messages using
+the same key that was used for encryption.
+
+
+
+
+                                                 5
+

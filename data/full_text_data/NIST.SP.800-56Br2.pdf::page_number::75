@@ -1,0 +1,47 @@
+                                                                                               NIST SP 800-56B REV. 2                                     RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                               USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                               7.2.1.3 RSASVE Recovery Operation (RSASVE.RECOVER)
+                                                                                               RSASVE.RECOVER recovers a secret value from ciphertext using an RSA private key. Once
+                                                                                               recovered, the secret value is considered to be a shared secret.
+                                                                                               Function call:
+                                                                                               RSASVE.RECOVER((n, d), C)
+                                                                                               Input:
+                                                                                                      1. (n, d): an RSA private key.
+                                                                                                      2. C: the ciphertext; a byte string of nLen bytes.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                               Assumptions: The RSA private key is part of a valid key pair.
+                                                                                               Process:
+                                                                                                      1. nLen = len(n)/8, the byte length of n.
+                                                                                                      2. Length checking:
+                                                                                                          If the length of the ciphertext C is not nLen bytes in length, output an indication of a
+                                                                                                          decryption error, and exit without further processing.
+                                                                                                      3. RSA decryption:
+                                                                                                               a. Convert the ciphertext C to an integer ciphertext c (see Appendix B.2):
+                                                                                                                                                          c = BS2I(C).
+                                                                                                               b. Apply the RSADP decryption primitive (see Section 7.1.2) to the ciphertext c using
+                                                                                                                  the private key (n, d) to produce an integer z:
+                                                                                                                                                    z = RSADP((n, d), c). 23
+                                                                                                               c. If RSADP indicates that the ciphertext is out of range, output an indication of a
+                                                                                                                  decryption error, and exit without further processing.
+                                                                                                               d. Convert the integer z to a byte string Z of nLen bytes (see Appendix B.1):
+                                                                                                                                                Z = I2BS(z, nLen).
+                                                                                                      4. Output the string Z as the secret value (i.e., the shared secret), or an error indicator.
+                                                                                               Output:
+                                                                                                          Z: the secret value/shared secret (a byte string of nLen bytes), or an error indicator.
+                                                                                               Note:
+                                                                                                      Care should be taken to ensure that an implementation does not reveal information about the
+                                                                                                      encapsulated secret value (i.e., the value of the integer z or its byte string equivalent Z). For
+                                                                                                      instance, the observable behavior of the I2BS routine should not reveal even partial
+
+                                                                                               23
+                                                                                                    When the private key is represented in the prime-factor or CRT format, appropriate changes are discussed in
+                                                                                                    Section 7.1.2.
+
+                                                                                                                                                          65
+

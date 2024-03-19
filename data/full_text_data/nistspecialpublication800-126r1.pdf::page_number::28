@@ -1,0 +1,58 @@
+                 The Technical Specification for the Security Content Automation Protocol (SCAP): SCAP Version 1.1
+
+
+
+      2. The <cpe_dict:check> element data associated with the identified <cpe_dict:cpe-
+         item> element SHALL be evaluated using the referenced CPE inventory data stream component
+         within the same data stream.
+
+      3. The result of evaluation SHALL be handled according to Section 4.7.3 of this document, with a
+         result of ―pass‖ indicating that the CPE Name was found on the machine.
+
+4.5     Check System Usage
+
+In XCCDF content, if multiple <xccdf:check-content-ref> elements are provided, then the
+following evaluation method SHALL be performed:
+
+      1. Evaluate each <xccdf:check-content-ref> element in the order that it appears in the
+         <xccdf:check> element. The first resolvable <xccdf:check-content-ref> element
+         SHALL be used to determine the <xccdf:Rule> status.
+
+      2. For each <xccdf:check-content-ref> element, a product will attempt to retrieve the
+         document referenced by the @href attribute. If not resolvable, the next available
+         <xccdf:check-content-ref> element SHALL be evaluated. If none of the
+         <xccdf:check-content-ref> elements are resolvable, then the result of the rule
+         evaluation SHALL be the XCCDF ―unchecked‖ status and processing of the <xccdf:Rule>
+         SHALL end. Please note that it is acceptable to map a remote URL to a local copy of the file in
+         cases where remote access is not available, not allowed, or not practical.
+
+      3. Once a resolvable <xccdf:check-content-ref> element is found, then check system
+         processing SHALL proceed. When evaluating a rule, an <xccdf:rule-
+         result/xccdf:message> with the @severity attribute value of ―info‖ SHALL be
+         generated, indicating the <xccdf:check-content-ref> @href and @name, if provided.
+
+Use of XCCDF check systems as specified in the <xccdf:check> element‘s @system attribute
+SHALL be restricted as follows:
+
+      1. SCAP scanning products SHALL implement the SCAP supported check systems that are required
+         for the SCAP capability or capabilities that the products offer. The SCAP supported check
+         systems are:
+
+           i.   OVAL check system. Use of the OVAL check system SHALL be indicated by the
+                http://oval.mitre.org/XMLSchema/oval-definitions-5 system identifier.
+
+          ii.   OCIL check system. Use of the OCIL check system SHALL be indicated by the
+                http://scap.nist.gov/schema/ocil/2 system identifier.
+
+      2. SCAP scanning tools MAY implement check systems that are not supported by SCAP.
+
+      3. Evaluation of an <xccdf:check> containing a reference to a non-SCAP check system SHALL
+         produce an ―unchecked‖ result if an SCAP scanning product does not implement the check
+         system.
+
+An <xccdf:check-content-ref> element may omit the @name attribute only for a patches up-to-
+date rule (see Section 3.2.6.4). When processing a patches-up-to-date rule, only OVAL patch class
+
+
+                                                        22
+

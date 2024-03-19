@@ -1,0 +1,55 @@
+               The Technical Specification for the Security Content Automation Protocol (SCAP): SCAP Version 1.2
+
+
+
+       iv. Use of the @name attribute in the <xccdf:check-content-ref> element is
+           OPTIONAL. If present, it MUST reference an OCIL questionnaire in the designated OCIL
+           source data stream component, otherwise see Section 4.5.2 for information on use of the
+           @multi-check attribute.
+        v. Follow the additional requirements in Appendix B of NIST Interagency Report (IR) 7692,
+           Specifications for the Open Checklist Interactive Language (OCIL) Version 2.0 [OCIL].
+If a check system that is not supported by SCAP is used in XCCDF content, this content SHALL NOT be
+considered well-formed with regards to SCAP.
+
+3.2.4.3 Use of a Patches Up-To-Date Rule
+An OVAL source data stream component MAY be used to represent a series of checks to verify that
+patches have been installed. Historically, an XCCDF convention has been used to identify such a
+reference. An XCCDF benchmark MAY include a patches up-to-date rule that MUST reference an
+OVAL source data stream component. When implementing a patches up-to-date XCCDF rule, the
+following approach SHALL be used:
+    1. The source data stream MUST include the OVAL source data stream component referenced by
+       the patches up-to-date rule, which contains one or more OVAL patch class definitions.
+    2. The <xccdf:Rule> element that references an OVAL source data stream component SHALL
+       have the @id attribute value of “xccdf_NAMESPACE_rule_security_patches_up_to_date”, where
+       NAMESPACE is the reverse DNS format namespace associated with the content maintainer.
+    3. Each <xccdf:check-content-ref> element SHALL omit the @name attribute.
+    4. The @multi-check attribute of the <xccdf:check> element SHOULD be set to “true”.
+       This causes a separate <xccdf:rule-result> to be generated for each OVAL Definition.
+       See Section 4.5.2 for more information.
+Here is a patches up-to-date rule example:
+
+<xccdf:Rule
+   id="xccdf_gov.nist.fdcc.xp_rule_security_patches_up_to_date"
+   selected="true">
+   <xccdf:title>Security Patches Up-To-Date</xccdf:title>
+   <xccdf:description>Keep systems up to current patch levels
+   </xccdf:description>
+   <xccdf:check system="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+      multi-check="true">
+      <xccdf:check-content-ref href="scap-win2000-patches.xml"/>
+   </xccdf:check>
+</xccdf:Rule>
+
+3.2.4.4 CVSS and CCSS Scores
+SCAP 1.0 required the inclusion of static CVSS scores in XCCDF vulnerability-related rules. However,
+CVSS base scores sometimes change over time, such as when more information is available about a
+particular vulnerability, and CVSS temporal and environmental scores are intended to change to reflect
+current threats, security controls, and other factors. During scoring, current CVSS scores acquired
+dynamically, such as from a data feed, SHOULD be used in place of the @weight attribute within
+XCCDF vulnerability-related rules. Section 3.8 contains additional requirements for CVSS usage.
+CCSS scores are more stable than CVSS scores, but they still may change over time. Accordingly, during
+scoring, current CCSS scores acquired dynamically, such as from a data feed, MAY be used in place of
+
+
+                                                      22
+

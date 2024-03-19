@@ -1,0 +1,47 @@
+NIST SP 800-207A                                              ZTA Model for Access Control in Cloud-Native
+September 2023                                                  Applications in Multi-Location Environments
+
+
+        shows these in the context of the application infrastructure and the example policies that
+        cover traffic flows from Service 1 to Service 2.
+
+                           selector:
+         matchLabels:
+            app: service-2
+      action: ALLOW
+      rules:
+      - from:
+         - source:
+               principals: ["cluster.local/ns/service-1/sa/service-1"]
+         to:
+         - operation:
+               ports: ["443"]
+               methods: ["GET"]
+               paths: ["/public"]
+
+
+ Fig. 4. An example authorization policy in a Service mesh that allows Service 1 to Service 2 on port 443
+                 but only allows it to execute the GET HTTP verb on the “/public” path
+
+This simple example shows some of the advanced capabilities that identity-tier policies can
+achieve by limiting access based on the application request context. Specifically, this policy
+limits the application actions to a single HTTP verb on a specific path, but a much more
+sophisticated policy can be implemented as well. See [2] and [3] for detailed overviews.
+
+        Another Application Infrastructure Scenario
+Consider another common application scenario in which there is an internal (i.e., within a cluster
+in the enterprise data center) three-tier application. This application is accessed from outside
+(through a mobile app or website) through a DMZ. This scenario consists of edge gateways
+present in the DMZ — an ingress gateway and an egress gateway at the entrance and exit points
+to and from the data center with firewalls at either side of the gateways. Each of the services that
+represent the front end and back end (application logic) of the three-tier application have to have
+a sidecar proxy to enforce policies that pertain to inter-service call requests. This scenario
+requires the definition and deployment of a combination of network-tier and identity-tier policies
+that span the various types of gateways and sidecar proxies. Deploying policies at these multiple
+locations requires an enterprise-level infrastructure that plays the role of a global control plane,
+as described in Section 2.1. This is designated as a central coordination infrastructure, as shown
+in Fig. 5.
+
+
+                                                   15
+

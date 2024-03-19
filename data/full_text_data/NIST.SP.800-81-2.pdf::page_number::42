@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+NSEC3 RR option for providing authenticated denial of existence. For internal DNS, something like split-
+DNS (see Section 7.2.8) could be deployed. For a discussion of NSEC3, see Section 10.4.
+
+6.2       Zone Transfer Threats and Protection Approaches
+
+Zone transfers are performed to replicate zone files in multiple servers to provide a degree of fault
+tolerance in the DNS service provided by an organization. Threats from zone transfers have not been
+documented formally through any IETF RFCs. A few threats could be expected, however: the first threat,
+denial of service, is common for any network transaction. The second threat is based on exploitation of
+knowledge gained from the information provided by zone transfers. The latter threat is common to any
+network packet.
+
+      •    Threat T15—Denial of Service: Because zone transfers involve the transfer of entire zones, they
+           place substantial demands on network resources relative to normal DNS queries. Errant or
+           malicious frequent zone transfer requests on the name servers of the enterprise can overload the
+           master zone server and result in denial of service to legitimate users.
+
+      •    Threat T16—The zone transfer response message could be tampered.
+The denial-of-service threat (T15) can be minimized if servers allowed to make zone transfer requests are
+restricted to a set of known entities. To configure this restriction into the primary name server, there
+should be a means of identifying those entities. Name server software such as BIND initially provided a
+configuration feature to restrict zone transfer requests to a set of designated IP addresses. Because IP
+addresses can be spoofed, however, this mode of configuration does not provide an adequate means of
+restricting zone transfer access.
+
+The IETF developed an alternate mechanism called a transaction signature (TSIG), whereby mutual
+identification of servers is based on a shared secret key. Because the number of servers involved in zone
+transfer is limited (generally restricted to name servers in the same administrative domain of an
+organization), a bilateral trust model that is based on a shared secret key may be adequate for most
+enterprises (except for very large ones). TSIG specifies that the shared secret key be used not only for
+mutual authentication but also for signing zone transfer requests and responses. Hence, it provides
+protection against tampering of zone transfer response messages (threat T16). Protection of DNS data
+alone (the payload) in a zone transfer message also can be ensured through verification of signature
+records accompanying RRs from a DNSSEC-signed zone. These signatures, however, do not cover all the
+information in a zone file (e.g., delegation information). Furthermore, they enable verification of only the
+individual RRsets and not the entire zone transfer response message.
+
+There is also another method to authenticate DNS transactions by using asymmetric cryptography (i.e.
+public key cryptography). The format of the SIG(0) RR is similar to the resource record signature
+(RRSIG) RR (see Section 9.2.1), and can be validated using a public key stored in the DNS (instead of a
+shared secret key). SIG(0) can be more computational expensive to use, but offer an advantage in that a
+previous trust relationship may not be necessary to use SIG(0) signed messages. However, since most
+zone transfers occur between parties that have a previously established relationship, it is considered easier
+to implement TSIG for authenticating zone transfer transactions.
+
+Another possibility is to rely on lower level network layer to provide security such as IPSec. This would
+remove the need for authentication at the DNS (application) layer. How to set up this level of security is
+beyond the scope of this guide.
+
+
+
+
+                                                      6-4
+

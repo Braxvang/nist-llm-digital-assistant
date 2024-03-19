@@ -1,0 +1,56 @@
+NIST SP 800-166                                                   DERIVED PIV APPLICATION AND
+                                                                  DATA MODEL TEST GUIDELINES
+
+                      •   Suitable drivers have been loaded between the test system and an
+                          instance of the reader.
+                      •   The Derived PIV Application Password and the PUK are recorded.
+                      •   The Derived PIV Application Password’s retry counter is not 0 and
+                          the PUK’s retry counter is greater than 1.
+ Test Scenario        1. Send the SELECT command with
+                            • AID == 'A0 00 00 03 08 00 00 20 00 01 00'
+                      2. Send the RESET RETRY COUNTER with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command contains an arbitrary
+                               PUK value that is less than 8 bytes in length
+                               concatenated without delimitation with an
+                               arbitrary new valid password value. The new
+                               password should be padded with 'FF' (if
+                               necessary) to complete the total length of the
+                               value to 8 bytes
+                      3. Send the RESET RETRY COUNTER with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command contains an arbitrary
+                               PUK value that is greater than 8 bytes in length
+                               concatenated without delimitation with an
+                               arbitrary new valid password value. The new
+                               password should be padded with 'FF' (if
+                               necessary) to complete the total length of the
+                               value to 8 bytes
+                      4. Send the VERIFY command with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command will contain the
+                               correct Derived PIV Application Password, padded
+                               with 'FF' (if necessary) to complete the total
+                               length of the value to 8 bytes
+ Expected Result(s)   1. From Step 1, the command returns the application property template
+                         with the status word '90 00'.
+                      2. From Step 2, the command returns either status word: 1) '6A 80'
+                         (incorrect parameter in command data field) or 2) '63 CX' and the
+                         PUK’s retry counter is decremented by 1 (where 'X' is the number of
+                         tries remaining).
+                      3. From Step 3, the command returns either status word: 1) '6A 80'
+                         (incorrect parameter in command data field) or 2) '63 CX' and the
+                         PUK’s retry counter is decremented by 1 (where 'X' is the number of
+                         tries remaining).
+                      4. From Step 4, the command returns status word '90 00'.
+ Postcondition(s)     Current password is unchanged.
+
+8.3.6.6 Reset Retry Counter using an Incorrect PUK
+
+ Test Assertion       TA-08.03.06.06
+
+
+
+
+                                            79
+

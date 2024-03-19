@@ -1,0 +1,61 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                   Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                      PIV Card Application Card Command Interface
+
+        Tag       Tag        Tag       Length             Name                                  Value
+                                                                            384 (cipher suite 7). For both algorithms,
+                                                                            the parameters field is absent.
+                                                                            signatureValue is the DER encoding of
+                                                                            signature result ECDSA-Sig-Value defined
+                                                                            below.
+                                                                            ECDSA-Sig-Value ::= SEQUENCE {
+                                                                                     r        INTEGER,
+                                                                                     s        INTEGER
+                                                                            }
+
+807                                Table 20. Intermediate card verifiable certificate format
+
+        Tag       Tag        Tag       Length           Name                                 Value
+      0x7F21                          Variable Card Verifiable
+                                               Certificate
+                0x5F29                1        Credential Profile       0x80
+                                               Identifier
+                0x42                  8        Issuer Identification    The leftmost 8 bytes of the subjectKeyIdentifier
+                                               Number                   in the content signing certificate needed to
+                                                                        verify the signature on the Intermediate CVC
+                0x5F20                8         Subject Identifier      The leftmost 8 bytes of the SHA-1 hash of the
+                                                                        public-key object
+               0x7F49                Variable   PublicKey Data
+                                                Object
+                           0x06      Variable   Algorithm OID          Possible values are:
+                                                                       0x2A8648CE3D030107 for ECDH (Curve P-256)
+                                                                       or
+                                                                       0x2B81040022 for ECDH (Curve P-384)
+                           0x86      Variable   Public-key object      Coded as follows: 04 || X || Y, where X and Y are
+                                                                       the coordinates of the point on the curve. See the
+                                                                       “Value” column of Table 13.
+                0x5F4C                1        Role Identifier          0x12 for card-application root CVC
+                0x5F37                Variable DigitalSignature         DigitalSignature ::= SEQUENCE {
+                                               object                            signatureAlgorithm
+                                                                                 AlgorithmIdentifier,
+                                                                                 signatureValue BIT STRING
+                                                                        }
+                                                                        AlgorithmIdentifier ::= SEQUENCE {
+                                                                                 algorithm          OBJECT
+                                                                        IDENTIFIER,
+                                                                                 parameters         ANY DEFINED BY
+                                                                                            algorithm OPTIONAL
+                                                                        }
+                                                                        algorithm is 1.2.840.113549.1.1.11 for RSA
+                                                                        with SHA-256 and PKCS #1 v1.5 padding. The
+                                                                        parameters field SHALL be NULL.
+
+808   The signature of the Intermediate CVC (DigitalSignature object) is calculated over the
+809   concatenation of the TLV-encoded Credential Profile Identifier, Issuer Identification Number,
+810   Subject Identifier, PublicKey Data Object, and Role Identifier (i.e., { '5F29' '01' '80' } || { '42' '08'
+811   IIN } || { '5F20' '08' SI } || { '7F49' L1 { { '06' L2 OID } { '86' L3 '04' X Y } } } { '5F4C' '01' '12'
+812   }). Before signing the CVC, the signer SHALL perform partial public-key validation [SP800-
+813   56A, Section 5.6.2.3.2] for the public key that will be placed in the public-key object and
+
+
+                                                              27
+

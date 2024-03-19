@@ -1,0 +1,49 @@
+      NIST SP 800-90C 3pd (Third Public Draft)                                                    Recommendation for RBG Constructions
+      September 2022
+
+889        Accessing Entropy Source Output
+890   The security provided by an RBG is based on the use of validated entropy sources. Section 3.1
+891   discusses the use of the Get_ES_Bitstring function to request entropy from one or more entropy
+892   sources. Section 3.2 discusses the behavior required by an entropy source. Section 3.3 discusses
+893   the conditioning of the output of one or more entropy sources to obtain a bitstring with full entropy
+894   before further use by an RBG.
+
+895             The Get_ES_Bitstring Function
+896   The Get_ES_Bitstring function specified in Section 2.8.2.2 is used within an RBG to obtain
+897   entropy from one or more validated entropy sources using one or more GetEntropy calls (see
+898   Sections 2.8.2.1 and 3.2) in whatever manner is required (e.g., by polling the entropy sources or
+899   by extracting bits containing entropy from a pool of collected bits). The Get_ES_Bitstring
+900   function shall only be used to access validated entropy sources to obtain the entropy for seeding
+901   and reseeding a DRBG and for providing input for the exclusive-or operation of an RBG3(XOR)
+902   construction (see Section 6.2).
+903   In many cases, the Get_ES_Bitstring function will need to query an entropy source (or a set of
+904   entropy sources) multiple times to obtain the amount of entropy requested. For the most part, the
+905   construction of the Get_ES_Bitstring function itself is not specified in this document but is left
+906   to the developer to implement appropriately for the selected entropy sources.
+907   The behavior of the Get_ES_Bitstring function shall be as follows:
+908        1. A Get_ES_Bitstring function shall only be used to access one or more validated entropy
+909           sources.
+910        2. The entropy bitstrings produced from multiple entropy-source calls to a single validated
+911           entropy source or by calls to multiple validated entropy sources shall be concatenated into
+912           a single bitstring. The entropy in the bitstring is computed as the sum of the entropy
+913           produced by each call to a validated entropy source that is to be counted as contributing
+914           entropy to the bitstring (see Section 2.3). 9
+915        3. If a failure is reported during an invocation of the Get_ES_Bitstring function by any
+916           physical or non-physical entropy source whose entropy is counted toward fulfilling an
+917           entropy request, the failure shall be handled as discussed in Section 7.1.2.
+918        4. If a non-physical entropy source whose entropy is not counted reports a failure, the failure
+919           shall be reported to the RBG or the consuming application.
+920        5. The Get_ES_Bitstring function shall not return an entropy_bitstring unless the bitstring
+921           contains sufficient entropy to fulfill the entropy request. The returned status shall indicate
+922           a success only when this condition is met.
+
+
+
+
+      9
+        For Method 1 in Section 3.3, only entropy contributed by one or more validated physical entropy sources is counted. For Method 2, the entropy
+      from all validated entropy sources is counted.
+
+
+                                                                           20
+

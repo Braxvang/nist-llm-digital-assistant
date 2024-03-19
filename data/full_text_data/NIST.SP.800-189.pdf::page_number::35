@@ -1,0 +1,60 @@
+                                                                                             NIST SP 800-189                                                            RESILIENT INTERDOMAIN TRAFFIC EXCHANGE:
+                                                                                                                                                                                BGP SECURITY & DDOS MITIGATION
+
+                                                                                             10.1.0.0/16 with AS path [AS1 (origin), AS2, AS3, AS4] is legitimate (i.e., not corrupted by
+                                                                                             prefix or path modifications along the way). For example, in Figure 8, AS6 would fail if it were
+                                                                                             to try to fake a connection to AS1 and announce a signed BGPsec update to AS5 (with a shorter
+                                                                                             path and a forged-origin AS1). This is because AS6 does not have an update signed to it directly
+                                                                                             from AS1.
+
+                                                                                             The ECDSA-P256 algorithm is currently recommended for signing BGPsec updates between
+                                                                                             ASes that peer with each other [RFC8608]. Updates will have a larger size due to the addition of
+                                                                                             a 64-byte ECDSA P-256 signature for each hop. Also, the route processors in BGP-PV routers
+                                                                                             will be required to perform additional processing due to signing and verification of path
+                                                                                             signatures. The performance characterization of BGP-PV quantifying routing information base
+                                                                                             (RIB) size and routing convergence time has been reported in [Sriram1]. High performance
+                                                                                             implementations of the cryptographic operations (ECC signing and verifications) associated with
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-189
+
+
+
+
+                                                                                             BGPsec update processing are available [Adalier1] [Adalier2] [NIST-SRx]. Optimization
+                                                                                             algorithms for BGPsec update processing are proposed and analyzed in [Sriram2].
+
+                                                                                             To reduce upgrade costs and encourage faster deployment, a leaf or stub AS is allowed to trust
+                                                                                             its upstream AS and negotiate to receive unsigned updates while it sends signed updates to the
+                                                                                             upstream AS [RFC8205].
+
+                                                                                             The standards for BGP-PV are documented in IETF RFC’s 8205, 8206, 8207, 8209, 8210, and
+                                                                                             8608. When implementations based on these standards become available in commercial
+                                                                                             products, this document may be updated to recommend BGP-PV.
+
+                                                                                             4.8       Checking AS Path for Disallowed AS Numbers
+
+                                                                                             The AS path in an update received in eBGP is checked to make sure that there is no AS loop
+                                                                                             [RFC4271]. This is done by checking that the AS number of the local system does not appear in
+                                                                                             the received AS path. The AS path is also checked to ensure that AS numbers meant for special
+                                                                                             purposes [IANA-ASN-sp] are not present. Note that the special purpose ASN 23456 is allocated
+                                                                                             for AS_TRANS [RFC6793] and can be present in an AS_PATH in conjunction with an
+                                                                                             AS4_PATH [RFC 6793] in the update.
+
+                                                                                                       Security Recommendation 36: The AS path in an update received in eBGP should be
+                                                                                                       checked to ensure that the local AS number is not present. The AS path should also be
+                                                                                                       checked to ensure that AS numbers meant for special purposes [IANA-ASN-sp] are not
+                                                                                                       present. 18 In case of a violation, the update should be rejected.
+
+                                                                                             4.9       Route Leak Solution
+
+                                                                                             Section 2.3 described the route leaks problem space and noted that in RFC 7908 [RFC7908], the
+                                                                                             various types of route leaks are enumerated. Section 2.3 also defined some basic terms used in
+                                                                                             discussions of route leaks. Route leak solutions fall into two categories: intra-AS and inter-AS
+                                                                                             (across AS hops). Many operators currently use an intra-AS solution, which is done by tagging
+
+
+                                                                                             18
+                                                                                                  Note that the special purpose ASN 23456 is allocated for AS_TRANS [RFC6793] and is allowed to be present in an
+                                                                                                    AS_PATH in conjunction with an AS4_PATH [RFC 6793] in the update.
+
+                                                                                                                                                           24
+

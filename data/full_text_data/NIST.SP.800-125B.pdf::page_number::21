@@ -1,0 +1,56 @@
+NIST SP 800-125B                                                   SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                      FOR VM PROTECTION
+
+
+4.       VM Protection through Traffic Control Using Firewalls
+
+The primary use of a firewall is for traffic control. In a virtualized infrastructure, traffic control for VM
+protection is to be exercised for the following two scenarios:
+
+     •    Traffic flowing between any two virtual network segments (or subnets)
+     •    All traffic flowing into and out of a VM
+
+Scenario 1: Traffic Flowing between Virtual Network Segments or Subnets
+
+There are several use cases where traffic flowing between two VMs (or groups of VMs) need to be
+controlled, regardless of whether the VMs are resident within the same virtualized host or in different
+virtualized hosts. The following are examples:
+
+     •    Applications in an enterprise may be of different sensitivity levels. It may be impractical to fully
+          segregate them by dedicating one or more virtualized hosts to applications of each sensitivity
+          level, so limited segregation may be achieved instead by designating a single application
+          sensitivity level for each VM. Because a given virtualized host may contain VMs of different
+          sensitivity levels, there is a need to control traffic between VMs within the same virtualized host
+          (inter-VM intra-host traffic).
+     •    Most large-scale enterprise applications are designed with three-tier architectures – web server,
+          application, and database. There may be multiple VMs associated with each tier, and for reasons
+          of load balancing and security, VMs hosting applications belonging to a particular tier are
+          generally assigned to the same network segment or subnet although they span multiple virtualized
+          hosts. This type of configuration gives rise to the presence of a web server subnet (segment),
+          database server subnet, etc. However, for any enterprise application to function, the webserver
+          tier needs to talk to the corresponding application tier, which in turn may need to communicate
+          with the database tier. A VM hosting a web server tier and housed in subnet-A needs controlled
+          connectivity to a VM hosting an application tier and housed in subnet-B. Since a subnet itself can
+          span multiple virtualized hosts, it automatically implies that VMs belonging to different
+          application tiers (on a dedicated subnet) may be located in different virtualized hosts and hence
+          the traffic between them needs to be controlled as well (inter-VM inter-host traffic).
+     •    In some enterprises, networks are segmented based on departments in an enterprise (this applies
+          even if the underlying infrastructure is virtualized). In such an environment, the need to exchange
+          data selectively between applications belonging to different departments may require
+          communication between VMs in different segments.
+
+The common requirement in all the use cases discussed above is that all inter-VM traffic must be
+subjected to policy-based inspection and filtering. Inter-VM traffic is initiated when a VM generates
+communication packets that are sent through a vNIC of that VM to the port of a virtual switch defined
+inside the hypervisor kernel. If the target VM resides inside the same virtualized host, these packets are
+forwarded to another port in the same virtual switch. The target VM (dedicated to it) either may be
+connected to the same virtual switch, or may connect through another VM that acts as a bridge between
+the virtual switches of the two communicating VMs. If the target VM resides in another virtualized host,
+these packets are sent to the uplink ports of that virtual switch to be forwarded to any of the pNICs of that
+virtualized host. From there, these packets travel through the physical network of the data center and on to
+the virtualized host where the target VM resides. The packets again travel through the virtual network in
+that virtualized host to reach the target VM.
+
+
+                                                       14
+

@@ -1,0 +1,61 @@
+Special Publication 800-73-4                                    Interfaces for Personal Identity Verification – Part 2:
+                                                                PIV Card Application Card Command Interface
+
+Command Syntax
+
+                                       '00' or '10' indicating command chaining
+            CLA
+                                       '0C' or '1C' for secure messaging
+            INS                        '87'
+            P1                         Algorithm reference. See Table 14 and [SP800-78, Table 6-2]
+            P2                         Key reference. See Table 4b, Part 1 for key reference values
+            Lc                         Length of data field
+            Data Field                 See Table 7
+            Le                         Absent or '00'
+
+
+                        Table 7. Data Objects in the Dynamic Authentication Template (Tag '7C')
+
+               Name                  Tag        M/O                              Description
+      Witness                        '80'        C       Demonstration of knowledge of a fact without revealing
+                                                         the fact. An empty witness is a request for a witness.
+      Challenge                      '81'        C       One or more random numbers or byte sequences to be
+                                                         used in the authentication protocol.
+      Response                       '82'        C       A sequence of bytes encoding a response step in an
+                                                         authentication protocol.
+      Exponentiation                 '85'        C       A parameter used in ECDH key agreement protocol.
+
+
+The data objects that appear in the dynamic authentication template (tag '7C') in the data field of the
+GENERAL AUTHENTICATE card command depend on the authentication protocol being executed. The
+Witness (tag '80') contains encrypted data (unrevealed fact). This data is decrypted by the card. The
+Challenge (tag '81') contains clear data (byte sequence), which is encrypted by the card. The Response
+(tag '82') contains either the decrypted data from tag '80' or the encrypted data from tag '81'. Note that the
+empty tags (i.e., tags with no data) return the same tag with content (they can be seen as “requests for
+requests”):
+
+           +     '80 00' Returns '80 TL <encrypted random>' (as per definition)
+           +     '81 00' Returns '81 TL <random>' (as per external authenticate example)
+Response Syntax
+
+                                       Absent, authentication-related data, signed data, shared secret, or
+            Data Field
+                                       transported key
+            SW1-SW2                    Status word
+
+
+
+               SW1           SW2                                       Meaning
+                                       Successful execution where SW2 encodes the number of response
+                 '61'         'xx'
+                                       data bytes still available
+                 '69'        '82'      Security status not satisfied
+               '6A'          '80'      Incorrect parameter in command data field
+               '6A'          '86'      Incorrect parameter in P1 or P2
+                 '90'        '00'      Successful execution
+
+
+
+
+                                                              18
+

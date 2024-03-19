@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                              SECURITY RECOMMENDATIONS FOR
+                                                                 SERVER-BASED HYPERVISOR PLATFORMS
+
+  HY-SR-3      The hypervisor should have configuration options to specify a                  HY-BF1 (VM
+               guaranteed physical RAM for every VM (that requires it) along with a           Process Isolation)
+               limit to this value, and to specify a priority value for obtaining the
+               required RAM resource in situations of contention among multiple VMs.
+               Further, the over-commit feature (if available) that enables the total
+               configured memory for all VMs to exceed the host physical RAM should
+               be disabled by default.
+  HY-SR-4      The hypervisor should have robust configuration features for                   HY-BF1 (VM
+               provisioning virtual resources to all hosted VMs in a way that it              Process Isolation)
+               does not exceed a key physical resource such as number of CPU
+               cores.
+  HY-SR-5      The hypervisor should provide features to specify a lower and upper            HY-BF1 (VM
+               bound for CPU clock cycles needed for every deployed VM as well as a           Process Isolation)
+               feature to specify a priority score for each VM, to facilitate scheduling in
+               situations of contention for CPU resources from multiple VMs.
+
+  HY-SR-6A, Security Recommendation HY-SR-6A (Emulation): Because of the                      HY-BF2
+  HY-SR-6B, complexity of emulating a hardware device through software,                       (Devices
+  HY-SR-6C emulation, apart from suffering performance penalties, also increases              Mediation &
+            the size of the TCB especially in situations where the guest OS has               Access Control)
+            native device drivers and the device emulation code runs as a kernel
+            module with the same privilege level as the hypervisor. Hence
+            emulation should only be used where complexity is manageable (e.g.,
+            USB host controller).
+
+               Security Recommendation HY-SR-6B (Para-virtualization): In
+               situations where para-virtualized device drivers are used in VMs,
+               mediation of access to physical devices should be enabled by running
+               back-end device drivers (which control the physical device attached
+               to the hypervisor host) in a dedicated VM rather than in the
+               hypervisor. This facilitates running the back-end device driver code
+               at a privilege level lower than that of the hypervisor. Additionally,
+               the hypervisor platform should include hardware support in the form
+               of I/O Memory Management Unit (IOMMU) for validating and
+               translating access from the driver domain’s underlying hardware
+               device to host memory. The specific IOMMU feature that is
+               mandatory is DMA remapping where the DMA call from a device to
+               guest physical address (GPA) must be translated to host physical
+               address (HPA) and then checked whether the HPA address falls
+               within the protection domain assigned to that device. Combining
+               these mechanisms enables reducing the size of TCB as well as
+               reducing the impact of faulty device or device driver behavior
+               (restricted to device-driver VM as opposed to the hypervisor).
+
+               Security Recommendation HY-SR-6C (Passthrough or self-
+               virtualizing hardware devices): For situations, where VMs needs to
+               be given dedicated access to DMA capable devices, the hypervisor
+               platform should include hardware support in the form of I/O Memory
+               Management Unit (IOMMU) for validating and translating all device
+               access to host memory. This recommendation also applies to use of
+               virtualization-enabled hardware devices (based on SR-IOV
+               specification). The specific IOMMU feature that is mandatory is DMA
+                                                   28
+

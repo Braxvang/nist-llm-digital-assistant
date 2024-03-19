@@ -1,0 +1,56 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              This will create an “on-demand” IPsec connection that is triggered by IP traffic. If the file
+                                                                                              clear-or-private is used instead, the IPsec connection is loaded but not triggered by
+                                                                                              traffic. However, it will respond to requests for IPsec connections from remote hosts.
+
+                                                                                              9.4.4   Testing the Solution
+
+                                                                                              Traffic is generated and nodes are inspected using the ipsec trafficstatus command.
+                                                                                              Once the basic mesh encryption is working, more advanced scenarios are tested.
+
+                                                                                                 •    A single IP address is added to the exception policy
+                                                                                                      /etc/ipsec.d/policies/clear to confirm that communication only happens in
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      cleartext.
+                                                                                                 •    Both network A and network B add each other’s IP ranges to the policy file for IPsec in
+                                                                                                      /etc/ipsec.d/policies/private-or-clear to test mesh encryption across
+                                                                                                      the two networks.
+                                                                                                 •    Some servers are tested with a policy in /etc/ipsec.d/policies/private,
+                                                                                                      which mandates IPsec encryption.
+                                                                                                 •    TCP streams are tested between network A and network B to confirm that there are no
+                                                                                                      issues with double encryption (a VPN over another VPN) and packet sizes.
+                                                                                                 •    An on-demand IPsec connection is triggered, and no more traffic is sent between the
+                                                                                                      nodes. The connection is monitored for possible termination due to idleness within the
+                                                                                                      configured timeframe.
+                                                                                                 •    Some servers are restarted or run without the IPsec capability for a limited time to ensure
+                                                                                                      that traffic is still encrypted when possible and recovery of the IPsec capability leads to
+                                                                                                      an encrypted traffic flow.
+                                                                                                 •    To harden against attacks where one compromised server takes over the IKE identity of
+                                                                                                      another server while using its non-matching certificate, the dns-match-id option is
+                                                                                                      enabled. After testing that the mesh connections still work, one host is configured with
+                                                                                                      another host’s certificate, and a mesh connection is attempted again. The connection is
+                                                                                                      tested for proper rejection.
+
+                                                                                              9.4.5   Analysis
+
+                                                                                              The additional provisioning to add IPsec to the virtual machines and containers is minimal and
+                                                                                              working. However, it was found that packet filters on the networks were no longer able to filter
+                                                                                              traffic because most of it was encrypted. This necessitated an extension of the provisioning
+                                                                                              system to push firewall rules to each virtual machine and container.
+
+                                                                                              While the initial deployment using certificates works, using raw keys in DNSSEC would work
+                                                                                              better for a large-scale deployment. However, it would require a way to update DNS dynamically
+                                                                                              after generating host keys for newly generated virtual machines and containers. A follow-up
+                                                                                              project is planned for a DNSSEC-based deployment.
+
+
+
+
+                                                                                                                                              119
+

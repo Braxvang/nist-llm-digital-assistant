@@ -1,0 +1,60 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                   Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                                      PIV Card Application Card Command Interface
+
+1186   them. Many types of security protocols employ the RSA key transport technique, such as
+1187   Secure/Multipurpose Internet Mail Extensions (S/MIME) for secure email.
+
+1188   A.5.1.1.              RSA Key Transport With the PIV KMK
+1189   As specified in SP 800-78, the on-card private KMK CAN be an RSA transport key that
+1190   complies with [PKCS1]. In the scenario described above, a sender encrypts a symmetric key with
+1191   the public RSA transport key of the recipient’s KMK. The role of the on-card KMK private RSA
+1192   transport key is to decrypt the sender’s symmetric key on behalf of the cardholder and provide it
+1193   to the client application cryptographic module.
+
+1194   A.5.1.1.1             GENERAL AUTHENTICATE Command
+
+1195   The card commands sent to the PIV Card to decrypt the symmetric key are listed below. It is
+1196   assumed that the cardholder’s PIN or OCC data has been successfully verified prior to sending
+1197   the GENERAL AUTHENTICATE command to the card.
+1198   Command 1 — GENERAL AUTHENTICATE (first chain)
+          CLA                       '10' indicates command chaining
+          INS                       '87'
+          P1                        '07' 28
+          P2                        '9D'
+          Lc                        Length of data field
+                                    '7C' – L1 {'82' '00' '81' L2 {first part of C}}, where C is the ciphertext to
+          Data Field
+                                    be decrypted, as defined in [PKCS1, Sections 7.1.2 and 7.2.2]
+          Le                        Absent (no response expected)
+
+1199   Response 1
+       Data Field                Absent
+       SW1-SW2                   '90 00' (Status word)
+
+1200   Command 2 — GENERAL AUTHENTICATE (last chain)
+          CLA                       '00' indicates last command of the chain
+          INS                       '87'
+          P1                        '07' 29
+          P2                        '9D'
+          Lc                        Length of data field
+          Data Field                {second and last part of ciphertext to be decrypted C }}
+          Le                        '00'
+
+1201   Response 2
+                                    '7C' – L1 {'82' L2 {first part of encoded message EM}}, where EM is as
+          Data Field
+                                    defined in [PKCS1, Sections 7.1.2 and 7.2.2]
+          SW1-SW2                   '61 xx', where x indicates the number of bytes remaining to send
+
+
+       28
+          Higher strength keys are recommended starting in 2031, per SP 800-56 Part 1. See SP 800-78-5 Tables 9 and 10, which reflect support for
+       higher strength keys for PIV cards and supporting systems, where applicable.
+       29
+          Higher strength keys are recommended starting in 2031, per SP 800-56 Part 1. See SP 800-78-5 Tables 9 and 10, which reflect support for
+       higher strength keys for PIV cards and supporting systems, where applicable.
+
+
+
+                                                                             45
+

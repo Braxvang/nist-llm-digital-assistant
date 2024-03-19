@@ -1,0 +1,53 @@
+the s most significant bits of the previous ciphertext. The forward cipher function is applied to
+each input block to produce the output blocks. The s most significant bits of the output blocks
+are exclusive-ORed with the corresponding ciphertext segments to recover the plaintext
+segments.
+
+In CFB encryption, like CBC encryption, the input block to each forward cipher function (except
+the first) depends on the result of the previous forward cipher function; therefore, multiple
+forward cipher operations cannot be performed in parallel. In CFB decryption, the required
+forward cipher operations can be performed in parallel if the input blocks are first constructed (in
+series) from the IV and the ciphertext.
+
+The CFB mode is illustrated in Figure 3.
+
+6.4   The Output Feedback Mode
+
+The Output Feedback (OFB) mode is a confidentiality mode that features the iteration of the
+forward cipher on an IV to generate a sequence of output blocks that are exclusive-ORed with
+the plaintext to produce the ciphertext, and vice versa. The OFB mode requires that the IV is a
+nonce, i.e., the IV must be unique for each execution of the mode under the given key; the
+generation of such IVs is discussed in Appendix C. The OFB mode is defined as follows:
+
+       OFB Encryption:                I1 = IV;
+                                      Ij = Oj -1                     for j = 2 … n;
+                                      Oj = CIPHK(Ij)                 for j = 1, 2 … n;
+                                      Cj = Pj ⊕ Oj                   for j = 1, 2 … n-1;
+                                         *    *
+                                      C n= P n ⊕ MSBu(On).
+
+       OFB Decryption:                I1 = IV;
+                                      Ij = Oj -1                     for j = 2 … n;
+                                      Oj = CIPHK(Ij)                 for j = 1, 2 … n;
+                                      Pj = Cj ⊕ Oj                   for j = 1, 2 … n-1;
+                                         *      *
+                                      P n = C n ⊕ MSBu(On).
+
+In OFB encryption, the IV is transformed by the forward cipher function to produce the first
+output block. The first output block is exclusive-ORed with the first plaintext block to produce
+the first ciphertext block. The forward cipher function is then invoked on the first output block
+to produce the second output block. The second output block is exclusive-ORed with the second
+plaintext block to produce the second ciphertext block, and the forward cipher function is
+invoked on the second output block to produce the third output block. Thus, the successive
+output blocks are produced from applying the forward cipher function to the previous output
+blocks, and the output blocks are exclusive-ORed with the corresponding plaintext blocks to
+produce the ciphertext blocks. For the last block, which may be a partial block of u bits, the
+most significant u bits of the last output block are used for the exclusive-OR operation; the
+remaining b-u bits of the last output block are discarded.
+
+In OFB decryption, the IV is transformed by the forward cipher function to produce the first
+
+
+
+                                                13
+

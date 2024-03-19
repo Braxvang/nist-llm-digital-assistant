@@ -1,0 +1,55 @@
+Special Publication 800-73-4                         Interfaces for Personal Identity Verification – Part 2:
+                                                     PIV Card Application Card Command Interface
+
+Card Application shall return an error (see Section 4.2.7). In the case of command chaining, if bits b3 and
+b4 of the CLA are set in any command in the chain, then they shall be set in every command in the chain.
+
+When secure messaging is used, the data field of the card command (or response) is encrypted first and
+then a message authentication code (MAC) is applied to the entire command (or response). When
+command (or response) chaining is required, the encryption and MAC are applied to the entire message
+and the result is then fragmented into separate command (or response) data fields.
+
+In order to ensure that message reordering or replay attacks can be detected, a 16-byte MAC chaining
+value (MCV) is used. For the first command, and for the first response, sent after successful completion
+of the key establishment protocol the MCV consists of 16 bytes of '00'. For each subsequent command the
+MCV is the 16-byte MAC value computed on the previous command, and for each subsequent response
+the MCV is the 16-byte MAC value computed on the previous response. The MCV is included as part of
+the message over which the MAC value for each command (or response) is computed.
+
+The SK ENC session key shall be used to encrypt the command data field and response data field as
+described in Section 4.2.2. The SK MAC session key shall be used to add integrity to the command as
+described in Section 4.2.3. The SK RMAC session key shall be used to add integrity to the response as
+described in Section 4.2.5.
+
+Secure messaging specified in this section can be applied to the following commands:
+
+          +     GET DATA
+          +     VERIFY
+          +     CHANGE REFERENCE DATA
+          +     GENERAL AUTHENTICATE
+  4.2.1   Secure Messaging Data Objects
+
+The command and response messages shall be BER-TLV encoded according to Table 17.
+
+                                 Table 17. Secure Messaging Data Objects
+
+              Tag    Description
+              '87'   Padding-content indicator byte followed by the encrypted data
+              '8E'   Cryptographic checksum (MAC)
+              '97'   Le
+              '99'   Status word
+
+  4.2.2   Command and Response Data Confidentiality
+
+Under secure messaging, the PIV data is encrypted using AES in Cipher Block Chaining (CBC) mode
+with the SK ENC session key, where SK ENC is a 128-bit key for CS2 and a 256-bit key for CS7 as per Table
+14. The encryption and encoding process for command data and response data shall be the same. The
+encryption of the command data or response data and encoding in BER-TLV format is illustrated Figure
+1. The encryption shall be computed over the entire message before applying fragmentation for data
+transportation.
+
+
+
+
+                                                    31
+

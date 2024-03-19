@@ -1,0 +1,55 @@
+    .01s1, .015s1, .02s1, .025s1}, where s1 is the size of f1 in bytes and the values of X are
+    rounded to the nearest whole number.
+
+For every choice of file size and modification method, each test has two additional
+parameters: file count and number of runs. The former specifies the number of files in
+the test set; the latter specifies the number of independent test runs to be executed
+(where each run creates its own new test set).
+Testing with real data. As already mentioned, two of the main challenges in testing
+with real data are the choice of representative samples, and the establishment of ground
+truth. In respect to the former the choice depends, to some degree, on the expected
+characteristics of the target data. For example, for general evaluation of artifacts found
+on the Internet, the govdocs-corpus is a good starting point.
+
+The focus of this section is to provide an approach for establishing ground truth using
+automated means. The proposed approach is to use the longest common substring (LCS)
+as the reference metric and to characterize the behavior of bytewise approximate
+matching algorithms with respect to this metric.
+
+Using a string comparison algorithm as a reference is a natural choice given that the
+algorithms treat the data objects as plain strings with no attempt to parse or interpret
+them. LCS should be considered a first-order approximation; two objects may have a lot
+more in common than what the LCS result suggests, so further refinements are to be
+expected at a later stage.
+
+Given an unordered pair of files (f1, f2), define the absolute (La) and relative (Lr) results
+as follows:
+
+                    La = alcsa(f1, f2), where 0 ≤ La ≤ min(|f1 |, |f2 |).                       (2)
+                                 భబబ ൈ ಽೌ
+                           ቒ                  ቓ
+                               ೘೔೙ሺ|೑భ|,|೑మ|ሻ
+                    Lr =                      , where 0 ≤ Lr ≤ 1.                               (3)
+                                    ଵ଴଴
+
+where |f | denotes the file size in bytes.
+
+Broadly, any two strings sharing a substring are related; however, we suggest a more practical
+lower bound on the minimum amount of commonality to declare two files related.
+Specifically, we require that the absolute size La is at least 100 (bytes) and that the relative
+result Lr exceeds 0.5% of the size of the smaller file. More formally, the true positive function
+T Plcs ( f1 , f2 ) is defined as
+
+                    T Plcs (f1, f2) ≡ La ≥ 100 ∧ Lr ≥ .01                                        (4)
+
+(Note: result of Lr is rounded and thus 0.5 is equal to 1.)
+Clearly, the true negative function T Nlcs (f1, f2) = ¬T Plcs (f1, f2).
+
+Approximate ground truth LCS is a well-studied problem and has known solutions of
+quadratic time complexity–O(mn), where m and n are the string lengths. Given that files can be
+large, the exact solution quickly becomes too burdensome to be practical. Therefore, we
+suggest an approximation of the longest common substring which, by design, provides a lower
+bound on LCS; details are given in Appendix 2.
+
+                                                  12
+

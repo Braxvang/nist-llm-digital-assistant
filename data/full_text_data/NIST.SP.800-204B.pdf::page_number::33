@@ -1,0 +1,57 @@
+                                                                                              NIST SP 800-204B                                                  ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                              APPLICATIONS USING A SERVICE MESH
+
+                                                                                              5       ABAC Deployment for Service Mesh
+
+                                                                                              The last section introduced three different types of authorization policies, including two use cases
+                                                                                              for end-user level authorization policies. This section will leverage those architectural choices to
+                                                                                              describe an ABAC-based authorization framework in the service mesh:
+
+                                                                                              ●     Security assurance for authorization framework enforcement
+                                                                                              ●     Supporting infrastructure for authorization requests
+                                                                                              ●     Advantages of an ABAC authorization framework for service mesh
+                                                                                              ●     Enforcement alternatives in proxies
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                              5.1     Reference Monitor Concept in Authorization Framework
+
+                                                                                              The authorization policy enforcement mechanism implemented in the service mesh for a
+                                                                                              microservices-based application must satisfy the three requirements of a reference monitor
+                                                                                              concept. It must be 1) non-bypassable, 2) protected from modification, and 3) verified and
+                                                                                              tested to be correct. These three requirements can be ensured by the following:
+
+                                                                                              ● Every request from a client to the microservices-based application, from one service to
+                                                                                                another (inter-services call), and from a microservice to an external application is
+                                                                                                intercepted by the ingress gateway, sidecar proxy, and egress proxy, respectively. These
+                                                                                                PEPs are non-bypassable.
+                                                                                              ● The policy enforcement modules are independent executables that are decoupled from the
+                                                                                                application logic and cannot be modified.
+                                                                                              ● Their outcome can be independently verified and tested through both shadow operations
+                                                                                                and live production requests.
+
+                                                                                              In short, a proxy running in the data plane of the service mesh is the reference monitor with
+                                                                                              respect to authorization enforcement. The authorization policy engine (e.g., NGAC-based
+                                                                                              ABAC policy engine) implemented as a container executing either natively in the proxy
+                                                                                              memory space or callable from a corresponding filter module in the proxy runs as a separate
+                                                                                              process that does not share any memory space with the calling application. Hence, it satisfies
+                                                                                              the requirement of a security kernel.
+
+                                                                                              5.2     Supporting Infrastructure for ABAC Authorization Framework
+
+                                                                                              Now consider the basic building blocks of the supporting infrastructure for service-to-service
+                                                                                              and end user + service-to-service requests.
+
+                                                                                              5.2.1    Service-to-Service Request (SVC-SVC) – Supporting Infrastructure
+
+                                                                                              The policy object used for authorizing this type of request was described in Section 4.5.1.
+                                                                                              Service-to-service requests must be authorized based on the identity of the calling and called
+                                                                                              services. The trusted document that carries the identity of the service is an X.509 certificate
+                                                                                              issued by one of the control plane components of the service mesh after verifying whether the
+                                                                                              requested identity is valid for the microservice by consulting an identity registry. The proxy
+                                                                                              communicates with this control plane component through a local agent, obtains a certificate,
+
+                                                                                                                                                25
+

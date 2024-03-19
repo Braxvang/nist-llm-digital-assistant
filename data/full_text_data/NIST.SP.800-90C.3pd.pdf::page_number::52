@@ -1,0 +1,53 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                   Recommendation for RBG Constructions
+       September 2022
+
+1412   where s is the requested instantiation security strength for the DRBG. The
+1413   prediction_resistance_flag (if used) is set to TRUE if prediction resistance is to be supported and
+1414   FALSE otherwise.
+1415   An RBG2 construction obtains entropy for its DRBG from one or more validated entropy sources,
+1416   either directly or using a conditioning function to process the output of the entropy source to obtain
+1417   a full-entropy bitstring for instantiation (e.g., when employing a CTR_DRBG without a derivation
+1418   function using entropy sources that do not provide full-entropy output).
+1419   SP 800-90A uses a Get_randomness-source_input call to obtain the entropy needed for
+1420   instantiation (see SP 800-90A).
+1421        1. When the DRBG is a CTR_DRBG without a derivation function, full-entropy bits shall be
+1422           obtained as follows:
+1423             a) If the entropy source provides full-entropy output, the Get_randomness-source_input
+1424                call is replaced by: 21, 22
+1425                                      (status, entropy_bitstring) = Get_ES_Bitstring (s + 128). 23
+1426                   For an RBG2(P) construction, only validated physical entropy sources shall be used.
+1427                   The output of the entropy sources shall be concatenated to obtain the s + 128 full-
+1428                   entropy bits to be returned as entropy_bitstring.
+1429                   (This recommendation assumes that non-physical entropy sources cannot provide full-
+1430                   entropy output. Therefore, the Get_ES_bitstring function shall not be used with non-
+1431                   physical entropy sources in this case.)
+1432             b) If the entropy sources does not provide full-entropy output, the Get_randomness-
+1433                source_input call is replaced by: 24, 25
+1434                                                  (status, Full_entropy_bitstring) =
+1435                                            Get_conditioned_full_entropy_input(s + 128).
+1436                   Validated physical and/or non-physical entropy sources shall be used to provide the
+1437                   requested entropy. For an RBG2(P) construction, the requested s + 128 bits of entropy
+1438                   shall be counted as specified in Method 1 of Section 2.3. For an RBG2(NP)
+1439                   construction, the requested s + 128 bits of entropy shall be counted as specified in
+1440                   Method 2 of Section 2.3.
+1441        2.    For the Hash_DRBG, HMAC_DRBG and CTR_DRBG (with a derivation function), the
+1442             entropy source shall provide 3s/2 bits of entropy to establish the security strength.
+1443             a)     If the consuming application requires full entropy in the returned bitstring, the
+1444                    Get_randomness-source_input call is replaced by:
+1445                                                            (status, Full_entropy_bitstring) =
+1446                                                   Get_conditioned_full_entropy_input(3s/2).
+
+       21
+          Appropriate changes may be required for the Instantiate_function in [SP800-90A] and the algorithms in Section 10 of that document.
+       22
+          See Section 3.8.2.2 for a specification of the Get_ES_Bitstring function.
+       23
+          For a CTR_DRBG using AES, s + 128 = the length of the key + the length of the AES block = seedlen (see Table 2 in SP 800-90A).
+       24
+          Appropriate changes may be required for the Instantiate_function in [SP800-90A] and the algorithms in Section 10.2 of that document.
+       25
+          See Section 4.3.2 for a specification of the Get_conditioned_full_entropy_input function.
+
+
+                                                                            39
+

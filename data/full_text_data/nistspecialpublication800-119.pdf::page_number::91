@@ -1,0 +1,59 @@
+                                                              GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+security concerns,‖ but the BSD and KAMI implementations claim that IPsec AH and jumbograms are
+incompatible due to an unexplained ―quirk in the specs‖ regarding the AH header size. Given the limited
+use of jumbograms, it is not surprising that some (perhaps most) IPsec implementations do not support
+them.
+
+Jumbograms may be used as a vehicle for DOS. They can cause substantial latency, increase the cost of
+retransmission, and interfere with QoS. A maximum length jumbogram will tie up a one gigabit per
+second link for over a half a minute, and if the UDP checksum fails, the receiving interface may request
+retransmission. A jumbogram, used together with a hop-by-hop header, could possibly be used to perform
+a resource-consumption attack.
+
+Intermediate systems such as application layer firewalls and intrusion detection systems may be
+unprepared to handle huge jumbograms (which can be up to four gigabytes long).
+
+Finally, many IPv6 implementations may contain places in which the Payload Length is stored as an
+unsigned 16-bit integer. Finding and exploiting these may be a method of causing buffer overflows,
+kernel crashes, or other unintended effects.
+
+4.6   Address Selection
+
+An IPv4 interface typically has one IPv4 unicast address, which may or may not be globally routable, plus
+the loopback address (127.0.0.1). An IPv6 interface, in contrast, typically starts with an interface local
+loopback address, a link local address, a unique local address, and a globally routable address.
+Renumbering and multihoming can result in having more than one address of certain types. There is
+nothing to stop one from generating and using additional addresses, and renumbering may cause more
+than one address of a given type to be active. Some addresses should still be accepted or handled by an
+implementation, but their use is no longer recommended. A choice of source addresses exists for every
+packet. Often, a choice of destination addresses exists as well.
+
+In a system running both IPv4 and IPv6, address selection is more complicated, and rules need to be
+given for which of these to prefer.
+
+RFC 3484 specifies rules for choosing source and destination addresses, but more recent experience has
+shown that additional rules are needed for networks with multiple prefixes. This section examines IPv6
+address selection rules and their consequences.
+
+  4.6.1   Specification Overview
+
+This section summarizes the rules for source and destination address selection specified in RFC 3484.
+Criteria for choices and preferences in each case are covered.
+
+Address selection may have to choose among IPv4 versus IPv6, addresses with different scopes, public or
+private address, and so forth. Some of the rules seem obvious, for example, choosing an address that has
+not been deprecated over one that has, but nevertheless, software has to be written to make the right
+choice. In general, source and destination pairs are chosen to match scopes and types (e.g., native IPv6,
+6to4, or IPv4-mapped), to prefer smaller scopes, and to prefer native addresses over transitional
+addresses. If the destination is a multicast address, the multicast scope is used in choosing the scope of
+the unicast source address. One of the principles introduced in address selection is longest prefix match,
+which means, in the absence of other criteria, one chooses source and destination addresses to try to take
+advantage of route aggregation.
+
+
+
+
+                                                  4-28
+

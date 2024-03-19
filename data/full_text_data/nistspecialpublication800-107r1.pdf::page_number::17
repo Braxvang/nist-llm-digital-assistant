@@ -1,0 +1,49 @@
+The HMAC key shall be kept secret. When the secrecy of the HMAC key, K, is not
+preserved, an adversary that knows K, may impersonate any of the users that share that
+key in order to generate MacTags that seem to be authentic (i.e., MacTags that can be
+verified and are subsequently presumed to be authentic).
+HMAC keys shall be generated as specified in SP 800-133 [SP 800-133].
+
+5.3.3 Truncation of HMAC Output
+When an application truncates the HMAC output to generate a MacTag to a desired
+length, λ, the λ left-most bits of the HMAC output shall be used as the MacTag.
+However, the output length, λ, shall be no less than 32 bits. For example, a low
+bandwidth channel or a desired high efficiency computation application such as audio or
+video casting application might use 32-bit MacTags.
+
+5.3.4 Security Effect of the HMAC Key
+Let C denote the bit length of the internal hash value that is denoted H in FIPS 180-4.
+(This H is often called the “chaining value” in descriptions of Merkle–Damgård-style
+hash functions.) Note that C is not (necessarily) equal to L, the bit length of the hash
+function’s output (see, for example, SHA-384 or SHA-512/t for any t < 512, for which L
+< 512 = C). In all currently approved hash functions, L ≤ C (with L = C for SHA-1, SHA-
+256, and SHA-512).
+The effective security strength 4 of the HMAC key is the minimum of the security
+strength of K and the value of 2C. That is, security strength = min(security strength of
+K, 2C). For example, if the security strength of K is 128 bits, and SHA-1 is used, then the
+effective security strength of the HMAC key is 128 bits, since for SHA-1, 2C= 320. Note
+that, in this example, even if the security strength of K is greater than 320 bits, the
+effective security strength of the key is limited to 320 bits (the value of 2C for SHA-1). In
+general, there is no benefit in generating K with more than 2C bits of security. In
+particular, it is not sensible to generate K with a bit length that exceeds the input block
+size of the approved L-bit hash function employed in the HMAC construction. Such a K
+is hashed, and the resulting L-bit value is used instead. Returning to the SHA-1 example,
+suppose that the key K has a bit length greater than 512 (the input block size for SHA-1).
+Instead of using K directly, HMAC replaces K by its 160-bit SHA-1 hash value, and so
+the effective security strength of that choice of K is no more than 160 bits.
+
+
+
+
+4
+  As described in [BCK1], the success of a collision attack on any approved HMAC algorithm in FIPS 198-
+1 that uses SHA-1 would require the collection of at least 280 pairs of chosen plaintexts and their
+corresponding HMAC values. This is an impractical task. So, the collision attack is not considered in this
+document. In this Recommendation, the strength of the HMAC key is considered to be the amount of work
+required for an attacker who performs a brute-force attack to discover the HMAC key K or the first hash
+values (Hs) from hashing the two strings:(K0 ⊕ opad ) and (K0 ⊕ ipad) separately in the HMAC
+construction (see FIPS 198-1) in order to generate authentic MacTags at any time.
+
+
+                                                   14
+

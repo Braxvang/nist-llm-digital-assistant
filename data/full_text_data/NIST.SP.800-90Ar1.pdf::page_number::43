@@ -1,0 +1,46 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+   4. If the length of the additional_input > max_additional_input_length, then return
+      (ERROR_FLAG, Null).
+   5. If prediction_resistance_request is set, and prediction_resistance_flag is not set, then
+      return (ERROR_FLAG, Null).
+   6. Clear the reseed_required_flag.        Comment: See Section 9.3.2 for a discussion.
+                                             Comment: Reseed if necessary (see Section 9.2).
+   7. If reseed_required_flag is set, or if prediction_resistance_request is set, then
+       7.1 status = Reseed_function (state_handle, prediction_resistance_request,
+           additional_input).
+                                             Comment: status indications other than SUCCESS
+                                             could be ERROR_FLAG or
+                                             CATASTROPHIC_ERROR_FLAG, in which
+                                             case, the status is returned to the consuming
+                                             application to handle. The Get_entropy_input call
+                                             could return a status of ERROR_FLAG to indicate
+                                             that entropy is currently unavailable, and could
+                                             return CATASTROPHIC_ERROR_FLAG to
+                                             indicate that an entropy source failed.
+       7.2 If (status ≠ SUCCESS), then return (status, Null).
+       7.3 Using state_handle, obtain the new internal state.
+       7.4 additional_input = the Null string.
+       7.5   Clear the reseed_required_flag.
+                                             Comment: Request the generation of
+                                             pseudorandom_bits using the appropriate generate
+                                             algorithm in Section 10.
+   8. (status, pseudorandom_bits, new_working_state) = Generate_algorithm (working_state,
+      requested_number_of_bits, additional_input).
+   9. If status indicates that a reseed is required before the requested bits can be generated,
+      then
+        9.1 Set the reseed_required_flag.
+        9.2 If the prediction_resistance_flag is set, then set the prediction_resistance request
+            indication.
+        9.3 Go to step 7.
+   10. Replace the old working_state in the internal state of the DRBG instantiation (e.g., as
+       indicated by state_handle) with the values of new_working_state.
+   11. Return (SUCCESS, pseudorandom_bits).
+Implementation notes:
+
+
+
+                                                 34
+

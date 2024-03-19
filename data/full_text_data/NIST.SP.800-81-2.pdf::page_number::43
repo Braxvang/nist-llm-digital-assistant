@@ -1,0 +1,57 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+6.3       Dynamic Updates Threats and Protection Approaches
+
+Dynamic updates involve DNS clients making changes to zone data in an authoritative name server in real
+time. Clients typically performing dynamic updates are CA servers, DHCP servers, or Internet Multicast
+Address servers. As with zone transfer transaction, the threats associated with dynamic update transaction
+have not been officially documented by the IETF through an RFC. The following are some common
+threats that could be expected, based on the fact that dynamic updates involve a data update request
+transiting a network.
+
+      •    Threat T17—Unauthorized Updates: Unauthorized updates could have several harmful
+           consequences for the content of zone data. Some harmful data operations include: (a) adding
+           illegitimate resources (new FQDN and new RRs to a valid zone file), (b) deleting legitimate
+           resources (entire FQDN or specific RRs), and (c) altering delegation information (NS RRs
+           pointing to child zones).
+
+      •    Threat T18: The data in a dynamic update request could be tampered.
+
+      •    Threat T19—Replay Attacks: Update request messages could be captured and resubmitted
+           later, thus causing inappropriate updates.
+Threats T17 and T18 could be countered by authenticating the entities involved and providing a means to
+detect tampering of the messages. Because these security objectives in the case of zone transfer are met
+by the TSIG/SIG(0) mechanism, the same TSIG/SIG(0) mechanism is specified for protecting dynamic
+updates. Although the dynamic update message contains some replay attack (Threat T19) protection in
+the prerequisite field of the message, TSIG/SIG(0) provides an additional mechanism to protect against
+replay attacks by including a timestamp field in the dynamic update request. This signed timestamp
+enables a server to determine whether the timing of the dynamic update request is within the acceptable
+time limits specified in the configuration.
+
+It sometimes makes more sense to use SIG(0) protection mechanisms for dynamic update than for zone
+transfer. Dynamic update transactions may happen between parties that do not always have a prior
+security relationship or may be part of a bootstrapping operation. Therefore it may be impractical to use
+TSIG with a shared secret, but SIG(0) authentication using keys stored in the DNS may be a possibility.
+
+Another possibility is to rely on lower level network layer to provide security such as IPSec. This would
+remove the need for authentication at the DNS (application) layer. How to set up this level of security is
+beyond the scope of this guide.
+
+6.4       DNS NOTIFY Threats and Protection Approaches
+
+DNS NOTIFY is a message sent by primary (master) name servers to secondary (slave) name servers,
+causing the secondary servers to start a refresh operation (i.e. query for SOA RR to check the serial
+number, etc.) and perform a zone transfer if an update to the zone has occurred. Because the NOTIFY
+message is only a signal, there are only minor security risks in dealing with the message. The primary
+security risk to consider is the following:
+
+      •    Threat T20—Spurious NOTIFY Messages: Secondary name servers would receive spurious
+           DNS NOTIFY messages from sources other than the primary name server.
+The only impact of receiving spurious DNS NOTIFY message is the increase in workload in secondary
+name servers since a zone transfer will only occur when an updated zone is on the primary server.
+
+
+                                                     6-5
+

@@ -1,0 +1,56 @@
+                                                                                             NIST SP 800-204                                                            SECURITY STRATEGIES FOR
+                                                                                                                                                        MICROSERVICES-BASED APPLICATION SYSTEMS
+
+                                                                                             4.5.1   Analysis of Circuit Breaker implementation options
+
+                                                                                             A common strategy for preventing or minimizing cascading failures involves the use of circuit
+                                                                                             breakers, which prohibits the delivery of data to the component (microservice) that is failing
+                                                                                             beyond a specified threshold. This is also known as the fail fast principle. Since the errant service
+                                                                                             is quickly taken offline, incidences of cascading failures are minimized while the errant
+                                                                                             component’s logs are analyzed, required fixes are performed, and microservices are updated.
+                                                                                             There are three options for deploying circuit breakers [9]: directly inside the client, on the side of
+                                                                                             services, or in proxies that operate between clients and services.
+
+                                                                                                     Client-side circuit breaker option: In this option, each client has a separate circuit breaker
+                                                                                                     for each external service that the client calls. When the circuit breaker in a client has
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204
+
+
+
+
+                                                                                                     decided to cut off calls to a service (called “open state” with respect to that service), no
+                                                                                                     message will be sent to the service, and communication traffic in the network is
+                                                                                                     subsequently reduced. Moreover, the circuit breaker functionality need not be
+                                                                                                     implemented in the microservice, which frees valuable resources for efficient
+                                                                                                     implementation of that service. However, locating the circuit breaker in the client carries
+                                                                                                     two disadvantages from a security point of view. First, a great deal of trust must be
+                                                                                                     placed in the client that the circuit breaker code executes properly. Second, the overall
+                                                                                                     integrity of the operation is at risk since knowledge of the unavailability of the service is
+                                                                                                     very much local to the client, a status that is determined based on the frequency of calls
+                                                                                                     from that client to the service rather than on the combined response status received by all
+                                                                                                     clients against that service.
+
+                                                                                                     Server-side circuit breaker option: In this option, an internal circuit breaker in the
+                                                                                                     microservice processes all client invocations and decides whether it should be allowed to
+                                                                                                     invoke the service or not. The security advantages of this option are that clients need not
+                                                                                                     be trusted to implement the circuit breaker function, and since the service has a global
+                                                                                                     picture of the frequency of all invocations from all clients, it can throttle requests to a
+                                                                                                     level which it can conveniently handle (e.g., temporarily lighten the load).
+
+                                                                                                     Proxy circuit breaker option: In this option, circuit breakers are deployed in a proxy
+                                                                                                     service, located between clients and microservices, which handles all incoming and
+                                                                                                     outgoing messages. Within this, there may be two options: one proxy for each target
+                                                                                                     microservice or a single proxy for multiple services (usually implemented in API
+                                                                                                     gateway) that includes both client-side circuit breakers and service-side circuit breakers
+                                                                                                     existing within that proxy. The security advantage of this option is that neither the client
+                                                                                                     code nor the services code needs to be modified, which avoids trust and integrity
+                                                                                                     assurance issues associated with both these categories of code as well as the circuit
+                                                                                                     breaker function. This option also provides additional protections such as making clients
+                                                                                                     more resilient to faulty services, and shielding services from cases in which a single
+                                                                                                     client sends too many requests [9], resulting in some type of denial of service to other
+                                                                                                     clients that use that service.
+
+
+
+                                                                                                                                               23
+

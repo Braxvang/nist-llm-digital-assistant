@@ -1,0 +1,56 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+   Bypassing firewall egress filtering with a forged Home Address Option
+The next three sections describe how security is provided between a MN and, first, its HA, and, second, a
+CN. In summary:
+
+   Mobile IPv6 security is based on a security goal and a threat analysis.
+
+   Mobile IPv6 uses IPsec where clearly practical and has updated its specifications to use IKEv2 and
+    RFC 4301.
+
+   Return routability was added as a practical method for securing route optimizations between a MN
+    and CN.
+Unfortunately, many implementations of MIPv6 don’t support using IPsec between the MN and the HA,
+so they are vulnerable to man-in-the-middle attacks. IKEv2 is also not widely supported by these
+implementations.
+4.4.3.1     Securing MN to HA Binding Updates
+
+The top priority for MIPv6 security is stopping a forged BU. Given the goal of using existing security
+systems wherever practical, IPsec was the logical choice. A working relationship between a MN and its
+HA naturally exists, and IPsec has always been a mandatory part of IPv6. The latest version of IPsec
+(RFC 4301) contains several improvements for securing communications between a MN and its HA. In
+addition to more efficient cryptographic transformations and the simplifications in IKEv2, selectors for
+ICMPv6 message types and the Mobility Header are now included, and the Peer Authorization Database
+(PAD) can also be used on the HA. The HA uses the PAD to specify how to authenticate the MN and tie
+the MN's identity to its HoA to prevent attacks that impersonate a MN. IPsec ESP in transport mode is
+used for:
+
+   BU:     MN  HA
+
+   BUA: HA  MN
+The MN’s security associations must use its HoA in either the source address, the Home Address
+Destination Option, or a Type 2 Routing Header. The integrity transform (ESP-NULL) is required,
+confidentiality is optional, and replay detection is recommended if dynamic keying (IKEv1 or IKEv2) is
+used. The following protocol elements are used:
+
+BU Message:
+
+   IPv6 Header: Source = CoA; Destination = HA
+
+   Home Address Option: Address = HoA
+
+   ESP header: transport mode, authentication
+
+   Mobility header: Alternate CoA Option = CoA
+BU Acknowledgement:
+
+   IPv6 Header: Source = HA; Destination = CoA
+
+   Type 2 Routing Header: Address = HA
+
+
+
+                                                   4-18
+

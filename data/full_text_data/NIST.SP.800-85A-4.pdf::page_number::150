@@ -1,0 +1,56 @@
+NIST SP 800-85A-4                                      PIV CARD APPLICATION & MIDDLEWARE
+                                                                INTERFACE TEST GUIDELINES
+
+ Precondition(s)      1. The IUT is inserted into the contact reader.
+                      2. There exists a valid PC/SC connection between the test system
+                         and the contact reader.
+                      3. Secure messaging session keys have not been established.
+ Test Scenario        1. Send SELECT card command with
+                         • AID == 'A0 00 00 03 08 00 00 10 00 01 00'
+                      2. Send GET DATA command with
+                         • CLA is set to a value of '0C'
+                         • The BER-TLV encoded encrypted PIV data field shall be
+                            formatted as follows: '87 11 01 (16 bytes of random
+                            data to simulate one block of encrypted data)'
+                         • The BER-TLV encoded C-MAC shall be formatted as
+                            follows: '8E 08 (8 bytes of random data to simulate
+                            MAC value)'
+                      3. Send GENERAL AUTHENTICATE card command
+                         • P1, algorithm reference, is set to '27' or '2E', as
+                            indicated by the 0xAC tag obtained from the
+                            application property template in step 1
+                         • P2, key reference, is set to '04' indicating the PIV
+                            Secure Messaging key
+                      4. Send GET DATA command using the '0C' CLA byte with
+                         • The encrypted data field of the command containing the
+                            tag of the CHUID data object
+                         • The command is properly formatted with the exception
+                            of the required BER-TLV encoded C-MAC, which shall be
+                            absent
+                      5. Send GENERAL AUTHENTICATE card command
+                         • P1, algorithm reference, is set to '27' or '2E', as
+                            indicated by the 0xAC tag obtained from the
+                            application property template in step 1
+                         • P2, key reference, is set to '04' indicating the PIV
+                            Secure Messaging key
+                      6. Send GET DATA command with
+                         • The encrypted data field of the command containing the
+                            tag of the CHUID data object
+                         • The command is properly formatted however the required
+                            BER-TLV encoded C-MAC is incorrect
+ Expected Result(s)   1. The command returns the application property template with
+                         the status word '90 00' at the end.
+                      2. Command returns '69 82' (security status not satisfied).
+                      3. Command returns '90 00' (successful execution).
+                      4. Command returns '69 87' (expected secure messaging data
+                         objects are missing).
+                      5. Command returns '90 00' (successful execution).
+                      6. Command returns '69 88' (secure messaging data objects are
+                         incorrect).
+ Postcondition(s)     N/A
+
+
+
+
+                                     C-49
+

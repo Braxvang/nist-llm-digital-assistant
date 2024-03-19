@@ -1,0 +1,54 @@
+                                    NIST Special Publication 800-38F
+
+
+      3.    If n = 2, then let S = CIPH-1K(C); if n > 2, then let S = W-1(C).
+      4.    If MSB32(S) ≠ ICV2, then return FAIL and stop.
+      5.    Let Plen = int(LSB32(MSB64(S))).
+      6.    Let padlen = 8(n-1)-Plen.
+      7.    If padlen < 0 or padlen > 7, then return FAIL and stop.
+      8.    If LSB8padlen(S) ≠ 08padlen, then return FAIL and stop.
+      9.    Return P = MSB8Plen(LSB64(n-1)(S)).
+
+7 Specification of TKW
+
+7.1        TW and TW-1
+Algorithm 7 specifies the wrapping function, TW, for the authenticated-encryption function of
+TKW (see Sec. 7.2) with a given KEK, K.
+
+Algorithm 7: TW(S)
+
+Prerequisites:
+KEK, K, for TDEA;
+designated cipher function, CIPHK.
+
+Input:
+a string, S, of n semiblocks, for some integer n ≥ 3.
+
+Steps:
+    1. Initialize the variables.
+           a) Let s = 6(n-1).
+           b) Let S1, S2 , … , Sn be the semiblocks such that S = S1 || S2 || … || Sn.
+           c) Let A0 = S1.
+           d) For i = 2, …, n, let Ri0 = Si.
+    2. Calculate the intermediate values. For t = 1, …, s, update the variables as follows:
+           a) At = MSB32(CIPHK(At-1 || R2t-1)) ⊕ [t]32;
+           b) For i = 2, …, n-1: Rit = Ri+1t-1;
+           c) Rnt = LSB32(CIPHK (At-1 || R2t-1)).
+    3. Output the results:
+           a) Let C1 = As.
+           b) For i = 2, …, n: Ci = Ris.
+           c) Return C1 || C2 || … || Cn.
+
+Algorithm 8 specifies the unwrapping function, TW-1, for the authenticated-decryption function
+of TKW (see Sec. 7.2) with a given KEK, K.
+
+Algorithm 8: TW-1(C)
+
+Prerequisites:
+KEK, K, for TDEA;
+
+
+
+
+                                                     16
+

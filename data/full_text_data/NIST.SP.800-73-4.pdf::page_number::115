@@ -1,0 +1,58 @@
+Special Publication 800-73-4                          Interfaces for Personal Identity Verification – Part 2:
+                                                      PIV Card Application Card Command Interface
+
+application and returns the result. The witness and challenge are encrypted/decrypted using the same the
+key and algorithm. Table 19 shows the GENERAL AUTHENTICATE card commands sent to the PIV
+Card Application to realize mutual authentication using 3 Key Triple DES – ECB (algorithm identifier
+'00').
+
+               Table 19. Mutual Authentication of Client Application and PIV Card Application
+
+               Command                        Response                           Comment
+      '00 87 00 9B 04 7C 02 80                                      Client application requests a
+      00 00'                                                        witness from the PIV Card
+                                                                    Application.
+                                     '7C 0A 80 08 88 77 66 55       PIV Card Application returns a
+                                     44 33 22 11 90 00'             witness that is created by
+                                                                    generating 8 bytes of random
+                                                                    data ('01 02 03 04 05 06 07 08')
+                                                                    and encrypting it using the
+                                                                    referenced key ('9B') and
+                                                                    algorithm ('00'). [SP800-78,
+                                                                    Tables 6-1 and 6-2]
+      '00 87 00 9B 18 7C 16 80                                      Client application returns the
+      08 01 02 03 04 05 06 07 08                                    decrypted witness ('01 02 03 04
+      81 08 09 0A 0B 0C 0D 0E                                       05 06 07 08') referencing
+      0F 10 82 00 00'                                               algorithm '00' and key reference
+                                                                    '9B'. Client application requests
+                                                                    encryption of challenge data ('09
+                                                                    0A 0B 0C 0D 0E 0F 10') from
+                                                                    the card using the same key.
+                                     '7C 0A 82 08 11 FF EE DD       PIV Card Application
+                                     CC BB AA 99 90 00'             authenticates the client
+                                                                    application by verifying the
+                                                                    decrypted witness. PIV Card
+                                                                    Application indicates successful
+                                                                    authentication of PIV Card
+                                                                    Application Administrator and
+                                                                    sends back the encrypted
+                                                                    challenge ('11 FF EE DD CC BB
+                                                                    AA 99'). Client application
+                                                                    authenticates the PIV Card
+                                                                    Application by decrypting the
+                                                                    encrypted challenge and getting
+                                                                    ('09 0A 0B 0C 0D 0E 0F 10').
+
+A.3           Authentication of PIV Cardholder
+
+The PIV cardholder is authenticated by first retrieving and validating either the X.509 Certificate for PIV
+Authentication or the X.509 Certificate for Card Authentication. Assuming the certificate is valid, the
+client application requests the PIV Card Application to sign a challenge using the private key associated
+with this certificate (i.e., key reference '9A' or '9E') and the appropriate algorithm (e.g., algorithm
+identifier '07'), which can be determined from the certificate as described in Part 1, Appendix C.1. The
+
+
+
+
+                                                    40
+

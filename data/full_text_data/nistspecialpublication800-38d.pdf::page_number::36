@@ -1,0 +1,53 @@
+                                NIST Special Publication 800-38D
+
+
+
+Appendix C: Requirements and Guidelines for Using Short Tags
+
+For some voice or video applications, short authentication tags can be appropriate. The forgery
+of some fraction of the individual authenticated “packets” may be tolerable, because each packet
+of data in a large stream may carry very little of the overall meaning.
+
+However, even for voice and video applications, short tags can be problematic for GCM, due to
+the targeted forgery attack that is summarized in Appendix B and detailed in Ref. [1]. Absent
+the requirements and guidelines in this appendix, it may be practical for the attack to produce the
+hash subkey, H, after which the authentication assurance is completely lost. Nevertheless, this
+Recommendation does not preclude short tags entirely, because knowledgeable security
+professionals should be able to manage the risks in connection with this attack, and its potential
+improvement.
+
+The following guidelines implicitly describe the special circumstances that may be appropriate
+for short tags. A packet in this context is a set of inputs to the authenticated decryption function.
+
+   1. Packets that fail the integrity check within the authenticated decryption function should
+      be silently discarded. In other words, the controlling protocol/system over which packets
+      are received should not provide an ACK/NACK response regarding the integrity of
+      individual packets. However, the receiver should log authentication errors internally—in
+      a way which is undetectable from side-channel information—and terminate the
+      connection or notify the user if the percentage of errors exceeds what would be
+      considered normal. This is standard security practice with any protocol/system and any
+      algorithm choice.
+
+   2. The AAD within packets should be limited to the necessary header information and
+      should not contain messages to be authenticated along with the encrypted data.
+
+   3. The substance or meaning of the overall message that is comprised of a large number of
+      packets should not be lost or compromised by the forgery of a single, arbitrary packet.
+      For example, packets could carry a sequence of snippets of voice or visual data, but an
+      individual packet should not carry a .txt or .doc file. Ideally, the plaintext data
+      underlying the encryption should not be so stereotypical as to be guessable.
+
+   4. The controlling protocol/system should establish a new GCM key—and thus a new hash
+      subkey, H—frequently, depending on the maximum combined length of the ciphertext
+      and AAD that can occur within a single packet. Moreover, for 32-bit tags, this combined
+      length should be very small—on the order of tens or hundreds of bytes; 64-bit tags extend
+      the maximum combined length into the millions of bytes.
+
+An example of a protocol that meets these guidelines is Secure Real-time Transport Protocol
+carrying Voice over Internet Protocol, running over User Datagram Protocol.
+
+
+
+
+                                                 28
+

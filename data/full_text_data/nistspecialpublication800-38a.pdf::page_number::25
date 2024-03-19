@@ -1,0 +1,53 @@
+Appendix B: Generation of Counter Blocks
+
+The specification of the CTR mode requires a unique counter block for each plaintext block that
+is ever encrypted under a given key, across all messages. If, contrary to this requirement, a
+counter block is used repeatedly, then the confidentiality of all of the plaintext blocks
+corresponding to that counter block may be compromised. In particular, if any plaintext block
+that is encrypted using a given counter block is known, then the output of the forward cipher
+function can be determined easily from the associated ciphertext block. This output allows any
+other plaintext blocks that are encrypted using the same counter block to be easily recovered
+from their associated ciphertext blocks.
+
+There are two aspects to satisfying the uniqueness requirement. First, an incrementing function
+for generating the counter blocks from any initial counter block can ensure that counter blocks do
+not repeat within a given message. Second, the initial counter blocks, T1, must be chosen to
+ensure that counters are unique across all messages that are encrypted under the given key.
+
+B.1    The Standard Incrementing Function
+
+In general, given the initial counter block for a message, the successive counter blocks are
+derived by applying an incrementing function. As in the above specifications of the modes, n is
+the number of blocks in the given plaintext message, and b is the number of bits in the block.
+
+The standard incrementing function can apply either to an entire block or to a part of a block.
+Let m be the number of bits in the specific part of the block to be incremented; thus, m is a
+positive integer such that m ≤ b. Any string of m bits can be regarded as the binary representation
+                                                        m
+of a non-negative integer x that is strictly less than 2 . The standard incrementing function takes
+                            m
+[x]m and returns [x+1 mod 2 ]m.
+
+For example, let the standard incrementing function apply to the five least significant bits of
+eight bit blocks, so that b=8 and m=5 (unrealistically small values); let * represent each unknown
+bit in this example, and let ***11110 represent a block to be incremented. The following
+sequence of blocks results from four applications of the standard incrementing function:
+
+               ***11110
+               ***11111
+               ***00000
+               ***00001
+               * * * 0 0 0 1 0.
+
+Counter blocks in which a given set of m bits are incremented by the standard incrementing
+                                                                                             m
+function satisfy the uniqueness requirement within the given message provided that n ≤ 2 .
+Whether the uniqueness requirement for counter blocks is satisfied across all messages that are
+encrypted under a given key then depends on the choices of the initial counter blocks for the
+messages, as discussed in the next section.
+
+
+
+
+                                                18
+

@@ -1,0 +1,59 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+
+7.2.3   Running Name Server Software with Restricted Privileges
+
+If the name server software is run as a privileged user (e.g., root in Unix systems), any break-in into the
+software can have disastrous consequences in terms of resources resident in the name server platform.
+Specifically, a hacker who breaks into the software acquires unrestricted access and therefore can
+potentially execute any commands or modify or delete any files. Hence, it is necessary to run the name
+server software as a nonprivileged user with access restricted to specified directories to contain damages
+resulting from break-in.
+
+The user name under which the name server software needs to run can be specified by using the chroot
+command in BIND. This is why this approach is known as running the DNS server in a chroot jail. An
+example command (entered on the command line) is the following:
+
+        >named -u named –t /var/named/chroot
+
+where the options specify the following:
+
+        –u specifies the userID to which the name server software will change after starting. This user
+        account should be created prior to issuing the chroot command.
+
+        –t specifies the directory in which the name server software owner will use as the root “jail” and
+        should have the appropriate privileges. This directory will have to be created by the system
+        administrator before starting the server process.
+
+This ability is also found in NSD as part of the NSD startup scripts. The default userID under which NSD
+runs is nsd and the default directory is /etc/nsd/ Both of these defaults can be changed in the NSD
+configuration file by adding:
+
+        server:
+             username: <userID>
+             chroot: <dir>
+
+
+7.2.4   Isolating the Name Server Software
+
+Even if the DNS software (e.g., BIND) is run on a secure OS, the vulnerabilities of other software
+programs on that platform can breach the security of DNS software. Hence, it is recommended that the
+platform on which the DNS software runs contains no programs other than those needed for OS and
+network support. If this is not possible due to resource constraints, care should be taken to ensure to limit
+the number of services running on the same platform.
+
+7.2.5   Dedicated Name Server Instance for Each Function
+
+An authoritative name server serves RRs from its own zone file; this function is called an authoritative
+function. Serving RRs either from its cache (directly or by building up its cache dynamically through
+iterative queries) is called a resolving function; this is how a resolving name server provides responses. A
+name server instance can be configured as an authoritative name server, a resolving name server, or both.
+Because of attacks such as cache poisoning (see Section 6.1), however, a resolving name server has to be
+
+
+
+
+                                                     7-3
+

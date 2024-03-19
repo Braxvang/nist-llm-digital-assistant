@@ -1,0 +1,56 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+efficient packets for transmission. The encapsulated protocol (IPv4 or IPv6) sees the tunnel as a single
+hop. The hop limit or TTL for the encapsulating protocol is independent of the TTL for the encapsulated
+protocol.
+
+  6.5.1   General Security Considerations for Tunneling
+
+The following are security items to consider for tunneled environments:
+
+        Tunnel endpoints
+        Inspection
+        Access control
+        Termination.
+Tunnel endpoints are always a focal point for security; attackers frequently target them in attacks.
+Potentially, traffic from anywhere can arrive at tunnel endpoints. Tunnels should be treated as an external
+link. The tunneled traffic should not be trusted without inspection. This requires examining IPv6 traffic
+within IPv4 packets and subjecting it to security controls at the same place, logically, that IPv4 is
+controlled. Packet filters, network ingress filtering, virus protection, application proxies, and intrusion
+detection systems need to apply the same security policy to what is inside tunneling protocols as they do
+to IPv4. Enforcing security policies at both the ingress and egress of the tunnel will protect the tunnel
+provider from attacks and protect hosts from traffic coming through the tunnel. Even if the traffic going
+through the tunnel is protected with end-to-end IPsec, additional security controls such as authorization
+should be applied at the tunnel endpoints.
+
+In addition to filtering on tunnel endpoints it is important to use Unicast Reverse Path Forwarding
+(Unicast RPF) filtering on the tunnel endpoints (RFC 3704). An attacker can perform traffic injection or
+reflection on or through the tunnel endpoints, sending crafted packets toward a tunnel endpoint router that
+will then forward the packet toward the other tunnel destination. The far-end tunnel endpoint will assume
+that the packet is legitimate because it came out of the tunnel interface and forward it onward to the
+destination. This threat can be mitigated by using Unicast RPF and tunnel endpoint filtering at both
+tunnel endpoints. Another technique for protecting the tunnel endpoints is to use traffic ACLs to insure
+that only legitimate packets are going through the tunnel. There is also a risk that an attacker could be
+performing tunnel sniffing and eavesdropping on traffic going through the tunnel. This can be protected
+with the use of IPsec (IPv4 with GRE to protect IPv6 tunnel).
+
+However, checking the IPv4 outer header doesn’t necessarily mean the inner IPv6 packet is legitimate.
+Depending on the security device being used, it can be difficult to check/match the outer and the inner
+header. An attacker may even be using tunnels to obfuscate traffic inside because the attacker knows that
+many organizations lack deep packet inspection of IPv4/IPv6 packets.
+
+
+Routers, firewalls, and security devices at the end of an enterprise network may not be technically capable
+of inspecting the IPv6 payload contained within IPv4 packets entering and exiting the network. In
+particular, security devices are unable to inspect encrypted tunnel traffic. By default, tunneling protocols
+do not encrypt traffic. Organizations should deploy security devices that can understand tunneled traffic
+or can inspect traffic once decapsulated.
+
+The access control lists (ACL) on IPv4 routers may be incapable of blocking access to the network from
+specific IPv6 addresses or from entire blocks of IPv6 addresses. They may not be able to recognize IPv6
+
+
+
+                                                   6-13
+

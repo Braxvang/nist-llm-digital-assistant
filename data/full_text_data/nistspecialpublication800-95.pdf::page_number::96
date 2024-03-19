@@ -1,0 +1,57 @@
+                                                                               GUIDE TO SECURE WEB SERVICES
+
+
+
+To exploit a format string vulnerability, the attacker sends unexpected inputs to the program in the form
+of strings specifically crafted to cause a privileged program to enable privilege escalation by a normal
+user. The format string vulnerability can then trick the privileged program into allowing arbitrary data to
+be written to the stack, thus enabling the attacker to take control of the program and the host on which it
+runs.
+
+A.2.3     Buffer Overflow Exploits
+
+Buffer overflow exploits are targeted at Web service components (most often those written in C or C++)
+that accept data as input and store it in memory (rather than on disk) for later use or manipulation. An
+overflow of a memory buffer results when the Web service component fails to adequately check the size
+of the input data to ensure that it is not larger than the memory buffer allocated to receive it, and instead
+passes the too-large data into the too-small buffer. The result is that the excess data is written into other
+areas of memory that are not prepared to receive it. Buffer overflows are particularly dangerous when
+those other areas of memory are allocated to store executable code rather than passive data—for example,
+an overflow of data onto the Web service program’s execution stack.
+
+If the oversized data input to the Web service component includes embedded spurious commands or
+malicious code, the buffer overflow may result in a loading of the malicious code into the service’s
+execution stack. The stack will then execute the malicious code instead of the valid Web service code
+that was displaced from the stack by the buffer overflow. Spurious commands planted in this way are
+usually designed to grant privileges to the malicious code that exceed the service program’s authorized
+permissions (possibly even granting administrator-level or root level permissions), thus granting the
+attack code—and through it, the attacker—access to data and control of resources and processes that
+would never have been granted to the displaced service code. Some buffer overflow attacks have a much
+simpler objective: they are designed to crash the service or suspend its execution (i.e., to achieve a DoS).
+
+There are four basic approaches to defending against buffer overflow vulnerabilities and attacks:
+
+ Safe programming. Write all Web service code in languages that automatically perform input
+  validation, such as Java and C#, or if writing in C or C++, ensure that all expected input lengths and
+  formats are explicitly specified, and that all inputs received are validated to ensure that they do not
+  exceed those lengths or violate those formats. Error and exception handling should be expressly
+  programmed to reject or truncate any inputs that violate the allowable input lengths/formats.
+ Memory allocation countermeasures. By allocating only non-executable storage areas for input
+  buffers, any attack code embedded in oversized inputs will not be inadvertently executed. This
+  approach can be used to stop those buffer overflow attacks that have the objective of executing
+  malicious code, but will not counteract buffer overflow DoS attacks.
+ Compiler-based countermeasures. Several leading C and C++ compilers include antioverflow
+  countermeasures that ensure that source code has array bounds checks performed at compile time on
+  all array accesses. This method completely eliminates the buffer overflow problem by making
+  overflows impossible, but imposes substantial overhead on the compilation process. Other compile-
+  time countermeasures perform integrity checks on code pointers to buffers before dereferencing those
+  pointers. This technique does not make buffer overflows impossible, but it does stop the majority of
+  buffer overflow attacks and makes the attacks that it cannot stop difficult to achieve. These
+  countermeasures have significant compatibility and performance advantages over compiler array
+  bounds checking.
+ Library-based countermeasures. Safe libraries that replace, at link time, commonly used but
+  overflow-prone standard C and C++ functions are available, as are filtering/wrapping mechanisms for
+
+
+                                                    A-3
+

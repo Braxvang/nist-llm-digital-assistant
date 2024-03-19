@@ -1,0 +1,50 @@
+      NIST SP 800-73pt1-5 ipd (Initial Public Draft)                Interfaces for Personal Identity Verification: Part 1
+      September 2023                                 PIV Card Application Namespace, Data Model, and Representation
+
+618   keysWithOffCardCerts value is greater than zero and SHALL be absent if the values of both
+619   keysWithOnCardCerts and keysWithOffCardCerts are zero. The offCardCertURL field MAY be
+620   present if the keysWithOffCardCerts value is zero but the keysWithOnCardCerts value is greater
+621   than zero.
+622   The file that is pointed to by the offCardCertURL field SHALL contain the DER encoding of the
+623   following data structure:
+624               OffCardKeyHistoryFile ::= SEQUENCE SIZE (1..20) OF SEQUENCE {
+625                      keyReference          OCTET STRING (SIZE(1))
+626                      cert                  Certificate
+627               }
+628   where keyReference is the key reference for the private key on the card and cert is the
+629   corresponding X.509 certificate. 5 The offCardCertURL field SHALL have the following format:
+630         "http://" <DNS name> "/" <ASCII-HEX encoded SHA-256 hash of OffCardKeyHistoryFile>
+631   The private keys for which the corresponding certificates are stored within the PIV Card
+632   Application SHALL be assigned to the lowest numbered key references reserved for retired key
+633   management private keys. For example, if keysWithOnCardCerts is 5, then the corresponding
+634   private keys SHALL be assigned to key references '82', '83', '84', '85', and '86'.
+635   The private keys for which the corresponding certificates are not stored within the PIV Card
+636   Application SHALL be assigned to the highest numbered key references reserved for retired key
+637   management private keys. For example, if keysWithOffCardCerts is 3, then the corresponding
+638   private keys SHALL be assigned to key references '93', '94', and '95'.
+639   Private keys do not have to be stored within the PIV Card Application in the order of their age.
+640   However, if the certificates that corresponding to only some of the retired key management
+641   private keys are available within the PIV Card Application, then the certificates that are stored in
+642   the PIV Card Application SHALL be the ones that were most recently issued.
+643   The Key History object is only available over the contact interface and VCI. The read access
+644   control rule for the Key History object is “Always,” meaning that it CAN be read without access
+645   control restrictions.
+646   The Security Object enforces integrity of the Key History object according to the issuer.
+
+647   3.3.4. Retired X.509 Certificates for Key Management
+
+648   These objects hold the X.509 Certificates for Key Management that corresponding to retired key
+649   management private keys, as described in Section 3.3.3. Retired key management private keys
+650   and their corresponding certificates are only available over the contact interface or VCI. The read
+651   access control rule for these certificates is “Always,” meaning that the certificates CAN be read
+652   without access control restrictions. The PKI cryptographic function (see Table 5) for all of the
+653   retired key management private keys is protected with a “PIN” or “OCC” access rule. In other
+654   words, once the PIN or OCC data is submitted and verified, subsequent key management key
+655   operations CAN be performed with any of the retired key management private keys without
+
+      5
+          The ASN.1 for Certificate may be imported from the ASN.1 module PKIX1Explicit88 in Appendix A.1 of [RFC5280].
+
+
+                                                                     12
+

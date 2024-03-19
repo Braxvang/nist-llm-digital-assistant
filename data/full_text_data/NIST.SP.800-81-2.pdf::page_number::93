@@ -1,0 +1,58 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+compromised a ZSK can use that key only during the KSK’s signature validity interval. An attacker that
+has compromised a KSK can use that key for only as long as the signature interval of the RRSIG covering
+the DS RR in the delegating parent. Therefore, it makes sense to keep these validity periods short, which
+will require frequent re-signing.
+
+To minimize the impact of a compromised ZSK, a zone administrator should set a signature validity
+period of 1 week for RRSIGs covering the DNSKEY RRSet in the zone (the RRSet that contains the ZSK
+and KSK for the zone). The DNSKEY RRSet can be re-signed without performing a ZSK rollover, but
+scheduled ZSK rollover should still be performed at regular intervals.
+
+To prevent the impact of a compromised KSK, a delegating parent should set the signature validity period
+for RRSIGs covering DS RRs in the range of a few days to 1 week. This re-signing does not require
+frequent rollover of the parent’s ZSK, but scheduled ZSK rollover should still be performed at regular
+intervals.
+
+
+Checklist item 24: The validity period for the RRSIGs covering a zone’s DNSKEY RRSet should be in
+the range of 2 days to 1 week. This value helps reduce the vulnerability period resulting from a key
+compromise.
+
+Checklist item 25: A zone with delegated children should have a validity period of a few days to 1 week
+for RRSIGs covering the DS RR for a delegated child. This value helps reduce the child zone’s
+vulnerability period resulting from a KSK compromise and scheduled key rollovers.
+
+
+Following checklist items 24 and 25 in a particular organization depends on the content management and
+DNSSEC tools in place and local policy regarding content management. A DNS administrator may be
+forced to choose one signature validity period for all of the content in a zone if the available tools do not
+allow for fine grain control in zone signing.
+
+In these cases it may be necessary for a DNS administrator to choose a single signature valididity period
+for the entire zone. In these cases, the DNS administrator should choose a value that minimizes the risk
+should a key compromise or emergency update be necessary.
+
+10.4 Hashed Authenticated Denial of Existance
+
+One of the side effects of the DNSSEC security extensions as they were first specified is the ability for a
+user to “walk” a zone by sending a series of queries for NSEC RRs (See Section 9). In that section the
+NSEC RR and its use in authenticated denial of existence is introduced. A client could send a query for
+an NSEC RR in the zone, then “walk” the zone by sending a follow-up query for the NSEC RR at the
+name indicated as the next name in the received NSEC RR. This would result in a client being able to
+enumerate the entire contents of a zone. While this is not an attack by itself (all DNS data is considered
+public), it would most likely be a prelude to an attack. An attacker would enumerate a zone to discover
+the IP addresses of servers to attack directly.
+
+There are several operational means to minimize the impact of zone enumeration and a protocol option in
+DNSSEC [IEEE]. The operational options are to use split DNS or some other means of segregating
+public servers from internal hosts. One way of doing that is described in Section 7.2.8 and Section 7.2.9.
+
+
+
+
+                                                    10-3
+

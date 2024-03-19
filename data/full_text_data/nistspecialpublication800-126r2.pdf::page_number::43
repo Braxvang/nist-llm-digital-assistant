@@ -1,0 +1,57 @@
+               The Technical Specification for the Security Content Automation Protocol (SCAP): SCAP Version 1.2
+
+
+          </arf:reports>
+        </arf:asset-report-collection>
+
+    9. Where applicable to the target system, each of the <xccdf:fact> elements in Table 20
+       SHALL be provided. Previous versions of SCAP required additional facts; these have been
+       incorporated into the use of the Asset Identification specification, as discussed in Section 4.4.2.
+                                    Table 20 - XCCDF Fact Descriptions
+
+ XCCDF Fact                                                          Description of Use
+                                                                     Equipment identification number or other
+ urn:scap:fact:asset:identifier:ein
+                                                                     inventory tag number
+                                                                     Globally unique identifier for the asset, if
+ urn:scap:fact:asset:identifier:guid
+                                                                     assigned
+ urn:scap:fact:asset:environmental_information:                      Organization that tracks the asset on its
+ owning_organization                                                 inventory
+ urn:scap:fact:asset:environmental_information:                      Geographic region where the asset is
+ current_region                                                      located
+ urn:scap:fact:asset:environmental_information:                      Name of the organization that does
+ administration_unit                                                 system administration for the asset
+
+
+4.5.1   Assigning Identifiers to Rule Results
+The <xccdf:rule-result> element provides data indicating the result of assessing a system using
+the identified <xccdf:Rule> element. If the target <xccdf:Rule> identified by the
+<xccdf:rule-result> element’s @idref attribute has one or more <xccdf:ident> elements
+with a @system attribute value listed in Section 3.2.4.1, then each <xccdf:ident> element SHALL
+also appear within the <xccdf:rule-result> element.
+Here is an example for a CVE entry:
+<xccdf:rule-result idref="java-upgrade-278" weight="10.0">
+   <xccdf:result>pass</xccdf:result>
+   …
+   <xccdf:ident system="http://cve.mitre.org">CVE-2006-0614</xccdf:ident>
+   …
+</xccdf:rule-result>
+
+If the <xccdf:ident> element is included, for tracking purposes it is important that produced XCCDF
+results have specific meanings. If an <xccdf:ident> element is present and it identifies a CVE, CCE,
+or CPE entry, then an <xccdf:rule-result> of “pass” SHALL indicate that the check content
+evaluated within the rule complied with one of the following:
+       For a CVE entry, the target platform satisfies all the conditions of the XCCDF rule and is
+        unaffected by the vulnerability or exposure referenced by the CVE.
+       For a CCE entry, the target platform complies with the configuration setting guidance expressed
+        in the XCCDF rule.
+       For a CPE entry, the target platform was identified on the system.
+It is important that these interpretations of <xccdf:ident> elements be preserved. For example,
+consider two policy recommendations. One is that a particular piece of software be installed, and the
+second that another piece of software not be installed. Both rules for these policy recommendations could
+use the same CPE entry in their <xccdf:ident> elements. However, because the interpretation of a
+
+
+                                                      36
+

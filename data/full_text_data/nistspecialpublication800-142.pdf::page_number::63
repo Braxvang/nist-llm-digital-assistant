@@ -1,0 +1,53 @@
+                                                           Practical Combinatorial Testing
+ _______________________________________________________
+Continuing with the analysis in this manner, some properties become apparent. For the
+discussion below, Pt = {combinations in t-way passing tests}, with Ft and Ct defined
+analogously. Let Tt = {t-way tests} and f(x) be a function that indicates whether a test x
+passes or fails for the system under test. Thus P4 = {combinations in 4-way passing tests},
+T5= {5-way tests}, etc.
+
+Suppose that a particular combination c triggers or causes a failure if whenever c is
+contained in some test x, f(x) = fail. (That is, the system is deterministic and the failure-
+triggering combination is not masked by other parameter values.) We can now consolidate
+these ideas into heuristics for identifying the failure-triggering combination(s) C.
+
+   •   Elimination: For a deterministic system, F \ P must contain the fault-triggering
+       combinations C because if any of those in C were in P, then the test would have
+       failed.
+
+   •   Interaction level lower bound: If all t-way tests pass, then a t-way or lower strength
+       combination did not cause the failure. The failure must have been caused by a
+       (t+k)-way combination, for some k > t. Note that the converse is not necessarily
+       true: if some t-way test fails, we cannot conclude that a t-way test caused the
+       failure, because any t-way test set contains some k-way combinations, for k > t.
+
+   •   Interaction continuity:     Now consider Ct. Because t-way tests cover all
+       combinations of t-way or lower strength (e.g., 4-way tests also cover all 3-way
+       combinations), a combination that triggered the failure in Ft must also occur in
+       F(t+1), F(t+2), etc. Therefore we can further reduce the potential failure-triggering
+       combinations by computing Ft I F (t + 1) I ... I F (t + k ) for whatever interaction
+       strength k we have tests available.
+
+   •   Value dependence: If tests in Ft cover all values for a t-way parameter combination
+       c, then the failure is independent of c; i.e., c is not a t-way failure-triggering
+       combination(s).
+
+
+Example: In the preceding discussion we assumed that a particular combination c triggers
+or causes a failure if whenever c is contained in some test x, f(x) = fail. However, in many
+cases the presence of a particular combination may trigger a failure, but is not guaranteed
+to do so (see discussion of interaction level lower bound above). Consider the following:
+
+       1. p(int a, int b, int c, int d, int e) {
+       2. if (a && b)          return 1;
+       3. else if (c && d)     return 2;
+       4. else if (e)          return 3;
+       5. else                 return 4;
+       6. }
+
+If line 3 is incorrectly implemented as “return 7” instead of “return 2”, then p(1,1,1,1,0) =
+
+
+
+                                                                                                57
+

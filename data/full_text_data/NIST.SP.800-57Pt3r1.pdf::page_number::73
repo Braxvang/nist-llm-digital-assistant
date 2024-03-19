@@ -1,0 +1,51 @@
+[RFC 6187] specifies the use of X.509 version 3 certificates to convey public keys for the
+digital-signature algorithms. It also formally defines 2048-bit RSA with SHA-256 as a
+method for use in SSH. This combination provides 112 bits of security and is allowed. It
+is important to note that the hash algorithm used with the digital signature algorithms for
+authentication can be different than the hash function HASH in the key exchange and the
+key-derivation functions of SSH TLP.
+
+10.2.1.4 Encryption Algorithms
+Several encryption algorithms are available for SSH; Federal Government applications
+shall use NIST-approved algorithms. The currently specified encryption algorithms and
+mode(s) of operation for SSH that are NIST-approved are 3DES-CBC, AES-128-CBC,
+AES-192-CBC and AES-256-CBC [RFC 4253], and AEAD_AES_128_GCM and
+AEAD_AES_256_GCM [RFC 5647]. 3DES-CBC is mandatory for IETF
+implementation.
+
+In the protocol, when either AEAD_AES_128_GCM or AEAD_AES_256_GCM is
+selected as the encryption algorithm for protecting an encrypted tunnel (client-to-server
+or server-to-client), it is also chosen as the MAC algorithm. A different algorithm or set
+of algorithms may be selected for communication in each direction. It should be noted
+that when AEAD_AES_128_GCM or AEAD_AES_256_GCM is chosen (for encryption
+and MAC generation), the algorithm is executed only once (rather than once for
+encryption and another time for integrity protection), because these modes provide both
+confidentiality and integrity protections at the same time.
+
+When AEAD_AES_128_GCM or AEAD_AES_256_GCM is used, the SSH packet-
+length field is not encrypted, but is processed as additional authenticated (plaintext) data.
+See [RFC 5647] for more details on using these algorithms in SSH.
+
+10.2.1.5 Message Authentication Codes (MAC) Algorithms
+Several MAC algorithms are available for SSH; Federal Government applications shall
+use NIST-approved algorithms. The currently specified MAC algorithms for SSH that are
+NIST-approved are HMAC-SHA1 (with MAC tags of 160 bits), HMAC-SHA1-96 (with
+MAC tags of 96 bits [RFC 4253]), AEAD_AES_128_GCM and AEAD_AES_256_GCM
+[RFC 5647].
+
+As explained in Section 10.2.1.4, AEAD_AES_128_GCM or AEAD_AES_256_GCM
+can only be chosen as the MAC algorithm when also chosen as the encryption algorithm.
+
+10.2.1.6 Public Host-Key Verification
+After the algorithm negotiation is completed, the TLP authenticates the server to the
+client in a key-exchange process [RFC 4253, Sec. 8]. In this key exchange, a Diffie-
+Hellman (DH) key exchange is performed, producing two values: a DH value45 K and an
+exchange hash value called H. H is the hash value of K and other data [RFC 4253, Sec. 8]
+for a complete specification of H). The generated H and K are subsequently used as
+inputs to a key-derivation function [RFC 4253, Sec. 7.2] for the specification of this
+function) to generate IVs and keys for the selected cryptographic algorithms.
+45
+     In the key-agreement schemes in [SP 800-56A], K would be considered to be the shared secret.
+
+                                                     65
+

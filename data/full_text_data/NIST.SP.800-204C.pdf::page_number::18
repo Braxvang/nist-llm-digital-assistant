@@ -1,0 +1,55 @@
+                                                                                              NIST SP 800-204C                                               DEVSECOPS FOR A MICROSERVICES-BASED
+                                                                                                                                                                    APPLICATION WITH SERVICE MESH
+
+                                                                                                 7. Inject sidecar proxies into those pods, nodes, or namespaces where application
+                                                                                                    microservice containers are hosted
+
+                                                                                              Overall, the control plane helps the administrator populate the data plane component with the
+                                                                                              configuration data that is generated from the policies resident in the control plane. The policies
+                                                                                              for function 3 above may include network routing policies, load balancing policies, policies for
+                                                                                              blue-green deployments, canary rollouts, timeout, retry, and circuit-breaking capabilities. These
+                                                                                              last three are collectively called by the special name of resiliency capabilities of the networking
+                                                                                              infrastructure services. Last but not the least are security-related policies (e.g., authentication and
+                                                                                              authorization policies, TLS establishment policies, etc.). These policy rules are parsed by a
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204C
+
+
+
+
+                                                                                              module that converts them into configuration parameters for use by executables in data plane
+                                                                                              proxies that enforce those policies.
+
+                                                                                              2.2.2 Data Plane
+
+                                                                                              The data plane component performs three different functions:
+
+                                                                                                 1. Secure networking functions
+                                                                                                 2. Policy enforcement functions
+                                                                                                 3. Observability functions
+                                                                                              The primary component of the data plane that performs all three functions listed above is called
+                                                                                              the sidecar proxy. This L7 proxy runs in the same network namespace (which, in this platform, is
+                                                                                              the same pod) as the microservice for which it performs proxy functions. There is a proxy for
+                                                                                              every microservice to ensure that a request from a microservice does not bypass its associated
+                                                                                              proxy and that each proxy is run as a container in the same pod as the application microservice.
+                                                                                              Both containers have the same IP address and share the same IP Table rules. That makes the
+                                                                                              proxy take complete control over the pod and handle all traffic that passes through it [9,10].
+
+                                                                                              The first category of functions (secure networking) includes all functions related to the actual
+                                                                                              routing or communication of messages between microservices. The functions that come under
+                                                                                              this category are service discovery, establishing a secure (TLS) session, establishing network
+                                                                                              paths and routing rules for each microservice and its associated requests, authenticating each
+                                                                                              request (from a service or user), and authorizing the request.
+
+                                                                                              With the example of establishing a mutual TLS session, the proxy that initiates the
+                                                                                              communication session will interact with the module in the control plane of the service mesh to
+                                                                                              check whether it needs to encrypt traffic through the chain and establish mutual TLS with the
+                                                                                              backend or target pod. Enabling this functionality using mutual TLS requires every pod to have a
+                                                                                              certificate (i.e., a valid credential). Since a good-sized microservice application (consisting of
+                                                                                              many microservices) may require hundreds of pods (even without horizontal scaling of individual
+                                                                                              microservices through multiple instances), this may involve managing hundreds of short-lived
+                                                                                              certificates. This, in turn, requires each microservice to have a robust identity and the service
+                                                                                              mesh to have an access manager, a certificate store, and a certificate validation capability. In
+                                                                                              addition, mechanisms for identifying and authenticating the two communicating pods are
+
+                                                                                                                                                 8
+

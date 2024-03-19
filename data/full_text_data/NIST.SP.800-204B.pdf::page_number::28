@@ -1,0 +1,41 @@
+                                                                                              NIST SP 800-204B                                                   ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                               APPLICATIONS USING A SERVICE MESH
+
+                                                                                              trusted, authenticatable credential that conveys not just the user’s principal but also that user’s
+                                                                                              capabilities in the system. A JWT is frequently used for this because it is locally
+                                                                                              authenticatable and conveys the user’s principal (the JWT’s subject), the issuer of the JWT
+                                                                                              (issuer), and arbitrary claims that the organization can control (e.g., to use for access control).
+
+                                                                                              Performing end user authorization based on a JWT is built directly into Envoy, the sidecar
+                                                                                              proxy of the reference mesh Istio. Envoy can be configured with a filter [16] that will process
+                                                                                              requests in two steps:
+
+                                                                                              1. JWT token verification involves extracting the token from the request header, verifying
+                                                                                                 whether issuers and audiences are allowed, fetching the public key, and verifying the digital
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                                 signature on the token.
+                                                                                              2. Match the resources in the request to the claims in the token to determine whether the end
+                                                                                                 user should be allowed access to the requested resources or denied.
+
+                                                                                              Envoy’s JWT filter acts as the PDP, making the access decision entirely locally. This requires
+                                                                                              that policy documents be small enough to reside on an individual sidecar proxy. Although a full
+                                                                                              ABAC is ideal for handling resource-level policies, the JWT filter is valuable as a
+                                                                                              steppingstone from a traditional system that only performs access control on the edge to a zero-
+                                                                                              trust system that performs authentication and authorization at each service. The limitation of
+                                                                                              this approach is that it becomes hard to revoke a user’s access once a JWT is issued.
+                                                                                              Community standards, such as Internet Engineering Task Force (IETF) Request for Comments
+                                                                                              (RFC) for OAuth2 Introspection, can be used to address this.
+
+                                                                                              An example of an authorization policy that will enable the sidecar itself to make an access
+                                                                                              control decision based on claims in the JWT and enforce it, without calling on an external
+                                                                                              authorization system, is given below:
+
+
+
+
+                                                                                                                                                 20
+

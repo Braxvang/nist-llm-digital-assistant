@@ -1,0 +1,63 @@
+5.6       Preparation of the minutia templates
+5.6.1         Conversion of INCITS 378 to ISO/IEC 19794-2 on-card comparison templates
+Existing PIV equipment produces (CBEFF-wrapped) [MINUSTD] instances of Table 6 for off-card comparison. An OCC
+process may choose to use such equipment in which case [CARD-MIN] data would appropriately be prepared from
+live [MINUSTD] templates via the non-trivial conversion of Figure 4. The conversion operation proceeds with a
+pruning operation (Sec. 5.6.2.1 and 5.6.2.2), a re-encoding (conversion of 8 bit to 6 bit minutia angle, conversion from
+14 bit to 8 bit position coordinates), and a sorting operation (Sec. 5.6.2.3). The order matters here due to arithmetic
+rounding.
+
+                                                                                          BIT Parameters              Vendor Y card
+
+
+                                           INCITS
+                         Vendor X                              Remove excess minutiae by
+      Input Image                         378:2004
+                         generator                                Quality and Position
+                                          template
+
+
+
+                    Angle Quantization                   (x,y) 197 → 100 pix cm-1                           ISO-CC
+                                                                                               Sort
+                        8 → 6 bits                         Resolution change                               template
+
+                                                                                                                         Vendor Y
+                                                     Vendor supplied component                                        PC based library
+
+
+                                     Figure 4 − Conversion of INCITS 378 to ISO/IEC 19794-2 card data
+
+5.6.2         Effect of the BIT
+
+5.6.2.1       Number of minutiae
+The number of minutiae sent to a PIV Card for on-card comparison is not limited by this document. However, the
+number may be subject to limits implied by the interface specifications of [800-73, Part 2].
+INFORMATIVE NOTE 1 Leading commercial minutia detectors produce a median of 41 minutiae from plain impression
+images with the 5% and 95% quantiles being 24 and 61 respectively over four large operational single index finger
+datasets.
+INFORMATIVE NOTE 2 A short-length APDU command constrains the maximum number of three-byte minutiae.
+Implementers should consult [800-73, Part 2] on the availability of command chaining [CARD-CMD] for larger
+templates.
+Because some templates will naturally contain 0 minutiae (i.e., the algorithm does not find any), the (off-card) client
+shall respect the minimum number indicated by the card in its BIT structure. The client shall either terminate the
+minutia-based authentication attempt or prompt for (re-)presentation of one of the enrolled fingers.
+All reference and verification templates shall be parameterized by the BIT parameters, as follows. If,
+―      the value indicated in the BIT for the minimum number of minutiae is N ≥ 0,
+―      the value indicated in the BIT for the maximum number of minutiae is N ≤ M,
+―      the number of minutiae available for sending to the card for OCC is K, then
+―      the number of minutiae sent to the card, S, shall be
+
+                                                     S     =     { MK ifif          K≥M
+                                                                                    K<M
+
+In the case K < N, the client should initially recapture fingerprints (by re-prompting the user to replace finger on the
+sensor) and it that is unsuccessful should terminate the authentication.
+
+5.6.2.2       Minutiae removal mechanism
+Minutiae shall be removed according to the specifications of [CARD-MIN, Clause 9.3.2]. Note that because the parent
+[MINUSTD] template allows larger spatial extent (14 bit integers at 197 pixels cm-1 off card), very large fingers may
+
+
+                                                                                                                                         21
+

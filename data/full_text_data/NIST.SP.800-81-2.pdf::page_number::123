@@ -1,0 +1,59 @@
+                                                          SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+ Appendix A—Definitions of Important Terms
+
+Selected terms used in the Secure Domain Name System (DNS) Deployment Guide are defined below. The
+terms come from the DNSSEC specifications [RFC4033], [RFC4034], [RFC4035] and [RFC3833] with
+some additions for specific terms used in this guide.
+
+Authentication Chain: An alternating sequence of DNS public key (DNSKEY) RRsets and Delegation
+Signer (DS) RRsets forms a chain of signed data, with each link in the chain vouching for the next. A
+DNSKEY RR is used to verify the signature covering a DS RR and allows the DS RR to be authenticated.
+The DS RR contains a hash of another DNSKEY RR, and this new DNSKEY RR is authenticated by
+matching the hash in the DS RR. This new DNSKEY RR, in turn, authenticates another DNSKEY RRSet
+and, in turn, some DNSKEY RR in this set may be used to authenticate another DS RR, and so forth until
+the chain finally ends with a DNSKEY RR whose corresponding private key signs the desired DNS data.
+For example, the root DNSKEY RRSet can be used to authenticate the DS RRSet for “example.” The
+“example.” DS RRSet contains a hash that matches some “example.” DNSKEY, and this DNSKEY’s
+corresponding private key signs the “example.” DNSKEY RRSet. Private key counterparts of the
+“example.” DNSKEY RRSet sign data records such as “www.example.” as well as DS RRs for
+delegations such as “subzone.example.”
+
+Authentication Key: A public key that a DNSSEC-aware resolver has verified and can therefore use to
+authenticate data. A DNSSEC-aware resolver can obtain authentication keys in three ways. First, the
+resolver generally is configured to know about at least one public key; this configured data usually is
+either the public key itself or a hash of the public key as found in the DS RR (see “trust anchor”). Second,
+the resolver may use an authenticated public key to verify a DS RR and the DNSKEY RR to which the
+DS RR refers. Third, the resolver may be able to determine that a new public key has been signed by the
+private key corresponding to another public key that the resolver has verified. Note that the resolver must
+always be guided by local policy in deciding whether to authenticate a new public key, even if the local
+policy is simply to authenticate any new public key for which the resolver is able verify the signature.
+
+Authoritative RRSet: Within the context of a particular zone, an RRSet (RRs with the same name, class,
+and type) is authoritative if and only if the owner name of the RRSet lies within the subset of the name
+space that is at or below the zone apex and at or above the cuts that separate the zone from its children, if
+any. RRs of type NSEC, RRSIG and DS are examples of RRSets at a cut that are authoritative at the
+parent side of the zone cut, and not the delegated child side.
+
+Chain of Trust: See “authentication chain.”
+
+Chained Secure Zone: A DNS zone in which there is an authentication chain from the zone to a trust
+anchor.
+
+Delegation Point: The name at the parental side of a zone cut. That is, the delegation point for
+“foo.example” would be the foo.example node in the “example” zone (as opposed to the zone apex of the
+“foo.example” zone). See also “zone apex.”
+
+DNS Administrator: Used in this document to cover the person (or persons) tasked with updating zone
+data and operating an enterprise’s DNS server. This term may actually cover several official roles, but
+these roles are covered by one term here.
+
+DNSSEC-Aware Name Server: An entity acting in the role of a name server that understands the DNS
+security extensions defined in this document set. In particular, a DNSSEC-aware name server is an entity
+that receives DNS queries, sends DNS responses, supports the EDNS0 [RFC2671] message size
+
+
+                                                    A-1
+

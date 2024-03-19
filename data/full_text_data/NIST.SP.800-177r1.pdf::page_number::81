@@ -1,0 +1,57 @@
+                                                                                               NIST SP 800-177 REV. 1                                                            TRUSTWORTHY EMAIL
+
+
+
+                                                                                                                          Table 5-2: MTA-STS Policy Tags and Descriptions
+
+                                                                                                        Tag                                            Description
+                                                                                                      version:          The version of MTA-STS in use by the receiver. Currently, the only
+                                                                                                                        defined value is STSv1
+                                                                                                       mode:            The requested behavior of clients if a TLS validation failure or MX
+                                                                                                                        matching failure occurs. Defined values are enforce, meaning a client
+                                                                                                                        should reject the connection, report, meaning a client should stop the
+                                                                                                                        connection and send a TLS failure report (see Section XX) and none,
+                                                                                                                        meaning a client should continue with the connection.
+                                                                                                        mx:             A hostname of a mail receiver that should be present (as common name
+                                                                                                                        or subject alternative name) in any received X.509 server certificates
+                                                                                                                        sent during a TLS handshake. A receiver’s policy resource may contain
+                                                                                                                        multiple mx= tags, each on a separate line.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                                     max_age:           Maximum lifetime of a policy (in seconds). Used as a time to live for a
+                                                                                                                        cached policy. Clients should recheck the receiver’s MTA-STS URL for
+                                                                                                                        a possible updated policy after the max_age has elapsed.
+
+
+                                                                                               An example MTA-STS policy for example.gov may look like the following (found at the URL
+                                                                                               above):
+
+                                                                                                      version: STSv1
+                                                                                                      mode: enforce
+                                                                                                      mx: mail1.example.gov.
+                                                                                                      mx: mail2.example.gov.
+                                                                                                      max_age:86400
+
+                                                                                               In the above, example.gov lists two mail servers for the domain (mail1.example.gov and
+                                                                                               mail2.example.gov). The domain also sets its policy to enforce, meaning that if a client sees a
+                                                                                               server certificate that lacks mail1.example.gov or mail2.example.gov, or encounters some
+                                                                                               other PKIX validation failure, it is to reject the connection.
+
+                                                                                               An MTA-STS compliant sender first checks for the presence of an MTA-STS policy at the
+                                                                                               receiver domain. First by checking its cache to see if an earlier discovered policy was found, or
+                                                                                               by looking in the DNS for the MTA-STS DNS RR. If it is a newly discovered policy, the client
+                                                                                               first gets the policy over HTTPS, then attempts to connect to each candidate MX listed in order
+                                                                                               in the policy. For each receiving mail server, the sender attempts to connect via STARTTLS,
+                                                                                               and validates the receiver’s server certificate. If successful, the message is delivered. If not, the
+                                                                                               sender moves on to the next mail server listed in the policy. If none of the connections are
+                                                                                               successful, the sender does not deliver the message.
+
+                                                                                               At the time of writing, there are no publicly available MTA-STS implementations, and only a
+                                                                                               single MTA-STS Internet draft has been posted. Therefore, it is not possible for organizations to
+                                                                                               deploy MTA-STS aware clients at the present time.
+
+                                                                                                                                                68
+

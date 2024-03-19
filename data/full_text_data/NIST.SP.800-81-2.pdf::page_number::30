@@ -1,0 +1,39 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+DNS zones that allow dynamic update open themselves to a host of malicious attacks. The full list of
+potential attacks is detailed in Section 6.3. The proposed solution to limit or prevent these attacks is given
+in sections 8.1.4, 8.2.7, 8.2.8 and 8.2.9.
+
+4.4   DNS NOTIFY
+
+Whenever changes occur in the zone file of the primary (master) DNS server, the secondary (slave) DNS
+servers that are supposed to carry identical data as the primary DNS server must be notified of the
+changes. This notification is accomplished through the DNS NOTIFY message, which signals a secondary
+DNS server to initiate a zone transfer (see Section 4.2). The DNS NOTIFY message is a much more
+efficient and faster way of keeping secondary servers in sync with the primary server than the alternative
+approach of secondary servers polling the primary server for changes via the SOA Refresh value timeout.
+
+Sending the DNS NOTIFY message, called a notify operation, is a default operation in BIND 9.x. The
+next question that arises is: How does the DNS name server software know to which servers the DNS
+NOTIFY message must be sent? The default in BIND 9.x is to notify servers that are defined in the NS
+RRs for the zone. If there are any additional servers to which the zone administrator wants the DNS
+NOTIFY message to be sent (e.g., stealth slave server), the DNS administrator can add the IP addresses of
+the other entities in the BIND configuration file. There are configuration options to stop the server from
+sending DNS NOTIFY messages to a particular zone or to all zones served by this name server.
+
+Once a secondary server receives a DNS NOTIFY message, it resets the relevant zone’s refresh value to
+zero, prompting a zone transfer attempt. As in any zone refresh, if the zone serial number in the SOA RR
+has not increased (see Section 10.1), the zone transfer does not take place. This procedure allows changes
+to the zone to propagate to all name servers more quickly.
+
+Since a DNS NOTIFY message triggers zone transfer, spurious DNS NOTIFY messages could result in
+unnecessary zone transfers and hence potential denial of service. The proposed solution for minimizing
+these spurious notifications is given in Section 8.1.5 and 8.1.6.
+
+
+
+
+                                                     4-6
+

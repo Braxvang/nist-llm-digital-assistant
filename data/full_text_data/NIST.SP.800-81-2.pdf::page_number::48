@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+run under security policy that is different from that of an authoritative name server. Hence, a name server
+instance should always be configured as either an authoritative name server or a resolving name server.
+
+An authoritative name server is only intended to provide name resolution for the zones for which it has
+authoritative information. Hence, the security policy should have recursion turned off for this type of
+name server. Disabling recursion prevents an authoritative name server from sending queries on behalf of
+other name servers and building up a cache using responses. Disabling this function eliminates the cache
+poisoning threat on authoritative serves and prevents their use as reflectors for DDoS attacks [BCP140].
+In BIND, recursion is disabled by using the options statement in the BIND configuration file as follows:
+
+        options {
+             recursion no;
+        };
+
+NSD can only operate as an authoritative only server. NSD cannot act as a recursive resolver and
+therefore does not have a comparable option, as it is NSD’s default behavior.
+
+A resolving name server is only intended to provide resolving services (processing resolving queries on
+behalf of clients) for internal clients. Thus, protection of resolving name servers can be ensured by
+restricting their types of interactions (also called transactions) to designated hosts through various
+configuration options in the configuration file of the name server software.
+
+7.2.6   Removing Name Server Software from Nondesignated Hosts
+
+DNS software should not be running or present in hosts that are not designated as name servers. The
+possibility arises in the case of DNS BIND software because of the fact that many versions of Unix
+(including Solaris and Linux versions) come installed with BIND as default. Hence, while taking an
+inventory of software in workstations and servers of the enterprise as part of the security audit, it is
+necessary to look for BIND installations and remove them from hosts that are not functioning as name
+servers.
+
+7.2.7   Network and Geographic Dispersion of Authoritative Name Servers
+
+Most enterprises have an authoritative primary server and a host of authoritative secondary name servers.
+It is essential that these authoritative name servers for an enterprise be located on different network
+segments. This dispersion ensures the availability of an authoritative name server not only in situations in
+which a particular router or switch fails but also during events involving an attack on an entire network
+segment. In addition to network-based dispersion, authoritative name servers should be dispersed
+geographically as well. In other words, in addition to being located on different network segments, the
+authoritative name servers should not all be located within the same building. One approach that some
+organizations follow is to locate some authoritative name servers in their own premises and others in their
+ISPs’ data centers or in partnering organizations.
+
+Additionally, a network administrator may choose to use a “hidden” master authoritative server and only
+have secondary servers visible on the network. A hidden master authoritative server is an authoritative
+DNS server whose IP address does not appear in the name server set for a zone. All of the name servers
+that do appear in the zone database as designated name servers all get their zone data from the hidden
+master via a zone transfer request. In effect, all visible name servers are actually secondary slave servers.
+This prevents potential attackers from targeting the master name server, as its IP address may not appear
+in the zone database. A hidden master only accepts zone transfer requests from the set of valid
+secondaries and refuses all other DNS queries.
+
+
+
+                                                     7-4
+

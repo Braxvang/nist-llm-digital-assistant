@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+The purpose of sending the key name in the TSIG record is to enable the verifier (recipient) of the DNS
+message to use the right key to verify it. It also enables the recipient to verify that the key name is indeed
+one of the keys shared with the sender. The purpose of the “Time Signed” or timestamp field in the TSIG
+record is to inform the message recipient about the time of MAC generation. The recipient compares this
+value with the current clock time at the recipient system to ensure that the MAC was generated within the
+allowable time specified as part of the TSIG record itself. The purpose of using a timestamp is to prevent
+replay attacks. For correct verification of generation time against current time, it is essential that the
+system clocks of the transaction participants be synchronized. Protocols such as the Network Time
+Protocol (NTP) are available for this purpose.
+
+The verification process consists of the recipient retrieving the appropriate secret key, generating its own
+hash of the received DNS message, and comparing it with the received hash (in the TSIG record). In this
+verification process, the receiving name server has performed the following validations:
+
+       •    The message has been verified as coming from an authenticated source (with whom it shares the
+            secret key).
+
+       •    The message has not been altered in transit (verified by matching of hash values).
+Source authentication counters identify spoofing, and data integrity checking helps to counter corruption
+and modification of data in transit.
+
+BIND version 8.2 was the first version to introduce TSIG features, and is present in every later version.
+BIND 9.x’s support for TSIG includes features to secure zone transfer and dynamic update transactions8.
+
+The following operations are needed to set up the environment for enabling DNS transactions to use
+TSIG:
+
+       •    The system clocks of the name servers (primary and secondary) participating in DNS transactions
+            must be synchronized (e.g., through NTP). If the primary and secondary servers' clocks differ
+            more than the "fudge factor" described above, the TSIG will fail to authenticate and the zone
+            transfer will fail.
+
+       •    There should be a secret key generation utility that can generate keys of the required length with
+            sufficient entropy. The key file (the file containing the secret key string) must be securely
+            communicated to the two servers participating in the transaction.
+
+       •    The key information should be specified in the configuration file through appropriate statements
+            (e.g., key statement and server statement in named.conf configuration file of BIND 9.x).
+The key generation process is described in Section 8.2.1. The commands needed to define the keys and
+instruct the name server to use those keys for all DNS transactions are outlined in Sections 8.2.2 and
+8.2.4, respectively. The set of checklists for key file creation and key definition within the name servers is
+given in Section 8.2.5. Protection of zone transfer transactions and dynamic update transactions using
+HMAC as specified in TSIG are covered in sections 8.2.7 and 8.2.8 respectively.
+
+
+
+
+8
+    Some server software such as Microsoft Windows Server 2008 does not implement TSIG, but use lower level transaction
+     security (such as IPSec). To set this up, see http://technet.microsoft.com/en-us/library/ee649243(WS.10).aspx
+
+
+                                                             8-12
+

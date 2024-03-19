@@ -1,0 +1,58 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+Consider an example of how a DNSSEC-aware resolver validates a DNS response from the signed zone
+example.com. The resolver, following its chain of trust starting from its trust anchor, has authenticated the
+public key for .com zone and trusts it. Hence, it trusts the NS RRs and DS RR served by the .com zone.
+From the NS RR and its associated glue RRs, the resolver has determined that the authoritative name
+server for example.com is ns.example.com and also knows its IP address. Using this information, it goes
+to ns.example.com and retrieves the KSK of example.com from its DNSKEY RRSet. It hashes this key
+and compares it with the hash in the DS RR of its parent zone .com. A match of these two hashes
+authenticates the referral from the .com zone to the example.com zone, as well as the KSK of the
+example.com zone. Because the ZSK is signed by the KSK of example.com, the resolver can obtain the
+ZSK of example.com in an authenticated way. Because the ZSK has signed all the RRsets in
+example.com, any signed response from that zone can be validated by using the now-trusted ZSK.
+
+As the description of the process indicates, the delegation information from a parent in the case of a
+chained secured zone consists of the following:
+
+    •   The NS RRs for the child zone. Because the authoritative source for these NS records is the
+        child zone, the NS RRs provided are called the hints or referral.
+
+    •   The glue RRs. They provide the location of the servers specified in the NS RRs (IP addresses of
+        referred name servers).
+
+    •   The DS RR. It provides the hash of the KSK or ZSK of the child zone.
+
+    •   The RRSIG RR. It covers the DS RR (signature of the DS RR).
+9.7.1   Recording and Communicating Results of Signature Verification
+
+Some name servers can be authoritative for some zones and not authoritative for others. For zones for
+which they are not authoritative, they perform the function of caching RRsets from previous queries
+pertaining to those zones. A DNSSEC-aware caching/resolving name server has additional tasks in its
+caching function. These additional tasks pertain to classifying the security state of the response RRsets
+and caching them accordingly [RFC4035]. The three possible states of RRsets are as follows:
+
+    •   Secure. A DNSSEC-aware caching name server (or resolver) will categorize an RRSet as secure
+        if verification of its associated RRSIG was successful. This means a valid chain of trust can be
+        formed from the RRSet to a trust anchor. The RRSet would then be placed in the cache and be
+        purged when the data is deemed no longer up to date (according to the TTL) or no longer
+        verifiable (according to the RRSIG validity period).
+
+    •   Insecure. A DNSSEC-aware cache categorizes an RRSet as insecure if it is provably insecure.
+        That means that no DNSSEC security RRs were in the response, and the recipient knew not to
+        expect them. This happens when a delegation to an unsigned zone (a delegation that does not
+        have a DS RR found in the referral response) is received. Insecure RRsets are handled the same
+        way as secure RRsets, but local policy on the end system may dictate not to trust insecure
+        delegations or data in a response.
+
+    •   Bogus. The DNSSEC-aware cache categorizes a response as bogus when verification of the
+        signatures (RRSIG RRs) fails or contains incorrect fields (e.g., RRSIG has expired). The cache
+        policy determines how to deal with these RRsets. They can either be dropped or put into a special
+        BAD cache containing only RRsets that are found to be bogus.
+
+
+
+                                                    9-13
+

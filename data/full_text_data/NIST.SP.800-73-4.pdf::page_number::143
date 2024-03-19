@@ -1,0 +1,60 @@
+Special Publication 800-73-4                                                        Part 3: PIV Client Application
+Interfaces for Personal Identity Verification                                             Programming Interface
+
+Parameters:            cardHandle                           Opaque identifier of the card to be acted upon as
+                                                            returned by pivConnect.
+
+                       aidLength                            Length of the PIV Card Application AID.
+
+                       applicationAID                       The AID of the PIV Card Application that is to
+                                                            become the currently selected card application.
+
+                       applicationProperties                The application properties of the selected PIV
+                                                            Card Application. See Part 2, Table 3.
+
+                       APLength                             As an input, length of the buffer allocated for
+                                                            applicationProperties. As an output, length of
+                                                            the application properties.
+
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_CARD_APPLICATION_NOT_FOUND
+                       PIV_CARD_READER_ERROR
+                       PIV_INSUFFICIENT_BUFFER
+
+If the length of application properties is longer than the buffer allocated by the client application, then the
+PIV Middleware shall return PIV_INSUFFICIENT_BUFFER, but shall still set APLength to the length of
+the application properties.
+
+3.2.2    pivEstablishSecureMessaging
+
+Purpose:               Establish secure messaging with the PIV Card Application.
+
+Prototype:             status_word pivEstablishSecureMessaging(
+                          IN handle            cardHandle,
+                       );
+
+Parameters:            cardHandle                  Opaque identifier of the card to be acted upon as
+                                                   returned by pivConnect.
+
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_CARD_READER_ERROR
+                       PIV_SM_FAILED
+
+After successful execution of the key establishment protocol, the PIV Middleware shall perform all
+subsequent GET DATA, VERIFY, and GENERAL AUTHENTICATE commands over secure
+messaging, with the exception of any subsequent uses of the GENERAL AUTHENTICATE command to
+perform the key establishment protocol.
+
+3.2.3    pivLogIntoCardApplication
+
+Purpose:               Set security state within the PIV Card Application.
+
+Prototype:             status_word pivLogIntoCardApplication(
+                          IN handle            cardHandle,
+                          IN sequence of byte authenticators,
+                          IN LONG              AuthLength
+
+                                                       8
+

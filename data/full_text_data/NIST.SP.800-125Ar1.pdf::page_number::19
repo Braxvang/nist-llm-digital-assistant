@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                                   SECURITY RECOMMENDATIONS FOR
+                                                                      SERVER-BASED HYPERVISOR PLATFORMS
+
+4.SECURITY RECOMMENDATION HY-BF1
+
+To ensure the isolation of processes running in VMs, the following requirements must be met:
+
+(a) The privileged commands or instructions from a Guest OS to the host processor must be mediated such
+    that the basic function of the VMM/hypervisor as the controller of virtualized resources is maintained.
+(b) The integrity of the memory management function of the hypervisor host must be protected against attacks
+    such as buffer overflows and illegal code execution, especially in the presence of translation tables that
+    are needed for managing memory access by multiple VMs.
+(c) Memory allocation algorithms must ensure that payloads in all VMs are able to perform their functions.
+(d) CPU allocation algorithms must ensure that payloads in all VMs are able to perform their functions.
+
+The requirements (a) and (b) can be met using software-based modules. However, hardware-based assistance
+for virtualization, such as Instruction Set Virtualization and Memory Virtualization, provide better assurance
+than software-based solutions in meeting those requirements and are therefore recommended in section 4.1.
+The hardware-assisted virtualization features are briefly discussed prior to stating the recommendations. The
+requirements (c) and (d) are meant to ensure the availability of application services running in VMs. The
+enablers are some features in memory allocation and CPU allocation algorithms, and their associated
+configuration parameters are stated as recommendations in sections 4.2 and 4.3, respectively.
+
+4.1 Hardware Assistance for Virtualization
+
+Instruction Set Virtualization: Processor architectures that support Instruction Set Virtualization provide two
+modes of operation: root mode and non-root mode, each of which have four hierarchical privilege levels with
+Level 0 being the highest and Level 3 being the lowest. Additionally, among the two modes, the root mode
+has a higher privilege for executing CPU instructions than non-root mode. By running the hypervisor in root
+mode and VMs (Guests) OS in non-root mode at privilege or ring level 0, the hypervisor is guaranteed safety
+from at least any instruction set-type attacks by any Guest OS. However, VM escape can take place through
+normal networking protocols. This safety is ensured by allowing the hardware trapping privileged instructions
+to run in non-root mode and execution in root mode. Additionally, when the hypervisor does not have to
+perform additional functions (e.g., translating sensitive instructions using techniques such as binary
+translation), the code executing with privileges is reduced in the hypervisor, making the TCB smaller and
+enabling better assurance verification.
+
+Memory Virtualization: Hardware-assisted memory virtualization is provided when the hardware enables the
+mapping of the Guest OS’s physical addresses in their respective page tables to the host’s physical addresses
+using hardware-based page tables instead of hypervisor-generated shadow page tables. The subsequent
+reduction in privileged code executing this function provides the same security advantage mentioned for
+Instruction Set Virtualization above.
+
+The security advantages of hardware-assisted virtualization platforms include the following:
+
+•   One of the potential security vulnerabilities for hypervisors is the buffer overflow attacks from VMs
+    resident on the virtualized host platform. The hardware support for memory management (e.g.,
+    Extended Page Tables, or EPT) that comes as part of the hardware-assisted virtualization can be
+    leveraged to prevent code execution from memory locations reserved for data storage, thus preventing
+    buffer overflow attacks.
+•   Hardware extensions for Virtualization provide two modes of execution: host or root mode and guest
+    or non-root mode. The host mode runs at a higher privilege than guest mode. The hypervisor code,
+    which provides the baseline functionality HY-BF1 (processor allocation and memory management),
+    runs in host mode while the guest OS and applications in VMs run in guest mode. Hence any exploit
+    code in guest OS cannot subvert the controls provided by the hypervisor code.
+                                                      12
+

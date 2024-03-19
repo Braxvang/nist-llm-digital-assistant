@@ -1,0 +1,59 @@
+Special Publication 800-73-4                             Interfaces for Personal Identity Verification – Part 2:
+                                                         PIV Card Application Card Command Interface
+
+Command 2 – GENERAL AUTHENTICATE (last chain)
+
+ CLA                 '00' indicates last command of the chain
+ INS                 '87'
+ P1                  '07'
+ P2                  '9D'
+ Lc                  Length of data field
+ Data Field          {second and last part of ciphertext to be decrypted C }}
+ Le                  '00'
+
+
+Response 2:
+
+                     '7C' – L1 {'82' L2 {first part of encoded message EM}} where EM is as
+ Data Field
+                     defined in [PKCS1, Sections 7.1.2 and 7.2.2]
+ SW1-SW2             '61 xx' where x indicates the number of bytes remaining to send
+
+
+Command 3: GET RESPONSE APDU:
+
+CLA                 '00'
+INS                 'C0'
+P1                  '00'
+P2                  '00'
+Le                  xx Length of remaining response as indicated by previous SW1-SW2
+
+
+Response 3:
+
+Data Field          {second and last part of encoded message EM}
+SW1-SW2             '90 00' (Status word)
+
+
+
+A.5.2        Elliptic Curve Cryptography Diffie-Hellman
+
+An ECDH key agreement scheme does not send an encrypted symmetric key to the participating entities.
+Instead, the two entities involved in the key agreement scheme compute a shared secret by combining
+their ECC private key(s) with the other party’s public key(s). The resulting shared secret (Z) serves as an
+input to a key derivation function (KDF), which each entity independently invokes to derive a common
+secret key. The secret key may be used as a session key or may be used to encrypt a session key.
+
+A.5.2.1 ECDH with the PIV KMK
+
+The PIV Card supports ECDH key agreement by performing the elliptic curve cryptography cofactor
+Diffie-Hellman (ECC CDH) primitive [SP800-56A, Section 5.7.1.2] using its ECC KMK private key and
+an ECC public key that is provided as input to the GENERAL AUTHENTICATE command. All other
+procedures required to complete key agreement are performed by the cardholder’s client application and
+its associated cryptographic module.
+
+
+
+
+                                                        45
+

@@ -1,0 +1,60 @@
+Special Publication 800-73-4                                                            Part 3: PIV Client Application
+Interfaces for Personal Identity Verification                                                 Programming Interface
+
+                        );
+
+Parameters:             cardHandle                     Opaque identifier of the card to be acted upon as
+                                                       returned by pivConnect.
+
+                        authenticators                 A sequence of zero or more BER-TLV encoded
+                                                       authenticators to be used to authenticate and set security
+                                                       state/status in the PIV Card Application context.
+
+                                                       The authenticator BER-TLV used on the PIV client API
+                                                       shall have the structure described in Table 3.
+
+                        AuthLength                     Length of the authenticator template.
+
+                             Table 3. Data Objects in an Authenticator Template (Tag '67')
+
+            Description             Tag         M/O                         Comment
+        Reference data              '81'        M      Value of the PIV Card Application PIN, Global PIN, or
+                                                       pairing code as described in Section 2.4.3, Part 2, or
+                                                       OCC data as described in Section 5.5.2 of [SP800-76]
+        Key reference               '83'        M      See Table 4a, Part 1 for PIV Card Application PIN,
+                                                       Global PIN, pairing code, and OCC key reference
+                                                       values
+
+Return Codes:           PIV_OK
+                        PIV_INVALID_CARD_HANDLE
+                        PIV_AUTHENTICATOR_MALFORMED
+                        PIV_AUTHENTICATION_FAILURE
+                        PIV_SECURITY_CONDITIONS_NOT_SATISFIED
+                        PIV_CARD_READER_ERROR
+                        PIV_SM_FAILED
+
+The PIV Middleware shall not submit authenticators to the PIV Card over a contactless interface without
+secure messaging. If secure messaging has not been established, then the pivLogIntoCardApplication
+function shall return PIV_SECURITY_CONDITIONS_NOT_SATISFIED.
+
+3.2.4    pivGetData
+
+Purpose:           Return the entire data content of the named data object.
+
+Prototype:              status_word pivGetData(
+                           IN handle            cardHandle,
+                           IN string            OID,
+                           IN LONG              oidLength,
+                           OUT sequence of byte data,
+                           INOUT LONG           DataLength
+                        );
+
+Parameters:             cardHandle                     Opaque identifier of the card to be acted upon as
+                                                       returned by pivConnect.
+
+                        OID                            Object identifier of the object whose data content is to be
+                                                       retrieved coded as a string; for example,
+                                                       “2.16.840.1.101.3.7.2.96.80”. See Part 1, Table 3.
+
+                                                          9
+

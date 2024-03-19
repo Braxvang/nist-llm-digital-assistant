@@ -1,0 +1,50 @@
+                                                                                              NIST SP 800-77 REV. 1                                                        GUIDE TO IPSEC VPNS
+
+
+                                                                                              bit harder to debug since it might not be obvious to the administrator where in the IP stack a
+                                                                                              packet is taken to be processed by the IPsec subsystem. This can lead to unexpected issues in
+                                                                                              hub-spoke deployments. For example, if a host with LAN IP address 10.0.2.1 and public IP
+                                                                                              192.0.2.1 creates an IPsec tunnel to a remote host on IP 192.0.2.2 to cover traffic between
+                                                                                              10.0.2.0/24 and 10.0.0.0/8, such an IPsec gateway might lose access to its own LAN since a
+                                                                                              packet with destination 10.0.2.13 will be sent over the IPsec tunnel because it falls within the
+                                                                                              destination IPsec policy range of 10.0.0.0/8. Routing-based VPNs do not have this issue because
+                                                                                              LAN packets do not pass through the routing table and instead find the target host to send the
+                                                                                              packet to via ARP.
+
+                                                                                              One common implementation processes the packets for IPsec after the network monitoring hooks
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              are consulted. This leads to debugging tools, such as the tcpdump tool, seeing the packet as
+                                                                                              leaving the host unencrypted, while, in fact, the packet is encrypted after it is shown to the
+                                                                                              network debugging tool.
+
+                                                                                              6.6   Firewall Settings
+
+                                                                                              The most common network issue when setting up IPsec is that a firewall on the VPN server or
+                                                                                              the network is blocking the IKE ports UDP 500 and 4500. If an IPsec connection works for
+                                                                                              simple ping commands but not when an application is trying to use the IPsec connection, the
+                                                                                              cause is most likely due to broken path MTU discovery. While this problem is not directly
+                                                                                              related to IPsec, it is often triggered because of the extra overhead of the ESP header making
+                                                                                              each 1500-byte original packet larger than 1500 bytes after the ESP header is added. The ESP
+                                                                                              packets would fragment, and, too often, some stateful router or firewall mistakenly drops these
+                                                                                              packets.
+
+                                                                                              Problems with the Maximum Segment Size (MSS) can be encountered when the ESP packet
+                                                                                              contains a TCP packet. For TCP to work properly, it needs to be able to send ICMP packets with
+                                                                                              the “packet too big” notification, but ICMP is often blocked. Some IPsec policies might only
+                                                                                              allow TCP packets and prohibit ICMP packets. This also commonly manifests itself as an
+                                                                                              administrator who can log in over the IPsec connection using the SSH protocol, but as soon as
+                                                                                              the administrator tries to actually use this session, the connection freezes. Decreasing the MTU
+                                                                                              size of the IPsec interface can work around this issue. For TCP, a common workaround is to set a
+                                                                                              smaller TCP MSS size that ensures that packets are not bigger than the path MTU. This method
+                                                                                              is called TCP MSS clamping. Most implementations also allow the setting of a fixed value
+                                                                                              independent of the discovered path MTU. Common fixed values include 1340 or even 1200.
+
+
+
+
+                                                                                                                                             58
+

@@ -1,0 +1,54 @@
+NIST SP 800-58                                             Voice Over IP Security
+    _________________________________________________________________________
+
+       compression, and, of course, both ends of a connection must use the same
+       compression algorithm. However, the study found that the time lost to
+       compression was made up for at the encryption phase, as the crypto-engine is
+       more efficient with the compressed packets. One thing they did not consider is
+       the tremendous strain put on end-point CPU’s as opposed to the crypto-engine.
+       The endpoint CPU may be computationally slow (in the case of a simple VOIP
+       phone) or may be performing many more operations than just VOIP (in the case
+       of a PC-based phone). In either case, the actual time required to perform the
+       compression may take much longer than the time saved in the crypto-engine. It
+       remains to be seen if this is the case, as Barbieri’s model of cIPsec was not tested
+       under high CPU load conditions.
+
+       It is important to note that the compression scheme used in cIPsec only
+       compresses the packet header information. The compression QoS issues
+       associated with audio codecs are not applicable in this scenario because no actual
+       media is being condensed, only the IP headers. However, packet loss does have
+       an exacerbated detrimental effect (for a different reason) on packets compressed
+       under the cIPsec scheme. Barbieri’s scheme needs to maintain information at the
+       system endpoints regarding the current session. When packets are lost, they
+       cannot be re-sent and the endpoints need to resynchronize [9]. However, the time
+       saved in the crypto-engine and the security provided may be well worth this price
+       of this approach. Further testing will be required to determine the validity of this
+       solution under diverse network and environmental conditions.
+
+ 9.6   Resolving NAT/IPsec Incompatibilities
+
+       There are solutions to the IPsec/NAT incompatibility problem previously outlined
+       in section 8.2. Straka [32] discusses several of these, including Realm-Specific IP
+       RSIP), IPv6 Tunnel Broker, IP Next Layer (IPNL), and UDP encapsulation.
+       RSIP is designed as a replacement for NAT and provides a clear tunnel between
+       hosts and the RSIP Gateway. RSIP supports both AH and ESP, but implementing
+       RSIP would require a significant overhaul of the current LAN architecture so
+       while it is quite an elegant solution, it is currently infeasible. Perhaps as a result
+       of these problems, RSIP is not widely used. The IPv6 tunnel broker method uses
+       an IPv6 tunnel as an IPsec tunnel, and encapsulates an IPv6 packet in an IPv4
+       packet. But this solution also requires LAN upgrades and doesn’t work in
+       situations where multiple NATs are used. IPNL introduces a new layer into the
+       network protocols between IP and TCP/UDP to solve the problem, but IPNL is in
+       competition with IPv6 and IPv6 is a much more widely used standard.
+
+       The most likely widespread solution to the problem of NAT traversal is UDP
+       encapsulation of IPsec. This implementation is supported by the IETF and
+       effectively allows all ESP traffic to traverse the NAT. In tunnel mode, this model
+       wraps the encrypted IPsec packet in a UDP packet with a new IP header and a
+       new UDP header, usually using port 500. This port was chosen because it is
+       currently used by IKE peers to communicate so overloading the port does not
+       require any new holes to be punched in the firewall [34]. The SPI field within the
+
+
+                                                                                           73
+

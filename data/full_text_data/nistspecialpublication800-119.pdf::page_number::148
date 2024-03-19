@@ -1,0 +1,50 @@
+                                                             GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+    A more sophisticated attack can be carried out, but it is somewhat difficult and it does not gain
+     too much. Actually, it works because the communications with the NAT are unprotected. It
+     goes as follows:
+1. The client (victim) prepares router solicitation, including authentication.
+2. The attacker intercepts the solicitation and somehow manages to prevent it from reaching the
+   server. One way to intercept the solicitation is by running a short-duration DOS attack against
+   the server.
+3. The attacker replaces the source IPv4 address and source UDP port of the request by one of its
+   own addresses and port and sends the modified request to the server.
+4. The server sees the IPv4 address from which the packet is received, verifies that the
+   authentication is correct, prepares a router advertisement, signs it, and returns it to the attacker.
+5. The attacker receives the advertisement, remembers the mapping, replaces the IPv4 address and
+   UDP port by the original values in the intercepted message, and sends the response to the client.
+6. The client receives the advertisement and uses the proposed prefix and the mapped addresses in
+   the origin indication encapsulation. The attacker can now run a DOS or man-in-the-middle
+   attack.
+    Other attacks may try to spoof a Teredo relay. An attacker may try to spoof another IPv6 host
+     or to place itself as a man-in-the-middle between a Teredo host and a native IPv6 host. The
+     attacks work by convincing the Teredo client that packets bound to the native IPv6 host should
+     be relayed to the IPv4 address of the attacker. These attacks are possible because there is no
+     obvious relationship between the IPv4 address of a relay and the native IPv6 addresses it
+     serves. A Teredo client cannot decide by looking at the encapsulating IPv4 and UDP headers
+     whether or not a relay is legitimate. The proper relay is identified by a direct IPv6
+     connectivity test. Traffic sent to this relay will be out of reach of attackers that are not on the
+     direct path between the Teredo client and its IPv6 peer. To stop on-path attacks, end-to-end
+     security such as IPsec is needed. IPsec is the best defense against many of these attacks.
+    A Teredo client keeps a cache of recently used peers. It is possible to provoke it to respond to
+     packets that appear to come from a large number of Teredo peers, thus overloading this list.
+    A DOS attack against the local peer discovery procedure exists if attackers can send spoofed
+     local discovery bubbles to a Teredo client. Mitigate DOS attacks by packet filtering,
+     restricting local peer discovery to the local link, or turning off support for discovery bubbles.
+    An attacker may try to overwhelm and take down a Teredo server. Having a failover server
+     can help, but addresses will have to be renumbered. A similar attack against a Teredo relay
+     may cause the Teredo relay to temporarily stop announcing the reachability of the Teredo
+     service prefix to the IPv6 network. The traffic will be picked up by the next relay. An
+     attacker may also try to overwhelm the state table in a Teredo relay. Relays may have to be
+     selective about whom they serve.
+    Three classes of DOS attacks attempt to inject traffic at locations where it is not expected.
+     The first uses a Teredo server as a reflector in a denial of service attack. The second uses a
+     Teredo server to carry out a denial of service attack against IPv6 nodes. The third uses a
+     Teredo relay to carry out a denial of service attack against IPv4 nodes. Adding appropriate
+     filters are effective at mitigating these attacks.
+
+
+
+                                                 6-26
+

@@ -1,0 +1,47 @@
+NIST SP 800-90A Rev. 1                                              Recommendation for Random Number
+                                                                     Generation Using Deterministic RBGs
+
+B.3 CTR_DRBG Example Using a Derivation Function
+
+This example of CTR_DRBG uses AES-128 and uses the entire input block as the counter field.
+The reseed and prediction resistance capabilities are supported, and prediction resistance is
+obtained during every Get_entropy_input call and reseed request. Although the
+prediction_resistance_request parameter in the Get_entropy_input and reseed request could be
+omitted, in this case, they are shown in the pseudocode as a reminder that prediction_resistance
+will be performed. A block cipher derivation function using AES-128 is used, and a
+personalization string and additional input are supported. A total of five internal states are
+available. For this implementation, the functions and algorithms are written as separate routines.
+AES_ECB_Encrypt is the Block_Encrypt function (specified in Section 10.3.3) that uses AES-
+128 in the ECB mode.
+The nonce for instantiation (instantiation_nonce) consists of a 32-bit incrementing counter. The
+nonce is initialized when the DRBG is instantiated (e.g., by a call to the clock or by setting it to a
+fixed value) and is incremented for each instantiation.
+The internal state contains the values for V, Key, reseed_counter, and security_strength, where V
+and Key are bitstrings, and all other values are integers. Since prediction resistance is known to
+be supported, there is no need for prediction_resistance_flag in the internal state.
+In accordance with Table 3 in Section 10.2.1, security strengths of 112 and 128 bits may be
+supported. Using AES-128, the following definitions are applicable for the instantiate, reseed
+and generate functions:
+   1. highest_supported_security_strength = 128.
+   2. Input/output block length (blocklen) = 128 bits.
+   3. Key length (keylen) = 128 bits.
+   4. Required minimum entropy for the entropy input during instantiation and reseeding =
+      security_strength.
+   5. Minimum entropy input length (min _length) = security_strength bits.
+   6. Maximum entropy input length (max _length) = 1000 bits.
+   7. Maximum personalization string input length (max_personalization_string_input_length)
+      = 800 bits.
+   8. Maximum additional input length (max_additional_input_length) = 800 bits.
+   9. Seed length (seedlen) = 256 bits.
+   10. Maximum number of bits per request (max_number_of_bits_per_request) = 4000 bits.
+   11. Reseed interval (reseed_interval) = 100 000 requests.
+
+B.3.1      The CTR_DRBG_Update Function
+
+CTR_DRBG_Update:
+   Input: bitstring (provided_data, Key, V).
+   Output: bitstring (Key, V).
+
+
+                                                 80
+

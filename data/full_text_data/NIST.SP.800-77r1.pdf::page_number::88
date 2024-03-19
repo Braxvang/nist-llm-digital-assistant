@@ -1,0 +1,60 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                GUIDE TO IPSEC VPNS
+
+
+                                                                                              Network card settings can also have a large impact on throughput. Check that the network card’s
+                                                                                              transmit queue (txqueuelen) is set large enough to accommodate the amount of traffic. Check the
+                                                                                              network card settings for TCP segmentation offload (TSO), generic segmentation offload (GSO),
+                                                                                              checksum offloading, and virtual local area network (VLAN) settings. If using a network card
+                                                                                              with IPsec hardware acceleration support, follow the vendor’s instructions on how to optimize
+                                                                                              the host.
+
+                                                                                              When using virtualization, ensure that the virtualization layer is using as much direct hardware
+                                                                                              access as possible. For performance, it will be better to configure a hardware network card inside
+                                                                                              a virtual machine than to configure the virtual machine with a virtual network card. On some
+                                                                                              hardware, this needs to be enabled in the Basic Input/Output System (BIOS). For example, on
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              Intel systems, ensure that Intel Virtualization Technology for Directed I/O (Intel VT-d) is
+                                                                                              enabled. Ensure that the virtualization is not emulating a slightly different CPU than the real
+                                                                                              hardware because it will not be able to use the hardware virtualization instructions of the CPU
+                                                                                              and instead will have to perform full emulation in software. 58
+
+                                                                                              Ideally, when not using IPsec, the system should be able to utilize line-speed unencrypted traffic.
+                                                                                              A popular network tool to perform network performance tests is iperf. Once the system is
+                                                                                              performing well without IPsec, IPsec can be enabled.
+
+                                                                                              IPsec hosts that are busy will spend the bulk of their computational resources on encrypting and
+                                                                                              decrypting ESP traffic. The performance of the algorithms for IKE is less important since there
+                                                                                              are far fewer IKE packets than ESP packets in most deployments of IPsec VPNs.
+
+                                                                                              7.2.4.1 ESP performance considerations
+
+                                                                                              If the host’s CPU usage is the limiting factor, it is particularly important to use the right
+                                                                                              algorithms. Using an AEAD algorithm for encryption and integrity protection is much faster than
+                                                                                              using two non-AEAD algorithms. The best algorithm choice will likely be AES-GCM because
+                                                                                              modern CPUs have hardware support for it. Both 256-bit and 128-bit AES keys currently
+                                                                                              provide strong protection, so when CPU load becomes an issue, one could consider switching
+                                                                                              from 256-bit to 128-bit keys, provided that this is allowed by the deployment policy. Otherwise,
+                                                                                              256-bit keys are recommended.
+
+                                                                                              If the host is running a few high-speed IPsec SAs, it could be that multiple CPUs on the host are
+                                                                                              not utilized properly to spread the cryptographic load of a single IPsec SA over multiple CPUs.
+                                                                                              When multiple CPUs are used for a single IPsec SA, there will be an increase in out-of-order
+                                                                                              packets being sent, and the replay window will need to be increased to accommodate this at both
+                                                                                              endpoints. IPsec replay protection can be disabled to test if that is the limiting factor for the
+                                                                                              server performance. This is less of a concern on busy servers that act as a remote access VPN
+                                                                                              since these will be serving many users’ IPsec SAs per CPU. For high-speed IPsec SAs, it is also
+                                                                                              important to use ESNs to avoid excessive rekeying.
+
+
+
+                                                                                              58   This usually happens when a virtual machine configuration with a specific CPU sub-type is migrated to different hardware
+                                                                                                   without the configuration being updated.
+
+
+
+                                                                                                                                                            71
+

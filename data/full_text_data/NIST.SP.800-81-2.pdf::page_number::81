@@ -1,0 +1,58 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+9.5   Publishing the Public Key (DNSSEC-OP3) and Setting Up Trust Anchors (DNSSEC-
+      OP7)
+
+The operation of verifying the zone data of a particular zone by a DNSSEC-aware resolver begins with
+that resolver knowing and trusting the public key of that zone (the one whose data is to be verified) or any
+of its ancestors (parent and zones above the parent in the DNS tree). If the zone to be verified (e.g.,
+example.com) is secure and its parent (.com) is not, the point of trust begins with the zone itself. If the
+parent (i.e., the .com zone) is secure (i.e., DNSSEC-aware) and the parent of the parent (i.e., a root zone)
+is not secure, the starting point of trust is the parent (i.e., .com zone). If a root zone is secure, of course
+that becomes the origin of trust.
+
+Whatever the starting point of the chain of trust (enterprise level, TLD, or root zone), the public key of
+that starting point should be made known by the associated name server to the DNSSEC-aware resolvers
+of interest. These public keys known to DNSSEC-aware resolvers are called trust anchors. Because there
+is no feature within DNS for third-party authentication of public keys (like X.509 Public Key
+Infrastructure), the public key has to be distributed through an out-of-band (relative to DNS) process. This
+distribution may be accomplished through channels such as Web sites or e-mails.
+
+The entries in the trust anchor list of a DNSSEC-aware resolver determine whether a signed response
+from a zone will be categorized as secure or insecure. As mentioned in section 9.2.2, the resolver has to
+establish trust in the public key of the zone that has sent the response before it performs signature
+verification. If that trust cannot be established due to not being able to build a trusted chain using any of
+the entries in trust anchor list, the response will be tagged as insecure. The reason for not being able to
+build a trusted chain may be one of several potential reasons: There maybe an intermediate zone signed
+using an algorithm the end validators does not understand or it may be due to the fact that the DNS
+namespace contains islands of signed zones as opposed to unbroken hierarchical sequence of signed
+zones. The effect of each trust anchor in labeling responses for a given mapping of islands of signed
+zones (Figure 9-2) is given in Table 9-2.
+
+
+
+
+                                                    root “.”
+
+
+
+
+                    gov                                                         org
+                                                         com
+
+
+                nist.gov
+                                                      example.com                     example.org
+
+
+
+
+                                 Figure 9-2. A Mapping of Islands of Security
+
+
+
+
+                                                     9-9
+

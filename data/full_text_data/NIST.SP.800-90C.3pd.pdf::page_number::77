@@ -1,0 +1,51 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                     Recommendation for RBG Constructions
+       September 2022
+
+2155   The Get_randomness-source_input call in the Instantiate_function results in a single request
+2156   being sent to the randomness source to generate bits to establish the security strength (see Section
+2157   4.2.1, item 2.a).
+2158              The HMAC_DRBG requests 3s/2 = 384 bits from the randomness source, where s = the
+2159              256-bit targeted security strength for the DRBG:
+2160                    (status, randomness_bitstring) = Generate_function(RBG2_state_handle, 384, 256,
+2161                                         prediction_resistance_request = TRUE).
+2162              This call requests the randomness source (indicated by RBG2_state_handle) to generate
+2163              384 bits at a security strength of 256 bits for the randomness input required for seeding the
+2164              DRBG in the RBG1 construction. Prediction resistance is requested so that the randomness
+2165              source (i.e., the RBG2(P) construction) is reseeded before generating the requested 384
+2166              bits (see Requirement 17 in Section 4.4.1). Note that optional additional_input is not
+2167              provided for this example.
+2168        2. The RBG2(P) construction checks that the request can be handled (e.g., whether a security
+2169           strength of 256 bits is supported). If the request is valid, 384 bits are generated after
+2170           reseeding the RBG2(P) construction, the internal state of the RBG2(P) construction is
+2171           updated, and status = SUCCESS is returned to the RBG1 construction along with the newly
+2172           generated randomness_bitstring.
+2173              If the request is determined to be invalid, status = FAILURE is returned along with a Null
+2174              bitstring as the randomnessy_bitstring. The FAILURE status is subsequently returned from
+2175              the Instantiate_function along with a Null value as the RBG1_state_handle, and the
+2176              instantiation process is terminated.
+2177    If a valid randomness_bitstring is returned from the RBG2(P) construction, the
+2178    randomness_bitstring is used along with the personalization_string to create the seed to
+2179    instantiate the DRBG (see [SP800-90A]). 37 If the instantiation is successful, the internal state is
+2180    established, a status of SUCCESS is returned from the Instantiate_function with a state handle
+2181    of RBG1_state_handle, and the RBG can be used to generate pseudorandom bits.
+
+2182   B.2.2. Generation by the RBG1 Construction
+2183   Assuming that the HMAC_DRBG in the RBG1 construction has been instantiated (see Appendix
+2184   B.2.1), pseudorandom bits are requested from the RBG by a consuming application using the
+2185   Generate_function call as specified in Section 2.8.1.2:
+2186                     (status, returned_bits) = Generate_function (RBG1_state_handle,
+2187           requested_number_of_bits, requested_security_strength, prediction_resistance_request =
+2188                                          FALSE, additional_input).
+2189              RBG1_state_handle was returned as the state handle during instantiation (see Appendix
+2190              B.2.1).
+
+
+
+        The first 256 bits of the randomness_bitstring are used as the randomness input, and the remaining 128 bits are used as the nonce in SP 800-90A,
+       37
+
+       Revision 1. A future update of SP 800-90A will revise this process by using the entire 384-bit string as the randomness input.
+
+
+                                                                             64
+

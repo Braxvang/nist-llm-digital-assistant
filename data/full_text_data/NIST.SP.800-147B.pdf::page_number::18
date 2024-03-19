@@ -1,0 +1,59 @@
+          This publication is available free of charge from http://dx.doi.org/10.6028/NIST.SP.800-147B
+
+                                                                       BIOS PROTECTION GUIDELINES FOR SERVERS
+
+
+See Appendix B for an example of this update mechanism.
+
+4.2   Update Mechanism 2: Secure BIOS Update at Reboot
+
+With this BIOS update mechanism, the BIOS flash memory process is initiated at server runtime.
+However, the actual update of the BIOS flash memory does not occur until a server reboot. This BIOS
+update mechanism prevents inauthentic code from ever being written to the BIOS flash memory.
+
+The relevant guidelines for implementing this BIOS update mechanism are listed below:
+    The BIOS update image must be digitally signed in accordance with the BIOS Update
+        Authentication requirements in Section 3.1. An implementation may divide the BIOS update
+        image into multiple, individually digitally signed parts.
+    A locking mechanism must exist for the BIOS flash memory such that no entity except an RTU
+        has write access to the BIOS flash memory at runtime. Although it is not necessary for an RTU to
+        have write access to the BIOS flash memory for this update mechanism, additional BIOS update
+        mechanisms may be supported that do have this requirement.
+    An RTU, as defined in Section 2.5, must be available during system boot that can update the
+        BIOS flash memory at runtime. The RTU must execute on reboot before the BIOS flash memory
+        is updated. The RTU will verify the BIOS update image’s digital signature before any changes to
+        the flash occur.
+    A memory location whose contents are preserved on reboot must exist in which the signed BIOS
+        update image can be buffered at runtime and which the RTU can access during the reboot to
+        verify the BIOS update image’s digital signature before updating the contents of the BIOS flash
+        memory. During reboot, the memory location holding the BIOS update image during verification
+        must not be accessible by any entities other than an RTU.
+
+The general steps for implementing this mechanism are:
+   1. A digitally signed BIOS update image is buffered into a storage location whose contents are
+       preserved when the server is rebooted.
+   2. When the server is rebooted, execution is transferred to the RTU.
+   3. The RTU verifies the BIOS update image is authentic. If found to be authentic, the RTU will
+       unlock the BIOS flash memory if necessary and write the update into the BIOS flash memory. If
+       the BIOS update image is determined to be inauthentic, the BIOS flash memory will not be
+       updated.
+   4. The locking mechanism for the BIOS flash memory is enabled before executing untrusted code,
+       including Option ROMs.
+
+See Appendix C for an example of this update mechanism.
+
+4.3   Update Mechanism 3: Secure BIOS Update Requiring Verification at Boot
+
+With this BIOS update mechanism, a locking mechanism to protect the BIOS flash memory at runtime
+does not exist or has limitations such that writes to the BIOS flash memory by an entity other than an
+RTU are not prevented. A rogue update of the BIOS flash memory might occur as the BIOS flash
+memory is not write-protected or locked. However, the contents of the BIOS flash memory shall be
+authenticated before being executed on every boot. If the BIOS flash memory is determined to be
+inauthentic during boot, a recovery process is initiated and the inauthentic BIOS is not executed.
+
+The relevant guidelines for implementing this BIOS update mechanism are listed below:
+
+
+
+                                                      4-2
+

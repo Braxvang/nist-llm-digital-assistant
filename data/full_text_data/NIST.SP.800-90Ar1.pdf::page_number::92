@@ -1,0 +1,42 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+   Input: integer (state_handle), integer prediction_resistance_request, bitstring
+   additional_input.
+   Output: string status.
+   Process:
+                                              Comment: Check for the validity of state_handle.
+       1. If ((state_handle < 0) or (state_handle > 4) or (internal_state (state_handle) = {Null,
+          Null, 0, 0}), then Return (“State not available for the indicated state_handle”).
+       2.   Get the internal state values.
+            2.1   V = internal_state (state_handle).V.
+            2.2   Key = internal_state (state_handle).Key.
+            2.3   security_strength = internal_state (state_handle).security_strength.
+       3. If (len (additional_input) > 800), then Return (“additional_input too long”).
+       4. (status, entropy_input) = Get_entropy_input (security_strength, security_strength,
+          1000, prediction_resistance_request).
+       6. If (status ≠ “Success”), then Return (status).
+                                              Comment: Invoke the reseed algorithm.
+       7. (V, Key, reseed_counter) = CTR_DRBG_Reseed_algorithm (V, Key,
+          reseed_counter, entropy_input, additional_input).
+       8. Save the internal state.
+            8.1   internal_state (state_handle). V = V.
+            8.2   internal_state (state_handle). Key = Key.
+            8.3   internal_state (state_handle). reseed_counter = reseed_counter.
+            8.4   internal_state (state_handle). security_strength = security_strength.
+       9. Return (“Success”).
+CTR_DRBG_Reseed_algorithm:
+   Input: bitstring (V, Key), integer (reseed_counter), bitstring (entropy_input,
+         additional_input).
+   Output: bitstring (V, Key), integer (reseed_counter).
+   Process:
+       1. seed_material = entropy_input || additional_input.
+       2. seed_material = Block_Cipher_df (seed_material, 256).
+       3. (Key, V) = CTR_DRBG_Update (seed_material, Key, V).
+       4. reseed_counter = 1.
+       5. Return (V, Key, reseed_counter).
+
+
+                                                 83
+

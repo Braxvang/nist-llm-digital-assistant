@@ -1,0 +1,53 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+follow:
+
+        If IPsec is desired, it is better to run it in the IPv6 domain, either end to end or nearly end to
+         end. Little is gained (except perhaps some protection against traffic analysis) by adding IPsec
+         in the IPv4 domain.
+        If IPv6 source address spoofing is a problem, check that the IPv4 and encapsulated IPv6
+         prefixes agree with the necessary exceptions for relay routers.
+        Many address spoofing and denial of service attacks stem from the requirements that 6to4
+         routers must accept and decapsulate IPv4 packets from any other 6to4 router or relay, and 6to4
+         relays must accept traffic from any IPv6 node. Administrators should apply normal ingress
+         and egress filtering rules to IPv4 addresses.
+        Any 6to4 prefix must correspond to a globally routable unicast IPv4 address. The IPv4
+         address must not be private, loopback, unspecified, multicast, broadcast, DHCP link local, or a
+         reserved IPv4 address.
+        The IPv6 address must not be IPv4 compatible, IPv4 mapped, loopback, unspecified, link
+         local, site local, or multicast.
+One risk posed by 6to4 is that of internal hosts using 6to4 to reach the Internet and bypassing a corporate
+firewall. An attacker could deploy a rogue 6to4 relay router using the anycast IP address 192.88.99.1 in
+order to insert these routers along the traffic path and perform man-in-the-middle attacks. 6to4 lacks any
+authentication mechanism. Protection mechanisms for 6to4 include using Unicast RPF on the 6to4 relay
+router itself and applying ACLs to the 6to4 relay router’s tunnel interface. ACLs could be created to
+completely block all 2002::/16 packets.
+Many of the threats against 6to4 do not apply to 6rd, because the IPv6 over IPv4 tunnels exist only within
+a single service provider. First, the customer’s end of a 6rd tunnel only needs to accept packets from a
+single or small set of known 6rd relay routers, Second, the tunnel endpoint within the service provider’s
+network can ensure that tunneled traffic arriving at its IPv4 address comes from a customer and not an
+outsider. Third, IPv6 packets can be protected against source address forgery to the same extent that IPv4
+packets are within a service provider’s network.
+  6.5.6   Intra-Site Automatic Tunnel Addressing Protocol (ISATAP)
+
+ISATAP allows isolated IPv6 hosts within a site running IPv4 to construct an automatic IPv6-in-IPv4
+tunnel. ISATAP uses IPv6 without depending on IPv4 multicast, as required with 6over4, but ISATAP
+requires more setup work than 6over4. All hosts using ISATAP must be dual stack IPv4/IPv6. The
+network may only route IPv4. Most dual stack IPv4/IPv6 operating systems implement ISATAP. More
+information about ISATAP is available in RFC 5214, Intra-Site Automatic Tunnel Addressing Protocol
+(ISATAP).
+
+ISATAP is a useful mechanism promoting early deployment of IPv6 within a site with an IPv6 prefix.
+Consider ISATAP a bootstrap mechanism for connecting IPv6 hosts as the other parts of the network
+become IPv6 enabled. Remove ISATAP when there is no longer a need. ISATAP is not appropriate for
+IPv6 dominant networks. Once IPv6 is available in a dual stack environment, disable all tunneling of
+IPv6 over IPv4.
+
+6.5.6.1 Using ISATAP
+
+ISATAP hosts communicate by tunneling IPv6 packets over IPv4 using protocol 41. The IPv4 addresses
+
+
+                                                   6-19
+

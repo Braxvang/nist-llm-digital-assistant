@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-90B                                                         RECOMMENDATION FOR THE ENTROPY SOURCES
+                                                                                                                                                                             USED FOR RANDOM BIT GENERATION
+
+                                                                                                     where
+
+                                                                                                                                                     𝑞𝑞 = 1 − 𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙
+
+                                                                                                     and x = x10, derived by iterating the recurrence relation
+                                                                                                                                                                𝑟𝑟           𝑟𝑟+1
+                                                                                                                                                𝑥𝑥𝑗𝑗 = 1 + 𝑞𝑞𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙 𝑥𝑥𝑗𝑗−1
+
+                                                                                                     for j from 1 to 10, and x0=1. Note that solving for 𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙 using the logarithm of these
+                                                                                                     equations is robust against overflows. Table 3 in Appendix G.2 provides some pre-
+                                                                                                     calculated values of 𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙 .
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-90B
+
+
+
+
+                                                                                                 7. The min-entropy is the negative logarithm of the greater performance metric
+                                                                                                                                                          ′                               1
+                                                                                                                             min-entropy = −log 2 (max(𝑃𝑃𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔 , 𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙 , 𝑘𝑘)).
+
+                                                                                             Example: Suppose that S = (2, 1, 3, 2, 1, 3, 1, 3, 1, 2), so that L = 10 and N = 9. For the purpose of
+                                                                                             this example, suppose that D = 3 (instead of 128). The following table shows the values in step 3.
+
+                                                                                                          i       lag           Winner          prediction          si       correcti-1       scoreboard
+                                                                                                                               (step 3b)                                                       (step 3d)
+                                                                                                          2    (2, --, --)         1                  2             1               0           (0, 0, 0)
+                                                                                                          3    (1, 2, --)          1                  1             3               0           (0, 0, 0)
+                                                                                                          4    (3, 1, 2)           1                  3             2               0           (0, 0, 1)
+                                                                                                          5    (2, 3, 1)           3                  1             1               1           (0, 0, 2)
+                                                                                                          6    (1, 2, 3)           3                  3             3               1           (0, 0, 3)
+                                                                                                          7    (3, 1, 2)           3                  2             1               0           (0, 1, 3)
+                                                                                                          8    (1, 3, 1)           3                  1             3               0           (0, 2, 3)
+                                                                                                          9    (3, 1, 3)           3                  3             1               0           (0, 3, 3)
+                                                                                                         10    (1, 3, 1)           2                  3             2               0           (0, 3, 3)
+
+
+                                                                                             After all of the predictions are made, correct = (0, 0, 0, 1, 1, 0, 0, 0, 0). Then, 𝑃𝑃𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔 = 0.2222,
+                                                                                                ′
+                                                                                             𝑃𝑃𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔𝑔 = 0.6008, 𝑃𝑃𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙𝑙 = 0.1167, and the resulting min-entropy estimate is 0.735.
+
+                                                                                             6.3.9   The MultiMMC Prediction Estimate
+
+                                                                                             The MultiMMC predictor is composed of multiple Markov Model with Counting (MMC)
+                                                                                             subpredictors. Each MMC predictor records the observed frequencies for transitions from one
+                                                                                             output to a subsequent output (rather than the probability of a transition, as in a typical Markov
+                                                                                             model), and makes a prediction, based on the most frequently observed transition from the current
+                                                                                             output. MultiMMC contains D MMC subpredictors running in parallel, one for each depth from 1
+                                                                                             to D. For example, the MMC with depth 1 creates a first-order model, while the MMC with depth
+                                                                                             D creates a Dth-order model. MultiMMC keeps a scoreboard that records the number of times that
+                                                                                             each MMC subpredictor was correct, and uses the subpredictor with the most correct predictions
+                                                                                             to predict the next value.
+
+
+                                                                                                                                                          52
+

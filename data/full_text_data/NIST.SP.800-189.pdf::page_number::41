@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-189                                           RESILIENT INTERDOMAIN TRAFFIC EXCHANGE:
+                                                                                                                                                               BGP SECURITY & DDOS MITIGATION
+
+                                                                                             AS3 (ISP-b) will be dropped at AS2 (ISP-a).
+
+                                                                                             5.1.4   SAV Using Loose Unicast Reverse Path Forwarding
+
+                                                                                             In the loose unicast Reverse Path Forwarding (uRPF) method, an ingress packet at the border
+                                                                                             router is accepted only if the FIB has one or more prefixes that encompasses the source address.
+                                                                                             That is, a packet is dropped if no route exists in the FIB for the source address. Loose uRPF
+                                                                                             sacrifices directionality. This method is not very effective for preventing address spoofing. It
+                                                                                             only drops packets if the spoofed address is non-routable (e.g., belongs to obviously disallowed
+                                                                                             prefix blocks—prefixes marked “False” in column “Global” [IANA-v4-sp] [IANA-v6-sp],
+                                                                                             unallocated, or allocated but currently not routed). It may be noted that the method would seem
+                                                                                             more useful for IPv6 than IPv4.
+
+                                                                                             5.1.5   SAV Using VRF Table
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-189
+
+
+
+
+                                                                                             Virtual routing and forwarding (VRF) technology [RFC4364] [Juniper5] allows a router to
+                                                                                             maintain multiple routing table instances separate from the global routing information base
+                                                                                             (RIB). External BGP (eBGP) peering sessions send specific routes to be stored in a dedicated
+                                                                                             VRF table. The uRPF process queries the VRF table (instead of the FIB) for source address
+                                                                                             validation. A VRF table can be dedicated per eBGP peer and used for uRPF for only that peer,
+                                                                                             resulting in a strict mode operation. For implementing loose uRPF on an interface, the
+                                                                                             corresponding VRF table would be global (i.e., contains the same routes as in the FIB).
+
+                                                                                             5.1.6   SAV Using Enhanced Feasible-Path uRPF (Emerging/Future)
+
+                                                                                             The enhanced feasible-path uRPF (EFP-uRPF) method is currently a work in progress (soon to
+                                                                                             be RFC) in the IETF [EFP-uRPF]. It holds promise for providing a significant improvement in
+                                                                                             effectiveness and deployability over the feasible-path uRPF. This section briefly describes the
+                                                                                             technology and standards effort but does not make a security recommendation concerning the
+                                                                                             use of EFP-uRPF at this time.
+
+                                                                                             EFP-uRPF adds greater flexibility and accuracy to uRPF operations than the existing uRPF
+                                                                                             methods discussed in Sections 5.1.2 through 5.1.5. The basic principle of the EFP-uRPF method
+                                                                                             for enhancing efficacy in multi-homing and asymmetric routing scenarios is as follows: if a route
+                                                                                             for prefix P1 is received on customer interface X and has origin AS1, and routes for P2 and P3
+                                                                                             are received on other peering interfaces Y and Z but have the same origin AS1, then allow the
+                                                                                             flexibility that data packets with a source address in any of these three prefixes (P1, P2, P3) may
+                                                                                             be legitimately received on customer interface X. Thus, based on the common origin AS
+                                                                                             principle, the prefix list for allowable source addresses in data packets (i.e., the RPF list) is
+                                                                                             expanded to include all three prefixes (P1, P2, P3) for customer interface X. Further, the same
+                                                                                             principle is applied for determining the prefix list for allowable source addresses for each
+                                                                                             customer interface and possibly lateral peer interfaces.
+
+                                                                                             As shown in Scenarios 1 and 2 (Figure 9 and Figure 10), the EFP-uRPF provides comparable or
+                                                                                             better performance than other uRPF methods for those scenarios. Scenario 3 (Figure 11) further
+                                                                                             illustrates that the EFP-uRPF method works best even in much more complex asymmetric
+                                                                                             routing scenarios. In Scenario 3 (Figure 11), the focus is on AS4 receiving data packets with a
+                                                                                             source address in {P1, P2, P3}. If the EFP-uRPF method (as described above) is used at AS4,
+
+                                                                                                                                             30
+

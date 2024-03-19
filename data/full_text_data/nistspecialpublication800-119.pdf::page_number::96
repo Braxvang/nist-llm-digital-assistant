@@ -1,0 +1,59 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+This choice is driven by two flags (called M for managed and O for other) in Router Advertisements
+(RA). When the M flag is set to 1, DHCPv6 should be used for address assignment. When the O flag is
+set to 1, DHCPv6 should be used to obtain other configuration information.
+
+Clients and servers use UDP to exchange DHCPv6 messages; they listen on ports 546 and 547,
+respectively. Both clients and servers include a DHCP Unique Identifier (DUID) to identify themselves.
+A client’s request for an address is called a Solicit message. It is normally sent from a link local source
+address to the link-scoped All_DHCP_Relay_Agents_and_Servers multicast address (FF02::1:2). A
+typical response to a Solicit message is an Advertise message containing a list of allocated addresses, the
+address of the default router, and the network prefix for the interface. DHCPv6 is capable of assigning
+multiple addresses to a single IPv6 interface. Being able to choose a default router allows DHCPv6 to
+perform load balancing. (For load balancing requirements without using DHCPv6, see RFC 4311.) Once
+the client has determined the address of a DHCPv6 server, it may, in some cases, send unicast messages
+directly to the server.
+
+If a client reaches a relay agent, the agent normally queries the All_DHCP_Servers site-scoped multicast
+address (FF05::1:3). This allows a DHCPv6 client to reach a DHCP server not attached to the same link.
+The relay operation is transparent to the client, and the discussion in the remainder of this section omits
+message relaying.
+
+4.7.1.1 Client-server Exchanges Involving Four Messages
+
+To request the assignment of one or more IPv6 addresses, a client first locates a DHCP server and then
+requests the assignment of addresses and other configuration information from the server. The client
+sends a Solicit message to the All_DHCP_Relay_Agents_and_Servers address to find available DHCP
+servers. Any server that can meet the client’s requirements responds with an Advertise message. The
+client then chooses one of the servers and sends a Request message to the server asking for confirmed
+assignment of addresses and other configuration information. The server responds with a Reply message
+that contains the confirmed addresses and configuration.
+
+4.7.1.2 Client-server Exchanges Involving Two Messages
+
+When a DHCP client does not need to have a DHCP server assign it IP addresses, the client can obtain
+configuration information such as a list of available DNS servers or NTP servers by exchanging a single
+message pair with a DHCP server. The client first sends an Information-Request message to the
+All_DHCP_Relay_Agents_and_Servers multicast address. A server responds with a Reply message
+containing the configuration information for the client.
+
+Even if a client needs address allocations, if a server has IPv6 addresses and other configuration
+information committed to a client, the client and server may be able to complete the exchange using only
+two messages. In this case, the client sends a Solicit message to the multicast
+All_DHCP_Relay_Agents_and_Servers address requesting the assignment of addresses and other
+configuration information. The client indicates it is willing to accept an immediate Reply message from
+the server. A server that is willing to commit the assignment of addresses to the client immediately
+responds with a Reply message. The configuration information and the addresses in the Reply message
+are then immediately available for use by the client.
+
+Each address assigned to the client has preferred and valid lifetimes specified by the server. The valid
+lifetime is always longer. When the preferred lifetime expires, the address is deprecated for new uses but
+may be used for existing connections (e.g., TCP or IPsec) until the valid lifetime expires. To request an
+extension of the lifetimes assigned to an address, the client sends a Renew message. The server returns a
+
+
+
+                                                   4-33
+

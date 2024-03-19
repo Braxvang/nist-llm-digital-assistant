@@ -1,0 +1,52 @@
+                                                                GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+ It is impossible to use IKE without getting into an endless spiral. IKE uses UDP, which requires ND,
+  which in turn uses the very same ICMPv6 messages IPsec was supposed to protect. Also, IKE does
+  not work with multicast addresses.
+ A large number of security associations needs to be pre-established.
+ AH was downgraded to MAY in RFC 4301 and is not included in many implementations.
+Nevertheless, it is possible to use IPsec to protect autoconfiguration and ND if security associations can
+be set up beforehand. One approach that has been suggested is to use pre-established security
+associations from a known set of temporary IPv6 addresses to secure setting up longer-lived addresses
+and then new IPsec security associations for these addresses. This process needs to cover certain
+multicast addresses (All Nodes, Solicited Node for each unicast address, All Routers, etc.) as well as
+unicast. Although this has been described at a high level, little practical experience working out all of the
+details exists. The following limitations appear to be unavoidable:
+
+ Manual keying must be used, and IKE cannot be used.
+ All interfaces and their hardware (MAC) addresses must be known ahead of time.
+ Replay detection must be turned off.
+ A fixed set of IPsec parameters must be used without any negotiation.
+
+  5.4.2   Using SEND to Secure Autoconfiguration and ND
+
+SEND was designed by operators of networks who needed to secure IPv6 autoconfiguration and ND but
+found IPsec to be an impractical choice. Many of these were mobile service operators incorporating IPv6
+into third generation mobile handsets.
+
+The core ideas behind SEND are:
+
+ Use CGAs.
+ Add an RSA Signature option to ICMPv6.
+ Define trust anchors capable of attesting for public keys of routers.
+ Add Nonce and Timestamp options to ICMPv6 for replay detection.
+
+Nodes are configured with public keys of trust anchors, which let them verify signatures on RAs. By
+using CGAs and signatures, addresses cannot be spoofed or hijacked. Also, certain denial-of-service
+attacks are prevented. Replay attacks can be detected by examining timestamps on multicast messages
+and verifying that nonces are returned in two-way exchanges.
+
+In ad hoc networks, using CGAs and signatures ensures that messages from the same address really came
+from the same entity, and no one else has stolen the address.
+
+  5.4.3   Current Status and Unknown Aspects
+
+Cryptographic protection for autoconfiguration and ND has not been widely used, so it remains to be seen
+whether they will become parts of generally accepted practices for IPv6 security.
+
+SEND also has not been widely implemented or deployed. Issues reportedly holding back some vendors
+
+
+                                                    5-19
+

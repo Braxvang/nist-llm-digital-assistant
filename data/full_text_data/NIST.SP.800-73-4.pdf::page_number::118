@@ -1,0 +1,60 @@
+Special Publication 800-73-4                             Interfaces for Personal Identity Verification – Part 2:
+                                                         PIV Card Application Card Command Interface
+
+Command 3: (GET RESPONSE APDU):
+
+            CLA                 '00'
+            INS                 'C0'
+            P1                  '00'
+            P2                  '00'
+            Le                  xx Length of remaining response as indicated by previous SW1-SW2
+
+
+Response 3:
+
+            Data Field          {second and last part of signature}
+            SW1-SW2             '90 00' (Status word)
+
+
+A.4.2     ECDSA
+
+The following example illustrates signature generation with ECDSA using ECC: Curve P-256 (i.e.,
+algorithm identifier '11'). Command chaining is not used in this example, as the hash value fits into the
+data field of the command. Padding does not apply to ECDSA.
+
+Command – GENERAL AUTHENTICATE
+
+            CLA                 '00'
+            INS                 '87'
+            P1                  '11'
+            P2                  '9C'
+            Lc                  Length of data field
+            Data Field          '7C' – L1 { '82' '00' '81' L2 {hash value of message}}
+            Le                  '00'
+
+
+Response:
+
+                                '7C' – L1 {'82' L2 (r,s)} where
+                                     •    (r,s) is DER encoded with the following ASN.1 structure:
+
+                                            Ecdsa-Sig-Value ::= SEQUENCE {
+            Data Field                             r    INTEGER,
+                                                   s    INTEGER }
+                                       •   L1 is the length of tag '82' TLV structure
+                                       •   L2 is the length of the DER encoded Ecdsa-Sig-Value
+                                           structure
+            SW1-SW2             '90 00' (Status word)
+
+
+
+A.5              Key Establishment Schemes with the PIV Key Management Key
+
+FIPS 201 specifies a public key pair and associated X.509 Certificate for Key Management. The key
+management key (KMK) is further defined in SP 800-78, which defines two distinct key establishment
+schemes for the KMK:
+
+
+
+                                                        43
+

@@ -1,0 +1,53 @@
+Practical Combinatorial Testing
+________________________________________________________________
+However, we must also consider overdraft protection and withdrawal limits, so the
+assertion above is not adequate. Collecting conditions, we can develop assertions for each
+of the eight possible settings of minflag, odflag, and limflag. If there is a minimum
+balance requirement, no overdraft protection, and a withdrawal limit below the default,
+what is the relationship between balance and the other parameters?
+
+minflag && !odflag && limflag
+     => balance >= min – oddefault && amt <= limit
+
+This relation must hold after the withdrawal, so to develop an assertion that must hold
+immediately before the withdrawal, substitute (balance – amt) for balance in the expression
+above:
+
+balance0 – amt >= min – oddefault && amt <= limit
+
+      Assertions such as this would be placed immediately before the balance is modified,
+not at the beginning of the code for the withdrawal function. Code prior to the subtraction
+from balance should have ensured that properties encoded by assertions hold immediately
+before the subtraction, thus any violation of the assertions indicates an error in the code (or
+possibly in the assertions!) that must be investigated. This is illustrated in Figure 26, where
+“wdl_init.c” and “wdl_final.c” are files containing assertions such as developed above.
+
+       Including the card number, there are 11 parameters for this module. We need to
+partition the inputs to determine what values to use in generating a covering array.
+Partitions should cover valid and invalid values, minimum and maximum for ranges, and
+values at and on either side of boundaries. The bank uses a check digit scheme for card
+numbers to detect errors such as digit transposition when numbers are entered manually. A
+simple partition could be as follows:
+
+       string acct: {valid, invalid}
+       int amt: {0, divisible by 20, not divisible by 20, max}
+       int balance: {0, negative, positive, max int}
+       int minflag: {T, F}
+       int min: {0, negative, positive, max int}
+       boolean odflag: {T, F}
+       int odamt: {0, negative, positive, max int}
+       int oddefault: {0, negative, positive, max int}
+       boolean hot: {T, F}
+       int acctlim: {0, negative, positive, max int}
+       int lim: {0, negative, positive, max int}
+
+Using the equivalence classes above, this is thus a 2447 system, or 262,144 possible inputs.
+If values on either side of boundaries are used, the number of possible input combinations
+will be much larger, but using combinatorial methods we can cover 3-way or 4-way
+combinations with only a few hundred tests.
+
+
+
+
+44
+

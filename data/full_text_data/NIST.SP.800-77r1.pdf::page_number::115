@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                              GUIDE TO IPSEC VPNS
+
+
+                                                                                              interfaces. Steps 1 through 7 below are mandatory for both types of VPN implementations.
+
+                                                                                                   1. Back up the routers. Backing up the router operating system and configuration files is a
+                                                                                                      necessity since the prototype is being implemented on production equipment. Even in a
+                                                                                                      test environment, performing a backup before making any changes is often very helpful
+                                                                                                      because the routers can be restored quickly to their original, clean state.
+
+                                                                                                   2. Update the firmware of the routers. To ensure that no known bugs are left unfixed, the
+                                                                                                      routers are updated to the latest firmware and assessed for regular operation without any
+                                                                                                      other changes in configuration. One endpoint is updated and rebooted. Once the network
+                                                                                                      is confirmed to be operating properly, the other endpoint’s firmware is updated, and the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      router is rebooted. Once both routers are confirmed to be working properly on the latest
+                                                                                                      firmware, the process of configuring the routers for IPsec can be started.
+
+                                                                                                   3. Verify the security of the routers. The network administrators should perform a
+                                                                                                      vulnerability assessment to identify any existing security issues with the routers, such as
+                                                                                                      unneeded user accounts or inadequate physical security controls. The administrators
+                                                                                                      should then address all identified issues before proceeding, or the IPsec implementation
+                                                                                                      may be compromised quickly.
+
+                                                                                                   4. Update the endpoints to support IPsec. This could involve patching the operating
+                                                                                                      system, installing or enabling IPsec services, or making other changes to the endpoints so
+                                                                                                      that they can support IPsec services. In this case, both endpoints happen to be Cisco
+                                                                                                      routers, so the administrators double-check each router to confirm that it can support
+                                                                                                      IPsec and the desired encryption algorithms.
+
+                                                                                                   5. Specify the IKE cryptographic algorithms. For the preferred proposal, use AES-GCM
+                                                                                                      since it is an AEAD algorithm; specify a PRF. For the fallback proposal, use AES-CBC
+                                                                                                      with HMAC-SHA256. It will use SHA-256 (in HMAC) for integrity protection as well.
+                                                                                                      The following ECP DH group (19) is specified:
+
+                                                                                                       crypto ikev2 proposal 1
+                                                                                                        encryption aes-gcm 256
+                                                                                                        prf sha256
+                                                                                                        group 19
+
+                                                                                                       crypto ikev2 proposal 2
+                                                                                                        encryption aes-cbc-256
+                                                                                                        integrity sha256 78
+                                                                                                        group 19 79
+                                                                                                       crypto ikev2 policy default
+                                                                                                        proposal 1
+
+
+                                                                                              78   For AEAD algorithms, a PRF needs to be specified. For non-AEAD algorithms, the PRF defaults to the integrity algorithm.
+                                                                                              79   Change this value to 14 or 15 if DH 19 is not supported by the other device.
+
+
+
+                                                                                                                                                           98
+

@@ -1,0 +1,55 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              9.4.3   Implementing a Prototype
+
+                                                                                              To make a realistic deployment prototype, the company decides to use two networks normally
+                                                                                              reserved as staging servers at different data centers that test new code before it is deployed into
+                                                                                              production. These two networks are already connected in a gateway-to-gateway architecture.
+                                                                                              First, servers in network A and servers in network B will each be configured for mesh encryption
+                                                                                              to their local nodes only. Once the mesh IPsec encryption is functional in one network, and the
+                                                                                              mesh IPsec encryption is functional in the other network, the mesh will be extended to
+                                                                                              incorporate both networks in a single mesh configuration. This allows for further testing of
+                                                                                              IPsec-in-IPsec packets when a server from network A starts an IPsec connection to a server in
+                                                                                              network B.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                 •    The open source Ansible software provisioning system is extended to create a PKCS#12
+                                                                                                      certificate for each new virtual machine that is created for network A and network B. If
+                                                                                                      the existing CA infrastructure allows this, Ansible could use that infrastructure to create
+                                                                                                      the CA-signed certificates.
+                                                                                                 •    Using a phased approach, create an IPsec configuration file. Then add it to the Ansible
+                                                                                                      script to be installed on new virtual machines deployed in networks A and B.
+                                                                                                      # /etc/ipsec.d/mesh.conf
+                                                                                                      conn private-or-clear
+                                                                                                             left=%defaultroute
+                                                                                                             leftcert=provisioned-cert
+                                                                                                             leftid=%fromcert
+                                                                                                             rightid=%fromcert
+                                                                                                             rightrsasigkey=%cert
+                                                                                                             right=%opportunisticgroup
+                                                                                                             type=transport
+                                                                                                             failureshunt=passthrough
+                                                                                                             auto=ondemand
+
+                                                                                                 •    As part of the new virtual machine provisioning, Libreswan is installed, and the
+                                                                                                      generated file containing the PKCS#12 bundle with friendly_name “provisioned-cert” is
+                                                                                                      imported into Libreswan using the ipsec import command.
+                                                                                                 •    IPsec is enabled using the “private-or-clear” connection by adding the IP network ranges
+                                                                                                      of the participating networks to the file /etc/ipsec.d/policies/private-or-
+                                                                                                      clear:
+
+                                                                                                      # /etc/ipsec.d/policies/private-or-clear
+                                                                                                      192.0.0.0/24
+                                                                                                      192.0.2.0/24
+                                                                                                      2001:db8:0:1::/64
+                                                                                                      2001:db8:0:2::/64
+
+
+
+
+                                                                                                                                              118
+

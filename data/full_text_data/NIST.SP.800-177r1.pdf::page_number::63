@@ -1,0 +1,59 @@
+                                                                                               NIST SP 800-177 REV. 1                                                       TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                                  •    Add an additional DMARC authentication failure type, for use when some authentication
+                                                                                                       mechanisms fail to produce aligned identiﬁers.
+
+                                                                                               4.6.6   Considerations for Agencies When Using Cloud or Contracted Email Services
+
+                                                                                               �e rua and ruf tags typically specify mailto: addresses in the sender’s domain. �ese reporting
+                                                                                               addresses are normally assumed to be in the same domain as the purported sender, but not
+                                                                                               always. Cloud providers and contracted services may provide DMARC report collection as part
+                                                                                               of their service oﬀerings. In these instances, the mailto: domain will diﬀer from the sending
+                                                                                               domain. To prevent DMARC reporting being used as a DoS vector, the owner of the mailto:
+                                                                                               domain must signal its legitimacy by posting a DMARC TXT DNS record with the Fully
+                                                                                               Qualiﬁed Domain Name (FQDN):
+
+                                                                                                                   original-sender-domain._report._dmarc.mailto-domain
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               For example, an original message sent from example.gov is authenticated with a DMARC
+                                                                                               record:
+
+                                                                                                       _dmarc.example.gov. IN TXT "v=DMARC1; p=reject;
+                                                                                                                   rua=mailto:reports.example.net"
+
+                                                                                               �e recipient then queries for a DMARC TXT RR at
+                                                                                               example.gov._report._dmarc.example.net and checks the rua tag includes the value
+                                                                                               rua=mailto:reports.example.net to ensure that the address speciﬁed in the sending domain
+                                                                                               owner's DMARC record is the legitimate receiver for DMARC reports.
+
+                                                                                               Note that, as with DKIM, DMARC records require the use of semicolons between tags.
+
+                                                                                               4.6.7   Mail Forwarding and Indirect Email Flows
+
+                                                                                               �e message authentication devices of SPF, DKIM and DMARC are designed to work directly
+                                                                                               between a sender domain and a receiver domain. �e message envelope and RFC5322.From
+                                                                                               address pass through a series of MTAs and are authenticated by the receiver. �e DKIM
+                                                                                               signature, message headers and message body arrive at the receiver unchanged. �e email system
+                                                                                               has additional complexities as there are a variety of message forwarding activity that will very
+                                                                                               often either modify the message or change the apparent message-From: domain. For example,
+                                                                                               user@example.gov sends a message to ourgroup@example.net, which is subsequently
+                                                                                               forwarded to all members of the mail group. If the mail group software simply relays the
+                                                                                               message, the envelope-From: address denoting the forwarder diﬀers from the message-From:
+                                                                                               address, denoting the original sender. In this case DMARC processing will rely on DKIM for
+                                                                                               authentication. If the forwarder modiﬁes the message-From: ﬁeld to match the HELO of the
+                                                                                               sending MTA (see Section 2.3.1), SPF may authenticate, but the modiﬁed header will make the
+                                                                                               DKIM signature invalid.
+
+                                                                                               Another example is the use of some third-party email scanning services. In cases where email is
+                                                                                               received by a domain, and then “shunted” to a third party for scanning. �e email is then sent
+                                                                                               back (via SMTP) to the original receiving domain, which may consider the incoming email as a
+
+                                                                                                                                              50
+

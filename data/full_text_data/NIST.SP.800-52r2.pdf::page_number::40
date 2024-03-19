@@ -1,0 +1,57 @@
+NIST SP 800-52 REV. 2                                                              GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+policy processing and checking. The server shall check the client key length if client
+authentication is performed and the server implementation provides a mechanism to do so.
+Federal agencies shall use the key size guidelines provided in SP 800-131A [10] to check the
+client key size.
+
+3.5.4     Server Hints List
+
+Clients may use the list of trust anchors sent by the server in the CertificateRequest message to
+determine if the client’s certification path terminates at one of these trust anchors. The list sent
+by the server is known as a “hints list.” When the server and client are in different PKI domains
+and the trust is established via direct cross-certification between the two PKI domains (i.e., the
+server PKI domain and the client PKI domain) or via transitive cross-certification (i.e., through
+cross-certifications among multiple PKI domains), the client may erroneously decide that its
+certificate will not be accepted by the server since the client’s trust anchor is not sent in the hints
+list. To mitigate this failure, the server shall either: 1) maintain the trust anchors of the various
+PKIs whose subscribers are the potential clients for the server and include them in the hints list
+or 2) be configured to send an empty hints list so that the client can always provide a certificate it
+possesses. The hints list shall be distinct from the server’s trust anchor store. 27 In other words,
+the server shall continue to only populate its trust anchor store with the trust anchor of the
+server’s PKI domain and the domains it needs to trust directly for client authentication. Note that
+the distinction between the server hints list and the server’s own trust store is as follows: 1) the
+hints list is the list of trust anchors that a potential client might trust, and 2) the server’s trust
+store is the list of trust anchors that the server explicitly trusts.
+
+3.6     Session Resumption and Early Data
+
+Previous TLS sessions can be resumed, allowing for a connection to be established using an
+abbreviated handshake. All versions of TLS offer session resumption, although the mechanism
+for performing resumption differs. A server may be configured to ignore requests to resume a
+session if the implementation allows it.
+
+Additional mechanisms have been developed for session resumption, such as the Stateless TLS
+Session Resumption extension [62]. While these guidelines neither encourage nor discourage the
+use of such mechanisms, it is important to understand the security impact if long-term or shared
+keys are compromised. If resumption is allowed, frequent key replacement and short lifetimes
+for resumption information are recommended, as applicable. See [67] for discussion on the
+security impacts of resumption mechanisms.
+
+TLS 1.3 allows the client to send data (known as 0-RTT data) in the first flight of a handshake.
+This practice may provide opportunities for attackers, such as replay attacks. 28 The TLS 1.3
+specification describes two mechanisms to mitigate threats introduced by 0-RTT data. One of
+
+
+27 Depending on the server and client trust anchors, the two lists could be identical, could have some trust anchors in common, or
+
+  have no trust anchors in common.
+
+28 TLS does not inherently provide replay protection for 0-RTT data.
+
+
+
+
+                                                               31
+

@@ -1,0 +1,55 @@
+NIST SP 800-166                                                    DERIVED PIV APPLICATION AND
+                                                                   DATA MODEL TEST GUIDELINES
+
+ Precondition(s)      •   A token with the Derived PIV Application is inserted into an
+                          appropriate token reader.
+                      •   Suitable drivers have been loaded between the test system and an
+                          instance of the reader.
+                      •   The Derived PIV Application Password’s retry counter is not 0.
+ Test Scenario        1. Send the SELECT command with
+                            • AID == 'A0 00 00 03 08 00 00 20 00 01 00'
+                      2. Send the VERIFY command with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command will contain the
+                               correct Derived PIV Application Password, padded
+                               with 'FF' (if necessary) to complete the total
+                               length of the value to 8 bytes
+                      3. Repeat Step 1 with
+                         • AID == 'A0 00 00 03 08 00 00 00 00' (invalid AID)
+                      4. Send the GENERAL AUTHENTICATE command
+                            • CLA is set to:
+                                1. '00' if command chaining is not needed or
+                                   '10' if command chaining is used. (The last
+                                   chain of the command sets CLA to '00')
+                            • P1, algorithm reference, is set to '07' or '11'.
+                               P2, key reference, is set to '9A' indicating the
+                               Derived PIV Authentication Key
+                            • Data field in the command is to include '81'
+                               specifying a challenge, followed by a randomly
+                               generated challenge, and '82 00' in order to
+                               request a response
+ Expected Result(s)   1. From Step 1, the command returns the application property template
+                         with the status word '90 00'.
+                      2. From Step 2, the command returns status word '90 00'.
+                      3. From Step 3, the command returns '6A 82' (application not found).
+                      4. From Step 4, the command returns the signed challenge with the
+                         status word '90 00'.
+ Postcondition(s)     The Derived PIV Application continues to be the currently selected
+                      application and the application security status of the Derived PIV
+                      Application Password is TRUE.
+
+8.3.1.5 Select with Another Valid AID when Derived PIV Application is Currently
+        Selected
+
+ Test Assertion       TA-08.03.01.05
+ Purpose              Confirms that the Derived PIV Application is deselected when the
+                      currently selected application is the Derived PIV Application and the
+                      SELECT command is sent with another valid AID that is supported.
+ DTR(s)               • DTR-06.03.02.08
+ Vendor               The vendor to provide information in its documentation validating
+ Documentation        compliance with this requirement.
+
+
+
+                                            46
+

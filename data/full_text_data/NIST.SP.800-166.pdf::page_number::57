@@ -1,0 +1,58 @@
+NIST SP 800-166                                                  DERIVED PIV APPLICATION AND
+                                                                 DATA MODEL TEST GUIDELINES
+
+ Test Scenario        1. Send the SELECT command with
+                            • AID == 'A0 00 00 03 08 00 00 20 00 01 00'
+                      2. Send the VERIFY command with
+                            • P2, key reference value, is set to '80'
+                            • Data field of the command will contain the
+                               correct Derived PIV Application Password, padded
+                               with 'FF' (if necessary) to complete the total
+                               length of the value to 8 bytes
+                      3. Send the GENERAL AUTHENTICATE command
+                            • CLA is set to:
+                                1. '00' if command chaining is not needed or
+                                2. '10' if command chaining is used. (The last
+                                   chain of the command sets CLA to '00')
+                            • P1, algorithm reference, is set to something
+                               other than '07' or '11' (indicating an invalid
+                               algorithm reference)
+                            • P2, key reference, is set to '9A' (the Derived
+                               PIV Authentication key)
+                            • Data field in the command is to include '81'
+                               specifying a challenge, followed by a randomly
+                               generated challenge, and '82 00' in order to
+                               request a response
+                      4. Send the GENERAL AUTHENTICATE command
+                            • CLA is set to:
+                                1. '00' if command chaining is not needed or
+                                2. '10' if command chaining is used. (The last
+                                   chain of the command sets CLA to '00')
+                            • P1, algorithm reference, is set to '07' or '11'
+                            • P2, key reference, is set to '9A' (the Derived
+                               PIV Authentication key)
+                            • Data field in the command is to include '81'
+                               specifying a challenge, followed by a randomly
+                               generated challenge (which is of incorrect length
+                               based on the chosen algorithm [e.g., challenge is
+                               greater than they key size]), and '82 00' in
+                               order to request a response
+ Expected Result(s)   1. From Step 1, the command returns the application property template
+                         with the status word '90 00'.
+                      2. From Step 2, the command returns status word '90 00'.
+                      3. From Step 3, the command returns status word '6A 86' (incorrect
+                         parameter in P1 or P2).
+                      4. From Step 4, the command returns status word '6A 80' (incorrect
+                         parameter in command data field).
+ Postcondition(s)     N/A
+
+8.3.3.3 Mutual Authenticate with Derived PIV Token Management Key
+
+ Test Assertion       TA-08.03.03.03
+ Purpose              Verifies that the Derived PIV Application responds to the GENERAL
+                      AUTHENTICATE command appropriately when mutually
+
+
+
+                                           50
+

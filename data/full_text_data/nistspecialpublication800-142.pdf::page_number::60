@@ -1,0 +1,55 @@
+Practical Combinatorial Testing
+________________________________________________________________
+9.2.3 Generating Tests from Counterexamples
+
+        NuSMV produces counterexamples where the input values would disprove the
+claims specified in the previous section. Each of these counterexamples is thus a set of test
+data that would have the expected result of GRANT or DENY.
+
+        For each SPEC claim, if this set of values cannot in fact lead to the particular result
+Rj, the model checker indicates that this is true. For example, for the configuration below,
+the claim that access will not be granted is true, because the user’s clearance level (u_l =
+0) is below the file’s level (f_l = 2):
+-- specification AG (((u_l = 0 & f_l = 2) & act = rd) -> AX
+!(access = GRANT)) is true
+
+        If the claim is false, the model checker indicates this and provides a trace of
+parameter input values and states that will prove it is false. In effect this is a complete test
+case, i.e., a set of parameter values and expected result. It is then simple to map these
+values into complete test cases in the syntax needed for the system under test.
+
+Excerpt from NuSMV output:
+       -- specification AG (((u_l = 0 & f_l = 0) & act = rd) -> AX
+           access = GRANT)) is false
+       -- as demonstrated by the following execution sequence
+       Trace Description: CTL Counterexample
+       Trace Type: Counterexample
+       -> State: 1.1 <­
+         u_l = 0
+         f_l = 0
+         act = rd
+         access = START_
+       -> Input: 1.2 <­
+       -> State: 1.2 <­
+         access = GRANT
+
+The model checker finds that 6 of the input parameter configurations produce a result of
+GRANT and 3 produce a DENY result, so at the completion of this step we have
+successfully matched up each input parameter configuration with the result that should be
+produced by the SUT.
+
+        We now strip out the parameter names and values, giving tests that can be applied
+to the system under test. This can be accomplished using a variety of methods; a simple
+script used in this example is given in the appendix. The test inputs and expected results
+produced are shown below:
+
+ u_l = 0 & f_l = 0 & act = rd -> access = GRANT
+ u_l = 0 & f_l = 1 & act = wr -> access = GRANT
+ u_l = 1 & f_l = 1 & act = rd -> access = GRANT
+ u_l = 1 & f_l = 2 & act = wr -> access = GRANT
+ u_l = 2 & f_l = 0 & act = rd -> access = GRANT
+
+
+
+54
+

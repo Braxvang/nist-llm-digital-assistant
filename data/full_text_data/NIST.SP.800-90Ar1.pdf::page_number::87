@@ -1,0 +1,42 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+                                              Comment: Invoke the instantiate algorithm. Note
+                                              that the entropy_input contains the nonce.
+        7. (V, Key, reseed_counter) = HMAC_DRBG_Instantiate_algorithm (entropy_input,
+           personalization_string).
+                                              Comment: Find an unused internal state.
+        8. (status, state_handle) = Find_state_space ( ).
+        9. If (status ≠ “Success”), then Return (status, −1).
+        10. Save the initial state.
+             10.1 internal_state (state_handle).V = V.
+             10.2 internal_state (state_handle). Key = Key.
+             10.3 internal_state (state_handle). reseed_counter = reseed_counter.
+             10.4 internal_state (state_handle).security_strength = security_strength.
+        11. Return (“Success” and state_handle).
+HMAC_DRBG_Instantiate_algorithm:
+   Input: bitstring (entropy_input, personalization_string).
+   Output: bitstring (V, Key), integer reseed_counter.
+   Process:
+        1. seed_material = entropy_input || personalization_string.
+        2. Set Key to outlen bits of zeros.
+        3. Set V to outlen/8 bytes of 0x01.
+        4. (Key, V) = HMAC_DRBG_Update (seed_material, Key, V).
+        5.   reseed_counter = 1.
+        6. Return (V, Key, reseed_counter).
+B.2.2        Generating Pseudorandom Bits Using HMAC_DRBG
+
+The implementation returns a Null string as the pseudorandom bits if an error has been detected.
+HMAC_DRBG_Generate_function:
+   Input: integer (state_handle, requested_no_of_bits, requested_security_strength).
+   Output: string (status), bitstring pseudorandom_bits.
+   Process:
+                                              Comment: Check for a valid state handle.
+        1. If ((state_handle < 0) or (state_handle > 2) or (internal_state (state_handle) = {Null,
+           Null, 0, 0}), then Return (“State not available for the indicated state_handle”, Null).
+        2. Get the internal state.
+
+
+                                                78
+

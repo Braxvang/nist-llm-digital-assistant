@@ -1,0 +1,45 @@
+NIST SP 800-90A Rev. 1                  HMAC_DRBG              Recommendation for Random Number
+                                                                Generation Using Deterministic RBGs
+
+
+       3. If (provided_data = Null), then return K and V.
+       4. K = HMAC (K, V || 0x01 || provided_data).
+       5. V = HMAC (K, V).
+       6. Return (K, V).
+
+10.1.2.3     Instantiation of HMAC_DRBG
+
+Notes for the instantiate function specified in Section 9.1:
+   The instantiation of HMAC_DRBG requires a call to the Instantiate_function
+   specified in Section 9.1. Process step 9 of that function calls the instantiate algorithm
+   specified in this section. The values of highest_supported_security_strength and min
+   _length are provided in Table 2 of Section 10.1. The contents of the internal state are
+   provided in Section 10.1.2.1.
+The instantiate algorithm:
+   Let HMAC_DRBG_Update be the function specified in Section 10.1.2.2. The output
+   block length (outlen) is provided in Table 2 of Section 10.1.
+   The following process or its equivalent shall be used as the instantiate algorithm for
+   this DRBG mechanism (see step 9 of the instantiate process in Section 9.1):
+   HMAC_DRBG_Instantiate_algorithm (entropy_input, nonce,
+     personalization_string, security_strength):
+       1. entropy_input: The string of bits obtained from the randomness source.
+       2. nonce: A string of bits as specified in Section 8.6.7.
+       3. personalization_string: The personalization string received from the consuming
+          application. Note that the length of the personalization_string may be zero.
+       4. security_strength: The security strength for the instantiation. This parameter is
+          optional for HMAC_DRBG, since it is not used.
+   Output:
+       1. initial_working_state: The initial values for V, Key and reseed_counter (see
+          Section 10.1.2.1).
+   HMAC_DRBG Instantiate Process:
+       1. seed_material = entropy_input || nonce || personalization_string.
+       2. Key = 0x00 00...00.                 Comment: outlen bits.
+       3. V = 0x01 01...01.                   Comment: outlen bits.
+                                              Comment: Update Key and V.
+       4. (Key, V) = HMAC_DRBG_Update (seed_material, Key, V).
+       5. reseed_counter = 1.
+       6. Return (V, Key. reseed_counter).
+
+
+                                              45
+

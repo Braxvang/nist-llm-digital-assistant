@@ -1,0 +1,44 @@
+NIST SP 800-90A Rev. 1                                           Recommendation for Random Number
+                                                                  Generation Using Deterministic RBGs
+
+
+                                             Comment: Increment the nonce; actual coding must
+                                             ensure that the nonce wraps when its storage limit is
+                                             reached, and that the counter pertains to all
+                                             instantiations, not just this one.
+        6. instantiation_nonce = instantiation_nonce + 1.
+                                             Comment: Invoke the instantiate algorithm.
+        7. (V, Key, reseed_counter) = CTR_DRBG_Instantiate_algorithm (entropy_input,
+           instantiation_nonce, personalization_string).
+                                             Comment: Find an available internal state and save
+                                             the initial values.
+        8. (status, state_handle) = Find_state_space ( ).
+        9. If (status ≠ “Success”), then Return (status, −1).
+        10. Save the internal state.
+           10.1 internal_state_ (state_handle).V = V.
+           10.2 internal_state_ (state_handle).Key = Key.
+           10.3 internal_state_ (state_handle).reseed_counter = reseed_counter.
+           10.4 internal_state_ (state_handle).security_strength = security_strength.
+        11. Return (“Success”, state_handle).
+CTR_DRBG_Instantiate_algorithm:
+   Input: bitstring (entropy_input, nonce, personalization_string).
+   Output: bitstring (V, Key), integer (reseed_counter).
+   Process:
+        1. seed_material = entropy_input || nonce || personalization_string.
+        2. seed_material = Block_Cipher_df (seed_material, 256).
+        3. Key = 0128.                               Comment: 128 bits.
+                 128
+        4. V = 0 .                                   Comment: 128 bits.
+        5. (Key, V) = CTR_DRBG_Update (seed_material, Key, V).
+        6. reseed_counter = 1.
+        7. Return (V, Key, reseed_counter).
+B.3.3      Reseeding a CTR_DRBG Instantiation Using a Derivation Function
+
+The implementation is designed to return a text message as the status when an error is
+encountered.
+CTR_DRBG_Reseed_function:
+
+
+
+                                                82
+

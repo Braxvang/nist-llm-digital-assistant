@@ -1,0 +1,52 @@
+Special Publication 800-73-4      Interfaces for Personal Identity Verification – Part 1: PIV
+                               Card Application Namespace, Data Model and Representation
+
+    +   The optional DUNS and Organizational Identifier fields are deprecated and will be eliminated
+        in a future version of SP 800-73.
+    +   The Global Unique Identification number (GUID) field must be present, and shall include a
+        Card Universally Unique Identifier (UUID) (see Section 3.4.1).
+    +   The Expiration Date is mapped to the reserved for future use (RFU) tag 0x35, keeping that
+        within the existing scope of the TIG SCEPACS specification. This field shall be 8 bytes in
+        length and shall be encoded in ASCII as YYYYMMDD. The expiration date shall be the
+        same as printed on the card.
+    +   The optional Cardholder UUID field is mapped to RFU tag 0x36. If present, it shall include a
+        Cardholder UUID as described in Section 3.4.2.
+    +   The CHUID shall be signed in accordance with Section 3.1.2.1. The card issuer’s digital
+        signature key shall be used to sign the CHUID and the associated certificate shall be placed in
+        the signature field of the CHUID.
+3.1.2.1 Asymmetric Signature Field in CHUID
+
+FIPS 201 requires inclusion of the asymmetric signature field in the CHUID data object. The
+asymmetric signature data element of the CHUID shall be encoded as a Cryptographic Message
+Syntax (CMS) external digital signature, as defined in RFC 5652 [RFC5652].
+
+The issuer asymmetric signature field is implemented as a SignedData type, as specified in
+[RFC5652], and shall include the following information:
+
+    +   The message shall include a version field specifying version v3
+    +   The digestAlgorithms field shall be as specified in [SP800-78]
+    +   The encapContentInfo shall:
+
+        –   Specify an eContentType of id-PIV-CHUIDSecurityObject
+
+        –   Omit the eContent field
+    +   The certificates field shall include only a single X.509 certificate, which can be used to verify
+        the signature in the SignerInfo field
+    +   The crls field shall be omitted
+    +   signerInfos shall be present and include only a single SignerInfo
+    +   The SignerInfo shall:
+
+        –   Use the issuerAndSerialNumber choice for SignerIdentifier
+
+        –   Specify a digestAlgorithm in accordance with [SP800-78]
+
+        –   Include, at a minimum, the following signed attributes:
+
+            •   A MessageDigest attribute containing the hash computed in accordance with
+                [SP800-78]
+
+
+
+
+                                                       6
+

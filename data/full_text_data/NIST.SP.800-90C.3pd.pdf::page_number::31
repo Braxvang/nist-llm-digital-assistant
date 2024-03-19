@@ -1,0 +1,45 @@
+      NIST SP 800-90C 3pd (Third Public Draft)                           Recommendation for RBG Constructions
+      September 2022
+
+839   See Section 3.1 for additional discussion about the Get_ES_Bitstring function.
+
+840   2.8.3. Interfacing with an RBG3 Construction
+841   An RBG3 construction requires interface functions to instantiate its DRBG (see Section 2.8.3.1)
+842   and to request the generation of full-entropy bits (see Section 2.8.3.2).
+
+843   2.8.3.1.        Instantiating a DRBG within an RBG3 Construction
+844   The RBG3_DRBG_Instantiate function is used to instantiate the DRBG within the RBG3
+845   construction using the following call:
+846              (status, state_handle) = RBG3_DRBG_Instantiate(prediction_resistance_flag,
+847                                         personalization_string).
+
+
+
+
+848
+849                                    Fig. 9. RBG3 DRBG_Instantiate function
+
+850   The RBG3’s instantiate function (shown in Figure 9) will result in a call to the DRBG’s
+851   Instantiate_function (provided in Section 2.8.1.1). An optional but recommended
+852   personalization_string (see Section 2.4.1) may be provided as an input parameter. If included, the
+853   personalization_string shall be passed to the DRBG that is instantiated in the
+854   Instantiate_function request. See Sections 6.2.1.1 and 6.3.1.1 for more specificity.
+855   If the returned status code indicates a success, a state handle may be returned to indicate the
+856   particular DRBG instance that is to be used by the construction. Note that if multiple instances of
+857   the DRBG are used, a separate state handle shall be returned for each instance. When provided,
+858   the state handle shall be used in subsequent calls to that RBG (e.g., during a call to the generate
+859   function) when multiple instances of the DRBG have been instantiated. If the status code indicates
+860   an error (e.g., entropy is not currently available, or the entropy source has failed), an invalid (e.g.,
+861   Null) state handle shall be returned.
+
+862   2.8.3.2.        Generation Using an RBG3 Construction
+863   The RBG3(XOR) and RBG3(RS) generate functions are different because of the difference in their
+864   designs (see Sections 6.2.1.2 and 6.3.1.2).
+865   For the RBG3(XOR) construction, the generate function is invoked using the following call:
+866      (status, returned_bits) = RBG3(XOR)_Generate(state_handle, requested_number_of_bits,
+867                            prediction_resistance_request, additional_input).
+
+
+
+                                                        18
+

@@ -1,0 +1,60 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                   GUIDE TO IPSEC VPNS
+
+
+                                                                                              updates. Each exchange can relay additional information about supported features or algorithms
+                                                                                              using Notify payloads.
+
+                                                                                              3.2.1     The IKE_SA_INIT Exchange
+
+                                                                                              The IKE_SA_INIT exchange sends the cryptographic IKE proposals for setting up the encrypted
+                                                                                              IKE SA. Each proposal consists of a list of components needed to establish an IKE SA. These
+                                                                                              components are called transforms. For IKEv2, four types of transforms are required: encryption
+                                                                                              (AEAD algorithms or encryption algorithms), integrity (none for AEAD 22, or a MAC otherwise),
+                                                                                              (Elliptic Curve) Diffie-Hellman—(EC)DH, and pseudorandom function (PRF). The
+                                                                                              IKE_SA_INIT exchange also includes data that will be used to generate a shared secret that is
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              used to derive symmetric keys to protect later traffic between the two peers, such as the sender’s
+                                                                                              (EC)DH public value (carried in the Key Exchange [KE] payload), a random nonce (in the nonce
+                                                                                              payload), and both IPsec SPIs (in the IKE Header). The initiator can propose multiple alternative
+                                                                                              transform combinations, and the responder selects the preferred proposal and returns a single
+                                                                                              proposal with those transforms, its own KE and nonce payloads, and a responder SPI.
+
+                                                                                              The initiator needs to determine the cryptographic policy that can be accepted by the responder.
+                                                                                              The initiator sends a list of transforms that represents its policy. 23 For the initiator’s (EC)DH Key
+                                                                                              Exchange algorithm, it will include the corresponding KE payload (e.g., an EC public key) of its
+                                                                                              preferred Key Exchange algorithm. If the responder does not allow this (EC)DH algorithm in
+                                                                                              any of its transforms, the responder will reply with an INVALID_KE notification that indicates
+                                                                                              the responder’s preferred (EC)DH algorithm based on the list that the initiator sent. The initiator
+                                                                                              can use this response to create a new IKE_SA_INIT packet with a proper KE payload that is
+                                                                                              acceptable to both initiator and responder policies.
+
+                                                                                              Since an (EC)DH computation is central processing unit (CPU) intensive, a malicious entity
+                                                                                              could send many spoofed IKE_SA_INIT messages, causing the responder to perform multiple
+                                                                                              (EC)DH key exchange calculations to try and complete the (EC)DH calculations and resulting in
+                                                                                              a denial of service attack. When a responder deems it is under attack, it may respond to an
+                                                                                              IKE_SA_INIT message with a special COOKIE payload instead of the regular payloads. The
+                                                                                              initiator that receives a response containing a COOKIE must resend its IKE_SA_INIT packet but
+                                                                                              now include that COOKIE payload. This proves to the responder that the initiator can receive
+                                                                                              packets—that is, the original packet received by the responder was not simply a spoofed packet
+                                                                                              by an attacker. The responder typically encodes some information in the COOKIE—such as the
+                                                                                              initiator’s IP address, a timestamp, and a random value—so that the COOKIE cannot be reused
+                                                                                              by an attacker redistributing it to its attacking nodes that are spoofing packets. Now the
+                                                                                              responder is assured that the initiator is an actual participant in the IKE exchange and not simply
+                                                                                              sending malicious packets using a forged (spoofed) IP address. While this could still be an
+
+
+
+
+                                                                                              22   AEAD algorithms combine encryption and integrity using a single private key. For the IKEv2 protocol, AEAD algorithms
+                                                                                                   are listed as encryption algorithms. The (separate) integrity algorithm for AEAD is either not included or the special value
+                                                                                                   for None is used.
+                                                                                              23   These are the preferred algorithms in each category that need to be used for adequately protecting transmitted data.
+
+
+
+                                                                                                                                                              22
+

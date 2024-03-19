@@ -1,0 +1,56 @@
+                                                                                               NIST SP 800-177 REV. 1                                                            TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               includes the report format as well as how to signal reporting over SMTP or HTTPS. HTTPS is
+                                                                                               given as an option for senders that wish to use a secure channel but believe SMTP over TLS will
+                                                                                               not work. Also, like DMARC, the location (via email or HTTPS) where reports should be sent
+                                                                                               are published in a DNS TXT resource record that the sender can query for in the receiver’s
+                                                                                               domain. Here the TXT RR has a well-known string _smtp.-tls prepended and using the
+                                                                                               following tag:value pairs each separated by a semicolon ‘;’:
+                                                                                                                        Table 5-4: TLS Reporting Value Tags and Descriptions
+
+                                                                                                          Tag                                            Description
+                                                                                                          v=              The version string. Default is TLSRPTv1
+                                                                                                         rua=             How the receiver wishes to have reports submitted. Options are
+                                                                                                                          mailto: (for email) or https (for a URI to submit reports via a POST
+                                                                                                                          command).
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               An example TLS reporting RR is given below for example.gov:
+
+                                                                                               _smtp-tlsrpt.example.gov IN TXT
+                                                                                                     “v=TLSRPTv1;rua=https://reporttls.example.gov/reports”
+
+
+                                                                                               Indicating that TLS failure reports when connecting to example.gov mail receivers should be
+                                                                                               sent to the URI listed in the rua tag. A reporting RR may have multiple values in the rua tag,
+                                                                                               indicating several alternative means to send reports.
+
+                                                                                               5.3   Email Content Security
+
+                                                                                               End users and their institutions have an interest in rendering the contents of their messages
+                                                                                               completely secure against unauthorized eyes. �ey can take direct control over message content
+                                                                                               security using either S/MIME [RFC5751] or OpenPGP [RFC4880]. In each of these protocols,
+                                                                                               the sender signs a message with a private key, and the receiver authenticates the signature with
+                                                                                               the public key obtained (somehow) from the sender. Signing provides a guarantee of the message
+                                                                                               source, but any man in the middle can use the public key to decode and read the signed message.
+                                                                                               For proof against unwanted readers, the sender encrypts a message with the recipient’s public
+                                                                                               key or with a generated symmetric key that is encrypted with the receiver’s public key which is
+                                                                                               obtained (somehow) from the receiver. �e receiver decrypts the message with the corresponding
+                                                                                               private key, or a symmetric key encrypted with the recipient’s public key, and the message
+                                                                                               content is kept conﬁdential from mailbox to mailbox. Both S/MIME and OpenPGP are protocols
+                                                                                               that facilitate signing and encryption, but secure open distribution of public keys is still a hurdle.
+                                                                                               Two recent DANE protocols have been proposed to address this. �e SMIMEA (for S/MIME
+                                                                                               certiﬁcates) and OPENPGPKEY (for OpenPGP keys) initiatives specify new DNS RR types for
+                                                                                               storing email end user key material in the DNS. S/MIME and SMIMEA are described in
+                                                                                               subsection 5.3.1, while OpenPGP and OPENPGPKEY are described in subsection 5.3.2.
+
+
+
+                                                                                                                                                70
+

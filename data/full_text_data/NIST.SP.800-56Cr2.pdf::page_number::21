@@ -1,0 +1,54 @@
+                                                                                               NIST SP 800-56C REV. 2                                RECOMMENDATION FOR KEY DERIVATION METHODS
+                                                                                                                                                                  IN KEY ESTABLISHMENT SCHEMES
+
+
+                                                                                                    If H(x) = KMAC256(salt, x, H_outputBits, “KDF”), then – in the absence of an agreed-upon
+                                                                                                    alternative – the default_salt shall be an all-zero string of 132 bytes (i.e., an all-zero string
+                                                                                                    of 1056 bits).
+                                                                                               Input:
+                                                                                                 1. Z – a byte string that represents the shared secret.
+                                                                                                2. OtherInput, which includes:
+                                                                                                   a. {salt} – A non-null (secret or non-secret) byte string that can be (optionally) provided if
+                                                                                                      either Option 2 (HMAC-hash) or Option 3 (KMAC#) is chosen for the implementation
+                                                                                                      of the auxiliary function H since those options require a salt value that is used as a MAC
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Cr2
+
+
+
+
+                                                                                                      key.
+                                                                                                      The salt included in OtherInput could be, for example, a value computed from nonces
+                                                                                                      exchanged as part of a key-establishment protocol that employs one or more of the key-
+                                                                                                      agreement schemes specified in [SP 800-56A] or [SP 800-56B], a value already shared
+                                                                                                      by the protocol participants, or a value that is pre-determined by the protocol. The
+                                                                                                      possibilities for the length of salt are determined as follows:
+                                                                                                      (1) The HMAC-hash algorithm, as defined in [FIPS 198], can accommodate MAC keys
+                                                                                                          of any bit length permitted for input to the hash function, hash. Therefore, when
+                                                                                                          Option 2 is chosen, the length of the byte string salt can be as large as allowed for
+                                                                                                          any string used as input to hash. However, if the bit length of salt is greater than the
+                                                                                                          bit length specified for a single input block for the hash function, hash, then the value
+                                                                                                          of salt is replaced by hash(salt) as part of the HMAC computation. See Table 2 for
+                                                                                                          details.
+                                                                                                      (2) The KMAC128 and KMAC256 algorithms specified in [SP 800-185] can
+                                                                                                          accommodate MAC keys of any length up to (22040 – 1) bits. Therefore, when Option
+                                                                                                          3 is chosen, salt can be a byte string of any agreed-upon length that does not exceed
+                                                                                                          (22037 – 1 bytes) (i.e., 22040 – 8 bits). The input salt value will be (re)formatted (using
+                                                                                                          a byte-padding function) during the execution of the KMAC algorithm to obtain a
+                                                                                                          string whose length is a multiple of either 168 bytes (for KMAC128) or 136 bytes
+                                                                                                          (for KMAC256). See Table 3 for details.
+                                                                                                      If a salt value required by H is omitted from OtherInput (or if a required salt value
+                                                                                                      included in OtherInput is the null string), then the value of default_salt shall be used as
+                                                                                                      the value of salt when H is executed.
+                                                                                                   b. L – A positive integer that indicates the length (in bits) of the secret keying material to
+                                                                                                      be derived; L shall not exceed H_outputBits × (232 –1).
+                                                                                                      (L = keydatalen in the notation of previous versions of [SP 800-56A], while L = KBits in
+                                                                                                      the notation of previous versions of [SP 800-56B]; current versions of those documents
+                                                                                                      have been updated to be consistent with SP 800-56C.)
+                                                                                                    c. FixedInfo – A bit string of context-specific data that is appropriate for the relying key-
+                                                                                                       establishment scheme. As its name suggests, the value of FixedInfo does not change
+                                                                                                       during the execution of the process described below.
+                                                                                                       FixedInfo may, for example, include appropriately formatted representations of the
+
+
+                                                                                                                                                13
+

@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+in its own zone file. A caching name server (also called a resolving/recursive name server), by contrast,
+provides responses either through a series of queries to authoritative name servers in the hierarchy of
+domains found in the name resolution query or from a cache of responses built by using previous queries.
+
+3.2.1    Authoritative Name Servers
+
+There are two types of authoritative name servers: master (or primary) name server and slave (or
+secondary) name server. To improve fault tolerance, there could be several slave name servers in an
+enterprise. A master name server contains zone files that are created and edited manually by the zone
+administrator. Sometimes a master name server allows the zone file to be dynamically updated by
+authorized DNS clients. A master name server that is configured with this feature usually is called the
+primary master name server. A slave (secondary) name server also contains authoritative information for
+a zone, but its zone file is a replication of the one in the associated master name server. The replication is
+enabled through a transaction called zone transfer that transfers all RRs from the zone file of a master
+name server to the slave name server. Because a name resolution query is for a specific RR, a zone
+transfer actually is treated as a category of name resolution query with type code AXFR, which means
+“all RRs for the zone that is being queried.” Whenever the contents of a zone file are changed in the
+master name servers, the slave name servers are notified of the change through a transaction called DNS
+NOTIFY. When a slave name server receives this request, it initiates a zone transfer request to the master
+name server.
+
+3.2.2    Caching Name Servers
+
+A caching name server generally is the local name server in the enterprise that performs the name
+resolution function on behalf of the various enterprise clients. A caching name server also is called a
+resolving/recursive name server. The name resolution function is performed by a caching name server in
+response to queries from a stub resolver. The search process involved in name resolution may involve
+searching its own cache, recursively querying various authoritative name servers through a set of iterative
+queries, or a combination of these methods.
+
+A specific name server can be configured to be both an authoritative and a recursive name server. In this
+configuration, the same name server provides authoritative information for queries pertaining to
+authoritative zones while it performs the resolving functions for queries pertaining to other zones. To
+perform the resolving function, it has to support recursive queries. Any server that supports recursive
+queries is more vulnerable to attack than a server that does not support such queries (see following
+sections). As a result, authoritative information might be compromised. Hence, it is not a good security
+practice to configure a single name server to perform both authoritative and recursive functions.
+
+3.3     Resolvers (DNS Software)
+
+Software such as Web browsers and e-mail clients that require access to Internet resources make use of
+the DNS client, called the client resolver or stub resolver. The stub resolver formulates a name resolution
+query for the resource sought by the Internet-accessing software and sends it to a caching (resolving)
+name server in the enterprise. Stub resolvers generally are configured to send queries to two or more
+resolving name servers to provide some fault tolerance for their operation. A stub resolver often is
+referred to as simply a resolver. A caching (resolving) name server that receives a query from a stub
+resolver also formulates queries for sending them to authoritative name servers (if it is not able to respond
+to the query from its cache) and hence also sometimes is referred to as a resolver because it has a
+resolving component and a caching (name server) component.
+
+
+
+
+                                                     3-2
+

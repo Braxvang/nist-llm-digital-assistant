@@ -1,0 +1,62 @@
+     11. Biometric Data Quality (5.2.1.9)        1          SINT        [-2,100]. A value of -2 shall denote that assignment was not supported by the
+                                                                        implementation; A value of -1 shall indicate that an attempt to compute a
+                                                                        quality value failed. Values from 0 to 100 shall indicate an increased
+                                                                        expectation that the sample will ultimately lead to a successful match.
+     12. Creator (5.2.1.12)                      18         Note 6      See Note 6 for data type
+     13. FASC-N                                  25         Note 7      See Note 7 for data type
+     14. Reserved for future use                 4                      0x00000000
+
+Some of the CBEFF Header fields in Table 14 take modality-specific values as detailed in Table 15.
+
+                                                 Table 15 – CBEFF content for specific modalities
+ Quantity              Fingerprint               Fingerprint           Iris Images           Facial Images           Other modalities
+                       Images                    Templates
+ Section               3.2.2                     3.3                   6                     7                       -
+ Biometric Format      0x001B                    0x001B                0x0101 i.e.,          0x001B                  For other biometric data on PIV
+ Owner                 i.e., M1, the             i.e., M1, the         ISO/IEC JTC 1/SC 37   i.e., M1, the INCITS    Cards, or retained by agencies,
+                       INCITS Technical          INCITS Technical      Biometrics            Technical Committee     this field shall be assigned in
+                       Committee on              Committee on                                on Biometrics           accordance with [CBEFF,
+                       Biometrics                Biometrics                                                          5.2.1.17].
+ Biometric Format Type 0x0401                    0x0201                0x0009                0x0501
+ Biometric Type        0x000008                  0x000008              0x000010              0x000002                0x0
+ Biometric Data Type   b001xxxxx i.e.,           b100xxxxx i.e.,       b010xxxxx i.e.,       b001xxxxx i.e., raw     [CBEFF, 5.2.1.7] has 3 categories
+                       raw                       processed             Intermediate                                  for the degree biometric data
+                                                                                                                     has been processed.
+ Quality value               Quality value shall be Q = 20(6 - NFIQ)   See NOTE 8         [FACESTD] requires 0
+                             where NFIQ is computed using the                             which shall be coded
+                             method of [NFIQ].                                            here as -2. Also 0-100
+                                                                                          values are allowed
+                                                                                          when quality
+                                                                                          assessment is available.
+                             When multiple views or samples of a biometric are contained in the record the largest (i.e., best) value should be
+                             reported. For all biometric data, whether stored on a PIV Card or otherwise, the quality value shall be a signed integer
+                             between -2 and 100 per the text of INCITS 358.
+
+NORMATIVE NOTES TO Table 14 AND Table 15.
+1.      Unsigned integers are denoted by UINT. Signed integers are denoted by SINT. Multi-byte integers shall be in Big
+        Endian byte order.
+2.      The security options field has two acceptable values. The value b00001101 indicates that the biometric data block
+        is digitally signed but not encrypted; the value b00001111 indicates the biometric data block is digitally signed and
+        encrypted. For the mandatory [MINUSTD] elements on the PIV Card the value shall be b00001101.
+        The fourth bit (mask 0x08) is set per prior versions of this document. The third bit (mask 0x04), which in each
+        case is set, implements the [CBEFF, 5.2.1.2] requirement that digital signature is differentiated from message
+        authentication code. The second bit (mask 0x02) indicates the use of encryption. The first bit (mask 0x01)
+        indicates the use of a digital signature. See [FIPS, 800-78] for specifications on digital signatures.
+3.      The signature shall be computed over the concatenated CBEFF_HEADER and CBEFF_BIOMETRIC_RECORD in
+        Table 13. The CBEFF_HEADER is given in Table 14. This includes the signature block length (on line 4) which may
+        not be known before the signature is computed. This problem may be solved by conducting a two phase
+        computation: 1) a dummy SB length value is inserted, the signature is computed (and discarded), the signature
+        length is written into the SB length field, and 2) the signature is recomputed. For some signing algorithms an
+        iterative procedure may be necessary.
+4.      This date shall be the date the biometric sample was acquired from the subject. For processed samples
+        (e.g.,templates) this date should be the date of acquisition of the parent sample. Creation Date shall be encoded
+        in eight bytes using a binary representation of "YYYYMMDDhhmmssZ". Each pair of characters (for example,
+        "DD") is coded in 8 bits as an unsigned integer. Thus 17:35:30 December 15, 2005 is represented as: 00010100
+        00000101 00001100 00001111 00010001 00100011 00011110 01011010 where the last byte is the binary
+        representation of the ASCII character Z which is included to indicate that the time is represented in Coordinated
+        Universal Time (UTC). The field "hh" shall code a 24 hour clock value.
+
+
+
+                                                                                                                                                     36
+

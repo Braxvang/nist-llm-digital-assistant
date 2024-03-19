@@ -1,0 +1,55 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+        An attacker can use a Teredo server as a reflector in a DOS attack on an IPv4 target in two
+         ways. The first is to construct a router solicitation message and post it to a Teredo server,
+         using as the IPv4 source address the spoofed address of the target. The Teredo server will
+         then send a router advertisement message to the target. The second is to construct a Teredo
+         IPv6 address using the Teredo prefix, the address of a selected server, the IPv4 address of the
+         target, and an arbitrary UDP port, and to send packets bound to that address to the Teredo
+         server. Again, adding appropriate filters can defend against these.
+        An attacker may use a Teredo server to launch a DOS attack against an arbitrary IPv6
+         destination. The attacker builds an IPv6 packet bound for the target. The attacker sends that
+         packet to the IPv4 address and UDP port of a Teredo server to be relayed from there to the
+         target over IPv6. Servers should check that the IPv4 and IPv6 source addresses are consistent,
+         and routers or security devices should perform ingress filtering for the IPv6 addresses.
+        An attacker with IPv6 connectivity may use a Teredo relay for a DOS attack against an
+         arbitrary IPv4 destination. The attacker may compose a Teredo IPv6 address using the Teredo
+         prefix, a ―cone‖ flag set to 1, the IPv4 address of the target, and an arbitrary UDP port. First,
+         relays should not allow the attacker to use multicast, broadcast, or non-routable IPv4
+         addresses. Second, IPv6 ingress filtering and trace back could be used (if enabled).
+        Most NPDs do not have the ability to inspect IPv6 UDP traffic.
+One protection mechanism against these threats is to make all enterprise computers be domain-joined to
+disable Teredo. If internal computer systems are joined to a Microsoft AD domain (enterprise-client)
+then they will not use Teredo by default. In addition, an organization could have users’ host operating
+systems block Teredo unless an IPv6-capable host-based firewall is being used. An even more likely
+strategy would be to go full dual-stack which will prevent Teredo from working because the host will
+already be on an IPv6 subnet.
+
+
+If Teredo is not required then it can be filtered. Perimeter systems can prevent Teredo packets from going
+to well-known Teredo servers and relays. Firewalls can also block all Teredo addresses of the form
+2001::/32 in UDP 3544 packets (use deep packet inspection [DPI] in case Teredo is being run on a non-
+standard TCP/UDP port). Organizations can also disallow the NAT firewall pin-hole to be created on the
+perimeter Internet firewall that would allow Teredo to operate through a NAT. It is also possible to create
+your own Teredo server on the perimeter and put it behind a firewall.
+  6.5.8   Tunnel Brokers
+
+IPv6 tunnel brokers provide dual stack IPv4/IPv6 nodes on IPv4 networks with a way to obtain IPv6
+connectivity without the administrative support of a large site running, for example, 6to4. It is intended
+for small sites or individual hosts. The IPv6 tunnel broker method requires the deployment of a tunnel
+broker server. The tunnel broker server can be viewed as a ―virtual IPv6 ISP.‖ More information on IPv6
+tunnel brokers is available in RFC 3053, IPv6 Tunnel Broker.
+
+6.5.8.1     Using IPv6 Tunnel Brokers
+
+The client connects to a tunnel broker, which sets up and manages tunnels between clients and tunnel
+servers. Tunnel servers are dual stack IPv4/IPv6 routers connected to the global Internet. These proxy
+servers reside at well-known IPv4 addresses. Public tunnel broker servers are available. A tunnel
+broker’s clients can be hosts or routers. The tunnel broker performs authentication and access control.
+The tunnel broker assigns the IPv6 tunnel endpoints and creates records for those endpoints in the DNS.
+The tunnel broker allocates relatively long-lived IPv6 addresses from its own global IPv6 address space.
+
+
+                                                   6-27
+

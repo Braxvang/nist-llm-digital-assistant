@@ -1,0 +1,36 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+   Block_Encrypt: A basic encryption operation that uses the selected block cipher algorithm.
+   The function call is:
+                         output_block = Block_Encrypt (Key, input_block)
+   For TDEA, the basic encryption operation is called the forward cipher operation (see [SP
+   800-67]); for AES, the basic encryption operation is called the cipher operation (see [FIPS
+   197]). The basic encryption operation is equivalent to an encryption operation on a single
+   block of data using the ECB mode.
+For the BCC function, let outlen be the length of the output block of the block cipher algorithm
+to be used.
+The following or an equivalent process shall be used to derive the requested number of bits.
+BCC (Key, data):
+   1. Key: The key to be used for the block cipher operation.
+   2. data: The data to be operated upon. Note that the length of data must be a multiple of
+      outlen. This is guaranteed by Block_Cipher_df process steps 4 and 8.1 in Section 10.3.2.
+Output:
+   1. output_block: The result to be returned from the BCC operation.
+BCC Process:
+   1. chaining_value = 0outlen.       Comment: Set the first chaining value to outlen zeros.
+   2.   n = len (data)/outlen.
+   3. Starting with the leftmost bits of data, split data into n blocks of outlen bits each, forming
+      block1 to blockn.
+   4. For i = 1 to n do
+        4.1 input_block = chaining_value ⊕ blocki.
+        4.2 chaining_value = Block_Encrypt (Key, input_block).
+   5. output_block = chaining_value.
+   6. Return (output_block).
+
+
+
+
+                                                61
+

@@ -1,0 +1,59 @@
+                                                            GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+       Access Control. A necessary component of IPsec is to specify and enforce proper protection.
+        Therefore, IPsec implementations contain a security policy database (SPD) and packet filter
+        that protects, passes, or drops traffic as specified in a security policy.
+
+       IP Payload Compression Protocol (IPComp). Optionally, IPsec can compress packet
+        payloads before encrypting them.
+
+The following points summarize the main ideas behind how IPsec works:
+
+       Both AH and ESP can be used in transport mode, which means that the AH or ESP protocol
+        following the IP header encapsulates and protects the upper layer protocol that follows, or they
+        can be run in tunnel mode, which means that the AH or ESP protocol encapsulates and
+        protects an entire IP datagram. A given SA uses one mode or the other. Typically, transport
+        mode runs end-to-end, and tunnel mode runs between intermediate security gateways, but
+        exceptions to this exist.
+
+       AH provides integrity protection for all packet headers and data, with the exception of a few
+        IP header fields that change unpredictably in transit. Because AH includes source and
+        destination IP addresses in its calculations, AH is incompatible with NAT. The use of AH has
+        decreased because more recent versions of ESP (RFC 2406 in 1998 and RFC 4303 in 2005)
+        can now provide integrity protection services with or without confidentiality. ESP does not
+        provide the integrity checks for the outermost IP header that AH can.
+
+       In tunnel mode, ESP can provide encryption and integrity protection for an entire encapsulated
+        IP packet including its ―inner‖ header. ESP tunnel mode is the most commonly used IPsec
+        protocol and mode. Because it can encrypt the original IP header, it can conceal the true
+        source and destination of the packet. Also, ESP can add padding to packets and send dummy
+        packets (IPv4 Protocol or IPv6 Next Header 59) to further complicate traffic analysis.
+        Another advantage of ESP tunnel mode is that it can be compatible with NAT.
+
+       In transport mode, ESP can provide encryption and integrity protection for the payload of an
+        IP packet and for the ESP header and trailer. Transport mode is not compatible with NAT.
+
+       IPsec can use IKE to create security associations. IKEv1 phase 1 creates an IKE SA; IKEv1
+        phase 2 creates an IPsec SA through a channel protected by the IKE SA. IKEv1 phase 1 has
+        two modes: main mode and aggressive mode. Main mode negotiates the establishment of the
+        bidirectional IKE SA through three pairs of messages, whereas aggressive mode uses only
+        three messages. Although aggressive mode is faster, it is also less flexible and secure. IKEv1
+        phase 2 has one mode: quick mode. Quick mode uses three messages to establish a pair of
+        unidirectional IPsec SAs. Quick mode communications are encrypted by the method specified
+        in the IKE SA created by phase 1.
+
+       IKEv2 contains many simplifications and improvements listed in Section 5.3.4, and whenever
+        possible, it should be used instead of IKEv1.
+
+       Although ESP does not provide integrity-protection for the outer IP addresses, the ability to
+        use the SA correctly implies possession of the message integrity check key for the SA. If the
+        parties at these addresses used IKE to negotiate the SA, they should be the only ones with this
+        key, so the recipient can infer the source of the packet, regardless of whether the source
+        address is intact. This argument does not hold if this key was manually distributed to more
+        than two parties, but IPsec was not intended to be used in this way.
+
+
+
+                                                 5-7
+

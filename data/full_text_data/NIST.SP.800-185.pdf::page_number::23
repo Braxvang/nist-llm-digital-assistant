@@ -1,0 +1,57 @@
+                                                                                             NIST SP 800-185                                                 SHA-3 DERIVED FUNCTIONS: CSHAKE,
+                                                                                                                                                            KMAC, TUPLEHASH, AND PARALLELHASH
+
+                                                                                             7     Implementation Considerations
+
+                                                                                             7.1   Precomputation
+
+                                                                                             cSHAKE is defined so that all the calls to the underlying KECCAK-f function [1] to accommodate
+                                                                                             the function name N and the customization string S will process an integer multiple of r bits,
+                                                                                             where r is the rate parameter. An implementation can precompute the result of processing this
+                                                                                             padded block of N and S with cSHAKE, and thus, will suffer no performance penalty when
+                                                                                             reusing the same choices of N and S in multiple cSHAKE executions. Since TupleHash and
+                                                                                             ParallelHash are defined in terms of cSHAKE, this same precomputation is available to
+                                                                                             implementations of those functions as well.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-185
+
+
+
+
+                                                                                             KMAC can precompute the result of processing N and S, and the result of processing the key K.
+                                                                                             Thus, KMAC128 using a fixed, precomputed customization string and key will process an input
+                                                                                             string as efficiently as SHAKE128.
+
+                                                                                             7.2   Limited Implementations
+
+                                                                                             The cSHAKE, KMAC, TupleHash, and ParallelHash functions are defined to accept a wide
+                                                                                             range of possible inputs (including unreasonably long inputs, and inputs involving fractional
+                                                                                             bytes), and to produce a wide range of possible output lengths. However, it is acceptable for a
+                                                                                             specific implementation to limit the possible inputs that it will process, and the allowed output
+                                                                                             lengths that it will produce.
+
+                                                                                             For example, it would be acceptable to limit an implementation of any of these functions to
+                                                                                             producing no more than 65536 bytes of output, or to producing only whole bytes of output, or to
+                                                                                             accepting only byte strings (never fractional bytes) as inputs. Additionally, implementations
+                                                                                             intended for only a specific, limited use may further restrict the sets of inputs they will process.
+                                                                                             For example, an implementation of TupleHash256 used only to process a 6-tuple of strings, and
+                                                                                             always using a customization string of "address tuple", would be acceptable.
+
+                                                                                             If it is possible for an implementation of one of these functions to be given a set of inputs that it
+                                                                                             cannot process, then the implementation shall signal an error condition and refuse to produce an
+                                                                                             output.
+
+                                                                                             7.3   Exploiting Parallelism in ParallelHash
+
+                                                                                             Specific implementations of ParallelHash are permitted to restrict their implementation to a small
+                                                                                             subset of the allowed values. For example, it would be acceptable for a particular implementation
+                                                                                             to only allow a single value of B if it were only expected to interoperate with another
+                                                                                             implementation that similarly restricted B to that same value.
+
+                                                                                             ParallelHash can be implemented in a straightforward and reasonably efficient way even when
+                                                                                             only sequential processing is available. However, a much faster implementation is possible when
+                                                                                             each of the individual blocks of the message can be handled in parallel. The choice of block size
+                                                                                             B can have a huge impact on the efficiency of ParallelHash in this case. ParallelHash is designed
+                                                                                             so that any machine that can apply parallel processing can, in principle, benefit from that parallel
+                                                                                             processing. For example, a machine that can hash four blocks in parallel and a machine that can
+                                                                                                                                              17
+

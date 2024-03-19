@@ -1,0 +1,51 @@
+The basic DNS does not have many security features [SP 800-81]. A suite of RFCs has
+been developed to provide security enhancements contained in three IETF documents,
+collectively called the DNS security extensions (DNSSEC) ([RFC 4033], [RFC 4034],
+[RFC 4035]). DNSSEC provides a layer of authentication and integrity protection for any
+kind of data stored in the DNS, including data used by other protocols. For example,
+there are RR types allocated for storing Secure Shell (SSH) keys in the DNS, which then
+rely on DNSSEC to protect the integrity of that information.
+
+8.1.1 DNS Data Authentication
+Cryptographically generated public key-based digital signatures provide authentication
+for DNS data. Commonly, there will be two or more digital signature public-key pairs
+(which make up the key set) used to implement DNSSEC in a zone. One key pair is used
+to sign the zone data (referred to as the Zone Signing Key or ZSK), and a separate key
+pair is used to sign the zone key set (known as the Key Signing Key or KSK). While
+some zones may only use one key pair for both ZSK and KSK, it is not recommended for
+federal agency zones. This KSK is also known as the Secure Entry Point (SEP) key for
+the zone – using it, a client can authenticate the ZSK (by validating the signature over the
+ZSK using the KSK public key), and then use the ZSK to authenticate the zone data. The
+KSK is also used to link the security chain37 from the zone to its delegating parent. Since
+the KSK is used to link security from the zone (e.g. “example.gov”) to the delegating
+parent zone (e.g. “.gov”) [RFC 4035], it is often longer lived, and used infrequently (used
+only to sign the zone key set). Multiple digital signature algorithms can be supported, so
+there may be multiple keys (one for each algorithm), as there is no algorithm negotiation
+in DNSSEC, and clients may only understand certain digital signature algorithms. There
+is one mandatory-to-implement algorithm as defined by the IETF, so there is at least one
+agreed-upon digital-signature algorithm that all servers and clients will understand.
+
+Currently, both RSA using SHA-1 and SHA-256 have been specified and can be used
+with DNSSEC zones. Most modern implementations either support both or will do so
+after an upgrade. Zones deploying DNSSEC for the first time can start with RSA using
+SHA-256. Zones that initially deployed with RSA using SHA-1 should migrate to RSA
+(2048-bit RSA key) using SHA-256: see [SP 800-131A] for information about guidelines
+for using RSA with different key sizes and hash algorithms. However, both hash
+algorithms (i.e., SHA-1 and SHA-256) should be used to generate digital signatures for
+DNS data for a period of time to ensure that client systems that cannot validate RSA with
+SHA-256 can still authenticate DNS data. The length of this transition period depends on
+the widespread availability and deployment of client-system software that understands
+RSA with SHA-256.
+
+8.1.2 DNS Transaction Authentication
+Additional authentication mechanisms are used for server-server communication and
+administrative control. Transaction authentication is performed by computing an HMAC
+
+37
+  The security chain (also referred to as “chain of authentication”) is the collection of digital signatures and
+public keys that can be used to trace a logical path from the data to be validated back to a trusted, installed
+public key on the client [SP 800-81]. This chain of public keys and signatures is similar to a PKI certificate
+chain (see Section 2.1), but entirely contained within the DNS.
+
+                                                      49
+

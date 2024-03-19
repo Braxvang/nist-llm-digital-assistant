@@ -1,0 +1,46 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+   1. highest_supported_security_strength = 128.
+   2. Output block length (outlen) = 160 bits.
+   3. Required minimum entropy for instantiation and reseed = security_strength.
+   4. Seed length (seedlen) = 440 bits.
+   5. Maximum number of bits per request (max_number_of_bits_per_request) = 5000 bits.
+   6. Reseed interval (reseed_interval) = 100 000 requests.
+   7. Maximum length of the personalization string (max_personalization_string_length) =
+      512 bits.
+   8. Maximum length of additional_input (max_additional_input_string_length) = 512 bits.
+   9. Maximum length of entropy input (max _length) = 1000 bits.
+
+B.1.1      Instantiation of Hash_DRBG
+
+This implementation will return a text message and an invalid state handle (-1) when an error is
+encountered. Note that the value of instantiation_nonce is an internal value that is always
+available to the instantiate function.
+Note that this implementation does not check the prediction_resistance_flag, since the
+implementation has been designed to support prediction resistance. However, if a consuming
+application actually wants prediction resistance, the implementation expects that
+prediction_resistance_flag = 1 during instantiation; this will be used in the generate function in
+Appendix B.1.3.
+Hash_DRBG_Instantiate_function:
+   Input: integer (requested_instantiation_security_strength, prediction_resistance_flag),
+                    bitstring personalization_string.
+   Output: string status, integer state_handle.
+   Process:
+                                              Comment: Check the input parameters.
+        1. If (requested_instantiation_security_strength > 128), then Return (“Invalid
+           requested_instantiation_security_strength”, -1).
+        2. If (len (personalization_string) > 512), then Return (“Personalization_string too
+           long”, -1).
+                                              Comment: Set the security_strength to one of the
+                                              valid security strengths.
+
+
+        3. If (requested_instantiation_security_strength ≤ 112), then security_strength = 112
+           Else security_strength = 128.
+                                              Comment: Get the entropy_input.
+
+
+                                                  72
+

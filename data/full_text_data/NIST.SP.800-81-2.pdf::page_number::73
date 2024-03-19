@@ -1,0 +1,59 @@
+                                                          SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+9.      Guidelines for Securing DNS Query/Response
+
+Section 6.1.4 describes the DNSSEC approach for protection of DNS query/response transactions through
+data origin authentication, data integrity verification, and authenticated denial of existence capabilities.
+This section describes the mechanisms involved in the DNSSEC approach, the operations those
+mechanisms involve, and a secure way of performing those operations by using checklists. In other
+words, this section provides guidelines for secure deployment of DNSSEC features through DNSSEC
+operations that are supported in name server software. These guidelines are covered in Sections 9.3
+through 9.7.
+
+To ensure end-to-end protection of DNS query/response transactions, additional protection measures
+(apart from what DNSSEC specification provides)—such as securing the communication path between
+local DNSSEC-aware caching/resolving name servers and stub resolvers—are needed. These measures
+are discussed in Section 9.8.
+
+Zone administrators need to have an understanding of the logic of dynamic updates in the presence of
+additional RRsets (especially the NSEC RRSet) introduced into the zone file by DNSSEC specification.
+This logic is explained in Section 9.9.
+
+9.1     Enabling DNSSEC processing in BIND & NSD
+
+Before a DNSSEC signed zone can be deployed, a name server must be configured to enable DNSSEC
+processing. In BIND, it is done by adding the following line to the options statement in the named
+configuration file (named.conf)
+
+         options {
+              dnssec-enable yes;
+              };
+
+After restart, the name server will now perform DNSSEC processing for DNS query/response
+transactions.
+
+In NSD and Windows Server, this option statement is not necessary. If the zone file contains DNSSEC
+Resource Records, they are loaded automatically and the server correctly sends DNSSEC enabled
+responses when signaled by a client query.
+
+
+Checklist item 15: Name servers that deploy DNSSEC signed zones or query signed zones should be
+configured to perform DNSSEC processing.
+
+
+
+9.2     DNSSEC Mechanisms and Operations
+
+DNSSEC mechanisms involve two main processes: sign and serve, and verify signature. These processes
+are described below.
+
+9.2.1    Sign and Serve
+
+The first task in this process is to generate digital signatures associated with every RR in the zone file.
+Instead of generating a signature for every RR, DNSSEC specifies generation of a signature for an RRSet
+
+
+                                                    9-1
+

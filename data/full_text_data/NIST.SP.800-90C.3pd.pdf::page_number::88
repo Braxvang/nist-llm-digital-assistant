@@ -1,0 +1,42 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                        Recommendation for RBG Constructions
+       September 2022
+
+2499   B.5.3. Reseeding an RBG3(XOR) Construction
+2500   The Hash_DRBG must be reseeded at the end of its designed seedlife and may be reseeded on
+2501   demand (e.g., by the consuming application). Reseeding will be automatic whenever the end of
+2502   the DRBG’s seedlife is reached during a Generate_function call (see [SP800-90A]). For this
+2503   example, whether reseeding is done automatically during a Generate_function call or is
+2504   specifically requested by a consuming application, the Reseed_function call is:
+2505                               status = Reseed_function(additional_input).
+2506       •   The state_handle parameter is not used in the Reseed_function call since a state_handle
+2507           was not returned from the RBG3(XOR)_DRBG_Instantiate function (see Appendix
+2508           B.5.1).
+2509       •   The security strength for reseeding the Hash_DRBG is recorded in the internal state as 256
+2510           bits.
+2511       •   Additional input is optional.
+2512   Section 6.3.1.3 refers to Section 5.2.3 for reseeding the Hash_DRBG. Since entropy is obtained
+2513   directly from the entropy source and no conditioning function is used (case 2 in Section 6.3.2), the
+2514   implementation has replaced the Get_randomness-source_input call used by the
+2515   Reseed_function in [SP800-90A] with a Get_ES_Bitstring call.
+2516   The Hash_DRBG is reseeded with a security strength of 256 bits as follows:
+2517                           (status, entropy_bitstring) = Get_ES_Bitstring(256).
+2518   If status = SUCCESS is returned by the Get_ES_Bitstring call, entropy_bitstring consists of at
+2519   least 256 bits that contain at least 256 bits of entropy. These bits are used to reseed the
+2520   Hash_DRBG. Status = SUCCESS is then returned to the calling application by the
+2521   Reseed_function.
+2522   If status = FAILURE, entropy_bitstring is an empty (e.g., null) bitstring. The Hash_DRBG is not
+2523   reseeded, and status ≠ SUCCESS is returned from the Reseed_function to the calling application
+2524   (e.g., the Generate_function).
+
+2525   B.6.    Example of an RBG3(RS) Construction
+2526   This construction is specified in Section 6.3 and requires an entropy source and a DRBG (see the
+2527   left half of Figure 24 outlined in green). The DRBG is directly accessible using the same
+2528   instantiation that is used by the RBG3(RS) construction (i.e., they share the same internal state).
+2529   When accessed directly, the DRBG behaves as an RBG2(P) construction (see the right half of
+2530   Figure 24 outlined in blue).
+
+
+
+
+                                                       75
+

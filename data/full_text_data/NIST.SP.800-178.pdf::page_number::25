@@ -1,0 +1,62 @@
+                                                                                               NIST SP 800-178                                                      COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                      DATA SERVICES: XACML AND NGAC
+
+
+                                                                                                Authorization state:
+                                                                                                  (s3, r, r5), (s3, w, r5), (s3, r, r7), (s3, w, r7), (s4, r, r6)
+
+                                                                                               Policy 2 applies to “IRS-agents and auditor access to tax-returns” (Target of the Policy) and has
+                                                                                               two Rules. This Policy is an “applicable policy” whenever users with role “IRS-agent or auditor”
+                                                                                               access the resource “tax-returns” with a write request. The Rules do not refine the Target, but
+                                                                                               state the conditions under which write requests from IRS-agents or auditors to tax-returns
+                                                                                               records can be allowed. Rule 1 will permit an applicable access request if the access time (an
+                                                                                               environmental variable) is between 8 AM and 6 PM. Rule 2 will deny the request even if the
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                               condition in Rule 1 applies through an additional condition; the IRS-agent or auditor is
+                                                                                               attempting to write to his or her own tax return. Since the intent of the Policy is to disallow IRS
+                                                                                               employees from altering their own tax returns, a policy combining algorithm of “deny-overrides”
+                                                                                               is used, while still allowing access if the conditions stated in Rule 2 do not apply.
+                                                                                               <Policy PolicyId = “Policy 2” rule-combining-algorithm=”deny-overrides”>
+                                                                                                            // IRS Agent and Auditor Access to Tax Returns //
+                                                                                                    <Target>
+                                                                                                       /* :Attribute-Category   : Attribute ID    : Attribute Value */
+                                                                                                                :access-subject      :Role                   :IRS-agent
+                                                                                                                :access-subject      :Role                   :auditor
+                                                                                                                :resource            :Resource-id            :tax-returns
+                                                                                                                :action              :Action-id              :write
+                                                                                                     </Target>
+
+                                                                                                     <Rule RuleId = “Rule 1” Effect=”Permit”>
+                                                                                                            <Condition>
+                                                                                                          Function: and
+                                                                                                          /* :Attribute-Category    : Attribute ID   : Attribute Value
+                                                                                                                          :environment        : Time                : ≥ 08:00
+                                                                                                                          :environment        : Time                : ≤ 18:00
+                                                                                                            </Condition>
+                                                                                                      </Rule>
+                                                                                                      <Rule RuleId = “Rule 2” Effect=”Deny”>
+                                                                                                            <Condition>
+                                                                                                              Function: string-equal
+                                                                                                                /* :Attribute-Category    :Attribute ID
+                                                                                                                         : access-subject     :SubjectName
+                                                                                                                        : resource            :Resource-owner
+                                                                                                            </Condition>
+                                                                                                       </Rule>
+                                                                                                 </Policy>
+
+                                                                                               3.5   XACML Access Request
+
+                                                                                               XACML specifies a format for conveying an access request and a related decision response. The
+                                                                                               format is referred to as XACML Context. The request and response formats represent a standard
+                                                                                               interface between a PDP, with standard behavior, and a standard PEP that issues requests and
+                                                                                               deals with the response. If the PEP does not generate requests in XACML Context, a context
+                                                                                               handler is required between the PEP and PDP. The handler converts application environment-
+                                                                                               specific requests (coming from PEP) to XACML Context requests before submitting them to
+                                                                                               PDP, and also converts XACML Context responses received from PDP to application
+                                                                                               environment-specific responses before forwarding them to PEP.
+                                                                                                                                                     13
+

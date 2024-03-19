@@ -1,0 +1,59 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+
+Checklist item 4: The authoritative name servers for an enterprise should be both network and
+geographically dispersed. Network-based dispersion consists of ensuring that all name servers are not
+behind a single router or switch, in a single subnet, or using a single leased line. Geographic dispersion
+consists of ensuring that not all name servers are in the same physical location, and hosting at least a
+single secondary server off-site.
+
+
+Checklist item 5: If a hidden master is used, the hidden authoritative master server should only accept
+zone transfer requests from the set of secondary zone name servers and refuse all other DNS queries. The
+IP address of the hidden master should not appear in the name server set in the zone database.
+
+
+
+7.2.8   Limiting Information Exposure through Partitioning of Zone files
+
+Authoritative name servers for an enterprise receive requests from both external and internal clients. In
+many instances, external clients need to receive RRs that pertain only to public services (public Web
+server, mail server, etc.) Internal clients need to receive RRs pertaining to public services as well as
+internal hosts. Hence, the zone information that serves these RRs can be split into different physical files
+for these two types of clients: one for external clients and one for internal clients. This type of
+implementation of the zone file is called split DNS.
+
+Split DNS does have some drawbacks. First, remote hosts (travelers using laptops to connect back to an
+organization, for example), may not be using an internal resolving DNS server, and therefore may not be
+able to see internal hosts. Second, internal host information may leak to outside the firewall (by accident
+or attack), defeating the purpose of having a split DNS, or causing confusion of an internal and external
+host have the same FQDN, but different IP addresses. Split DNS should not be seen as a replacement for
+proper access control techniques.
+
+
+Checklist item 6: For split DNS implementation, there should be a minimum of two physical files or
+views. One should exclusively provide name resolution for hosts located inside the firewall. It also can
+contain RRsets for hosts outside the firewall. The other file or view should provide name resolution only
+for hosts located outside the firewall or in the DMZ, and not for any hosts inside the firewall.
+
+
+
+To set up split DNS using BIND, the view statement is used in the BIND configuration file. For example,
+to set up an authoritative view of the zone “sales.mycom.com” for internal clients:
+
+        view “insider” {
+             match-clients { internal_hosts; };
+             recursion no;
+             zone sales.mycom.com {
+                   type master;
+                   file “sales_internal.db”;
+             };
+        };
+
+
+
+
+                                                     7-5
+

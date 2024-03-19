@@ -1,0 +1,57 @@
+                                                                 GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+A hacker who can change the DNS A record for isatap.example.com to be the attacker’s own IPv4
+address would be able to communicate with all ISATAP-enabled computers on the network. The attacker
+would have created a rogue ISATAP relay router. Thus, even if an organization has not enabled ISATAP
+it might be useful to have a static DNS entry for isatap.vzw.com pointing to the loopback address
+127.0.0.1, thus disabling ISATAP.
+Other risks include traffic injection into the tunnel interface on the relay router. This can be mitigated
+through the use of ACLs and Unicast RPF filtering on the ISATAP router. ISATAP packets use IP
+protocol 41, so if those packets are filtered at the perimeter this will prevent ISATAP packets from
+leaving the organization.
+
+
+  6.5.7   Teredo Protocol
+
+The 6over4 mechanism requires IPv4 multicast. The 6to4 and 6rd protocols require public IPv4
+addresses. Although ISATAP solves both of these problems, ISATAP does not work across NATs.
+Microsoft developed the Teredo protocol as a solution, submitting it to IETF. The IETF approved it as
+RFC 4380, Teredo: Tunneling IPv6 over UDP through Network Address Translations (NATs).
+
+Teredo’s functionality and usage scenarios are similar to 6to4, but 6to4 requires support from a router,
+which serves as the edge device connected to the Internet. IPv4 NAT devices do not usually support 6to4
+router functionality. Even if the NAT device supported 6to4, the 6to4 protocol would still not work for
+configurations with multiple NATs between a site and the IPv4 Internet or for NATs that do not handle
+protocol 41 packets, since some NATs only handle TCP and UDP.
+
+Teredo is a useful mechanism for promoting early deployment of IPv6 on hosts behind a NAT, prior to
+having an IPv6 network, in the case where an IPv6 prefix has been provided to the site. Production and
+pre-production networks have been using Teredo.
+
+Because Teredo has more overhead than other methods, Teredo is considered a technology of last resort
+for IPv6 connectivity. The design of Teredo favors robustness over efficiency. If native IPv6, ISATAP,
+or 6to4 connectivity can be used, Teredo is not needed. The use of Teredo will decrease as more IPv4
+NATs support 6to4 and IPv6 connectivity becomes more common.
+
+Teredo provides address assignment and automatic tunneling for host-to-host unicast IPv6 traffic across
+an IPv4 Internet even if the dual stack IPv4/IPv6 hosts are located behind one or more IPv4 NATs.
+Teredo works for the various types of cone NATs, but it does not work, in general, for symmetric NATs.
+See RFC 5389, Session Traversal Utilities for NAT (STUN), for definitions of these types of NAT
+devices. To get through the IPv4 NATs, IPv6 packets are tunneled over IPv4 and UDP.
+
+6.5.7.1     Using Teredo
+
+The general approach to NAT traversal starts with detecting the presence of NAT. Then the protocol is
+started from inside the NAT and encapsulated in UDP. There is a need for some mechanism to keep track
+of the NAT mappings.
+
+Figure 6-4 shows the components of Teredo and the protocol messages used to set up communications
+between a Teredo client and a remote IPv6 interface. A Teredo client is a dual stack IPv4/IPv6 node with
+an IPv4 address behind a NAT device. A Teredo server is also dual stack IPv4/IPv6, but it has a globally
+routable IPv4 address. The Teredo server listens to UDP port 3544 for client requests and uses a Teredo
+service prefix to construct an IPv6 address for the Teredo client. A Teredo relay is a dual stack IPv4/IPv6
+
+
+                                                    6-22
+

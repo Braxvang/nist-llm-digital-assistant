@@ -1,0 +1,61 @@
+                                                                                              NIST SP 800-77 REV. 1                                                              GUIDE TO IPSEC VPNS
+
+
+                                                                                              implemented targets are PASS (never encrypt with IPsec), DROP, REJECT (DROP and send an
+                                                                                              ICMP message), and HOLD (cache the packet until an IPsec SA has been established).
+
+                                                                                              Looking at the SAD and SPD entries of the previous figures, it can be seen that the host with IP
+                                                                                              address 198.51.100.1 is allowed to send ESP packets to the host with IP 203.0.113.1. The
+                                                                                              encrypted IP packet included can only have the source IP address 192.168.13.6 but can have any
+                                                                                              destination IP address. AES-GCM is used as the AEAD encryption algorithm. In other words,
+                                                                                              there is a VPN client running on 198.51.100.1 that started a VPN connection to the VPN server
+                                                                                              on 203.0.113.1 and received the internal IP address 192.168.13.6.
+
+                                                                                              The IP address family of the IPsec host does not need to match the IP address family of the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              included encrypted IP packets. Figure 15 shows policies for two IPsec gateways using IPv6
+                                                                                              addresses that are used to connect two IPv4 subnets with each other.
+
+                                                                                              src 192.0.0.0/24 dst 192.0.2.0/24
+                                                                                                  dir out priority 1042407 ptype main
+                                                                                                  tmpl src 2001:db8:1:2::45 dst 2001:db8:1:2::23
+                                                                                                      proto esp reqid 16389 mode tunnel
+
+                                                                                              src 192.0.2.0/24 dst 192.0.0.0/24
+                                                                                                  dir in priority 1042407 ptype main
+                                                                                                  tmpl src 2001:db8:1:2::23 dst 2001:db8:1:2::45
+                                                                                                      proto esp reqid 16389 mode tunnel
+                                                                                                Figure 15: Example of IPsec Policies for a Gateway Architecture Connecting IPv4 Subnets using IPv6 on
+                                                                                                                                                 Linux
+
+                                                                                              The output of the commands to inspect the current SAD and SPD differs by vendor. Figure 16
+                                                                                              shows the SAD and SPD entries for an IPv6 in IPv4 IPsec connection in tunnel mode using the
+                                                                                              ipsecctl command on OpenBSD.
+
+                                                                                              FLOWS:
+                                                                                              flow esp in from 2001:db8:0:1::/64 to 2001:db8:0:2::/64
+                                                                                                peer 203.0.113.1 srcid FQDN/east dstid FQDN/west type use
+                                                                                              flow esp out from 2001:db8:0:2::/64 to 2001:db8:0:1::/64
+                                                                                                peer 203.0.113.1 srcid FQDN/east dstid FQDN/west type require
+
+                                                                                              SAD:
+                                                                                              esp tunnel from 198.51.100.1 to 203.0.113.1 spi 0x03f86d3a
+                                                                                               auth hmac-sha2-256 enc aes-256
+                                                                                              esp tunnel from 203.0.113.1 to 198.51.100.1 spi 0x4df47d50
+                                                                                               auth hmac-sha2-256 enc aes-256
+                                                                                                  Figure 16: Example of IPsec States and Policies Connecting IPv6 Subnets using IPv4 on OpenBSD
+                                                                                                                                         (line breaks added)
+
+                                                                                              5.1.3   SAD Message Types
+
+                                                                                              Regardless of the implementation, the following types of messages are sent between the IKE and
+                                                                                              IPsec subsystems:
+
+
+
+                                                                                                                                                 51
+

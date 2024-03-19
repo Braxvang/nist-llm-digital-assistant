@@ -1,0 +1,59 @@
+                                                                                                NIST SP 800-126 REV. 3                                      THE TECHNICAL SPECIFICATION FOR SCAP VERSION 1.3
+
+
+
+                                                                                               with a @system attribute value listed in Section 3.2.4.1, then each <xccdf:ident> element SHALL
+                                                                                               also appear within the <xccdf:rule-result> element.
+                                                                                               Here is an example for a CVE entry:
+                                                                                               <xccdf:rule-result idref="java-upgrade-278" weight="10.0">
+                                                                                                  <xccdf:result>pass</xccdf:result>
+                                                                                                  …
+                                                                                                  <xccdf:ident system="http://cve.mitre.org">CVE-2006-0614</xccdf:ident>
+                                                                                                  …
+                                                                                               </xccdf:rule-result>
+
+                                                                                               If the <xccdf:ident> element is included, for tracking purposes it is important that produced XCCDF
+                                                                                               results have specific meanings. If an <xccdf:ident> element is present and it identifies a CVE, CCE,
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-126r3
+
+
+
+
+                                                                                               or CPE entry, then an <xccdf:rule-result> of “pass” SHALL indicate that the check content
+                                                                                               evaluated within the rule complied with one of the following:
+                                                                                                   •   For a CVE entry, the target platform satisfies all the conditions of the XCCDF rule and is
+                                                                                                       unaffected by the vulnerability or exposure referenced by the CVE.
+                                                                                                   •   For a CCE entry, the target platform complies with the configuration setting guidance expressed
+                                                                                                       in the XCCDF rule.
+                                                                                                   •   For a CPE entry, the target platform was identified on the system.
+                                                                                               It is important that these interpretations of <xccdf:ident> elements be preserved. For example,
+                                                                                               consider two policy recommendations. One is that a particular piece of software be installed, and the
+                                                                                               second that another piece of software not be installed. Both rules for these policy recommendations could
+                                                                                               use the same CPE entry in their <xccdf:ident> elements. However, because the interpretation of a
+                                                                                               CPE entry is that a “pass” result indicates software was installed, the second policy recommendation’s
+                                                                                               rule would violate this. This can be corrected by using the @con:negate attribute, a Boolean attribute
+                                                                                               that inverts the rule result. The second rule could check for the software being installed and then negate
+                                                                                               that result, thus giving a result consistent in meaning with the first rule. For rules that cannot have their
+                                                                                               interpretations preserved through the use of the @con:negate attribute, an alternative is to have a CCE
+                                                                                               entry corresponding to the recommendation. Rules that do not use <xccdf:ident> elements have no
+                                                                                               such restrictions.
+
+                                                                                               4.5.2   Mapping OVAL Results to XCCDF Results
+                                                                                               When evaluating an <xccdf:Rule> element that references an OVAL Definition, the
+                                                                                               <xccdf:rule-result> element SHALL be used to capture the result of this evaluation. This result
+                                                                                               SHALL be determined by evaluating the referenced OVAL Definition on a target host. The result value
+                                                                                               of an individual <xccdf:check> SHALL be mapped from the OVAL Definition result produced
+                                                                                               during evaluation. The corresponding <xccdf:rule-result/xccdf:result> value is then
+                                                                                               computed based on the result values of all relevant <xccdf:check> elements. (Normally only a single
+                                                                                               <xccdf:check> element is needed, but where an <xccdf:complex-check> element is used,
+                                                                                               there may be multiple results that must be combined, as outlined in the XCCDF specification.) While the
+                                                                                               OVAL specification permits limiting result status reporting, SCAP-conformant content SHALL include
+                                                                                               full status reporting, including Error, Unknown, Not Applicable, Not Evaluated, True, and False.
+                                                                                               Content consumers SHALL apply the mapping illustrated in Table 23 when deriving <xccdf:check>
+                                                                                               results from OVAL Definition processing. The corresponding result value SHALL be recorded based on
+                                                                                               the @class attribute of the OVAL Definition and the @negate attribute of the <xccdf:check>
+                                                                                               element where applicable.
+
+
+                                                                                                                                                    38
+

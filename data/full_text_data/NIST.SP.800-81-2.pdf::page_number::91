@@ -1,0 +1,58 @@
+                                                             SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+10.       Guidelines for Minimizing Information Exposure Through DNS Data Content
+          Control
+
+The DNS security extensions provide only origin authentication and data integrity protection. This
+protection does not provide confidentiality because of the design decision to keep DNS data public.
+Features such as split DNS provide some means of keeping internal network information from appearing
+on the global Internet, but they are not official parts of the DNS protocol specification.
+
+It is possible that an attacker may learn valuable information about an organization’s network through
+DNS and use that information to launch an attack. For some elements, such as IP addresses of public
+servers, this possibility is unavoidable. There are steps a DNS administrator can take in generating a zone
+file to keep network exposure to a minimum, however; these steps are given below. This process should
+be done prior to signing a zone. Network information that should be kept absolutely private should not be
+published in DNS at all.
+
+10.1 Choosing Parameter Values in SOA RR
+
+The first action a DNS administrator should undertake is to ensure that the values in the SOA resource
+record data are correct. The values in this RR regulate the communication between primary and secondary
+servers for the zone, such as when secondary servers should periodically perform zone transfers from the
+primary server. This data also contains the minimum TTL value field, which gives client resolvers an
+indication of how long to cache non-DNSSEC negative responses. Some suggested values for these fields
+are as follows [RFC1912]:
+
+      •    Serial Number. The serial number in the SOA RDATA is used to indicate to secondary name
+           servers that a change to the zone has occurred and a zone transfer should be performed. It should
+           always be increased whenever a change is made to the zone data.
+
+      •    Refresh Value. The refresh value tells the secondary servers how many seconds to wait between
+           zone transfers. For zones that are updated frequently, this number should be small (20 minutes to
+           2 hours). For zones that are updated infrequently, a larger number can be substituted (2 to 12
+           hours). For a signed zone, this value should not be more than the length of the RRSIG validity
+           period, to ensure that secondary zones do not contain zones with expired RRSIGs. This value also
+           may depend on bandwidth constraints on the primary server side. Note that if a primary server
+           issues a NOTIFY message when it is updated, a secondary server will immediately perform a
+           zone transfer and not wait until the refresh value has timed out.
+
+      •    Retry Value. The retry value is the period a secondary server should wait before attempting to
+           perform a zone transfer if the previous attempt failed. This value should be a fraction of the
+           refresh value. If using a Refresh value in the range given above, the possible range of values for
+           this field would be 5 minutes to 1 hour.
+
+      •    Expire Value. The expire value is the length of time a secondary server should consider the zone
+           information valid if it can no longer reach the primary server to refresh. This field allows
+           secondary servers to continue to operate until network disruptions are resolved. This value
+           depends on the frequency of changes to the zone and the reliability of the connection between
+           name servers. It should be a multiple of the refresh value and possibly set to as long as 2 to 4
+           weeks.
+
+
+
+
+                                                      10-1
+

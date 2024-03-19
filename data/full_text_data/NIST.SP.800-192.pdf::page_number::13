@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-192                                                       VERIFICATION & TEST METHODS FOR
+                                                                                                                                                                   ACCESS CONTROL POLICIES/MODELS
+
+                                                                                             accessed no more than i times simultaneously by user group y). For example, if a user’s role is a
+                                                                                             cashier, he or she cannot be an accountant at the same time when handling a customer’s checks.
+                                                                                             This type of policy can be specified with asynchronous or direct specification expressions of an
+                                                                                             FSM model, which uses a variable semaphore to express the dynamic properties of the
+                                                                                             authorization decision process. Another example of dynamic constraint states is enforcing a limited
+                                                                                             number of concurrent accesses to an object. The authorization process for a user thus has four
+                                                                                             states: idle, entering, critical, and exiting. A user is normally in the idle state. The user is
+                                                                                             moved to the entering state when the user wants to access the critical object. If the limited number
+                                                                                             of access times is not reached, the user is moved to the critical state, and the number of the current
+                                                                                             access is increased by 1. When the user finishes accessing the critical object, the user is moved to
+                                                                                             the exiting state, and the number of the current access is decreased by 1. Then the user is moved
+                                                                                             from the exiting state to the idle state. The authorization process can be modeled as Example 2:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-192
+
+
+
+
+                                                                                             { VARIABLES
+                                                                                                 count, access_limit : INTEGER;
+                                                                                                 request_1 : process_request (count);
+                                                                                                 request_2 : process_request (count);
+                                                                                                 …….
+                                                                                                 request_n: process_request (count);
+                                                                                                 /*max number of user requests allowed by the system*/
+                                                                                                 access_limit := k; /*max number of concurrent access*/
+                                                                                                 count := 0; act {rd, wrt}; object {obj};
+                                                                                                 process_request (access_limit) {
+                                                                                                    VARIABLES
+                                                                                                      permission : {start, grant, deny};
+                                                                                                      state : {idle, entering, critical, exiting};
+                                                                                                    INITIAL_STATE (permission) := start;
+                                                                                                    INITIAL_STATE (state) := idle;
+                                                                                                    NEXT_STATE (state) := CASE {
+                                                                                                       state == idle : {idle, entering};
+                                                                                                       state == entering & ! (count > access_limit): critical;
+                                                                                                       state == critical : {critical, exiting};
+                                                                                                       state == exiting : idle;
+                                                                                                       OTHERWISE: state};
+                                                                                                   NEXT_STATE (count) := CASE {
+                                                                                                       state == entering : count + 1;
+                                                                                                       state == exiting : count -1;
+                                                                                                       OTHERWISE: DO_NOTHING };
+                                                                                                   NEXT_STATE (permission) := CASE {
+                                                                                                      (state == entering)& (act == rd) & (object == obj): grant;
+                                                                                                      OTHERWISE: deny;
+                                                                                                      }
+                                                                                                 }
+                                                                                             }
+                                                                                                                                Example 2 – dynamic AC model
+
+
+
+
+                                                                                                                                                  6
+

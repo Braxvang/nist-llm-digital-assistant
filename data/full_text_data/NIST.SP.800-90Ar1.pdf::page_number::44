@@ -1,0 +1,51 @@
+NIST SP 800-90A Rev. 1                                               Recommendation for Random Number
+                                                                      Generation Using Deterministic RBGs
+
+
+If a reseed capability is not supported, or a reseed is not desired, then generate process steps 6
+and 7 are removed; generate process step 9 is replaced by:
+    9. If status indicates that a reseed is required before the requested bits can be generated,
+       then
+        9.1 status = Uninstantiate_function (state_handle).
+        9.2 Return an indication that the DRBG instantiation can no longer be used.
+
+9.3.2       Reseeding at the End of the Seedlife
+
+When pseudorandom bits are requested by a consuming application, the generate function checks
+whether or not a reseed is required by comparing the counter within the internal state (see
+Section 8.3) against a predetermined reseed interval for the DRBG implementation. This is
+specified in the generate process (see Section 9.3.1) as follows:
+    a. Step 6 clears the reseed_required_flag.
+    b. Step 7 checks the value of the reseed_required_flag. At this time, the
+       reseed_required_flag is clear, so step 7 is skipped unless prediction resistance was
+       requested by the consuming application. For the purposes of this explanation, assume that
+       prediction resistance was not requested.
+    c. Step 8 calls the Generate_algorithm, which checks whether a reseed is required. If it is
+       required, an appropriate status is returned.
+    d. Step 9 checks the status returned by the Generate_algorithm. If the status does not
+       indicate that a reseed is required, the generate process continues with step 10.
+    e. However, if the status indicates that a reseed is required (see step 9), then the
+       reseed_required_flag is set, the prediction_resistance_request indicator is set if the
+       instantiation is capable of performing prediction resistance, and processing continues by
+       going back to step 7. This is intended to obtain fresh entropy for reseeding at the end of
+       the reseed interval whenever access to fresh entropy is available (see the concept of Live
+       Entropy Sources in [SP 800-90C]).
+    f. The substeps in step 7 are executed. The reseed function is called; any additional_input
+       provided by the consuming application in the generate request is used during reseeding.
+       The new values of the internal state are acquired, any additional_input provided by the
+       consuming application in the generate request is replaced by a Null string, and the
+       reseed_required_flag is cleared.
+    g. The generate algorithm is called (again) in step 8, the check of the returned status is made
+       in step 9, and (presumably) step 10 is then executed.
+
+9.3.3       Handling Prediction Resistance Requests
+
+When pseudorandom bits are requested by a consuming application with prediction resistance,
+the generate function specified in Section 9.3.1 checks that the instantiation allows prediction
+resistance requests (see step 5 of the generate process); clears the reseed_required_flag (even
+though the flag won’t be used in this case); executes the substeps of generate process step 7,
+resulting in a reseed, a new internal state for the instantiation, and setting the additional input to a
+
+
+                                                  35
+

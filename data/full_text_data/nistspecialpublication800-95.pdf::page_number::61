@@ -1,0 +1,66 @@
+                                                                            GUIDE TO SECURE WEB SERVICES
+
+
+
+    <Policy PolicyId=“ExamplePolicy”
+     RuleCombiningAlgId=“urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides”>
+      <Target>
+        <Subjects> <AnySubject/> </Subjects>
+        <Resources>
+          <Resource>
+            <ResourceMatch MatchId=“urn:oasis:names:tc:xacml:1.0:function:anyURI-equal”>
+               <AttributeValue
+    DataType=“http://www.w3.org/2001/XMLSchema#anyURI”>http://server.example.com/code/docs/guide.
+    html</AttributeValue>
+               <ResourceAttributeDesignator DataType=“http://www.w3.org/2001/XMLSchema#anyURI”
+                AttributeId=“urn:oasis:names:tc:xacml:1.0:resource:resource-id”/>
+            </ResourceMatch>
+          </Resource>
+        </Resources>
+        <Actions> <AnyAction/> </Actions>
+      </Target>
+      <Rule RuleId=“ReadRule” Effect=“Permit”>
+        <Target>
+          <Subjects> <AnySubject/> </Subjects>
+          <Resources> <AnyResource/> </Resources>
+          <Actions>
+            <Action>
+               <ActionMatch MatchId=“urn:oasis:names:tc:xacml:1.0:function:string-equal”>
+                 <AttributeValue
+                  DataType=“http://www.w3.org/2001/XMLSchema#string”>read</AttributeValue>
+                 <ActionAttributeDesignator DataType=“http://www.w3.org/2001/XMLSchema#string”
+                  AttributeId=“urn:oasis:names:tc:xacml:1.0:action:action-id”/>
+               </ActionMatch>
+            </Action>
+          </Actions>
+        </Target>
+        <Condition FunctionId=“urn:oasis:names:tc:xacml:1.0:function:string-equal”>
+          <Apply FunctionId=“urn:oasis:names:tc:xacml:1.0:function:string-one-and-only”>
+            <SubjectAttributeDesignator DataType=“http://www.w3.org/2001/XMLSchema#string”
+              AttributeId=“group”/>
+          </Apply>
+          <AttributeValue
+           DataType=“http://www.w3.org/2001/XMLSchema#string”>developers</AttributeValue>
+        </Condition>
+      </Rule>
+    </Policy>
+
+
+                                     Figure 3-11. An XACML Policy
+
+The XACML specification uses the term policy enforcement point (PEP) to refer to the entity that
+performs the access control, such as a file system or Web server. The PEP sends XACML requests to the
+PDP and receives XACML responses that it uses to grant or deny access. The PDP is the entity that
+receives access requests from the PEP. It looks at the request and the applicable policy and sends a
+response as to whether or not access should be granted.
+
+Figure 3-12 shows an XACML request in which the user, jsmith@users.example.com, is attempting to
+perform a read action on http://server.example.com/docs/guide.html. This request provides the user’s
+group attribute, which is required by the policy to make the access decision. From the request,
+jsmith@users.example.com’s group attribute is “developers.” This request is sent by the PEP to the PDP.
+
+
+
+
+                                                 3-26
+

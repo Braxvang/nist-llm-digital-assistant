@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                     GUIDE TO IPSEC VPNS
+
+
+                                                                                              IKEv2 has built-in protection against DDoS attacks, but IKEv1 does not. When the number of
+                                                                                              incomplete IKE sessions (sometimes called half-open IKE SAs) reaches a threshold, indicating a
+                                                                                              possible DDoS attack, IKEv2 can enable DDoS COOKIES. Each new IKE_SA_INIT request
+                                                                                              will be answered with a reply that only contains a COOKIE based on a local secret 60 and the
+                                                                                              client’s IP address and port. The client will have to resend its original IKE_SA_INIT request
+                                                                                              with the COOKIE added to the request. The server can calculate the value of the COOKIE
+                                                                                              without needing to store any state in memory for the original IKE_SA_INIT request. The IKE
+                                                                                              server will only perform the expensive DH calculations after the client has retransmitted its
+                                                                                              IKE_SA_INIT packet with the COOKIE, proving to the server that the client was not simply a
+                                                                                              spoofed IP packet.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              Additionally, IKEv1 can be coerced into an amplification attack. With IKEv1, the responder and
+                                                                                              initiator are each responsible for retransmission when a packet is lost. A malicious user can send
+                                                                                              a single spoofed IKEv1 packet to an IKEv1 server and cause that IKEv1 server to send several
+                                                                                              retransmit packets to the spoofed IP address. Some IKEv1 implementations defend against this
+                                                                                              by never responding more than once to an initial IKEv1 request, but this can break legitimate
+                                                                                              IKEv1 clients using aggressive mode when there is actual packet loss happening.
+
+                                                                                              7.2.5     Packet Filter
+
+                                                                                              The purpose of the packet filter is to specify how each type of incoming and outgoing traffic
+                                                                                              should be handled—whether the traffic should be permitted or denied (usually based on IP
+                                                                                              addresses, protocols, and ports) and how permitted traffic should be protected (if at all). By
+                                                                                              default, IPsec implementations typically provide protection for all traffic. In some cases, this
+                                                                                              may not be advisable for performance reasons. Encrypting traffic that does not need protection or
+                                                                                              is already protected (e.g., encrypted by another application) can be a significant waste of
+                                                                                              resources. For such traffic, the packet filter could specify the use of the null encryption algorithm
+                                                                                              for ESP, which would provide integrity checks and anti-replay protection, or the packet filter
+                                                                                              could simply pass along the traffic without any additional protection at all and fully depend on
+                                                                                              the application to provide data integrity. One caveat is that the more complex the packet filter
+                                                                                              becomes, the more likely it is that a configuration error may occur, which could permit traffic to
+                                                                                              traverse networks without sufficient protection.
+
+                                                                                              An issue related to packet filters is that certain types of traffic are incompatible with IPsec. For
+                                                                                              example, IPsec cannot negotiate security for multicast and broadcast traffic. 61 This means that
+                                                                                              some types of applications, such as multicast-based video conferencing, may not be compatible
+                                                                                              with IPsec. Attempting to use IPsec to secure such traffic often causes communication problems
+                                                                                              or impairs or breaks application functionality. Other traffic, such as multicast DNS (mDNS) and
+                                                                                              DNS Service Discovery (DNS-SD) broadcast requests, should not be forwarded to other
+                                                                                              networks because they have no meaning or relevance beyond the local network. For example,
+
+
+                                                                                              60   The secret is usually a random value refreshed every hour to prevent attackers from attempting to guess the secret by trying
+                                                                                                   different possibilities until the correct value is found. The server needs to remember the current and previous secret and to
+                                                                                                   perform two calculations so that clients that happen to connect just before the secret refresh will not be rejected for using the
+                                                                                                   now-obsolete old secret.
+                                                                                              61   Section 10.1 contains information on current research efforts to create IPsec solutions for multicast traffic.
+
+
+
+                                                                                                                                                               74
+

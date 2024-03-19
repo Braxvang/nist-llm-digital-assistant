@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+The process is similar to the process described in Section 11.4 above with the following changes:
+
+    1. The zone administrator follows the steps 1-5 in Section 11.4 above. The administrator does not
+       have to wait after the NSEC3RSASHA1 KSK appears in the parent zone.
+    2. The zone administrator waits the TTL of the parent zone and then removes the DNSKEY RRs of
+       the RSA/SHA-1 algorithm. At this point, it is safe to strip the NSEC RRs and replace them with
+       NSEC3 RRs. The DS in the parent zone signals that the zone uses NSEC3 rather than NSEC. As
+       with the algorithm rollover process above, the RSA/SHA-1 RRSIGs over zone data RRsets
+       remain in the zone.
+    3. The zone administrator waits for the TTL of the zone and then removes the RRSIGs generated
+       using RSA/SHA-1.
+Note that the last two steps can be done in a single operation if the zone is small enough. If the zone is
+too large to sign in a single operation, the resigning procedure defined in RFC 5155 [RFC 5155] in adding
+NSEC3 RRs using dynamic updates and resigning with NSEC3.
+
+Secondly, when the transition is complete, the zone may become provably unsecure for some validators.
+This is part of the design consideration of NSEC3 to allow for non-NSEC3 aware validators to revert to a
+provably unsecure state when encountering NSEC3 RRs rather than generating validation errors. End
+user validators that do not understand NSEC3 will not recognized the NSEC3 RSA/SHA-1 DNSKEY
+algorithm code (code 7) and will treat the zone as signed by an unknown algorithm and no validation will
+be done.
+
+11.7 DNSSEC in a Split-Zone Deployments
+
+11.7.1 Ideal Solution: Internal Delegation
+
+If deploying split horizon DNS for the first time, or if there is a means to re-design an enterprises’ DNS, it
+is recommended that the administrator choose a new internal-only delegation from the primary zone. For
+example, if the zone were named “example.net”, the internal zone would be “internal.example.net”.
+
+It may even been that the internal-only zone has an entire separate zone name invisible from the external
+Internet. For example, an enterprise with the zone “example.net” may choose to have their internal zone
+be renamed “internal.example.” Since the internal network is only accessible by internal hosts, and it is
+simple to have primary recursive servers act as stealth secondaries for this zone, there would not be an
+issue of having internal hosts unreachable from inside.
+
+In this case, the network topology would fall along these lines. In the external network:
+
+    •   Zone file: contains only external (i.e., globally accessible) servers (Web, email, etc.).
+
+    •   Server configuration: an authoritative-only server with the external zone.
+
+Internal network:
+
+    •   Zone file: contains internal hosts and any internal interfaces to external servers.
+
+    •   Server configuration: an authoritative server for internal zone. Or a recursive caching server that
+        also acts as a slave to the internal zone.
+
+
+
+
+                                                    11-10
+

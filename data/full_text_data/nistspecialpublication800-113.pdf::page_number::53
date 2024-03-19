@@ -1,0 +1,56 @@
+                                                                                         GUIDE TO SSL VPNS
+
+
+
+ Users can authenticate to all sites simultaneously. Each user’s routing table is configured so that
+  packets destined for a specific site’s addresses will take that site’s VPN connection. If a user creates
+  VPNs to Sites A and B simultaneously, then packets destined for a Site A subnet traverse the VPN to
+  Site A, with the same applying to packets destined for a Site B subnet.
+Note that the routing issues mentioned earlier in this section are also relevant for an architecture with
+multiple sites. Each site must be sure to correctly route and to not block VPN packets with addresses
+assigned at other sites. If the VPN devices have multiple interfaces, the packets destined for the external
+interface may have to be routed differently from packets destined for the internal interface. This depends
+on how the internal connectivity between sites is configured.
+
+4.3.4.4 High Availability or Load Balancing Support
+
+An organization may decide to implement high availability or load balancing. High availability may be
+required so the organization can meet service level agreements (SLA) for guaranteed uptime, or load
+balancing may be required to support a large number of users. SSL VPN products vary widely in how
+they support high availability and load balancing. For this reason, an organization with a need for high
+availability or load balancing should answer at least these questions about each device under evaluation,
+with testing possibly being required to receive detailed answers.
+
+ Does the device employ an active/passive or an active/active mode architecture? An active/passive
+  architecture only supports one active device at a time, while an active/active architecture supports two
+  devices simultaneously. Active/passive systems are much easier to design and are therefore usually
+  less expensive than active/active systems. Active/active systems are mostly useful in architectures
+  where a very high load is expected, so more than one device needs to be active under normal
+  circumstances.
+ How is state information maintained across devices in a failure scenario? How long does the failover
+  process take for proxying, translation, and network extension?
+ In an active/active mode architecture, is state information for all sessions mirrored across all devices
+  so a device failure will not disrupt any user sessions? Or does each device track state information
+  (such as user authentication status) only for its own sessions so a device failure may require re-
+  authentication?
+ If an external load balancing solution is used, how is state information maintained throughout the
+  architecture?
+Configuration and upgrading pose additional issues. Some devices mirror configuration settings across
+devices, so only the active devices should be configured. Any altered settings on the passive devices will
+quickly be overwritten by the active device’s settings. If configuration settings are not mirrored, all
+devices should be configured with identical settings at the same time.
+
+For upgrades, the vendor’s instructions for upgrading should be followed. Some vendors require the
+passive device in an active/passive mode architecture to be upgraded first. After this upgrade is complete,
+the newly upgraded device becomes active and the newly passive device can then be upgraded. Other
+vendors require the active device to be upgraded first. The active device is still handling VPN traffic
+while it is being upgraded and only fails over to the passive device when it is ready to reboot with the new
+upgrade in place. Upgrading the active device first avoids a scenario where the passive device is being
+upgraded and receives mirrored configuration changes from the active device in the middle of the upgrade
+process.
+
+
+
+
+                                                   4-21
+

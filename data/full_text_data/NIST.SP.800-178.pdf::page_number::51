@@ -1,0 +1,61 @@
+                                                                                               NIST SP 800-178                                                     COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                     DATA SERVICES: XACML AND NGAC
+
+
+                                                                                               demonstrates support for the Chinese wall policy [21], which cannot be entirely accommodated
+                                                                                               by XACML.
+
+                                                                                               NGAC has shown support for history-based separation of duty [3]. Simon and Zurko, in their
+                                                                                               seminal paper on separation of duty [22], describe history-based separation of duty as the most
+                                                                                               accommodating form of separation of duty, subsuming the policy objectives of other forms.
+                                                                                               Other history-based policies that can be accommodated by NGAC include two-person control,
+                                                                                               workﬂow, and conﬂict-of-interest.
+
+                                                                                               Despite the use of attributes, the policies discussed thus far have resulted in a user-based
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                               authorization state. In other words, the policies and attributes together constitute an authorization
+                                                                                               state of the form {(u, ar, o)}, where user u is authorized to access object o under the access right
+                                                                                               ar. Such policies ignore the fact that processes, not users, actually access object content. In
+                                                                                               general, user-based authorization controls (whether MAC or DAC) share a weakness: their
+                                                                                               inability to prevent the “leakage” of data to unauthorized principals through malware, or through
+                                                                                               malicious or complacent user actions.
+
+                                                                                               To illustrate this weakness, assume the following authorization state {(u1, r, o1), (u1, w, o2), and
+                                                                                               (u2, r, o2)}. Note that it is impossible to determine if u2 can read the content of o1. Under one
+                                                                                               scenario, u1 can read and subsequently write the contents of o1 to o2. Even if policy depended
+                                                                                               on “trust in users”, the existence of a Trojan horse that can easily thwart policy must be assumed.
+                                                                                               This threat exists because, in reality, users do not perform operations on objects, but under a
+                                                                                               user’s capabilities, processes perform operations (actions) on the content of objects (resources).
+                                                                                               Therefore, a program executed by u1 can read the contents of o1 and, without u1’s further action
+                                                                                               or knowledge, write that content to o2. Note that one cannot prevent this leakage even with the
+                                                                                               addition of a user-based deny condition or relation NOT (u2, r, o1). The importance of
+                                                                                               preventing inappropriate leakage of data (often called confinement) was recognized as early as
+                                                                                               the 1970s, with the establishment of the Bell and LaPadula security model [23] and the specific
+                                                                                               MAC policy defined in Trusted Computer Security Evaluation Criteria (TCSEC) [24].
+
+                                                                                               Because XACML does not allow the specification and enforcement of policies that pertain to
+                                                                                               processes in isolation of their users, it excludes or imposes undue constraints on users in regard
+                                                                                               to MAC confinement policies. Another drawback of XACML is that its PDP is stateless, which
+                                                                                               places limitations on the policies that can be speciﬁed and enforced. Although XACML includes
+                                                                                               the concept of an obligation, it is not used to alter authorization state.
+
+                                                                                               Consider the following XACML TCSEC MAC policy specification:
+                                                                                               <Policy PolicyId = “Policy 3” rule-combining-algorithm=”only-one-applicable”>
+                                                                                                            // TCSEC MAC Policy Specification //
+                                                                                                    <Target> /* Policy applies to all subjects with clearance levels – Top-
+                                                                                               Secret, Secret, or Unclassified and resources with classification levels –
+                                                                                               Top-Secret, Secret, or Unclassified for both “read” and “write” actions */
+                                                                                                       /* :Attribute-Category    :Attribute ID    :Attribute Value */
+                                                                                                              :access-subject      :Clearance        :Top-Secret
+                                                                                                              :access-subject      :Clearance        :Secret
+                                                                                                              :access-subject      :Clearance        :Unclassified
+                                                                                                              :resource            :Classification   :Top-Secret
+                                                                                                              :resource            :Classification   :Secret
+
+
+                                                                                                                                                39
+

@@ -1,0 +1,58 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                       Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                          PIV Card Application Card Command Interface
+
+                  P2                      Key reference '04', '9A', '9C', '9D', or '9E'
+                  Lc                      Length of data field
+                  Data Field              Control reference template. See Table 11.
+                  Le                      '00'
+
+734                                    Table 11. Data objects in the template (Tag 'AC')
+
+                                 Name                          Tag       M/O               Description
+                   Cryptographic mechanism identifier          '80'       M       See Part 1, Table 6
+                   Parameter                                   '81'       C       Specific to the cryptographic
+                                                                                  mechanism
+
+735   Response Syntax
+                  Data Field              Data objects of public key of generated key pair. See Table 12
+                  SW1-SW2                 Status word
+
+736                                   Table 12. Data objects in the template (Tag '7F49')
+
+                                                       Name                               Tag
+                                      Public-key data objects for RSA
+                                      Modulus                                             '81'
+                                      Public exponent                                     '82'
+
+                                      Public key data objects for ECC
+                                      Point                                               '86'
+
+737   The public-key data object in tag '86' is encoded as follows:
+738                                         Table 13. Public-key encoding for ECC
+
+                                Tag                  Length               Value
+                                '86'                 L                    04 || X || Y [SECG, Section 2.3.3]
+
+739   The octet '04' indicates that the X and Y coordinates of point P are encoded without the use of
+740   point compression. The length L is 65 bytes for points on Curve P-256 and 97 bytes for points on
+741   Curve P-384.
+                    SW1        SW2                                        Meaning
+                                          Successful execution where SW2 encodes the number of response
+                     '61'      'xx'
+                                          data bytes still available
+                     '69'      '82'       Security status not satisfied
+                                          Incorrect parameter in command data field (e.g., unrecognized
+                    '6A'       '80'
+                                          cryptographic mechanism)
+                    '6A'       '81'       Function not supported
+                                          Incorrect parameter P2; the cryptographic mechanism of the
+                    '6A'       '86'       reference data to be generated is different than the cryptographic
+                                          mechanism of the reference data of a given key reference
+                     '90'      '00'       Successful execution
+742
+
+
+
+
+                                                                  20
+

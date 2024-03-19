@@ -1,0 +1,421 @@
+Addendum to                        Recommendation for Block
+NIST Special Publication 800-38A   Cipher Modes of Operation:
+October, 2010
+                                   Three Variants of Ciphertext
+                                   Stealing for CBC Mode
+
+                                   Morris Dworkin
+
+
+
+
+     C O M P U T E R                   S E C U R I T Y
+Addendum to                        Recommendation for Block
+NIST Special Publication 800-38A   Cipher Modes of Operation:
+                                   Three Variants of Ciphertext
+                                   Stealing for CBC Mode
+
+                                   Morris Dworkin
+
+
+
+
+     C O M P U T E R                       S E C U R I T Y
+
+
+                                   Computer Security Division
+                                   Information Technology Laboratory
+                                   National Institute of Standards and Technology
+                                   Gaithersburg, MD 20899-8930
+
+
+
+
+                                   October 2010
+
+
+
+
+                                   U.S. Department of Commerce
+                                   Gary Locke, Secretary
+
+
+
+                                   National Institute of Standards and Technology
+                                   Patrick Gallagher, Director
+                         Addendum to NIST Special Publication 800-38A
+
+
+
+
+Reports on Information Security Technology
+
+The Information Technology Laboratory (ITL) at the National Institute of Standards and Technology
+(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the Nation’s
+measurement and standards infrastructure. ITL develops tests, test methods, reference data, proof of
+concept implementations, and technical analyses to advance the development and productive use of
+information technology. ITL’s responsibilities include the development of technical, physical,
+administrative, and management standards and guidelines for the cost-effective security and privacy of
+sensitive unclassified information in Federal computer systems. This Special Publication 800-series
+reports on ITL’s research, guidance, and outreach efforts in computer security, and its collaborative
+activities with industry, government, and academic organizations.
+
+
+
+
+Certain commercial entities, equipment, or materials may be identified in this document in order
+to describe an experimental procedure or concept adequately. Such identification is not intended
+to imply recommendation or endorsement by the National Institute of Standards and Technology,
+nor is it intended to imply that the entities, materials, or equipment are necessarily the best
+available for the purpose.
+
+
+
+
+                                         Addendum
+        National Institute of Standards and Technology Special Publication 800-38A
+                                    11 pages (June 2010)
+                                     CODEN: NSPUE2
+
+
+
+
+                                                  ii
+                                          Addendum to NIST Special Publication 800-38A
+
+
+Table of Contents
+
+1       INTRODUCTION .............................................................................................................................................. 1
+2       SPECIFICATION OF CBC-CS1 ...................................................................................................................... 2
+3       SPECIFICATION OF CBC-CS2 ...................................................................................................................... 4
+4       SPECIFICATION OF CBC-CS3 ...................................................................................................................... 6
+REFERENCES ............................................................................................................................................................. 7
+
+
+
+
+List of Figures
+
+Figure 1: CBC-CS1-Encrypt.......................................................................................................... 3
+Figure 2: CBC-CS1-Decrypt ......................................................................................................... 4
+
+
+
+
+                                                                                   iii
+Addendum to NIST Special Publication 800-38A
+
+
+
+
+                     iv
+                    Addendum to NIST Special Publication 800-38A
+
+
+
+
+1 Introduction
+
+A limitation to Cipher Block Chaining (CBC) mode, as specified in NIST SP 800-38A,
+Ref. [1], is that the plaintext input must consist of a sequence of blocks. (In the rest of
+this publication, a block is called a “complete block” to emphasize the contrast with a
+“partial block” whose bit length is smaller than the block size.) Although Appendix A of
+Ref. [1] describes how padding methods can be used to meet this requirement, in such
+cases, the length of the resulting ciphertext expands over the length of the unpadded
+plaintext by the number of padding bits.
+
+This addendum to Ref. [1] specifies three variants of CBC mode that accept any plaintext
+input whose bit length is greater than or equal to the block size, whether or not the length
+is a multiple of the block size. Unlike the padding methods discussed in Ref. [1], these
+variants avoid ciphertext expansion.
+
+These variants are denoted CBC-CS1, CBC-CS2, and CBC-CS3, where “CS” indicates
+“ciphertext stealing,” because when padding bits are needed in these variants, they are
+taken from the penultimate ciphertext block. The variants differ only in the ordering of
+the ciphertext bits. CBC-CS1 was specified as a suggestion on the NIST Computer
+Security Resource Center web site. CBC-CS2 is specified, for example, in Ref. [3].
+CBC-CS3 is the variant specified for Kerberos 5 in Ref. [2].
+
+Below are the specifications for encryption and decryption using CBC-CS1, CBC-CS2,
+and CBC-CS3, building on the specification of the CBC encryption and decryption in
+Ref. [1]. Diagrams are given for CBC-CS1 encryption and decryption. Each variant
+inherits the relevant requirements of Ref. [1], e.g., on the underlying block cipher, the
+key, and the initialization vector.
+
+The following notational conventions apply to the specifications below:
+
+   •   Bit strings are denoted with upper case letters; integers with lower case letters.
+   •   The block size of the underlying block cipher is denoted b.
+   •   For a bit string X, the bit length of X is denoted len(X).
+   •   For a bit string X and a positive integer r that does not exceed len(X), the string
+       consisting of the leftmost r bits of X is denoted MSBr(X), and the string consisting
+       of the rightmost r bits of X is denoted LSBr(X).
+   •   For an input block B and key K, the output block of the cipher function
+       (“encryption”) is denoted CIPHK(B), and the output block of the inverse cipher
+       function (“decryption”) is denoted CIPH-1K(B).
+
+In principle, the input strings to encryption and decryption for each of the variants may be
+any string whose length is not less than b bits, but typically an implementation is
+designed to accept a restricted set of lengths. For example, the set of lengths may be
+
+
+
+                                             1
+                      Addendum to NIST Special Publication 800-38A
+
+
+restricted to multiples of 8, so that the input strings may be represented with bytes/octets.
+The input lengths that an implementation allows are called the valid lengths.
+
+2 Specification of CBC-CS1
+
+Algorithm: CBC-CS1-Encrypt
+
+Input:           plaintext P, such that len(P) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          ciphertext C, such that len(C)=len(P).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(P), let d=len(P)-(n-1)⋅b, and let P1,
+         P2, … , Pn-1, Pn* be the unique sequence of bit strings such that:
+                a) P = P1||P2||…||Pn-1||Pn*; and
+                b) P1, P2, … and Pn-1 are complete blocks.
+         Consequently, len(Pn*)=d, and 1≤d≤b, so that Pn* is either a complete block or a
+         nonempty partial block.
+
+2.       Let PAD be the bit string consisting of b-d ‘0’ bits, and let Pn= Pn*||PAD. Note
+         that if Pn* is a complete block, then PAD is the empty string, and Pn= Pn*.
+
+3.       Apply CBC encryption to the plaintext (P1, P2, … Pn-1, Pn) with initialization
+         vector IV and key K to produce (C1, C2, … Cn-1, Cn).
+
+4.       Let Cn-1* = MSBd(Cn-1).
+
+5.       Return C1||C2||…||Cn-2||Cn-1*||Cn.
+
+When Pn* is a complete block, CBC-CS1-Encrypt is equivalent to CBC encryption.
+
+Diagram: Figure 1 below illustrates the CBC-CS1-Encrypt algorithm for the case that
+Pn* is a partial block, i.e., d<b. The bolded rectangles contain the inputs and outputs.
+The dotted rectangles provide alternate representations of two blocks in order to illustrate
+the role of the “stolen” ciphertext.
+
+In particular, the string of the b-d rightmost bits of Cn-1, denoted Cn-1**, becomes the
+padding for the input block to the final invocation of the block cipher within the
+execution of CBC mode. The ciphertext that is returned in Step 5 above omits Cn-1**,
+because it can be recovered from Cn during decryption.
+
+
+
+
+                                                2
+                      Addendum to NIST Special Publication 800-38A
+
+
+
+
+                                Figure 1: CBC-CS1-Encrypt
+
+Algorithm: CBC-CS1-Decrypt
+
+Input:          ciphertext C, such that len(C) is valid;
+                initialization vector IV;
+                key K.
+
+Output:         plaintext P, such that len(P) = len(C).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(C), let d=len(C)-(n-1)⋅b, and let C1,
+         C2, … , Cn-2, Cn-1*, Cn be the unique sequence of bit strings such that
+                a) C=C1||C2||…||Cn-2 ||Cn-1*||Cn;
+                b) Cn is a complete block; and
+                c) if n>2, then C1,…,Cn-2, are complete blocks.
+         Consequently, len(Cn-1*)=d, and 1≤d≤b, so that Cn-1* is either a complete block or
+         a nonempty partial block.
+
+2.       Let Z*=MSBd(CIPH-1K(Cn)), and Z**=LSBb-d(CIPH-1K(Cn)).
+
+3.       Let Cn-1=Cn-1*||Z**. Note that if Cn-1* is a complete block, then Z** is the empty
+         string, and Cn-1=Cn-1*.
+4.       Apply CBC decryption to (C1, C2, …, Cn-1) with initialization vector IV and key K
+         to produce (P1, P2, … Pn-1).
+
+                                              3
+                        Addendum to NIST Special Publication 800-38A
+
+
+
+5.        Let Pn*=Cn-1*    Z* .
+
+6.        Return P1||P2||…||Pn-1||Pn*.
+
+When Cn-1* is a complete block, CBC-CS1-Decrypt is equivalent to CBC decryption.
+
+Diagram:
+
+Figure 2 below illustrates the CBC-CS1-Decrypt algorithm for the case that Cn-1* is a
+partial block, i.e., d<b. As in the previous diagram, the bolded rectangles contain the
+inputs and outputs.
+
+
+                                                       Cn-1*       Z**
+
+                   C1                    C2                    Cn-1            Cn
+
+
+                CIPH-1K              CIPH-1K                CIPH-1K       CIPH-1K
+                                                 …
+     IV            ⊕                     ⊕                     ⊕          Z*        Z**
+
+
+                   P1                    P2                    Pn-1      ⊕
+
+                                                                         Pn*
+
+                                  Figure 2: CBC-CS1-Decrypt
+
+
+3 Specification of CBC-CS2
+
+Algorithm: CBC-CS2-Encrypt
+
+Input:            plaintext P, such that len(P) is valid;
+                  initialization vector IV;
+                  key K.
+
+Output:           ciphertext C, such that len(C) = len(P).
+
+Steps:
+
+
+                                                 4
+                       Addendum to NIST Special Publication 800-38A
+
+
+1.       Let n be the smallest integer such that n⋅b≥len(P), let d=len(P)-(n-1)⋅b, and let P1,
+         P2, … , Pn-1, Pn* be the unique sequence of bit strings such that:
+                a) P=P1||P2||…||Pn-1||Pn*; and
+                b) P1, P2, … and Pn-1 are complete blocks.
+         Consequently, len(Pn*)=d, and 1≤d≤b, so that Pn* is either a complete block or a
+         nonempty partial block.
+
+2.       Apply CBC-CS1-Encrypt to the plaintext P with initialization vector IV and key K
+         to produce C1||C2||…||Cn-2||Cn-1*||Cn.
+
+3.       If d=b, return C1||C2||…||Cn-2 ||Cn-1*||Cn; if d<b, return C1||C2||…||Cn-2||Cn||Cn-1*.
+
+When Pn* is a complete block, then CBC-CS2-Encrypt, like CBC-CS1-Encrypt, is
+equivalent to CBC encryption. When Pn* is a partial block, then CBC-CS2-Encrypt and
+CBC-CS1-Encrypt differ only in the ordering of Cn-1* and Cn.
+
+Algorithm: CBC-CS2-Decrypt
+
+Input:           ciphertext C, such that len(C) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          plaintext P, such that len(P)=len(C).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(C), let d=len(C)-(n-1)⋅b, and let C1,
+         C2, … , Cn-2, Cn-1, Cn* be the unique sequence of bit strings such that
+                a) C=C1||C2||…||Cn-2 ||Cn-1||Cn*;
+                b) Cn-1 is a complete block; and
+                c) If n>2, then C1,…,Cn-2, are complete blocks.
+         Consequently, len(Cn*)=d, and 1 ≤ d ≤ b, so that Cn* is either a complete block or
+         a nonempty partial block.
+
+2.       If d=b, i.e., Cn* is a complete block, then apply CBC-CS1-Decrypt to C with
+         initialization vector IV and key K, and return the result, P. STOP.
+
+3.       If d<b, i.e., Cn* is a partial block, then let C′= C1||C2||…||Cn-2 ||Cn*||Cn-1.
+
+4.       Apply CBC-CS1-Decrypt to C′, and return the result, P.
+
+Note that in Step 3, Cn* precedes Cn-1 in order to undo the corresponding swap within the
+ciphertext in Step 3 of CBC-CS2-Encrypt.
+
+
+
+
+                                                  5
+                      Addendum to NIST Special Publication 800-38A
+
+
+4 Specification of CBC-CS3
+
+Algorithm: CBC-CS3-Encrypt
+
+Input:           plaintext P, such that len(P) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          ciphertext C, such that len(C)=len(P).
+
+Steps:
+
+1.       Apply CBC-CS1-Encrypt to the plaintext P with initialization vector IV and key K
+         to produce C1||C2||…||Cn-2||Cn-1*||Cn.
+
+2.       Return C1||C2||…||Cn-2||Cn||Cn-1*.
+
+Note that in Step 2, Cn-1* and Cn are unconditionally swapped, i.e., even when Cn-1* is a
+complete block; therefore, CBC-CS3 is not strictly an extension of CBC mode. In the
+other case, i.e., when Cn-1* is a nonempty partial block, CBC-CS3-Encrypt is equivalent
+to CBC-CS2-Encrypt.
+
+Algorithm: CBC-CS3-Decrypt
+
+Input:           ciphertext C, such that len(C) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          plaintext P, such that len(P)=len(C).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(C), let d=len(C)-(n-1)⋅b, and let C1,
+         C2, … , Cn-2, Cn-1, Cn* be the unique sequence of bit strings such that
+                a) C=C1||C2||…||Cn-2 ||Cn-1||Cn*;
+                b) Cn-1 is a complete block; and
+                c) If n>2, then C1,…,Cn-2, are complete blocks.
+         Consequently, len(Cn*)=d, and 1≤d≤b, so that Cn* is either a complete block or a
+         nonempty partial block.
+
+2.       Apply the CBC-CS1-Decrypt algorithm with initialization vector IV and key K to
+         C1||C2||… ||Cn-2 ||Cn*||Cn-1, and return the result, P.
+
+Note that in Step 2, Cn* precedes Cn-1 in order to undo the corresponding swap that was
+performed within Step 2 of CBC-CS3-Encrypt.
+
+
+
+                                                6
+                  Addendum to NIST Special Publication 800-38A
+
+
+
+References
+
+[1]   Dworkin, M., NIST Special Publication 800-38A, 2001 Edition: Recommendation
+      for Block Cipher Modes of Operation, Methods and Techniques, December 2001,
+      Natl. Inst. Stand. Technol. [Web page], http://www.csrc.nist.gov/publications/
+      nistpubs/800-38a/sp800-38a.pdf.
+
+[2]   Raeburn, K., Request for Comments 3962: Advanced Encryption Standard (AES)
+      Encryption for Kerberos 5, Internet Engineering Task Force, February 2005.
+
+[3]   Schneier, B., Applied Cryptography, Second Edition: protocols, algorithms, and
+      source code in C. New York: Wiley, 1996.
+
+
+
+
+                                        7
+

@@ -1,0 +1,54 @@
+Special Publication 800-73-4                                Interfaces for Personal Identity Verification – Part 2:
+                                                            PIV Card Application Card Command Interface
+
+        1) RSA key transport and
+        2) Elliptic Curve Diffie-Hellman (ECDH) key agreement.
+
+The use of the KMK for RSA key transport and ECDH key agreement is discussed in Appendices A.5.1
+and A.5.2, respectively.
+
+A.5.1        RSA Key Transport
+
+In general, RSA transport keys are used to establish symmetric keys, where a sender encrypts a symmetric
+key with the receiver’s public key and sends the encrypted key to the receiver. The receiver decrypts the
+encrypted key with the corresponding private key. The decrypted symmetric key subsequently is used by
+both parties to protect further communication between them. Many types of security protocols employ the
+RSA key transport technique. S/MIME for secure email is one of the many protocols employing RSA
+transport keys to distribute symmetric keys between entities.
+
+A.5.1.1 RSA Key Transport with the PIV KMK
+
+As specified in SP 800-78, the on-card private KMK can be an RSA transport key that complies with
+[PKCS1]. In the scenario described above, a sender encrypts a symmetric key with the KMK’s public
+RSA transport key. The role of the on-card KMK private RSA transport key is to decrypt the sender’s
+symmetric key on behalf of the cardholder and provide it to the client application cryptographic module.
+
+A.5.1.1.1 The GENERAL AUTHENTICATE Command
+
+Listed below are the card commands sent to the PIV Card to decrypt the symmetric key. It is assumed that
+the cardholder’s PIN or OCC data has been successfully verified prior to sending the GENERAL
+AUTHENTICATE command to the card.
+
+Command 1 – GENERAL AUTHENTICATE (first chain)
+
+ CLA                 '10' indicates command chaining
+ INS                 '87'
+ P1                  '07'
+ P2                  '9D'
+ Lc                  Length of data field
+                     '7C' – L1 {'82' '00' '81' L2 {first part of C}} where C is the ciphertext to be
+ Data Field
+                     decrypted, as defined in [PKCS1, Sections 7.1.2 and 7.2.2]
+ Le                  Absent (no response expected)
+
+
+Response 1:
+
+Data Field          Absent
+SW1-SW2             '90 00' (Status word)
+
+
+
+
+                                                          44
+

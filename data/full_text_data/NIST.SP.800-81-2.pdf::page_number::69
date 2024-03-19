@@ -1,0 +1,60 @@
+                                                         SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+combination of domain/subdomain names and RR types (A, MX, NS, etc.), BIND 9 and later versions
+provide the update-policy substatement within the zone statement. The update-policy substatement bases
+these restrictions on the TSIG key. In other words, the update-policy statement specifies which TSIG keys
+(or holders of keys) are allowed to perform dynamic updates on which domains/subdomains and RR types
+within that domain/subdomain.
+
+The general form of the update-policy statement is as follows:
+
+        update-policy {
+             (grant | deny) TSIGkey nametype name [type]
+        };
+
+where the semantics of each of the statement components are as follows:
+
+        grant/deny—allow/disallow dynamic update for the combination that follows
+
+        TSIGkey—the name of the TSIG key used to authenticate the update request
+
+        nametype—can be one the following with the associated semantics:
+
+                name—restriction applies to the domain name specified in the following name field
+
+                subdomain—restriction applies to subdomains of the domain specified in the following
+                name field
+
+                wildcard—restriction applies to the set of domains specified using the wildcard syntax
+                (i.e., *) in the following name field
+
+                self—restriction applies to the domain whose name is the same as that in the TSIGkey
+                field (i.e., the domain name whose records are to be updated has the same name as the
+                key used to authenticate the dynamic update request). In this usage, the contents of the
+                name field become redundant but still should be used in the statement (i.e., the name field
+                cannot be left blank)
+
+        name—used to specify the name of the domain. The syntax used and the domains it covers are
+        based on the value used in the nametype field (e.g., if subdomain is the value of the nametype
+        field, then all subdomains of the domain name used are being covered under this statement).
+
+        type—an optional field that can contain any valid RRType (except the NSEC type) or the
+        wildcard type ‘ANY’ (ANY stands for all RR types except the NSEC type). If it is missing, it
+        denotes all RRTypes except SOA, NS, RRSIG, and NSEC. It also is possible to put in multiple
+        RRTypes separated by a space (e.g., A NS).
+
+Examples of update-policy statements and their associated semantics are given below.
+
+Suppose there is a domain sales.example.com within example.com and that name server uses a TSIG key
+that has the same name as its own domain name (i.e., sales.example.com). All dynamic updates from
+sales.example.com could be restricted to all resource records of that domain within the zone file as
+follows:
+
+        zone “example.com” {
+             type master;
+
+
+                                                  8-17
+

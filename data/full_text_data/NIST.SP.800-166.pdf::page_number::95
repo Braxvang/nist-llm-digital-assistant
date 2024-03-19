@@ -1,0 +1,51 @@
+NIST SP 800-166                                                                    DERIVED PIV APPLICATION AND
+                                                                                   DATA MODEL TEST GUIDELINES
+
+9.         Test Assertions for the Derived PIV Application Data Model
+
+This section lists the test assertions used to determine conformity to the derived test requirements
+(DTR) listed in Section 7. The Implementation Under Test (IUT), the Derived PIV Data Objects
+loaded on a Derived PIV Application by an issuer, must meet the stated objective(s) of the
+assertion by way of a test or submission of artifacts in order to be deemed conformant to the
+associated DTR(s).
+
+9.1        BER-TLV Conformance
+
+The following assumptions apply to the test assertions within this section.
+
+       1      When the length of the value field is between 0 and 127 bytes, the length field should
+              consist of a single byte where bit 8 is set to 0 and bits 7 to 1 encode the number of
+              bytes in the value field.
+
+              When the length of the value field is greater than 127 bytes, the length field consists
+              of two or more bytes. 17 The first byte is '81', '82', '83' or '84' where the low order
+              nibble of each of these possible first-byte values (1, 2, 3, or 4 respectively) encodes
+              the number of subsequent bytes in the length field. These subsequent bytes are taken
+              together in order to be a big-endian integer encoding the number of bytes in the value
+              field. Table 1 shows the encoding of the length field.
+       2      Except for the Discovery Object tag, each BER-TLV tag is encoded as three bytes.
+       3      Each data object returned is appended with a 2 byte status word.
+       4      All variable length value fields can have zero lengths, which will result in a tag length
+              field being immediately followed by the next tag, if applicable.
+       5      The final byte of the command string can be set to 0x00 to retrieve an entire data
+              object regardless of the size of that object.
+
+     Number of bytes in the         First byte               Subsequent bytes                    Length of
+           length field                                                                       the value field
+             1 byte                '00' to '7F'      None                          0 to 127
+             2 byte                    '81'          '00' to 'FF'                  0 to 255
+             3 byte                    '82'          '0000' to 'FFFF'              0 to 65 535
+             4 byte                    '83'          '000000' to 'FFFFFF'          0 to 16 777 215
+             5 byte                    '84'          '00000000' to 'FFFFFFFF'      0 to 4 294 967 295
+
+                                              Table 1 - Encoding of Length Field
+
+
+
+
+17
+     Use of the shortest encoding format is preferred.
+
+
+                                                             88
+

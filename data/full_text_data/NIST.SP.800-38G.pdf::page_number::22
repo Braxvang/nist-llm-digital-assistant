@@ -1,0 +1,54 @@
+NIST SP 800-38G                                                    METHODS FOR FORMAT-PRESERVING ENCRYPTION
+
+
+       •   radix ∈ [2 .. 216],
+       •   radix minlen ≥ 100, and
+       •   2 ≤ minlen ≤ maxlen ≤ 2 ⎣log radix (296)⎦.
+
+
+Algorithm 9: FF3.Encrypt(K, T, X)
+
+Prerequisites:
+Designated cipher function, CIPH, of an approved 128-bit block cipher;
+Key, K, for the block cipher;
+Base, radix;
+Range of supported message lengths, [minlen .. maxlen].
+
+Inputs:
+Numeral string, X, in base radix of length n, such that n ∈ [minlen .. maxlen];
+Tweak bit string, T, such that LEN(T) = 64.
+
+Output:
+Numeral string, Y, such that LEN(Y) = n.
+
+Steps:
+1.    Let u = ⌈n/2⌉; v = n – u.
+2.    Let A = X [1 .. u]; B = X [u + 1 .. n].
+3.    Let TL = T[0 .. 31] and TR = T [32 .. 63]
+4.    For i from 0 to 7:
+      i.    If i is even, let m = u and W = TR, else let m = v and W = TL.
+      ii.    Let P = W ⊕ [i]4 || [NUMradix (REV(B))]12.
+      iii Let S = REVB(CIPHREVB(K) REVB(P)).
+      iv. Let y = NUM(S).
+      v.    Let c = (NUMradix (REV(A)) + y) mod radix m.
+                               m
+      vi. Let C = REV(STR radix (c)).
+      vii. Let A = B.
+      viii. Let B = C.
+5.    Return A || B.
+
+Description:
+The “split” of the numeral string X into two substrings, A and B, is performed in Steps 1 and 2. If
+n is even, LEN(A)=LEN(B); otherwise, LEN(A)=LEN(B)+1.7 The tweak, T, is partitioned in Step 3
+into a 32-bit left tweak, TL, and a 32-bit right tweak, TR. An iteration loop for the eight Feistel
+rounds of FF3 is initiated in Step 4, executing eight substeps for each round, as follows:
+
+In Step 4i, the parity of the round number, i, determines the length, m, of the substring A, and
+whether TL or TR will be used as W in Step 4ii, in which a 32-bit encoding of i, XORed with W, is
+concatenated with a 96-bit encoding of B to produce a block, P. In Step 4iii, the block cipher
+
+7
+    If n is odd, A is one numeral longer than B, in contrast to FF1, where B is one numeral longer than A.
+
+                                                            17
+

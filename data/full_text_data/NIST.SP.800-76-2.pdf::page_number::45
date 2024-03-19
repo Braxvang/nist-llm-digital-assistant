@@ -1,0 +1,54 @@
+      When multiple samples (e.g., two single finger minutiae views) are included in one record (e.g., an INCITS 378
+      record) and the Creation Dates are different, the Creation Date shall be the earliest of the multiple views.
+5.    The Validity Period contains two dates each of which shall be coded according to Normative Note 4.
+      a.    The validity period should start at the time when the biometric data is available for use (e.g., according to
+            policy or issuance considerations). It shall be no earlier than the Creation Date. Biometric applications (e.g.,
+            authentication) should respect this date.
+      b.    [FIPS 201-2] limits the lifetime for biometric data. For facial images, agencies might reduce those limits to
+                        22
+            eight years (Creation Date to closing date), but this might vary with technical or policy factors at agency
+            discretion. Biometric ageing is considered to be a slow continuous process. This field therefore serves as an
+            advisory that biometric data should be re-collected from the Cardholder at the next opportunity. This date is
+            not intended to invalidate any function of the card (see [FIPS] for that).
+6.    For PIV the Creator field has length 18 bytes of which the first K ≤ 17 bytes shall be printable ASCII characters, and
+      the first of the remaining 18-K shall be a null terminator (zero).
+7.    This field shall contain the 25 bytes of the FASC-N component of the CHUID identifier, per [800-73, 1.8.{3,4}]. The
+      FASC-N field may be filled with zeroes in the one exceptional case where PIV registration images are being stored
+      before a FASC-N has been assigned. In such instances, the digital signature shall be regenerated once the FASC-N
+      is known.
+8.    Iris quality may be set to [-2,100]. Note that formal standardization of iris image properties and quality metrics are
+      pending in the ISO/IEC 29794-6 standard [IRISQUAL] with publications expected in late 2013 or early 2014. The
+      value -2 indicates a failure to compute, and -1 indicates no attempt to compute quality.
+
+9.3        The CBEFF Signature Block
+The CBEFF_SIGNATURE_BLOCK contains the digital signature of the biometric data and thus facilitates the verification
+of the integrity of the biometric data. The process of generating a CBEFF_SIGNATURE_BLOCK is described as follows.
+The CBEFF_SIGNATURE_BLOCK shall be encoded as a CMS external digital signature as defined in [RFC5652]. The
+digital signature shall be computed over the entire CBEFF structure except the CBEFF_SIGNATURE_BLOCK itself
+(which means that it shall include the CBEFF_HEADER and the biometric records). The algorithm and key size
+specifications for the digital signature shall be implemented according to [800-78].
+The CMS encoding of the CBEFF_SIGNATURE_BLOCK is as a SignedData type, and shall include the following
+information:
+―     The message shall include a version field specifying version v3
+―     The digestAlgorithms field shall be as specified in [SP 800-78]
+―     The encapcontentInfo shall:
+            −   Specify an eContentType of id-PIV-biometricObject
+            −   Omit the eContent field
+―     If the signature on the biometric was generated with the same key as the signature on the CHUID, the certificates
+      field shall be omitted
+―     If the signature on the biometric was generated with a different key than the signature on the CHUID, the
+      certificates field shall include only a single certificate, which can be used to verify the signature in the SignerInfo
+      field. The certificate shall be an X.509 digital signature certificate that has been issued in accordance with Section
+      4.2.1 of FIPS 201-2
+―     The crls field shall be omitted
+―     signerInfos shall be present and include only a single SignerInfo
+―     The SignerInfo shall:
+
+22
+  The eight year duration comes from a study of the effect of face ageing on recognition accuracy [FACEPERF]. Because face-
+ based manual verification is common, this duration is adopted as a default. Iris seems to have longer-term stability [IREX-VI].
+ There are no published studies of long term fingerprint stability.
+
+
+                                                                                                                                   37
+

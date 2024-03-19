@@ -1,0 +1,58 @@
+NIST SP 800-85A-4                                      PIV CARD APPLICATION & MIDDLEWARE
+                                                                INTERFACE TEST GUIDELINES
+
+ Reference(s)       1. SP 800-73-4 Part 2, Section 3.2.1
+                    2. AS01.16, AS05.01, AS05.12 through AS05.22A, AS05.18A-R4,
+                       AS05.22C-R4, and AS05.22D-R4.
+ Precondition(s)    1. The PIV Card Application PIN and Global PIN (if supported) are
+                       each 6 bytes in length.
+                    2. PIV Card Application PIN is recorded.
+                    3. Global PIN (if supported) is recorded.
+                    4. Cardholder fingerprint minutia for on-card comparison is
+                       recorded (if OCC is implemented).
+                    5. Pairing code (if supported) is recorded.
+                    6. The reset retry counter values of PIV Card Application PIN, Global
+                       PIN (if implemented), and OCC (if implemented) are recorded.
+                    7. The card is not blocked and security status is set to FALSE for all
+                       authenticators.
+ Test Scenario      1. Send SELECT card command with
+                       • AID == 'A0 00 00 03 08 00 00 10 00 01 00'
+                    2. Send GET DATA command with
+                       • Data field of the command containing the tag of the
+                          Discovery Object. Parse the PIN Usage Policy to
+                          discover the PIN and OCC supported by the card. Perform
+                          the test for all cases that match the PIN Usage Policy
+                       2a. Test case for the mandatory PIV Card Application PIN
+                            ('80')
+                            1. Send GET DATA command with
+                                • Data field of the command containing the tag
+                                   of the Cardholder Fingerprints data object
+                            2. Send VERIFY card command with
+                                • P2, key reference value is set to '80'
+                                • Data field of the command will contain the
+                                   correct PIV Card Application PIN value, padded
+                                   with 'FF' to complete the total length of the
+                                   value to 8 bytes
+                            3. Send GET DATA command with
+                                • Data field of the command containing the tag
+                                   of the Cardholder Fingerprints data object
+                            4. Reset the security status of the '80' key
+                               reference by sending the VERIFY command with
+                                • P2, key reference value is set to '80'
+                                • P1 parameter is 'FF' and both L c and the data
+                                   field are absent
+                            5. Send GET DATA command with
+                                • Data field of the command containing the tag
+                                   of the Cardholder Fingerprints data object
+                            6. Send VERIFY card command with
+                                • P2, key reference value is set to '80'
+                                • Data field of the command will contain the
+                                   correct PIV Card Application PIN value, NOT
+                                   padded with 'FF', so that the total length of
+                                   the value is less than 8 bytes
+                            7. Send VERIFY card command with
+
+
+
+                                    C-9
+

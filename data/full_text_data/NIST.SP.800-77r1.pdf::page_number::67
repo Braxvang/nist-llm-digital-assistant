@@ -1,0 +1,54 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                           GUIDE TO IPSEC VPNS
+
+
+                                                                                              5.1.2    The Security Policy Database (SPD)
+
+                                                                                              The kernel maintains a list of IPsec policies in the SPD. The policy describes the nature of the
+                                                                                              traffic that matches a policy rule and links it to the state used to encrypt or decrypt the packet.
+                                                                                              Policies without states are used for on-demand IPsec connections. Figure 14 shows examples of
+                                                                                              two policies corresponding to the SAs in Figure 12.
+
+                                                                                              src 192.168.13.6/32 dst 0.0.0.0/0
+                                                                                                  dir out priority 1040383 ptype main
+                                                                                                  tmpl src 198.51.100.1 dst 203.0.113.1
+                                                                                                      proto esp reqid 1 mode tunnel
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              src 0.0.0.0/0 dst 192.168.13.6/32
+                                                                                                  dir in priority 1040383 ptype main
+                                                                                                  tmpl src 203.0.113.1 dst 198.51.100.1
+                                                                                                      proto esp reqid 1 mode tunnel
+                                                                                                                    Figure 14: Examples of Policies Corresponding to Figure 12 on Linux
+
+                                                                                              The IPsec security policy information consists of:
+                                                                                                   •   The IP addresses of the IPsec gateways
+                                                                                                   •   The source IP addresses allowed in the classless inter-domain routing (CIDR) format
+                                                                                                   •   The destination IP addresses in CIDR format
+                                                                                                   •   The transport protocol covered (0 for all)
+                                                                                                   •   The source and destination port ranges (0 for all) 41
+                                                                                                   •   A link to the associated SA state
+                                                                                                   •   Direction (inbound, outbound, or forward 42)
+                                                                                                   •   The priority of the policy compared to other policy rules
+                                                                                                   •   IPsec protocol (ESP, AH, IPComp)
+                                                                                                   •   Mode (transport or tunnel)
+                                                                                                   •   IPComp information
+
+                                                                                              Using the SPD and SAD, packets are processed for encryption and decryption, and all of the
+                                                                                              security policies are applied. If a policy violation is detected, the packet is dropped (e.g., when
+                                                                                              an encrypted packet is decrypted into a packet with a source address that is not allowed by the
+                                                                                              security policy of the SA). 43 A policy can also point to a non-IPsec SA target. Commonly
+
+
+
+
+                                                                                              41   For protocols without ports but with types, such as ICMP, the types are encoded as port numbers.
+                                                                                              42   Not all IPsec implementations have a forward policy. Think of it as a firewall within the IPsec subsystem.
+                                                                                              43   The SAD and SPD can be seen using the “ip xfrm” command on Linux. On BSD systems, the “setkey” tool can be used.
+
+
+
+                                                                                                                                                         50
+

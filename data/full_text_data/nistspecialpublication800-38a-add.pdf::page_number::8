@@ -1,0 +1,52 @@
+                      Addendum to NIST Special Publication 800-38A
+
+
+restricted to multiples of 8, so that the input strings may be represented with bytes/octets.
+The input lengths that an implementation allows are called the valid lengths.
+
+2 Specification of CBC-CS1
+
+Algorithm: CBC-CS1-Encrypt
+
+Input:           plaintext P, such that len(P) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          ciphertext C, such that len(C)=len(P).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(P), let d=len(P)-(n-1)⋅b, and let P1,
+         P2, … , Pn-1, Pn* be the unique sequence of bit strings such that:
+                a) P = P1||P2||…||Pn-1||Pn*; and
+                b) P1, P2, … and Pn-1 are complete blocks.
+         Consequently, len(Pn*)=d, and 1≤d≤b, so that Pn* is either a complete block or a
+         nonempty partial block.
+
+2.       Let PAD be the bit string consisting of b-d ‘0’ bits, and let Pn= Pn*||PAD. Note
+         that if Pn* is a complete block, then PAD is the empty string, and Pn= Pn*.
+
+3.       Apply CBC encryption to the plaintext (P1, P2, … Pn-1, Pn) with initialization
+         vector IV and key K to produce (C1, C2, … Cn-1, Cn).
+
+4.       Let Cn-1* = MSBd(Cn-1).
+
+5.       Return C1||C2||…||Cn-2||Cn-1*||Cn.
+
+When Pn* is a complete block, CBC-CS1-Encrypt is equivalent to CBC encryption.
+
+Diagram: Figure 1 below illustrates the CBC-CS1-Encrypt algorithm for the case that
+Pn* is a partial block, i.e., d<b. The bolded rectangles contain the inputs and outputs.
+The dotted rectangles provide alternate representations of two blocks in order to illustrate
+the role of the “stolen” ciphertext.
+
+In particular, the string of the b-d rightmost bits of Cn-1, denoted Cn-1**, becomes the
+padding for the input block to the final invocation of the block cipher within the
+execution of CBC mode. The ciphertext that is returned in Step 5 above omits Cn-1**,
+because it can be recovered from Cn during decryption.
+
+
+
+
+                                                2
+

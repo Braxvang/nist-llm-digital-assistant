@@ -1,0 +1,45 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+   11. Set the internal state for the new instantiation (e.g., as indicated by state_handle) to the
+       initial values for the internal state (i.e., set the working_state to the values returned as
+       initial_working_state in step 9) and any other values required for the working_state (see
+       Section 10), and set the administrative information to the appropriate values (e.g., the
+       values of security_strength and the prediction_resistance_flag).
+   12. Return (SUCCESS, state_handle).
+
+9.2 Reseeding a DRBG Instantiation
+
+The reseeding of an instantiation is not required, but is recommended whenever a consuming
+application and implementation are able to perform this process. Reseeding will insert additional
+entropy into the generation of pseudorandom bits. Reseeding may be:
+    •   Explicitly requested by a consuming application,
+    •   Performed when prediction resistance is requested by a consuming application,
+    •   Triggered by the generate function when a predetermined number of pseudorandom
+        outputs have been produced or a predetermined number of generate requests have been
+        made (i.e., at the end of the seedlife), or
+    •   Triggered by external events (e.g., whenever entropy is available).
+The reseed function:
+   1. Checks the validity of the input parameters,
+   2. Obtains entropy input from a randomness source that supports the security strength of the
+      DRBG, and
+   3. Using the reseed algorithm, combines the current working state with the new entropy
+      input and any additional input to determine the new working state.
+Let working_state be the working state for the particular DRBG instantiation (e.g.,
+HMAC_DRBG) , let min_length and max_ length be defined for each DRBG mechanism, and
+let Reseed_algorithm be a call to the appropriate reseed algorithm for the DRBG mechanism
+(see Section 10).
+The following or an equivalent process shall be used to reseed the DRBG instantiation.
+Reseed_function (state_handle, prediction_resistance_request, additional_input):
+   1) state_handle: A pointer or index that indicates the internal state to be reseeded. If a state
+      handle is not used by an implementation because the implementation does not support
+      multiple simultaneous instantiations, a state_handle is not provided as input. Since there
+      is only a single internal state in this case, reseed process step 1 obtains the contents of the
+      internal state, and reseed process step 6 replaces the working_state of this internal state.
+
+
+
+
+                                                 29
+

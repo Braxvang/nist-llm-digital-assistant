@@ -1,0 +1,57 @@
+                                                          SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+Suppose the enterprise example.com decides that it no longer needs a separate set of e-mails for people in
+the marketing department. This change will require removal of the mailserver (RRType = “MX”) from
+the domain marketing.example.com. The modified NSEC RR will now read as follows:
+
+        marketing.example.com.              IN    NSEC       sales.example.com. (A RRSIG
+        NSEC)
+
+Adding a new domain name to the zone:
+
+To enable customers to order goods online, the enterprise decides to add a separate domain
+websales.example.com. A separate name server and a set of new hosts also will be added. This new
+domain requires the following changes to the zone file:
+
+    •   A new NSEC RR (or NSEC3 RR) for the newly added domain. In this case, a NSEC RR for the
+        domain name websales.example.com should be added. Its location in the canonical order must be
+        determined. This NSEC RR should be set to point to the next domain name in the new canonical
+        order. The presence of the name server and hosts should be reflected in this new RR (through the
+        NS and A codes in the RR types list field) as shown below, and the associated RRSIG RR must
+        be generated. Also note that the new delegation is unsecure, since there is no DS RR indicated in
+        the RR list. Any client looking in the domain should not expect DNSSEC information in replies.
+        websales.example.com.              IN    NSEC      www.example.com. (A NS RRSIG
+        NSEC)
+
+    •   The NSEC RR (or NSEC3 RR) pertaining to the domain name just preceding the added domain
+        (in the canonical order) has to be modified to point to the newly added domain. The NSEC RR
+        should now point to the domain websales.example.com. A new RRSIG RR must be generated
+        (signed by the ZSK) covering the newly generated NSEC RR.
+        sales.example.com.            IN    NSEC     websales.example.com. (A RRSIG
+        NSEC)
+
+
+Deleting a domain name from the zone:
+
+Suppose the enterprise has decided that all sales will be made through the Web only. Because hosts have
+been created to handle this function in the new domain websales.example.com, the hosts in the domain
+sales.example.com are no longer needed because usage of the applications that reside on them has been
+discontinued. This implies that all RRs belonging to a domain should be removed from the zone. This
+change involves the following operations:
+
+    •   The NSEC RR (or NSEC3 RR) corresponding to the deleted domain should be removed, so the
+        NSEC RR pertaining to domain sales.example.com has to be deleted.
+
+    •   The NSEC RR (or NSEC3 RR) pertaining to the domain name just preceding the deleted domain
+        has to be modified to point to the domain name immediately following the deleted domain (i.e.,
+        pointed to by the deleted NSEC RR). In this case, the NSEC RR for marketing.example.com
+        should point to the domain websales.example.com as follows:
+        marketing.example.com.              IN    NSEC websales.example.com. (A MX
+        RRSIG NSEC)
+
+
+
+                                                   9-17
+

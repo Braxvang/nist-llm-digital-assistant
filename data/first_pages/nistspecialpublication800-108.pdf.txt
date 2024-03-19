@@ -1,0 +1,879 @@
+      Withdrawn NIST Technical Series Publication
+
+                                           Warning Notice
+
+The attached publication has been withdrawn (archived), and is provided solely for historical purposes.
+It may have been superseded by another publication (indicated below).
+
+Withdrawn Publication
+Series/Number            Special Publication (SP) 800-108
+Title                    Recommendation for Key Derivation Using Pseudorandom Functions (Revised)
+Publication Date(s)      October 2009
+Withdrawal Date          August 17, 2022
+Withdrawal Note          SP 800-108 is withdrawn and superseded in its entirety by NIST SP 800-108r1
+Superseding Publication(s) (if applicable)
+
+The attached publication has been superseded by the following publication(s):
+Series/Number            NIST SP 800-108r1
+Title                    Recommendation for Key Derivation Using Pseudorandom Functions
+Author(s)                Lily Chen
+Publication Date(s)      August 2022
+URL/DOI                  https://doi.org/10.6028/NIST.SP.800-108r1
+Additional Information (if applicable)
+Contact                  Computer Security Division (Information Technology Laboratory)
+Latest revision of the
+attached publication
+Related Information      https://csrc.nist.gov/publications/detail/sp/800-108/rev-1/final
+Withdrawal
+Announcement Link
+
+
+
+
+Date updated: August 17, 2022
+            NIST Special Publication 800-108
+Recommendation for Key Derivation
+    Using Pseudorandom Functions
+                                                 (Revised)
+
+                                                    Lily Chen
+
+
+
+                               Computer Security Division
+                       Information Technology Laboratory
+
+
+
+
+COMPUTER SECURITY
+
+                                             October 2009
+
+
+
+
+                              U.S. Department of Commerce
+                                             Gary Locke, Secretary
+
+              National Institute of Standards and Technology
+                                 Patrick Gallagher, Deputy Director
+SP 800-108        Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+
+                                       Abstract
+
+This Recommendation specifies techniques for the derivation of additional keying material
+from a secret key, either established through a key establishment scheme or shared through
+some other manner, using pseudorandom functions.
+KEY WORDS: key derivation, pseudorandom function
+
+
+
+
+                                            2
+SP 800-108        Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+
+                                 Acknowledgements
+The author, Lily Chen of the National Institute of Standards and Technology (NIST),
+would like to thank her colleagues, Elaine Barker, William Burr, Quynh Dang, Donna
+Dodson, Morris Dworkin, Katrin Hoeper, Jim Nechvatal, Tim Polk, Allen Roginsky of
+NIST, and Rich Davis of National Security Agency, for helpful discussions and valuable
+comments.
+The author also gratefully appreciates the thoughtful and instructive comments received
+during the public comment period, which helped to improve the quality of this publication.
+
+
+
+
+                                            3
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+
+Authority
+This document has been developed by the National Institute of Standards and Technology
+(NIST) in furtherance of its statutory responsibilities under the Federal Information
+Security Management Act (FISMA) of 2002, Public Law 107-347.
+NIST is responsible for developing standards and guidelines, including minimum
+requirements, for providing adequate information security for all agency operations and
+assets, but such standards and guidelines shall not apply to national security systems. This
+guideline is consistent with the requirements of the Office of Management and Budget
+(OMB) Circular A-130, Section 8b(3), Securing Agency Information Systems, as analyzed
+in A-130, Appendix IV: Analysis of Key Sections. Supplemental information is provided
+in A-130, Appendix III.
+This Recommendation has been prepared for use by federal agencies. It may be used by
+nongovernmental organizations on a voluntary basis and is not subject to copyright.
+(Attribution would be appreciated by NIST.)
+Nothing in this Recommendation should be taken to contradict standards and guidelines
+made mandatory and binding on federal agencies by the Secretary of Commerce under
+statutory authority. Nor should these guidelines be interpreted as altering or superseding
+the existing authorities of the Secretary of Commerce, Director of the OMB, or any other
+federal official.
+Conformance testing for implementations of key derivation schemes, as specified in this
+Recommendation, will be conducted within the framework of the Cryptographic Module
+Validation Program (CMVP), a joint effort of NIST and the Communications Security
+Establishment Canada. An implementation of a key derivation function must adhere to the
+requirements in this Recommendation in order to be validated under the CMVP. The
+requirements of this Recommendation are indicated by the word “shall.”
+
+
+
+
+                                             4
+SP 800-108                 Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+
+Table of Contents
+1.           Introduction........................................................................................ 6
+2.           Scope and Purpose ............................................................................. 6
+3.           Definitions, Symbols and Abbreviations ........................................... 6
+             3.1       Definitions................................................................................................ 6
+             3.2       Symbols and Abbreviations ..................................................................... 8
+4.           Pseudorandom Function (PRF).......................................................... 9
+5.           Key Derivation Functions (KDF) .................................................... 10
+             5.1       KDF in Counter Mode ........................................................................... 12
+             5.2       KDF in Feedback Mode ......................................................................... 13
+             5.3       KDF in Double-Pipeline Iteration Mode................................................ 14
+6.           Key Hierarchy .................................................................................. 16
+7.           Security Considerations ................................................................... 16
+             7.1       Cryptographic Strength .......................................................................... 16
+             7.2       The Length of the Key Derivation Key.................................................. 17
+             7.3       Converting Keying Material to Cryptographic Keys ............................. 17
+             7.4       Input Data Encoding .............................................................................. 18
+             7.5       Key Separation ....................................................................................... 18
+             7.6       Context Binding ..................................................................................... 19
+Appendix A: References (Informative) ........................................................ 20
+Appendix B: Revision History...................................................................... 21
+
+
+
+
+Figures
+Figure 1: KDF in Counter Mode................................................................................................... 13
+Figure 2: KDF in Feedback Mode ................................................................................................ 14
+Figure 3: KDF in Double-Pipeline Iteration Mode ....................................................................... 15
+Figure 4: Key Hierarchy................................................................................................................ 16
+
+
+
+                                                                 5
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+      1. Introduction
+When parties share a secret symmetric key (e.g., upon a successful execution of a key-
+establishment scheme as specified in [1] and [2]), it is often the case that additional keys
+will be needed (e.g. as described in [3]). Separate keys may be needed for different
+cryptographic purposes – for example, one key may be required for an encryption
+algorithm, while another key is intended for use by an integrity protection algorithm, such
+as a message authentication code. At other times, the distinct keys required by multiple
+entities may be generated by a trusted party from a single master key. Key derivation
+functions are used to derive such keys.
+
+      2. Scope and Purpose
+This Recommendation specifies several families of key derivation functions that use
+pseudorandom functions. These key derivation functions can be used to derive additional
+keys from a key that has been established through an automated key-establishment scheme
+(e.g. as defined in [1] and [2]), or from a pre-shared key (e.g., a manually distributed key).
+Effectively, the key derivation functions specified in this Recommendation provide the key
+expansion functionality described in [4], where key derivation is portrayed as a process
+that potentially requires two separate steps: 1) randomness extraction (to obtain an initial
+key) and 2) key expansion (to produce additional keys from that initial key and other data).
+Note that the key-agreement schemes specified in [1] and [2] already incorporate the use of
+a (hash-based) key derivation function. If the key used as an input to one of the key
+derivation functions specified in this Recommendation has been established by using one
+of those key-agreement schemes, then, for all intents and purposes, that key has been
+obtained by employing one of the key derivation functions defined in [1] and [2] as a
+randomness extractor.
+
+      3. Definitions, Symbols and Abbreviations
+3.1      Definitions
+Approved            FIPS approved or NIST Recommended. An algorithm or technique that
+                    is either 1) specified in a FIPS or NIST Recommendation, or 2)
+                    adopted in a FIPS or NIST Recommendation or 3) specified in a list of
+                    NIST Approved security functions.
+Cryptographic       A binary string used as a secret parameter by a cryptographic
+key                 algorithm. In this Recommendation, a cryptographic key shall be either
+                    a truly random binary string of a length specified by the cryptographic
+                    algorithm or a pseudorandom binary string of the specified length that
+                    is computationally indistinguishable from one selected uniformly at
+                    random from the set of all binary strings of that length.
+Entity              An individual (person), organization, device or a combination thereof.
+                    “Party” is a synonym. In this Recommendation, an entity may be a
+                    functional unit that executes certain processes.
+
+
+                                              6
+SP 800-108        Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+Hash function     A function that maps a bit string of arbitrary length to a fixed length bit
+                  string. Approved hash functions are designed to satisfy the following
+                  properties:
+                     1. (One-way) It is computationally infeasible to find any input that
+                        maps to any pre-specified output, and
+                     2. (Collision resistant) It is computationally infeasible to find any
+                        two distinct inputs that map to the same output.
+                  Approved hash functions are specified in FIPS 180-3 [6].
+Key derivation    The process that derives keying material from a key.
+
+Key derivation    A function that, with the input of a cryptographic key and other data,
+function          generates a binary string, called keying material.
+Key derivation    A key used as an input to a key derivation function to derive other
+key               keys.
+Key-              A procedure, conducted by two or more participants, after which the
+establishment     resultant keying material is shared by all participants.
+Key hierarchy     A key hierarchy is a multiple-level tree structure, such that each node
+                  represents a key, and each branch, pointing from one node to another,
+                  indicates a key derivation from one key to another key.
+Keying material   A binary string, such that any non-overlapping segments of the string
+                  with the required lengths can be used as symmetric cryptographic keys.
+Message           A family of cryptographic algorithms that is parameterized by a
+authentication    symmetric key. Each of the algorithms can act on input data of
+code              arbitrary length to produce an output value of a specified length (called
+                  the MAC of the input data). A MAC algorithm can be used to provide
+                  data origin authentication and data integrity.
+Nonce             A time-varying value that has at most a negligible chance of repeating
+                  – for example, a random value that is generated anew for each use, a
+                  timestamp, a sequence number, or some combination of these.
+Pipeline          A term used to describe a series of sequential PRF executions.
+Pseudorandom      A function that can be used to generate output from a random seed and
+function          a data variable such that the output is computationally indistinguishable
+                  from truly random output.
+
+
+
+
+                                            7
+SP 800-108          Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+Security strength   A measure of the computational complexity associated with recovering
+                    certain secret and/or security-critical information concerning a given
+                    cryptographic algorithm from known data (e.g. plaintext/ciphertext
+                    pairs for a given encryption algorithm). In this Recommendation, the
+                    security strength of a key derivation function is measured by the work
+                    required to distinguish the output of the KDF from a bit string selected
+                    uniformly at random from the set of all bit strings with the same length
+                    as the output of the KDF, under the assumption that the key derivation
+                    key is the only unknown input to the KDF.
+Shall               This term is used to indicate a requirement of a Federal Information
+                    Processing Standard (FIPS) or a requirement that needs to be fulfilled
+                    to claim conformance to this Recommendation. Note that shall may be
+                    coupled with not to become shall not.
+Should              This term is used to indicate an important recommendation. Ignoring
+                    the recommendation could result in undesirable results. Note that
+                    should may be coupled with not to become should not.
+
+3.2      Symbols and Abbreviations
+A(i)                  The output of the ith iteration in the first pipeline in a double
+                      pipeline iteration mode.
+A || B                The concatenation of binary strings A and B.
+CMAC                  Cipher-based Message Authentication Code (as specified in NIST
+                      SP 800-38B [7]).
+h                     An integer whose value is the length of the output of the PRF in
+                      bits.
+H()                   A hash function.
+HMAC                  Keyed-hash Message Authentication Code (as specified in FIPS
+                      198-1 [8]).
+i                     The counter for each iteration, which is represented as a binary
+                      string of length r when it is an input to each iteration of the PRF.
+IV                    A binary string that is used as an initial value in computing the first
+                      iteration in feedback mode. It may be an empty string.
+KDF                   Key Derivation Function.
+K(i)                  The output of the ith iteration of the PRF.
+KI                    A key derivation key. For a key derivation, KI is used (along with
+                      other data) to derive keying material KO.
+KO                    Keying material that is derived from a key derivation key KI and
+                      other data.
+
+
+                                              8
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+L                    An integer specifying the length of the derived keying material KO
+                     in bits, which is represented as a binary string when it is an input to
+                     a key derivation function.
+MAC                  Message Authentication Code.
+n                    The number of iterations of the PRF needed to generate L bits of
+                     keying material.
+PRF                  Pseudorandom Function.
+PRF(s, x)            A pseudorandom function with seed s and input data x.
+r                    An integer, smaller or equal to 32, whose value is the length of the
+                     binary representation of the counter i when i is an input in counter
+                     mode or (optionally) in feedback mode and double-pipeline
+                     iteration mode of each iteration of the PRF.
+|S|                  The length (in bits) of binary string S.
+[T]2                 An integer T represented as a binary string (denoted by the “2”)
+                     with a length specified by the function, an algorithm, or a protocol
+                     which uses T as an input.
+w                    An integer that denotes the length of a key derivation key in bits.
+{X}                  Used to indicate that data X is an optional input to the key
+                     derivation function.
+⎡X⎤                  The smallest integer that is larger than or equal to X. The ceiling of
+                     X.
+∅                    The empty binary string. That is, for any binary string A, ∅ || A =
+                     A || ∅ = A.
+0x00                 An all zero octet.
+
+
+
+      4. Pseudorandom Function (PRF)
+A pseudorandom function is the basic building block in constructing a key derivation
+function in this Recommendation. Generally, a pseudorandom function family {PRF(s, x) |
+s ∈ S} consists of polynomial time computable functions with an index (also called a seed)
+s and input variable x, such that when s is randomly selected from S and not known to
+observers, PRF(s, x) is computationally indistinguishable from a random function defined
+on the same domain with output to the same range as PRF(s, x). For a formal definition of
+a pseudorandom function, please refer to [9].
+When a cryptographic key KI is regarded as the seed, that is, s = KI, the output of the
+pseudorandom function can be used as keying material. In Section 5, several families of
+PRF-based key derivation functions are defined without describing the internal structure of
+the PRF. For key derivation, this Recommendation approves the use of either the keyed-
+
+
+                                             9
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+hash Message Authentication Code (HMAC) specified in [8] or the cipher-based Message
+Authentication Code (CMAC) specified in [7] as the pseudorandom function. For a given
+KDF using HMAC or CMAC, the key KI is assumed to be computationally
+indistinguishable from one that has been selected uniformly at random from the set of all
+the binary strings with length of |KI|.
+Note that [1] and [2] specify additional (hash-based) key derivation functions that are
+tailored to the needs of the key establishment schemes described in those documents.
+
+   5. Key Derivation Functions (KDF)
+This Section defines several families of key derivation functions that use PRFs. For the
+purposes of this Recommendation, a key derivation function (KDF) is a function with
+which an input key and other input data are used to generate (i.e., derive) keying material
+that can be employed by cryptographic algorithms. In other words, the KDFs specified
+here provide a key-expansion capability (as noted in Section 2).
+The key that is input to a key derivation function is called a key derivation key. To comply
+with this Recommendation, a key derivation key shall be a cryptographic key (see Section
+3.1). The key derivation key used as an input to one of the key derivation functions
+specified in this Recommendation can be generated by an approved cryptographic random
+bit generator (e.g., by a deterministic random bit generator of the type specified in [5]), or
+by an approved automated key-establishment process (e.g., as defined in [1] and [2]).
+When the key derivation key is established through an automated key-establishment
+process, the key derivation key shall be a segment of the secret keying material that results
+from that process. The nomenclature secret keying material is intended to distinguish the
+(pseudo)random binary strings output by such a process from various precursors, such as
+shared secret values computed through algebraic operations on the public and private
+values in a Diffie-Hellman key-agreement scheme (e.g., gxy mod p ).
+Any disjoint segments of the derived keying material (with the required lengths) can be
+used as cryptographic keys for the corresponding algorithms. However, in order to make
+sure that different parties will obtain the same keys from the derived keying material, the
+cryptographic scheme employing a KDF must define the way to convert (i.e., parse) the
+keying material into different keys. For example, when 256 bits of keying material are
+derived, the scheme may specify that the first 128 bits will be used as a key for a message
+authentication code and that the second 128 bits will be used as an encryption key for a
+given encryption algorithm.
+The KDFs specified in this Recommendation are constructed using PRFs (see Section 4).
+Depending on the intended length of the keying material to be derived, the KDF may
+require multiple invocations of the PRF. A way to iterate the multiple invocations is called
+a mode of iteration. In this Recommendation, a counter mode is specified in Section 5.1, a
+feedback mode in Section 5.2, and a double-pipeline iteration mode in Section 5.3. In
+keeping with the terminology above, the output of a key derivation function is called the
+derived keying material and may subsequently be segmented into multiple keys.
+
+
+
+
+                                             10
+SP 800-108              Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+To define key derivation functions, the following notations are used. Some of the notations
+have been defined in Section 3.2. They are repeated here for easy reference.
+    1) KI – Key derivation key, a key that is used as an input to a key derivation function
+       (along with other input data) to derive keying material. When HMAC is used as
+       the PRF, KI is used as the key, and the other input data is used as the text as defined
+       in [8]. When CMAC is used as the PRF, KI is used as the block cipher key, and the
+       other input data is used as the message as defined in [7].
+    2) KO – Keying material output from a key derivation function specified in this
+       Recommendation, a binary string of the required length, which is derived using a
+       key derivation key.
+    3) Label – A string that identifies the purpose for the derived keying material, which
+       is encoded as a binary string. The encoding method for the Label is defined in a
+       larger context, for example, in the protocol that uses a KDF.
+    4) Context – A binary string containing the information related to the derived keying
+       material. It may include identities of parties who are deriving and/or using the
+       derived keying material and, optionally, a nonce known by the parties who derive
+       the keys.
+    5) IV – A binary string that is used as an initial value in computing the first iteration
+       in the feedback mode. It can be either public or secret. It may be an empty string.
+    6) L – An integer specifying the length (in bits) of the derived keying material KO. L is
+       represented as a binary string when it is an input to a key derivation function. The
+       length of the binary string is specified by the encoding method for the input data.
+    7) h – An integer that indicates the length (in bits) of the output of the PRF.
+    8) n – An integer whose value is the number of iterations of the PRF needed to
+       generate L bits of keying material.
+    9) i – A counter, a binary string of length r that is an input to each iteration of a PRF
+       in counter mode and (optionally) in feedback mode and double-pipeline iteration
+       mode.
+    10) r – An integer, smaller or equal to 32, that indicates the length of the binary
+       representation of the counter i.
+    11) {X} – Used to indicate that the data X is an optional input to the key derivation
+       function.
+    12) 0x00 – An all zero octet. An optional data field used to indicate a separation of
+       different variable length data fields 1 .
+
+
+1
+ This indicator may be considered as a part of the encoding method for the input data and can be replaced by
+other indicators, for example, an indicator to represent the length of the variable length field. If, for a specific
+KDF, only data fields with identical length are used, then the indicator may be omitted.
+
+
+                                                        11
+SP 800-108          Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+A key derivation function iterates a pseudorandom function n times and concatenates the
+outputs until L bits of keying material are generated, where n = ⎡L/h⎤. For counter mode,
+n shall not be larger than 2r-1, where r ≤ 32 is the binary length of the counter. For
+feedback mode and double-pipeline iteration mode, n is limited to 232-1 in this section
+based on the fact that L = (232-1) h bits keying material is far more than enough for most
+applications. Notice that in these two modes, even though the counter is used as an input, it
+does not affect this limit. However, for each KDF or an application which uses a KDF, a
+smaller limit can be applied to the number of iterations.
+For each of the iterations of the PRF, the key derivation key KI is used as the key, and the
+input data consists of an iteration variable and a string of fixed input data. Depending on
+the mode of iteration, the iteration variable could be a counter, the output of the PRF from
+the previous iteration, a combination of both, or an output from the first pipeline iteration
+in the case of double-pipeline iteration mode. In the following key derivation functions, the
+fixed input data is a concatenation of a Label, a separation indicator 0x00, the Context, and
+[L]2. One or more of these fixed input data fields may be omitted unless required for
+certain purposes as discussed in Section 7.5 and Section 7.6.
+The length for each data field and an order shall be defined unambiguously. For example,
+the length and the order may be defined as a part of a KDF specification or by the protocol
+where the KDF is used. In each of the following sections, a specific order for the feedback
+value, the counter, the Label, the separation indicator 0x00, the Context, and [L]2 is used,
+assuming that each of them is represented with a specific length. This Recommendation
+specifies several families of KDFs. Alternative orders for the input data fields may be used
+for different KDFs.
+
+5.1 KDF in Counter Mode
+This section specifies a family of KDFs that uses the counter mode. In counter mode, the
+output of the PRF is computed with a counter as the iteration variable. The mode is defined
+as follows.
+Fixed values:
+                1. h - The length of the output of the PRF in bits, and
+                2. r - The length of the binary representation of the counter i.
+Input: KI, Label, Context, and L.
+Process:
+   1. n := ⎡L/h⎤.
+   2. If n > 2r-1, then indicate an error and stop.
+   3. result(0):= ∅.
+   4. For i = 1 to n, do
+       a. K(i) := PRF (KI, [i]2 || Label || 0x00 || Context || [L]2)
+
+
+
+                                              12
+SP 800-108           Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+         b. result(i) := result(i-1) || K(i).
+   5. Return: KO := the leftmost L bits of result(n).
+Output: KO.
+In each iteration, the fixed input data is the string Label || 0x00 || Context || [L]2. The
+counter [i]2 is the iteration variable and is represented as a binary string of r bits. The KDF
+in counter mode is illustrated in Figure 1.
+ Fixed Input data
+
+    KI
+                     i=1              i=2                        i=n
+
+
+
+
+                    PRF              PRF                          PRF
+
+
+
+
+                     K(1)            K(2)             ……          K(n)
+
+
+                                    KO, L-bits
+
+
+Figure 1: KDF in Counter Mode
+
+5.2 KDF in Feedback Mode
+This section specifies a family of KDFs that uses the feedback mode. In feedback mode,
+the output of the PRF is computed using the result of the previous iteration and, optionally,
+using a counter as the iteration variable(s). The mode is defined as follows. (Note that
+when L ≤ h, IV = ∅, and the counter is used, the feedback mode will generate an output
+that is identical to the output of the counter mode specified in Section 5.1.)
+Fixed values:
+                1. h - The length of the output of the PRF in bits, and
+                2. r - The length of the binary representation of the counter i. r is specified
+                       only when a counter is used as an input.
+Input: KI, Label, Context, IV, and L.
+Process:
+         1. n: = ⎡L/h⎤.
+         2. If n > 232 -1, then indicate an error and stop.
+
+
+                                                 13
+SP 800-108             Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+       3. result(0):= ∅ and K(0):= IV.
+       4. For i = 1 to n, do
+              a.      K(i) := PRF (KI, K(i-1) {|| [i]2 }|| Label || 0x00 || Context || [L]2)
+              b.      result(i) := result(i-1) || K(i)
+       5.    Return: KO := the leftmost L bits of result(n).
+Output: KO.
+In each iteration, the fixed input data is the string Label || 0x00 || Context || [L]2. The
+iteration variable is K(i-1){|| [i]2}. The KDF in feedback mode is illustrated in Figure 2.
+ Fixed Input data
+
+       KI
+                     {i = 1}          {i = 2}                      {i = n}
+    K(0)
+
+
+
+                     PRF              PRF                          PRF
+
+
+
+
+                      K(1)            K(2)             ……           K(n)
+
+
+                                     KO, L-bits
+
+
+Figure 2: KDF in Feedback Mode
+
+5.3 KDF in Double-Pipeline Iteration Mode
+For a KDF in the counter mode or feedback mode, a PRF is iterated in a single pipeline.
+This section specifies a family of KDFs that iterates a PRF in two pipelines. In the first
+iteration pipeline, a sequence of secret values A(i) is generated, each of which is used as
+an input to the respective PRF iteration in the second pipeline.
+Fixed values:
+                   1. h - The length of the output of the PRF in bits, and
+                   2. r - The length of the binary representation of the counter i. r is specified
+                          only when a counter is used as an input.
+Input: KI, Label, Context, and L.
+Process:
+
+
+                                                  14
+SP 800-108            Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+   1. n: = ⎡L/h⎤.
+   2. If n > 232 -1, then indicate an error and stop.
+   3. result(0):= ∅
+   4. A(0):= IV = Label || 0x00 || Context || [L]2.
+   5. For i = 1 to n, do
+       a.     A(i) := PRF (KI, A(i-1))
+       b.    K(i) := PRF (KI, A(i){|| [i]2}|| Label || 0x00 || Context || [L]2)
+       c.     result (i) := result(i-1) || K(i)
+   7. Return: KO, i.e., the leftmost L bits of result(n).
+Output: KO.
+The first iteration pipeline uses a feedback mode with an initial value of A(0)= IV =
+Label || 0x00 || Context || [L]2. Each second pipeline iteration generates K(i) using A(i)
+and, optionally, a counter [i]2 as the iteration variable. The KDF in the double-pipeline
+iteration mode is illustrated in Figure 3.
+                 KI
+
+
+
+                               PRF           PRF                         PRF
+
+
+
+                    A(0)        A(1)         A(2)          ……            A(n)
+ Fixed Input Data
+
+                    KI         {i = 1}       {i = 2}                       {i = n}
+
+
+
+
+                              PRF           PRF                           PRF
+
+
+
+                               K(1)         K(2)        ……                K(n)
+
+
+                                                  KO, L-bits
+
+Figure 3: KDF in Double-Pipeline Iteration Mode
+
+
+                                             15
+SP 800-108             Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+
+   6. Key Hierarchy
+The keying material derived from a given key derivation key could subsequently be used
+as one or more key derivation keys to derive still more key derivation keys. In this way, a
+key hierarchy could be established. In a key hierarchy, a KDF is used with a higher-level
+“parent” key derivation key (and other appropriate input data) to derive a number of lower-
+level “child” keys. Figure 4 presents a three-level key hierarchy as an example. In the
+hierarchy described by Figure 4, the second level keys KI (1), KI (2), and KI(3) are derived
+from the top level key KI. Assuming KI (1), KI (2), and KI(3) are used as key derivation keys,
+from each of them, further keys are derived as the bottom level keys in the key hierarchy.
+                              KI
+
+
+
+
+        KI (1)                   KI (2)          KI (3)
+
+
+
+
+  K11            K12       K21            K22   K31       K32
+
+
+Figure 4: Key Hierarchy
+
+
+   7. Security Considerations
+An improperly defined key derivation function can make the derived keying material
+vulnerable to attacks. This section will discuss some factors that affect the cryptographic
+strength of the keying material derived by a KDF. However, some of the required security
+properties cannot be achieved by the key derivation function itself. For example, the
+overall security of the derived keying material depends on the protocols that establish the
+key derivation key. These external conditions are out of the scope of the security
+discussion in this Recommendation.
+
+7.1 Cryptographic Strength
+The security strength of a key derivation function is measured by the amount of work
+required to distinguish the output of the KDF from a truly uniformly distributed bit string
+of the same length, under the assumption that the key derivation key, KI, is the only
+unknown input to the KDF. This amount is certainly no greater than the work required to
+recover KI and/or the remaining portions of the derived keying material from a given
+segment of KDF output. Given a set of input data (other than KI) and the corresponding
+output data (of sufficient bit length), the key KI can be recovered in (at most) 2w
+
+                                                16
+SP 800-108            Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+executions of the KDF, where w is the bit length of KI, through an exhaustive search over
+all possible KI values.
+
+7.2 The Length of the Key Derivation Key
+For some KDFs, the length of the key derivation key is defined by the PRF used for the
+key derivation. For example, when using CMAC as a PRF, the key length is uniquely
+determined by the underlying block cipher. In this case, an implementation should check
+whether the key derivation key length is consistent with the length required by the PRF.
+However, some PRFs can accommodate different key lengths. If the HMAC is used as the
+PRF, then a KDF can use a key derivation key of essentially any length. It is worth noting
+that when the key length is longer than the block length of the underlying hash function for
+HMAC, the key will be hashed to h bits first, where h is the length of the hash function
+output. In this case, given a pair of the input data and the corresponding output value of the
+PRF, the hashed key can be recovered in (at most) 2h computations of the PRF. Therefore,
+the security strength may not be increased with a longer key length.
+
+7.3 Converting Keying Material to Cryptographic Keys
+The length, L, of the derived keying material is dependent upon the requirements of the
+cryptographic algorithms that rely on the KDF output. The length of a given cryptographic
+key is determined by the algorithm that will employ it – for example, a block cipher or a
+message authentication code – and the desired security strength. In the absence of
+limitations that may be imposed by relying applications, any segment of the derived keying
+material having the required length can be specified for use as a key, subject to the
+following restriction: When multiple keys (or any other types of secret parameters, e.g.
+secret initialization vectors) are obtained from the derived keying material, they shall be
+selected from disjoint (i.e., non-overlapping) segments of the KDF output. Therefore, the
+value of L shall be equal to or greater than the sum of the lengths of the keys (etc.) that
+will be obtained from the derived keying material.
+In Section 5.1, n, the number of iterations of the PRF computations, is limited by 2r−1,
+where r ≤ 32 is the binary length of the counter that is used as input during the iterations.
+This ensures that the counter values [i]2 used as an input to the PRF will not repeat during
+a particular call to the KDF function. This also limits the length of the derived keying
+material to L ≤ (2r−1)h, where h is the bit length of the PRF output. For feedback mode and
+double-pipeline iteration mode, the number of iterations is limited to 232 – 1.
+To comply with this Recommendation, the derived keying material shall not be used as a
+key stream for a stream cipher 2 .
+
+
+
+
+2
+ The level of security provided by using the key derivation functions specified in this Recommendation to
+generate a key stream for stream ciphers has not been investigated.
+
+
+                                                    17
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+7.4 Input Data Encoding
+The input data of a key derivation function consists of different data fields (e.g., a Label,
+the Context, and the length of the output keying material). In Section 5, each of the data
+fields, representing certain information, is encoded as a binary string. The encoding
+method shall define a one-to-one mapping from the set of all possible input information
+for that data field to a set of the corresponding binary strings. The different data fields
+shall be assembled in a specific order. The encoding method (including the field order)
+may be defined in a larger context, for example, by the protocol that uses a key derivation
+function. The encoding method shall be designed for unambiguous conversion of the
+combined input information to a unique binary string.
+Unambiguous encoding for input data is required to deter attacks on the KDF that depend
+on manipulating the input data. For detailed discussions on each attack, please see [10].
+
+7.5 Key Separation
+In this Recommendation, key separation is a security requirement for the cryptographic
+keys derived from the same key derivation key. The keys shall be separate in the sense that
+the compromise of some keys will not degrade the security strength of any of the other
+keys. In the families of KDFs specified in this Recommendation, key separation can be
+achieved through different approaches for the following two situations.
+   1. When keying material for multiple cryptographic keys is obtained from the output
+      of a single execution of a key derivation function, the segments of the keying
+      material used by different keys need to be cryptographically separate in the
+      following sense: The compromise of some keys must not degrade the security of
+      any of the other keys that are obtained from the output of the same execution of
+      KDF; that is, the compromise of some keys must not make the task of
+      distinguishing any of the other keys from random strings with the same length
+      easier than the task would be if none of the keys were compromised. In order to
+      satisfy this requirement when using the key derivation functions specified in this
+      Recommendation, different keys shall use disjoint (i.e. non-overlapping) segments
+      of the derived keying material.
+   2. When keying materials for multiple cryptographic keys is obtained from the output
+      of multiple executions of a particular key derivation function using the same value
+      for KI, the keying materials output by different calls to the KDF need to be
+      cryptographically separate in the following sense: The compromise of the keying
+      material output from one of the executions of the KDF must not degrade the
+      security of any of the keying material output from the other executions of the KDF,
+      that is, the compromise must not make the task of distinguishing any of the other
+      keying material from random strings of the same length easier than the task would
+      be if none of the keying material were compromised. In order to satisfy this
+      requirement when using the key derivation functions specified in this
+      Recommendation, different input data strings (e.g. Label || 0x00 || Context || [L]2)
+      shall be used for different executions. The different data strings can be obtained
+
+
+
+                                             18
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+       through including different information related to the derived keying materials.
+       Examples of different information include
+           - Label, if the keying materials are derived for different purposes;
+           - identities in Context, if the keying materials are derived for different sets of
+             entities;
+           - a nonce in Context, if the nonce is communicated by means of the relying
+             protocol and therefore shared by each entity who derives the keying
+             material; or
+           - session identifiers, if the keying materials are derived for different sessions.
+
+7.6 Context Binding
+Derived keying material should be bound to all relying entities and other information to
+identify the derived keying material. This is called context binding. In particular, the
+identity (or identifier, as the term is defined in [1] and [2]) of each entity that will access
+(meaning derive, hold, use, and/or distribute) any segment of the keying material should
+be included in the Context string input to the KDF, provided that this information is known
+by each entity who derives the keying material. Besides identities, other information
+related to the derived keying material such as session identifiers, sequence numbers, as
+well as nonce may be included in the Context string, assuming the information can be
+communicated, for instance, by means of the relying protocol.
+Context binding may not necessarily increase the security strength of an application
+making use of a derived key; however, the binding may provide a way to detect protocol
+errors – by providing assurance that all parties who (correctly) derive the keying material
+are aware of who will access it and in which session it will be used. If those parties have
+different understandings, then they will derive different keying material. When that keying
+material is used in a protocol, the protocol will likely fail to complete its execution, and
+therefore, will indicate errors to the participants.
+
+
+
+
+                                              19
+SP 800-108        Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+Appendix A: References (Informative)
+
+
+[1] NIST SP 800-56A, Recommendation for Pair-Wise Key Establishment Schemes Using
+    Discrete Logarithm Cryptography, May 2006.
+[2] NIST SP 800-56B, Recommendation for Pair-Wise Key Establishment Schemes Using
+    Integer Factorization Cryptography, expected to be published in 2008.
+[3] IETF RFC 5216, The EAP-TLS Authentication Protocol, March 2008.
+[4] Y. Dodis, R. Gennaro, J. Håstad, H. Krawczyk, and T. Rabin, Randomness Extraction
+    and Key derivation Using the CBC, Cascade, and HMAC Modes, Crypto’04, LNCS
+    3152, pp. 494-510. Springer Verlag, 2004.
+[5] NIST SP 800-90, Recommendation for Random Number Generation Using
+    Deterministic Random Bit Generators, March 2007.
+[6] FIPS 180-3, Secure Hash Standard, Revision expected to be published in 2008.
+[7] NIST SP 800-38B, Recommendation for Block Cipher Modes of Operation – The
+    CMAC Mode for Authentication, May 2005.
+[8] FIPS 198-1, The Keyed-Hash Message Authentication Code (HMAC), Revision
+    expected to be published in 2008.
+[9] O.Goldreich, S. Goldwasser and S. Micali, “How to construct pseudorandom
+    functions”, Journal of the ACM, Vol. 33, No. 4, pp. 210-217, (1986).
+[10] C. Adams, G. Kramer, S. Mister, and R. Zuccherato “On the Security of Key
+    Derivation Functions”, Information Security, LNCS 3225, pp. 134-145, Springer
+    Verlag, 2004.
+
+
+
+
+                                          20
+SP 800-108         Recommendation for Key Derivation Using Pseudorandom Functions
+
+
+
+Appendix B: Revision History
+
+
+The original version of this document was published in November, 2008. In October, 2009,
+the following revision was incorporated:
+
+In Section 5, page 12, at the end of the paragraph
+
+ “For each of the iterations of the PRF, the key derivation key KI is used as the key, and
+the input data consists of an iteration variable and a string of fixed input data. Depending
+on the mode of iteration, the iteration variable could be a counter, the output of the PRF
+from the previous iteration, a combination of both, or an output from the first pipeline
+iteration in the case of double-pipeline iteration mode. In the following key derivation
+functions, the fixed input data is a concatenation of a Label, a separation indicator 0x00,
+the Context, and [L]2.”
+
+the sentence “One or more of these fixed input data fields may be omitted unless required
+for certain purposes as discussed in Section 7.5 and Section 7.6.” is added.
+
+
+
+
+                                             21
+

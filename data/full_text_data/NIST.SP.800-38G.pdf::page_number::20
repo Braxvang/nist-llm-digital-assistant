@@ -1,0 +1,55 @@
+NIST SP 800-38G                                                 METHODS FOR FORMAT-PRESERVING ENCRYPTION
+
+
+Steps:
+1.    Let u = ⎣n/2⎦; v = n – u.
+2.    Let A = X [1 .. u]; B = X [u + 1 .. n].
+3.    Let b = ⎡ ⎡v ⋅ LOG(radix)⎤/8⎤.
+4.    Let d = 4 ⎡b/4⎤ + 4.
+5.    Let P = [1]1 || [2]1 || [1]1 || [radix]3 || [10]1 || [u mod 256]1 || [n]4 || [t]4.
+6.    For i from 0 to 9:
+      i.    Let Q = T || [0](−t−b−1) mod 16 || [i]1 || [NUMradix(B)]b.
+      ii.   Let R = PRF(P || Q).
+      iii. Let S be the first d bytes of the following string of ⎡d/16⎤ blocks:
+             R || CIPHK (R ⊕ [1]16) || CIPHK (R ⊕ [2]16) … CIPHK (R ⊕ [⎡d/16⎤ – 1]16).
+      iv. Let y = NUM(S).
+      v.    If i is even, let m = u; else, let m = v.
+      vi. Let c = (NUMradix (A) + y) mod radix m.
+                           m
+      vii. Let C = STR radix (c).
+      viii. Let A = B.
+      ix. Let B = C.
+7.    Return A || B.
+
+Description
+The “split” of the numeral string X into two substrings, A and B, is performed in Steps 1 and 2. If
+n is even, LEN(A)=LEN(B); otherwise, LEN(A)=LEN(B)–1. The byte lengths b and d, which are
+used in Steps 6i and 6iii, respectively, are defined in Steps 3 and 4.6 A fixed block, P, used as the
+initial block for the invocation of the function PRF in Step 6ii, is defined in Step 5. An iteration
+loop for the ten Feistel rounds of FF1 is initiated in Step 6, executing nine substeps for each
+round, as follows:
+
+The tweak, T, the substring, B, and the round number, i, are encoded as a binary string, Q, in
+Step 6i. The function PRF is applied to the concatenation of P and Q in Step 6ii, to produce a
+block, R, which is either truncated or expanded to a byte string, S, with the appropriate number
+of bytes, d, in Step 6iii. (In Figure 1, S corresponds to the output of FK.) In Steps 6iv to 6vii, S is
+combined with the substring A to produce a numeral string C in the same base and with the same
+length. (In Figure 1, the combining of S with A is indicated by the “+” operation.) In particular,
+in Step 6iv, S is converted to a number, y. In Step 6v, the length, m, of A for this Feistel round is
+determined. In Step 6vi, y is added to the number represented by the substring A, and the result is
+reduced modulo the mth power of radix, yielding a number, c, which is converted to a numeral
+string in Step 6vii. In Steps 6viii and 6ix, the roles of A and B are swapped for the next round:
+the substring B is renamed as the substring A, and the modified A (i.e., C) is renamed as B.
+
+This completes one round of the Feistel structure in FF1. After the tenth round, the concatenation
+of A and B is returned as the output in Step 7.
+
+
+
+6
+  When B is encoded as a byte string in Step 6i, b is the number of bytes in the encoding. The definition of d ensures
+that the output of the Feistel round function is at least four bytes longer than this encoding of B, which minimizes
+any bias in the modular reduction in Step 6vi.
+
+                                                         15
+

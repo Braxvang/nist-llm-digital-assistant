@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+keyword key followed by the name of the TSIG key. (See Section 8.2.2 for details on how to enter in the
+key statement in a BIND name server configuration file.) Once the key statement has been entered, the
+following substatement can be added to the zone statement to make use of the secret key for dynamic
+updates:
+
+            zone “example.com” {
+                 type master;
+                 file “zonedb.example.com”;
+                 allow-update { key dhcp-server.example.com.; };
+            };
+
+Note that although the string dhcp-server.example.com. looks like a FQDN, it actually denotes the name
+of the TSIG key. The implication of the configuration statement example is that any host that possess the
+key named dhcp-server.example.com. can submit dynamic update requests (adding, deleting, or
+modifying RRs) to the zone file (for the zone example.com) that resides in the primary authoritative name
+server.
+
+To use SIG(0) to authenticate dynamic update messages, the key used must first have its public
+component stored in the DNS, so a validating client can obtain it 10. See section 9.5 on publishing keys.
+The previous steps above need to be performed to control access (if desired). After that is done, the
+updating name server (i.e., primary authoritative name server) should be able to obtain the key and
+process the dynamic update request (if the name server supports SIG(0) with dynamic update).
+
+8.2.8       Configuring Dynamic Update Forwarding Restrictions Using TSIG Keys
+
+Dynamic updates are allowed on the copy of the zone file in the primary authoritative name server only
+because that is the only “writable” copy. This does not automatically imply that the primary authoritative
+name server is the only one allowed to accept dynamic update requests. In fact, BIND 9.1.0 and later
+versions allow secondary name servers to accept dynamic update requests and forward them to the
+primary authoritative name server. In this scenario, if there are no restrictions on the basis of the identity
+of hosts from whom the secondary name server can forward such dynamic update requests, it is
+equivalent to circumventing the dynamic update restrictions specified in the primary name server because
+the request can literally originate from any host to the secondary name server and be forwarded to the
+primary name server. To counter this problem, a new substatement, allow-update-forwarding, is now
+available in BIND versions that have the dynamic update forwarding feature. An example of this allow-
+update-forwarding statement using TSIG keys is given below:
+
+            zone “example.com” {
+                 type slave;
+                 file “backupdb.example.com”;
+                       allow-update-forwarding { key dhcp-
+            server.example.com.; };
+            };
+
+8.2.9       Configuring Fine-Grained Dynamic Update Restrictions Using TSIG/SIG(0) Keys
+
+The allow-update substatement specifies dynamic update restrictions based on the originators of dynamic
+update requests (a specific set of hosts identified by IP address or holding a TSIG key) but not the
+contents of the zone records. To specify dynamic update access (grant or deny) restrictions based on a
+
+10
+     For more information, see the note from the dynamic update howto: http://ops.ietf.org/dns/dynupd/secure-ddns-howto.html
+
+
+                                                              8-16
+

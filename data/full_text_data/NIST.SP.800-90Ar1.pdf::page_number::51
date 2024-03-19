@@ -1,0 +1,44 @@
+NIST SP 800-90A Rev. 1                     HASH_DRBG              Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+        1. status: The status returned from the function. The status will indicate SUCCESS, or
+           indicate that a reseed is required before the requested pseudorandom bits can be
+           generated.
+        2. returned_bits: The pseudorandom bits to be returned to the generate function.
+        3. new_working_state: The new values for V, C, and reseed_counter.
+     Hash_DRBG_Generate Process:
+        1. If reseed_counter > reseed_interval, then return an indication that a reseed is
+           required.
+        2. If (additional_input ≠ Null), then do
+              2.1 w = Hash (0x02 || V || additional_input).
+              2.2 V = (V + w) mod 2seedlen.
+        3. (returned_bits) = Hashgen (requested_number_of_bits, V).
+        4. H = Hash (0x03 || V).
+        5. V = (V + H + C + reseed_counter) mod 2seedlen.
+        6. reseed_counter = reseed_counter + 1.
+        7. Return (SUCCESS, returned_bits, V, C, reseed_counter).
+     Hashgen (requested_number_of_bits, V):
+     Input:
+        1. requested_no_of_bits: The number of bits to be returned.
+        2.    V: The current value of V.
+     Output:
+        1. returned_bits: The generated bits to be returned to the generate function.
+     Hashgen Process:
+                requested _ no _ of _ bits
+        1. m =                             .
+                        outlen
+        2. data = V.
+        3. W = the Null string.
+ €
+        4. For i = 1 to m
+              4.1 w = Hash (data).
+              4.2 W = W || w.
+              4.3 data = (data + 1) mod 2seedlen.
+        5. returned_bits = leftmost (W, requested_no_of_bits).
+        6. Return (returned_bits).
+
+
+
+                                                    42
+

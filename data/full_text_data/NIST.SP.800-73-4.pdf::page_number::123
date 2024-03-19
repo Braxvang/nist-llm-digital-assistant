@@ -1,0 +1,55 @@
+Special Publication 800-73-4                           Interfaces for Personal Identity Verification – Part 2:
+                                                       PIV Card Application Card Command Interface
+
+            Command                               Response                              Comment
+00 87 27 04 50 7C 4E 81 4A 00                                              The GENERAL
+00 00 00 00 00 00 00 00 04 X Y                                             AUTHENTICATE command is
+82 00 00                                                                   used to perform the key
+                                                                           establishment protocol, as
+                                                                           specified in Section 4.1.8, where
+                                                                           cipher suite CS2 is being used,
+                                                                           ID sH is all zeros, and X and Y are
+                                                                           the coordinates of Q eH . X and Y
+                                                                           are 32 bytes each.
+                                      7C L1 82 L2 00 N ICC                 The response for the key
+                                      AuthCryptogram ICC C ICC             establishment protocol, as
+                                                                           specified in Section 4.1.8, where
+                                                                           N ICC and AuthCryptogram ICC are
+                                                                           16 bytes each, and C ICC is as
+                                                                           specified in Section 4.1.5.
+After the client application verifies C ICC and the authentication cryptogram and validates the certificate(s)
+needed to verify the signature on C ICC , the PIV Card has been authenticated and session keys for secure
+messaging have been established (SK ENC , SK MAC , and SK RMAC ).
+The VERIFY command is used to submit the pairing code (“65135275”) to the PIV Card Application.
+For the command, ENC C1 is the result of encrypting '36 35 31 33 35 32 37 35 80 00 00 00 00 00 00 00'
+using an IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01') and T C-MAC,1 =
+CMAC(SK MAC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0C 20 00 98 80 00 00 00 00 00 00 00
+00 00 00 00 87 11 01' || ENC C1 ).
+For the response, T R-MAC,1 = CMAC(SK RMAC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 99 02 90
+00').
+0C 20 00 98 1D 87 11 01 ENC C1                                             The VERIFY command is used
+8E 08 T 8 (T C-MAC,1 ) 00                                                  over secure messaging to submit
+                                                                           the pairing code to the card.
+                                      99 02 90 00 8E 08 T 8 (T R-MAC,1 )   The card responds that the
+                                      90 00                                command has been successfully
+                                                                           executed, and that the VCI has
+                                                                           been established.
+Once the VCI has been established, the GET DATA command may be used to retrieve the X.509
+Certificate for PIV Authentication.
+For the command, ENC C2 is the result of encrypting '5C 03 5F C1 05 80 00 00 00 00 00 00 00 00 00 00'
+using an IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02'), and T C-MAC,2 is computed
+using T C-MAC,1 as the MCV.
+For the response, ENC R2 is the result of encrypting the X.509 Certificate for PIV Authentication data
+object encapsulated in BER-TLV format with tag '53' using an IV of AES(SK ENC , '80 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 02'), and T R-MAC,2 is computed using T R-MAC,1 as the MCV.
+0C CB 3F FF 20 87 11 01 ENC C2                                             The GET DATA command is
+97 01 00 8E 08 T 8 (T C-MAC,2 ) 00                                         used to request the X.509
+                                                                           Certificate for PIV
+                                                                           Authentication. The command is
+                                                                           submitted over VCI.
+
+
+
+
+                                                     48
+

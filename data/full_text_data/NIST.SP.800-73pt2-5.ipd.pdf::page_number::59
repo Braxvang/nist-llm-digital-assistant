@@ -1,0 +1,63 @@
+NIST SP 800-73pt2-5 ipd (Initial Public Draft)                      Interfaces for Personal Identity Verification: Part 2
+September 2023                                                         PIV Card Application Card Command Interface
+
+               Command                                  Response                                 Comment
+ The VERIFY command is used to submit the pairing code (“65135275”) to the PIV Card Application.
+ For the command, ENC C1 is the result of encrypting '36 35 31 33 35 32 37 35 80 00 00 00 00 00 00 00' using an
+ IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 01') and T C-MAC,1 = CMAC(SK MAC , '00 00 00
+ 00 00 00 00 00 00 00 00 00 00 00 00 00 0C 20 00 98 80 00 00 00 00 00 00 00 00 00 00 00 87 11 01' || ENC C1 ).
+ For the response, T R-MAC,1 = CMAC(SK RMAC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 99 02 90 00').
+ 0C 20 00 98 1D 87 11 01 ENC C1                                                    The VERIFY command is used
+ 8E 08 T 8 (T C-MAC,1 ) 00                                                         over secure messaging to submit the
+                                                                                   pairing code to the card.
+                                          99 02 90 00 8E 08 T 8 (T R-MAC,1 ) 90    The card responds that the
+                                          00                                       command has been successfully
+                                                                                   executed and that the VCI has been
+                                                                                   established.
+ Once the VCI has been established, the GET DATA command MAY be used to retrieve the X.509 Certificate for
+ PIV Authentication.
+ For the command, ENC C2 is the result of encrypting '5C 03 5F C1 05 80 00 00 00 00 00 00 00 00 00 00' using an
+ IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 02'), and T C-MAC,2 is computed using T C-MAC,1
+ as the MCV.
+ For the response, ENC R2 is the result of encrypting the X.509 Certificate for the PIV Authentication data object
+ encapsulated in BER-TLV format with tag '53' using an IV of AES(SK ENC , '80 00 00 00 00 00 00 00 00 00 00 00
+ 00 00 00 02'), and T R-MAC,2 is computed using T R-MAC,1 as the MCV.
+ 0C CB 3F FF 20 87 11 01 ENC C2                                                    The GET DATA command is used
+ 97 01 00 8E 08 T 8 (T C-MAC,2 ) 00                                                to request the X.509 Certificate for
+                                                                                   PIV Authentication. The command
+                                                                                   is submitted over VCI.
+                                          87 82 05 91 01 <bytes 1 – 251 of         The response includes the tag,
+                                          ENC R2 > 61 00                           length, and padding indicator bytes
+                                                                                   of the BER-TLV-encoded
+                                                                                   encrypted response data, the first
+                                                                                   251 bytes of the encrypted
+                                                                                   response, and an indicator that at
+                                                                                   least 256 bytes of additional data is
+                                                                                   available. The padding indicator is
+                                                                                   '01' to indicate that padding was
+                                                                                   applied.
+ 00 C0 00 00 00                                                                    Request the next 256 bytes of the
+                                                                                   response.
+                                          <bytes 252 – 507 of ENC R2 > 61 00 Return the next 256 bytes of the
+                                                                                   response.
+ …                                        …
+ 00 C0 00 00 A3                                                                    Request the final 163 bytes of the
+                                                                                   response.
+                                          <bytes 1276 – 1424 of ENC R2 > 99        Return the final 163 bytes of the
+                                          02 90 00 8E 08 T 8 (T R-MAC,2 ) 90 00    response, including the BER-TLV-
+                                                                                   encoded status word for the
+                                                                                   command and the BER-TLV-
+                                                                                   encoded R-MAC.
+ At this point, the VERIFY command could be used to submit the PIV Card Application PIN to the PIV Card
+ Application. However, in this example and for illustrative purposes only, a VERIFY command is sent to the card
+ without a data field in order to retrieve the current value of the retry counter associated with the PIV Card
+ Application PIV.
+ 0C 20 00 80 0A 8E 08 T 8 (T C-MAC,3 )                                             The VERIFY command is used to
+ 00                                                                                retrieve the number of additional
+                                                                                   retries allowed for the PIV Card
+                                                                                   Application PIN.
+
+
+
+                                                           49
+

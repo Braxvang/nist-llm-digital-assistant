@@ -1,0 +1,57 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                      Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                                         PIV Card Application Card Command Interface
+
+1257        •     C(0e, 2s) — Both the initiator and responder use only static key pairs [SP800-56A,
+1258              Section 6.3].
+1259              In the C(0e, 2s) scheme, the information sent between the client application’s
+1260              cryptographic module and the PIV Card is the same when acting as the initiator or the
+1261              responder. The other party’s static public key is sent to the PIV Card, and the static
+1262              shared secret is returned in plaintext. Note that, for this scheme, the client application’s
+1263              cryptographic module also generates a nonce when acting as the initiator of the scheme.
+1264   The C(2e, 0s) scheme does not involve the use of static keys, so the PIV Card would not be
+1265   involved in the implementation of this scheme.
+
+1266   A.6.       Authentication of the PIV Cardholder Over the Virtual Contact Interface
+1267   If the PIV Card supports the virtual contact interface, then all non-card management operations
+1268   of the PIV Card Application MAY be performed over the contactless interface. In order to
+1269   perform an operation that would otherwise be restricted to the contact interface, the key
+1270   establishment protocol in Section 4.1 needs to be performed to establish session keys for secure
+1271   messaging, and the pairing code needs to be submitted over secure messaging in order to
+1272   establish a virtual contact interface. 30
+1273   This appendix shows an example of the establishment of a VCI and its use to perform cardholder
+1274   authentication using the PIV Authentication key. First, the GENERAL AUTHENTICATE
+1275   command is used to perform the key establishment protocol. The VERIFY command is then
+1276   used to submit the pairing code and establish the VCI. At that point, the GET DATA command
+1277   is used to read the X.509 Certificate for PIV Authentication. The GENERAL AUTHENTICATE
+1278   command is used to perform a challenge/response with the PIV Authentication key after the PIN
+1279   is submitted using the VERIFY command.
+1280                           Table 25: PIV Cardholder Authentication over Virtual Contact Interface
+
+                    Command                                                Response                    Comment
+        00 87 27 04 50 7C 4E 81 4A 00 00                                                The GENERAL AUTHENTICATE
+        00 00 00 00 00 00 00 04 X Y 82 00                                               command is used to perform the
+        00                                                                              key establishment protocol, as
+                                                                                        specified in Section 4.1.8, where
+                                                                                        cipher suite CS2 is being used, ID sH
+                                                                                        is all zeros, and X and Y are the
+                                                                                        coordinates of Q eH . X and Y are 32
+                                                                                        bytes each.
+                                                  7C L1 82 L2 00 N ICC                  The response for the key
+                                                  AuthCryptogram ICC C ICC              establishment protocol, as specified
+                                                                                        in Section 4.1.8, where N ICC and
+                                                                                        AuthCryptogram ICC are 16 bytes
+                                                                                        each and C ICC is as specified in
+                                                                                        Section 4.1.5.
+        After the client application verifies C ICC and the authentication cryptogram and validates the certificate(s) needed
+        to verify the signature on C ICC , the PIV Card has been authenticated, and session keys for secure messaging have
+        been established (SK ENC , SK MAC , and SK RMAC ).
+
+
+       30
+          As noted in SP 800-73-5 Part 1, Section 5.5, the pairing code does not need to be submitted if the Bit 3 of the first byte of the PIN Usage Policy
+       is set to one.
+
+
+
+                                                                                48
+

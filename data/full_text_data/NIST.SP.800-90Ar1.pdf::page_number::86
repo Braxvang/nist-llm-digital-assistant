@@ -1,0 +1,45 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+   1. highest_supported_security_strength = 256.
+   2. Output block (outlen) = 256 bits.
+   3. Required minimum entropy for the entropy input at instantiation = (3/2) security_strength
+      (this includes the entropy required for the nonce).
+   4. Seed length (seedlen) = 440 bits.
+   5. Maximum number of bits per request (max_number_of_bits_per_request) = 7500 bits.
+   6. Reseed_interval (reseed_ interval) = 10 000 requests.
+   7. Maximum length of the personalization string (max_personalization_string_length) =
+      160 bits.
+   8. Maximum length of the entropy input (max _length) = 1000 bits.
+
+B.2.1      Instantiation of HMAC_DRBG
+
+This implementation will return a text message and an invalid state handle (−1) when an error is
+encountered.
+HMAC_DRBG_Instantiate_function:
+   Input: integer (requested_instantiation_security_strength), bitstring personalization_string.
+   Output: string status, integer state_handle.
+
+
+   Process:
+                                              Check the validity of the input parameters.
+        1. If (requested_instantiation_security_strength > 256), then Return (“Invalid
+           requested_instantiation_security_strength”, −1).
+        2. If (len (personalization_string) > 160), then Return (“Personalization_string too
+           long”, −1)
+                                                       Comment: Set the security_strength to one
+                                                       of the valid security strengths.
+        3. If (requested_security_strength ≤ 112), then security_strength = 112
+           Else if (requested_ security_strength ≤ 128), then security_strength = 128
+           Else if (requested_ security_strength ≤ 192), then security_strength = 192
+           Else security_strength = 256.
+                                                       Comment: Get the entropy_input and the
+                                                       nonce.
+        4. min_entropy = 1.5 × security_strength.
+        5. (status, entropy_input) = Get_entropy_input (min_entropy, 1000).
+        6. If (status ≠ “Success”), then Return (status, −1).
+
+
+                                                  77
+

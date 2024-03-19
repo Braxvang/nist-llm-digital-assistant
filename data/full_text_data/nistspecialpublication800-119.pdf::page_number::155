@@ -1,0 +1,56 @@
+                                                               GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+    -     SOCKS-based IPv6/IPv4 Gateway Mechanism (RFC 3089)
+    -     Application Level Gateways.
+  6.6.1    SIIT
+
+SIIT stands for Stateless IP/ICMP Translation. It replaces headers, IPv4 for IPv6 and vice versa. It also
+translates ICMP messages and adds the ICMP pseudo-header checksum. If necessary, it fragments and
+reassembles IPv4 messages.
+
+6.6.1.1      Using SIIT
+
+SIIT uses IPv4-translated addresses to refer to IPv6-enabled nodes. When it needs to create an IPv6
+address from an IPv4 address w.x.y.z, it uses 0:0:FFFF:0:0:0:w.x.y.z. SIIT uses IPv4 mapped addresses
+to refer to IPv4-only nodes: 0:0:0:0:0:FFFF.w.x.y.z. SIIT thus requires IPv6 interfaces to obtain an IPv4
+address and is not a convenient transition mechanism for an IPv6 dominant network.
+
+SIIT also adjusts the payload length appropriately and equates the following fields:
+
+         IPv4 traffic class and IPv6 TOS
+         IPv4 protocol number and IPv6 next header number
+         IPv4 TTL and IPv6 hop limit.
+
+
+  6.6.2    NAT-PT
+
+NAT-PT stands for Network Address Translation—Protocol Translation. It uses SIIT and performs NAT
+traversal for IPv4. NAT-PT allows IPv6 systems and services to communicate with IPv4 systems and
+vice versa. NAT-PT is the successor to IPv4 NAT, which is well understood and widely deployed.
+
+6.6.2.1      Using NAT-PT
+
+NAT-PT is controversial for may reasons, which are explained in detail in RFC 4966. The IETF
+recommends that it no longer be used, and discussions of how it may be revised are ongoing. Its biggest
+benefit is that IPv6 connectivity becomes possible for legacy applications that may never have IPv6
+support. The main objections to NAT-PT are that it reintroduces the scaling and operational issues of
+NAT into IPv6 and may make full migration to IPv6 more difficult. For example:
+
+         It breaks end-to-end security: DNSSEC has to terminate on the NAT if it performs translation
+          and IPsec cannot transit NAT-PT.
+
+         It prevents full deployment of new applications.
+
+         It may be a single point of failure and performance bottleneck.
+
+         Protocols with embedded IP addresses do not work.
+
+         Protocols like RSVP that do not use port numbers cannot be multiplexed.
+
+In addition, translation is incompatible with multicast, mobility, and multihoming. Where possible, a
+
+
+
+                                                   6-33
+

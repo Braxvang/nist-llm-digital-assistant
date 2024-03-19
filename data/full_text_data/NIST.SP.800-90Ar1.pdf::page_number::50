@@ -1,0 +1,47 @@
+NIST SP 800-90A Rev. 1                 HASH_DRBG                 Recommendation for Random Number
+                                                                  Generation Using Deterministic RBGs
+
+
+       3. additional_input: The additional input string received from the consuming
+          application. Note that the length of the additional_input string may be zero.
+   Output:
+       1. new_working_state: The new values for V, C, and reseed counter.
+
+
+   Hash_DRBG Reseed Process:
+       1. seed_material = 0x01 || V || entropy_input || additional_input.
+       2. seed = Hash_df (seed_material, seedlen).
+       3. V = seed.
+       4. C = Hash_df ((0x00 || V), seedlen).        Comment: Preceed with a byte of all zeros.
+       5. reseed_counter = 1.
+       6. Return (V, C, and reseed_counter).
+
+10.1.1.4     Generating Pseudorandom Bits Using Hash_DRBG
+
+Notes for the generate function specified in Section 9.3:
+   The generation of pseudorandom bits using a Hash_DRBG instantiation requires a call to the
+   generate function specified in Section 9.3. Process step 8 of that function calls the generate
+   algorithm specified in this section. The values for max_number_of_bits_per_request and
+   outlen are provided in Table 2 of Section 10.1.
+The generate algorithm:
+   Let Hash be the selected hash function. The seed length (seedlen) and the maximum interval
+   between reseeding (reseed_interval) are provided in Table 2 of Section 10.1. Note that for
+   this DRBG mechanism, the reseed counter is used to update the value of V, as well as to
+   count the number of generation requests.
+   The following process or its equivalent shall be used as the generate algorithm for this
+   DRBG mechanism (see step 8 of the generate process in Section 9.3):
+   Hash_DRBG_Generate_algorithm (working_state, requested_number_of_bits,
+      additional_input):
+       1. working_state: The current values for V, C, and reseed_counter (see Section
+          10.1.1.1).
+       2. requested_number_of_bits: The number of pseudorandom bits to be returned to the
+          generate function.
+       3. additional_input: The additional input string received from the consuming
+          application. Note that the length of the additional_input string may be zero.
+   Output:
+
+
+
+
+                                                41
+

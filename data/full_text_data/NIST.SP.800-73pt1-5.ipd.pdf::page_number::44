@@ -1,0 +1,60 @@
+       NIST SP 800-73pt1-5 ipd (Initial Public Draft)                Interfaces for Personal Identity Verification: Part 1
+       September 2023                                 PIV Card Application Namespace, Data Model, and Representation
+
+1068                                                 Table 10. Card Holder Unique Identifier
+
+             Card Holder Unique Identifier                                        0x3000
+                        Data Element (TLV)                            Tag                             Type                           Max. Bytes
+            FASC-N                                                   0x30        Fixed                                             25
+            GUID                                                     0x34        Fixed                                             16
+            Expiration Date                                          0x35        Date (YYYYMMDD)                                   8
+            Cardholder UUID (Optional)                               0x36        Fixed                                             16
+            Issuer Asymmetric Signature                              0x3E        Variable                                          2816 18
+            Error Detection Code                                     0xFE        LRC                                               0
+
+1069   Note that the Buffer Length, Organizational Identifier, and DUNS data elements have been
+1070   eliminated in this version of SP 800-73.
+1071   The Error Detection Code is the same element as the Longitudinal Redundancy Code (LRC) in
+1072   [TIG SCEPACS]. It is present in the CHUID because TIG SCEPACS makes the LRC
+1073   mandatory. However, this document makes no use of the Error Detection Code, and therefore the
+1074   length of the TLV value is set to 0 bytes (i.e., no value will be supplied).
+1075                                          Table 11. X.509 Certificate for PIV Authentication
+
+             X.509 Certificate for PIV Authentication                            0x0101
+                        Data Element (TLV)                            Tag                            Type                           Max. Bytes
+            Certificate                                              0x70        Variable                                         1856 19
+            CertInfo                                                 0x71        Fixed                                            1
+            Error Detection Code                                     0xFE        LRC                                              0
+
+1076   Note that the MSCUID data element has been eliminated in this version.
+1077                                                     Table 12. Cardholder fingerprints
+
+             Cardholder Fingerprints                                             0x6010
+                       Data Element (TLV)                            Tag                            Type                            Max. Bytes
+            Fingerprint I & II                                      0xBC       Variable                                           4000 20
+            Error Detection Code                                    0xFE       LRC                                                0
+
+1078                                                          Table 13. Security Object
+
+              Security Object                                                  0x9000
+                       Data Element (TLV)                          Tag                             Type                           Max. Bytes
+             Mapping of DG to ContainerID                         0xBA       Variable                                           30
+             Security Object                                      0xBB       Variable                                           1298
+             Error Detection Code                                 0xFE       LRC                                                0
+1079
+
+       18
+          The values in the “Max. Bytes” columns denote the lengths of the value (V) fields of BER-TLV elements.
+       19
+          This is the recommended length. The certificate size can exceed the indicated length value.
+       20
+          This is the recommended length. The certificate that signed the Fingerprint I & II data element in the Cardholder Fingerprints data object can
+       either be stored in the CHUID or in the Fingerprint I & II data element itself. For the latter, the “Max. Bytes” value quoted is a recommendation,
+       and the signer certificate in CBEFF_SIGNATURE_BLOCK can exceed the “Max. Bytes.” Note that the use of separate content signing keys for
+       biometric data and CHUID has been deprecated in FIPS 201-3. In future revisions, the CHUID and biometric elements will be signed with the
+       same key. The content signing certificate will not be found in this data element but instead will be contained in the CHUID data element. Hence,
+       the size will be as indicated in the table.
+
+
+                                                                            32
+

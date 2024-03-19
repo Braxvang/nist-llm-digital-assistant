@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              VPN gateways are also commonly used as NAT devices. If packets from the internal network are
+                                                                                              NAT’ed to the VPN server’s public IP before being considered for IPsec protection, the source
+                                                                                              IP will no longer match the IPsec policy, and the packet will not be sent out via IPsec. Instead, it
+                                                                                              could leak onto the internet without encryption or be caught by the firewall subsystem running
+                                                                                              on the VPN gateway.
+
+                                                                                              In an IPv4-based network, machines within the same subnet use the address resolution protocol
+                                                                                              (ARP) to find the Ethernet address belonging to a local IP address. If remote access clients are
+                                                                                              being assigned IP addresses from the remote local area network (LAN), the VPN server needs to
+                                                                                              be configured to answer for all IP addresses that are reachable via the IPsec VPN since those
+                                                                                              remote VPN clients do not receive the local network ARP requests. This service is often called
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              proxy ARP. Some IPsec implementations detect this automatically. For IPv6, this process is
+                                                                                              handled via IPv6 neighbor discovery, which would also need to be performed by the VPN server
+                                                                                              if the local IPv6 range is used for remote access clients.
+
+                                                                                              The responder authenticates the initiator first and fully establishes the IPsec SA before the
+                                                                                              initiator receives the IKE_AUTH response packet. If the initiator determines that the responder
+                                                                                              failed to authenticate itself, the initiator can only notify the responder of this by immediately
+                                                                                              deleting the IKE SA since the responder believes this is a fully established IKE SA and IPsec
+                                                                                              SA. This sometimes confuses administrators when debugging a problem because from the
+                                                                                              responder’s point of view, this was a successful—but very short—IPsec connection.
+
+                                                                                              6.5   Routing-Based VPNs Versus Policy-Based VPNs
+
+                                                                                              IPsec implementations need to inspect packet streams to determine when a packet should be
+                                                                                              encrypted and when it should be transmitted unencrypted. One method is to use the routing table.
+                                                                                              If a route is pointing to a specific IPsec device, the IPsec implementation processes the packet
+                                                                                              based on its SPD/SAD rules. However, using routes can be fragile. Another subsystem could
+                                                                                              change the routing to accidentally or maliciously bypass the IPsec device, thus bypassing all
+                                                                                              encryption policies.
+
+                                                                                              Another issue of routing-based policies is that administrators often use a single IPsec policy
+                                                                                              covering all possible IPv4 addresses (0.0.0.0/0) to all possible IPv4 addresses (0.0.0.0/0). Once
+                                                                                              the tunnel is established, routing is used to determine which packets to send over the IPsec
+                                                                                              connection. If a remote branch extends its network to use another subnet, such as 192.0.2.0/24,
+                                                                                              the only change needed is for the local branch to add a route for that IP range into the IPsec
+                                                                                              device. Firewall rules to limit the subnets allowed are omitted to allow this easy type of
+                                                                                              deployment, but this introduces a security problem as well as a compatibility problem. If the
+                                                                                              routes into the IPsec devices on both ends do not match, traffic will be encrypted in one direction
+                                                                                              but not in the other. At best, the IPsec gateway expecting encrypted packets will drop the
+                                                                                              unencrypted packets, and network connectivity will fail. Worse, the IPsec gateway could
+                                                                                              mistakenly route the unencrypted (and possibly modified) packets onto its local network.
+
+                                                                                              Policy-based VPNs that cover only specific subnets rather than every address (0.0.0.0/0) are a
+                                                                                              better solution and are recommended over routing-based VPNs despite the additional
+                                                                                              management overhead required. Depending on the implementation, policy-based VPNs can be a
+
+
+
+                                                                                                                                              57
+

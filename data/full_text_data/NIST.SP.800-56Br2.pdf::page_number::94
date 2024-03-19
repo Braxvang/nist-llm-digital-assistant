@@ -1,0 +1,56 @@
+                                                                                               NIST SP 800-56B REV. 2                          RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                    USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                                                   Party U                                                      Party V
+
+                                                                                                        (PubKeyU, PrivKeyU)                                        (PubKeyV, PrivKeyV)
+
+                                                                                                     Obtain party V’s public key-         PubKeyV
+                                                                                                         establishment key               ←   
+
+                                                                                                                                          PubKeyU               Obtain party U’s public key
+                                                                                                                                            →                    establishment-key
+
+                                                                                                           (ZU, CU) =                      CU
+                                                                                                                                                           ZU = RSASVE.Recover(PrivKeyV, CU)
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                                    RSASVE.Generate(PubKeyV)             →
+
+                                                                                                            ZV =                           CV                         (ZV, CV) =
+                                                                                                 RSASVE.RECOVER(PrivKeyU, CV)            ←               RSASVE.GENERATE(PubKeyU)
+
+                                                                                                             Z = ZU || ZV                                                 Z = ZU || ZV
+
+                                                                                                  Compute DerivedKeyingMaterial =                            Compute DerivedKeyingMaterial =
+                                                                                                  MacKey || KeyData and destroy Z                            MacKey || KeyData and destroy Z
+
+                                                                                                              MacTagV =?                  MacTagV                        MacTagV =
+                                                                                                 TMacTagBits[MAC(MacKey, MacDataV)]      ←             TMacTagBits[MAC(MacKey, MacDataV)]
+
+                                                                                                        Figure 9: KAS2-Party_V-confirmation Scheme (from Party V to Party U)
+                                                                                               Each party first performs the appropriate steps of the KAS2-basic scheme as described in Section
+                                                                                               8.3.2.
+                                                                                               To provide (and receive) key confirmation (as described in Section 5.6.1), both parties set
+                                                                                               EphemDataV = CV, and EphemDataU = CU.
+                                                                                               Party V provides MacTagV to party U (as specified in Section 5.6.1, with P = V and R = U), where
+                                                                                               MacTagV is computed (as specified in Section 5.2.1) on
+                                                                                                              MacDataV = “KC_1_V” || IDV || IDU || CV || CU{ || TextV}.
+                                                                                               Party U (the KC recipient) uses the identical format and values to compute
+                                                                                               TMacTagBits[MAC(MacKey, MacDataV)] and then verify that it equals MacTagV as provided by party
+                                                                                               V.
+                                                                                               The MAC key used during key confirmation (i.e., MacKey) shall be destroyed by party V
+                                                                                               immediately after the computation of MacTagV, and by party U immediately after the verification
+                                                                                               of the received MacTagV or a (final) determination that the received MacTagV is in error.
+                                                                                               Certain messages may be combined or sent in a different order (e.g., CV and MacTagV may be sent
+                                                                                               together, or CV may be sent before CU).
+
+                                                                                               8.3.3.3 KAS2-Party_U-confirmation
+                                                                                               Figure 10 depicts a typical flow for a KAS2 scheme with unilateral key confirmation from party
+                                                                                               U to party V. In this scheme, party U and party V assume the roles of key-confirmation provider
+                                                                                                                                               84
+

@@ -1,0 +1,55 @@
+                                                                                               NIST SP 800-56B REV. 2                           RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                     USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                                      b. MacTagLen: the byte length of MacTag. (MacTagBits, as used in Section 5.2, is equal
+                                                                                                         to 8 × MacTagLen.)
+
+                                                                                               MacKey shall be the first MacKeyLen bytes of the keying material and shall be used only for the
+                                                                                               key-confirmation operation. For KTS-OAEP key confirmation, the length of the keying material
+                                                                                               shall be at least MacKeyLen bytes, and usually longer so that keying material other than MacKey
+                                                                                               is available for subsequent operations.
+
+                                                                                               9.2.4.2 KTS-OAEP-Party_V-confirmation
+                                                                                               KTS-OAEP-Party_V-confirmation is a variant of KTS-OAEP-basic with unilateral key
+                                                                                               confirmation from party V to party U. The successful completion of the key-confirmation process
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                               provides party U with a) assurance that party V has derived the same secret Z value, and b)
+                                                                                               assurance that party V has actively participated in the process.
+                                                                                               Figure 13 depicts a typical flow for the KTS-OAEP-Party_V-confirmation scheme. In this
+                                                                                               scheme, party V and party U assume the roles of key-confirmation provider and recipient,
+                                                                                               respectively.
+
+
+                                                                                                              Party U                                                       Party V
+
+                                                                                                       K = MacKey ll KeyData                                          (PubKeyV, PrivKeyV)
+
+                                                                                                     Obtain party V’s public key-           PubKeyV
+                                                                                                         establishment key                 ←   
+
+                                                                                                            C=                                C                           K=
+                                                                                                RSA-OAEP.ENCRYPT(PubKeyV, K, A)            →             RSA-OAEP.DECRYPT(PrivKeyV, C, A)
+
+                                                                                                                                                                     MacKey || KeyData = K
+
+                                                                                                             MacTagV =?                     MacTagV                         MacTagV =
+                                                                                                TMacTagBits[MAC(MacKey, MacDataV)]         ←             TMacTagBits[MAC(MacKey, MacDataV)]
+
+                                                                                                                    Figure 13: KTS-OAEP-Party_V-confirmation Scheme
+                                                                                               Each party first performs the appropriate steps of the KTS-OAEP-basic scheme as described in
+                                                                                               Section 9.2.3.
+                                                                                               To provide (and receive) key confirmation (as described in Section 5.6.1), both parties form
+                                                                                                                   MacData with EphemDataV = Null, and EphemDataU = C.
+                                                                                               Party V provides MacTagV to party U (as specified in Section 5.6.1, with P = V and R = U),
+                                                                                               where MacTagV is computed (as specified in Section 5.2.1) using
+                                                                                                                    MacDataV = “KC_1_V” || IDV || IDU || Null || C{ || TextV}.
+                                                                                               Party U uses the identical format and values to compute TMacTagBits[MAC(MacKey, MacDataV)] and
+                                                                                               then verify that it matches the MacTagV value provided by party V.
+
+                                                                                                                                               92
+

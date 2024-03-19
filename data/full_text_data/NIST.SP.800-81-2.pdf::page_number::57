@@ -1,0 +1,60 @@
+                                                               SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+            options {
+                 allow-query { any; };
+                 blackhole { fake-net; };
+            };
+
+            zone “example.com.” {
+                 type master;
+                 file “zonedb.example.com”;
+                 allow-query { local_hosts; };
+            };
+
+In the named.conf snippet above, two ACLs, local_hosts and fake-net, have been specified. DNS queries
+from any hosts are allowed at the server level. No transactions are permitted from the hosts included
+under fake-net. Queries to the zone example.com can be initiated only by the hosts included under the
+ACL local_hosts because any restriction specified under the zone (zone-specific) statement overrides the
+restriction specified under the options (server-wide) statement.
+
+Key material can also be used in ACL statements. This would indicate that only hosts knowing (and
+using) the shared key (or key pair) would be able to communicate. How a key is use in an ACL is
+discussed in Section 8.2.2.
+
+NSD does not have the feature to define ACLs as a means of only allowing queries from designated set of
+hosts.
+
+Administrators using Microsoft Windows Server as their DNS server can query the Microsoft TechNet 4
+website for information on configuring access control lists for their server version.
+
+8.1.1.1 Restricting Recursive Queries (a special case under DNS Query/Response)
+
+Authoritative name servers provide name resolution service from their own data and are supposed to
+provide this service for any DNS client. Hence, configuring an authoritative name server to accept queries
+from a restricted set of hosts does not make sense. The practical security protection for an authoritative
+name server is to turn off the query recursion feature so that the authoritative name server does not poison
+its cache by querying other (possibly compromised) name servers. A local resolving/recursive name
+server can be configured to accept queries only from internal hosts, to protect it from denial-of-service
+attacks as well as cache poisoning. However, there may be situations in which it is economically
+infeasible to dedicate separate servers for authoritative service and resolution service, and the resolving
+name server has to perform as authoritative server for one or more zones. In this situation, the following
+strategies are possible within the BIND 9.x name server:
+
+       •    Restricting all queries accepted by the server to a specified set of IP addresses of internal clients
+            and then overriding this set only for authoritative zones so that any DNS client can obtain
+            information for resources in that zone.
+
+       •    Restricting recursive queries to a specified set of IP addresses of internal clients through a direct
+            configuration option
+
+       •    Serving different responses (data) to different clients by defining views.
+
+
+4
+    http://technet.microsoft.com/en-US/
+
+
+                                                         8-5
+

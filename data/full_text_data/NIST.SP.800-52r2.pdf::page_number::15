@@ -1,0 +1,51 @@
+NIST SP 800-52 REV. 2                                            GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+2.4   Integrity
+
+The keyed MAC algorithm, specified by the negotiated cipher suite, provides message integrity.
+As with confidentiality, there is a different key for each direction of communication. The sender
+of a message (client or server) calculates the MAC for the message using the appropriate MAC
+key (the client write MAC secret or the server write MAC secret). When the receiver processes
+the message, it calculates its own version of the MAC using the MAC algorithm and sender’s
+write MAC key. The receiver verifies that the MAC that it calculates matches the MAC received
+in the message from the sender.
+
+Two types of constructions are used for MAC algorithms in TLS. TLS versions 1.0, 1.1, and 1.2
+support the use of the Keyed-Hash Message Authentication Code (HMAC) using the hash
+algorithm specified by the negotiated cipher suite. With HMAC, MACs for server-to-client
+messages are keyed by the server write MAC key, while MACs for client-to-server messages
+are keyed by the client write MAC key. These MAC keys are derived from the shared master
+secret.
+
+TLS 1.2 added AEAD cipher modes of operation, such as Counter with CBC-MAC (CCM) [41]
+and Galois Counter Mode (GCM) [56, 61], as an alternative way of providing integrity and
+confidentiality. In AEAD modes, the sender uses its write key for both encryption and integrity
+protection. The client and server write MAC keys are not used. The recipient decrypts the
+message and verifies the integrity information using the sender's write key. In TLS 1.3, only
+AEAD symmetric algorithms are used for confidentiality and integrity.
+
+2.5   Authentication
+
+Server authentication is performed by the client using the server’s public-key certificate, which
+the server presents during the handshake. The exact nature of the cryptographic operation for
+server authentication is dependent on the negotiated security parameters and extensions. In many
+cases, authentication is performed explicitly by verifying digital signatures using public keys that
+are present in certificates or implicitly by the use of the server public key by the client during the
+establishment of the master secret. A successful Finished message implies that both parties
+calculated the same master secret, and thus, the server must have known the private key
+corresponding to the public key in the server’s certificate.
+
+Client authentication is optional and only occurs at the server’s request. Client authentication is
+based on the client’s public-key certificate. The exact nature of the cryptographic operation for
+client authentication depends on the negotiated cipher suite’s key-exchange algorithm and the
+negotiated extensions. For example, when the client’s public-key certificate contains an RSA
+public key, the client signs a portion of the handshake message using the private key
+corresponding to that public key, and the server verifies the signature using the client's public
+key to authenticate the client.
+
+
+
+
+                                                  6
+

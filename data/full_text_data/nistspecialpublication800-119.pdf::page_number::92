@@ -1,0 +1,48 @@
+                                                                   GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+Another new concept is the address selection policy table, which allows administrators to add or override
+address selection rules. IPv4 addresses are represented in the table as IPv4-mapped IPv6 addresses, and
+these are assigned scopes corresponding to IPv6 link-local or global addresses. RFC 3484 gives an
+example of a policy table:
+
+        Prefix              Precedence Label                 Use
+        ::1/128                        50         0          Loopback
+        ::/0                           40         1          Default (including native IPv6)
+        2002::/16                      30         2          6to4
+        ::/96                          20         3          IPv4 Compatible
+        ::ffff:0:0/96                  10         4          IPv4 Mapped
+
+
+Given an address, the entire table is scanned to find the entry with the longest common prefix matching
+the address. Then the corresponding Precedence and Label are returned. This has the effect of, first,
+matching labels of the source and destinations, and, second, preferring native IPv6 addresses over IPv4 or
+the different tunneling addresses (6to4 or v4-compatible).
+
+The first step in source address selection is to make a list of candidate choices. In general, the choice
+should match the interface and scope. The next step is to sort the candidates by going through an ordered
+list of rules, starting with rule 1, and proceeding to the next rule only to break ties:
+
+    1. Prefer a source address that equals the destination.
+    2. Prefer the smallest scope that is at least as large as the destination’s scope. (This rule is
+       mandatory.)
+    3. Prefer an address that is not deprecated.
+    4. Prefer a home address over a care-of address, unless the application chooses to reverse this.
+    5. Prefer an address on the correct outgoing interface for the given destination.
+    6. Prefer an address that matches the label of the destination in the policy table.
+    7. Prefer a public address over a temporary address, unless the application chooses to reverse this.
+    8. Use the address with the longest matching prefix in common with the destination.
+Selecting a destination address follows a similar set of rules. One main difference is that choosing a
+destination involves asking what source would be used for each choice. Candidates are listed and
+compared, starting at rule 1, and continuing down the list of rules to break ties:
+
+    1. Avoid unusable destinations (ones that are unreachable or have no usable source address).
+    2. Prefer a destination with a source of matching scope.
+    3. Prefer a destination with a source that is not deprecated.
+    4. Prefer a destination with a source that is just a home address to one with a source that is just a
+       care-of address.
+
+
+
+                                                      4-29
+

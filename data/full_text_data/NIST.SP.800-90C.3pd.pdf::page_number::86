@@ -1,0 +1,43 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                         Recommendation for RBG Constructions
+       September 2022
+
+2432   B.5.2.1.        Generation
+2433   Let n indicate the requested number of bits to generate. The construction in Section 6.3.1.2 is used
+2434   as follows:
+2435   RBG3(XOR)_Generate:
+2436   Input: integer n, string additional_input.
+2437   Output: integer status, bitstring returned_bits.
+2438   Process:
+2439       1. (status, ES_bits) = Get_conditioned_full-entropy_input(n).
+2440       2. If (status ≠ SUCCESS), then return(status, Null).
+2441       3. (status, DRBG_bits) = Generate_function(n, 256, prediction_resistance_request =
+2442          FALSE, additional_input).
+2443       4. If (status ≠ SUCCESS), then return(status, Null).
+2444       5. returned_bits = ES_bits ⊕ DRBG_bits.
+2445       6. Return SUCCESS, returned_bits.
+2446   Note that the state_handle parameter is not used in the RBG3(XOR)_Generate call or the
+2447   Generate_function call (in step 3) for this example since a state_handle was not returned from
+2448   the RBG3(XOR)_DRBG_Instantiate function (see Appendix B.5.1).
+2449   In step 1, the entropy source is accessed via the conditioning function using the
+2450   Get_conditioned_full-entropy_input routine (see Appendix B.5.2.2) to obtain n bits with full
+2451   entropy.
+2452   Step 2 checks that the Get_conditioned_full-entropy_input call in step 1 was successful. If it
+2453   was not successful, the RBG3(XOR)_Generate function is aborted, returning status ≠ SUCCESS
+2454   to the consuming application along with a Null bitstring as the returned_bits.
+2455   Step 3 calls the Hash_DRBG to generate n bits to be XORed with the n-bit output of the entropy
+2456   source (ES_Bits; see step 1) in order to produce the RBG output. Note that a request for prediction
+2457   resistance is not made in the Generate_function call (i.e., prediction_resistance_request =
+2458   FALSE). Optionally, this parameter could be omitted since prediction resistance is never
+2459   requested.
+2460   Step 4 checks that the Generate_function invoked in step 3 was successful. If it was not
+2461   successful, the RBG3(XOR)_Generate function is aborted, returning status ≠ SUCCESS to the
+2462   consuming application along with a Null bitstring as the returned_bits.
+2463   If step 3 returns an indication of success, the ES_bits returned in step 1 and the DRBG_bits obtained
+2464   in step 3 are XORed together in step 5. The result is returned to the consuming application in step
+2465   6.
+
+
+
+
+                                                          73
+

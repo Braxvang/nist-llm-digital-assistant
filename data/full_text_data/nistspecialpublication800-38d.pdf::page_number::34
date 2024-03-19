@@ -1,0 +1,55 @@
+                                NIST Special Publication 800-38D
+
+
+
+Appendix B: Authentication Assurance
+
+The creation of an authentication tag by the authenticated encryption function provides the
+mechanism whereby assurance of the authenticity of the plaintext and AAD (and IV) can be
+obtained upon the execution of the authenticated decryption function. The nature of this
+assurance depends on the output of the authenticated decryption function:
+
+   •   If the output is the plaintext, then the design of the mode provides strong, but not
+       absolute, assurance that the purported source of the data created the tag, i.e., that the
+       plaintext and the AAD (and the IV and the tag) are authentic. Consequently, the mode
+       also provides strong assurance that this information was not subsequently altered, either
+       intentionally or unintentionally.
+
+   •   If the output is FAIL, then it is certain that at least one of the given inputs (i.e., the
+       ciphertext, the AAD, the IV, or the tag) is not authentic.
+
+In the first case, the assurance is not absolute because forgeries are possible, in principle. In
+other words, an adversary, i.e., a party without access to the key or to the authenticated
+encryption function, may be able to produce the correct tag for some triple of ciphertext, AAD,
+and IV.
+
+As with any tag-based authentication mechanism, if the adversary chooses a t-bit tag at random,
+it is expected to be correct for given data with probability 1/2t. With GCM, however, an
+adversary can choose tags that increase this probability, proportional to the total length of the
+ciphertext and AAD. Consequently, GCM is not well-suited for use with short tag lengths or
+very long messages.
+
+In particular, if n denotes the total number of blocks in the encoding (i.e., the input to the
+GHASH function in the definition of S in Secs. 7.1 and 7.2 above) of the ciphertext and AAD,
+then there is a method of constructing a “targeted” ciphertext forgery that is expected to succeed
+with a probability of approximately n/2t. Moreover, each successful forgery in this attack 1)
+increases the probability that subsequent targeted forgeries will succeed, and 2) leaks
+information about the hash subkey, H. Eventually, H may be compromised entirely, with
+consequences as described at the end of Appendix A: the authentication assurance is completely
+lost.
+
+Ref. [1] describes the attack, and Ref. [7] gives a detailed treatment of the security properties of
+GCM. Appendix C gives guidance and requirements for the use of the two shortest tags sizes, 32
+and 64 bits.
+
+Independent of this attack, an adversary may attempt to systematically guess many different tags
+for a given input to authenticated decryption, and thereby increase the probability that one (or
+more) of them, eventually, will be accepted as valid. For this reason, the system or protocol that
+implements GCM should monitor and, if necessary, limit the number of unsuccessful verification
+attempts for each key.
+
+
+
+
+                                                26
+

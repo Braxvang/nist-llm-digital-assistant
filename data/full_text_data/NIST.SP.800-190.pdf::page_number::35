@@ -1,0 +1,57 @@
+                                                                                             NIST SP 800-190                                              APPLICATION CONTAINER SECURITY GUIDE
+
+
+                                                                                             internal apps can use another, and communication between the two should occur through a small
+                                                                                             number of well-defined interfaces.
+
+                                                                                             4.3.4   Mixing of workload sensitivity levels
+
+                                                                                             Orchestrators should be configured to isolate deployments to specific sets of hosts by sensitivity
+                                                                                             levels. The particular approach for implementing this varies depending on the orchestrator in use,
+                                                                                             but the general model is to define rules that prevent high sensitivity workloads from being placed
+                                                                                             on the same host as those running lower sensitivity workloads. This can be accomplished
+                                                                                             through the use of host ‘pinning’ within the orchestrator or even simply by having separate,
+                                                                                             individually managed clusters for each sensitivity level.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-190
+
+
+
+
+                                                                                             While most container runtime environments do an effective job of isolating containers from each
+                                                                                             other and from the host OS, in some cases it may be an unnecessary risk to run apps of different
+                                                                                             sensitivity levels together on the same host OS. Segmenting containers by purpose, sensitivity,
+                                                                                             and threat posture provides additional defense in depth. Concepts such as application tiering and
+                                                                                             network and host segmentation should be taken into consideration when planning app
+                                                                                             deployments. For example, suppose a host is running containers for both a financial database and
+                                                                                             a public-facing blog. While normally the container runtime will effectively isolate these
+                                                                                             environments from each other, there is also a shared responsibility amongst the DevOps teams
+                                                                                             for each app to operate them securely and eliminate unnecessary risk. If the blog app were to be
+                                                                                             compromised by an attacker, there would be far fewer layers of defense to protect the database if
+                                                                                             the two apps are running on the same host.
+
+                                                                                             Thus, a best practice is to group containers together by relative sensitivity and to ensure that a
+                                                                                             given host kernel only runs containers of a single sensitivity level. This segmentation may be
+                                                                                             provided by using multiple physical servers, but modern hypervisors also provide strong enough
+                                                                                             isolation to effectively mitigate these risks. From the previous example, this may mean that the
+                                                                                             organization has two sensitivity levels for their containers. One is for financial apps and the
+                                                                                             database is included in that group. The other is for web apps and the blog is included in that
+                                                                                             group. The organization would then have two pools of VMs that would each host containers of a
+                                                                                             single severity level. For example, the host called vm-financial may host the containers running
+                                                                                             the financial database as well as the tax reporting software, while a host called vm-web may host
+                                                                                             the blog and the public website.
+
+                                                                                             By segmenting containers in this manner, it will be much more difficult for an attacker who
+                                                                                             compromises one of the segments to expand that compromise to other segments. An attacker
+                                                                                             who compromises a single server would have limited capabilities to perform reconnaissance and
+                                                                                             attacks on other containers of a similar sensitivity level and not have any additional access
+                                                                                             beyond it. This approach also ensures that any residual data, such as caches or local volumes
+                                                                                             mounted for temp files, stays within the data’s security zone. From the previous example, this
+                                                                                             zoning would ensure that any financial data cached locally and residually after container
+                                                                                             termination would never be available on a host running an app at a lower sensitivity level.
+
+                                                                                             In larger-scale environments with hundreds of hosts and thousands of containers, this
+                                                                                             segmentation must be automated to be practical to operationalize. Fortunately, common
+                                                                                             orchestration platforms typically include some notion of being able to group apps together, and
+
+                                                                                                                                             23
+

@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+    •   Minimum TTL. The minimum TTL value is the default value used as the TTL of zone RRsets as
+        well as in negative caching. The minTTL value depends on how often the information changes in
+        the zone. If a zone is static, the value could be large; if the zone is dynamic, the value should be
+        small. A minimum value of 5 minutes is advised, with a recommended range of 30 minutes to 5
+        days.
+
+
+Checklist item 18: The refresh value in the zone SOA RR should be chosen with the frequency of
+updates in mind. If the zone is signed, the refresh value should be less than the RRSIG validity period.
+
+Checklist item 19: The retry value in a zone SOA RR should be 1/10th of the refresh value.
+
+Checklist item 20: The expire value in the zone SOA RR should be 2 to 4 weeks.
+
+Checklist item 21: The minimum TTL value should be between 30 minutes and 5 days.
+
+
+10.2 Information Leakage from Informational RRTypes
+
+There are several types of RRs in the DNS that are meant to convey information to humans and
+applications about the network, hosts, or services. These RRs include the Responsible Person (RP) record,
+the Host Information (HINFO) record, the Location (LOC) record, and the catch-all text string resource
+record (TXT) [RFC1035]. Although these record types are meant to provide information to users in good
+faith, they also allow attackers to gain knowledge about network hosts before attempting to exploit them.
+For example, an attacker may query for HINFO records, looking for hosts that list an OS or platform
+known to have exploits. Therefore, great care should be taken before including these record types in a
+zone. In fact, they are best left out altogether.
+
+More careful consideration should be taken with the TXT resource record type. A DNS administrator will
+have to decide if the data contained in a TXT RR constitutes an information leak or is a necessary piece of
+information. For example, several authenticated email technologies use TXT RR's to store email sender
+policy information such as valid email senders for a domain. These judgments will have to be made on a
+case-by-case basis.
+
+
+Checklist item 22: A DNS administrator should take care when including HINFO, RP, LOC, or other RR
+types that could divulge information that would be useful to an attacker, or the external view of a zone if
+using split DNS. These RR types should be avoided if possible and only used if necessary to support
+operational policy.
+
+Checklist item 23: A DNS administrator should review the data contained in any TXT RR for possible
+information leakage before adding it to the zone file.
+
+
+10.3 Using RRSIG Validity Periods to Minimize Key Compromise
+
+The best way for a zone administrator to minimize the impact of a key compromise is by limiting the
+validity period of RRSIGs in the zone and in the parent zone. This strategy limits the time during which
+an attacker can take advantage of a compromised key to forge responses. An attacker that has
+
+
+
+                                                   10-2
+

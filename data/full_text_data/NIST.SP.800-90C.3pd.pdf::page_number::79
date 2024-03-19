@@ -1,0 +1,45 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                        Recommendation for RBG Constructions
+       September 2022
+
+2219       •    Access to a second sub-DRBG (Sub-DRBG2) that provides output for a second application
+2220            that requires a security strength of 256 bits
+
+2221   B.3.1. Instantiation of the Sub-DRBGs
+2222   Each sub-DRBG is instantiated using output from an RBG1 construction that is discussed in
+2223   Appendix 62B.2.
+
+2224   B.3.1.1.        Instantiating Sub-DRBG1
+2225   Sub-DRBG1 is instantiated using the following Instantiate_function call (see Section 2.8.1.1):
+2226       (status, sub-DRBG1_state_handle) = Instantiate_function (128, prediction_resistance_flag
+2227                                  = FALSE, “Sub-DRBG App 1”).
+2228       •    A security strength of 128 bits is requested from the DRBG indicated by the
+2229            RBG1_state_handle.
+2230       •    Setting “prediction_resistance_flag = FALSE” indicates that a consuming application will
+2231            not be allowed to request prediction resistance. Optionally, the parameter can be omitted.
+2232       •    The personalization string to be used for sub-DRBG1 is “Sub-DRBG App 1.”
+2233       •    The returned state handle for sub-DRBG1 will be sub-DRBG1_state_handle.
+2234   The randomness input for establishing the 128-bit security strength of sub-DRBG1 is requested
+2235   using the following Generate_function call to the RBG1 construction):
+2236           (status, randomness-source_input) = Generate_function(RBG1_state_handle, 192, 128,
+2237                         prediction_resistance_request = FALSE, additional_input).
+2238       •    192 bits are requested from the source RBG (indicated by RBG1_state_handle) at a security
+2239            strength of 128 bits (192 = 128 + 64 = 3s/2).
+2240       •    Setting “prediction_resistance_flag = FALSE” indicates that the source RBG (the RBG1
+2241            construction) will not need to reseed itself before generating the requested output.
+2242            Alternatively, the parameter can be omitted.
+2243       •    Additional input is optional.
+2244   If status = SUCCESS is returned from the Generate_function, the HMAC_DRBG in sub-DRBG1
+2245   is seeded using the randomness-source_input obtained from the RBG1 construction and the
+2246   personalization_string provided in the Instantiate_function call (i.e., “Sub-DRBG App 1”). The
+2247   internal state is recorded for Sub-DRBG1 (including the 128-bit security strength), and status =
+2248   SUCCESS is returned from the Instantiate_function along with a state handle of sub-
+2249   DRBG1_state_handle.
+2250   If status = FAILURE is returned from the Generate_function call, then the internal state is not
+2251   created, status = FAILURE and a Null state handle are returned from the Instantiate_function,
+2252   and the sub-DRBG1 cannot be used to generate bits.
+
+
+
+
+                                                        66
+

@@ -1,0 +1,53 @@
+                      Addendum to NIST Special Publication 800-38A
+
+
+4 Specification of CBC-CS3
+
+Algorithm: CBC-CS3-Encrypt
+
+Input:           plaintext P, such that len(P) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          ciphertext C, such that len(C)=len(P).
+
+Steps:
+
+1.       Apply CBC-CS1-Encrypt to the plaintext P with initialization vector IV and key K
+         to produce C1||C2||…||Cn-2||Cn-1*||Cn.
+
+2.       Return C1||C2||…||Cn-2||Cn||Cn-1*.
+
+Note that in Step 2, Cn-1* and Cn are unconditionally swapped, i.e., even when Cn-1* is a
+complete block; therefore, CBC-CS3 is not strictly an extension of CBC mode. In the
+other case, i.e., when Cn-1* is a nonempty partial block, CBC-CS3-Encrypt is equivalent
+to CBC-CS2-Encrypt.
+
+Algorithm: CBC-CS3-Decrypt
+
+Input:           ciphertext C, such that len(C) is valid;
+                 initialization vector IV;
+                 key K.
+
+Output:          plaintext P, such that len(P)=len(C).
+
+Steps:
+
+1.       Let n be the smallest integer such that n⋅b≥len(C), let d=len(C)-(n-1)⋅b, and let C1,
+         C2, … , Cn-2, Cn-1, Cn* be the unique sequence of bit strings such that
+                a) C=C1||C2||…||Cn-2 ||Cn-1||Cn*;
+                b) Cn-1 is a complete block; and
+                c) If n>2, then C1,…,Cn-2, are complete blocks.
+         Consequently, len(Cn*)=d, and 1≤d≤b, so that Cn* is either a complete block or a
+         nonempty partial block.
+
+2.       Apply the CBC-CS1-Decrypt algorithm with initialization vector IV and key K to
+         C1||C2||… ||Cn-2 ||Cn*||Cn-1, and return the result, P.
+
+Note that in Step 2, Cn* precedes Cn-1 in order to undo the corresponding swap that was
+performed within Step 2 of CBC-CS3-Encrypt.
+
+
+
+                                                6
+

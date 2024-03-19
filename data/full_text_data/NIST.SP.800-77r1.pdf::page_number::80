@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                    GUIDE TO IPSEC VPNS
+
+
+                                                                                                        implementations may use a gateway management server; a server failure could severely
+                                                                                                        impact the management of all gateways. Generally, if the network is designed to be
+                                                                                                        redundant, the IPsec gateways and management servers should also be designed to be
+                                                                                                        redundant.
+                                                                                                   •    NAT. NAT provides a mechanism to use private addresses on the internal network while
+                                                                                                        using public addresses to connect to external networks. NAT can map each private
+                                                                                                        address to a different public address, while the network address port translation (NAPT)
+                                                                                                        variant of NAT can map many private addresses to a single public address, differentiating
+                                                                                                        the original addresses by assigning different public address ports. 48 NAT is often used by
+                                                                                                        enterprises, small offices, and residential users that do not want to pay for more IP
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                        addresses than necessary or wish to take advantage of the security benefits and flexibility
+                                                                                                        of having private addresses assigned to internal hosts. Unfortunately, as described in
+                                                                                                        Section 4, there are known incompatibilities between IPsec and NAT because NAT
+                                                                                                        modifies the IP addresses in the packet, which directly violates the packet integrity
+                                                                                                        assurance provided by IPsec. However, there are a few solutions to this issue, including:
+                                                                                                             o Perform NAT before applying IPsec. This can be accomplished by arranging
+                                                                                                               the devices in a particular order or by using an IPsec gateway that also performs
+                                                                                                               NAT. For example, the gateway can perform NAT first and then IPsec for
+                                                                                                               outbound packets. This is sometimes required because an IPsec service provider
+                                                                                                               with multiple customers cannot build tunnels to each customer using the same
+                                                                                                               internal IP addresses and thus requires their customers to use specific RFC 1918
+                                                                                                               [41] IP addresses.
+                                                                                                             o Use UDP or TCP encapsulation of ESP packets. Encapsulation requires tunnel
+                                                                                                               mode. Encapsulation adds a UDP or TCP header to each packet, which provides
+                                                                                                               an IP address and UDP/TCP port that can be used by NAT (including NAPT).
+                                                                                                               This removes conflicts between IPsec and NAT in most environments. 49 IKE
+                                                                                                               negotiates the use of encapsulation. During the IKE initial exchanges, both
+                                                                                                               endpoints perform NAT discovery to determine if NAT services are running
+                                                                                                               between the two IPsec endpoints. NAT discovery involves each endpoint sending
+                                                                                                               a hash of its original source address(es) and port to the other endpoint, which
+                                                                                                               compares the original values to the actual values to determine if NAT was
+                                                                                                               applied. IKE then moves its communications from UDP port 500 to port 4500 in
+                                                                                                               order to avoid inadvertent interference from NAT devices that perform
+                                                                                                               proprietary alterations of IPsec-related activity. Detection of NAT and the use of
+                                                                                                               encapsulation can also cause the host behind the NAT device to send keepalive
+                                                                                                               packets to the other endpoint, which should keep the NAPT port-to-address
+                                                                                                               mapping from being lost. Although all IKEv2 implementations must support UDP
+
+
+
+                                                                                              48   Additional information on NAT and NAPT is available from [58].
+                                                                                              49   In some cases, either the network architecture or the type of traffic may require additional measures to allow IPsec traffic to
+                                                                                                   negotiate NAT successfully. For example, protocols such as the Session Initiation Protocol (SIP) for Voice over IP (VoIP)
+                                                                                                   and File Transfer Protocol (FTP) have IP addresses embedded in the application data. Handling such traffic correctly in
+                                                                                                   NAT environments may require the use of application-layer gateways (ALGs).
+
+
+
+                                                                                                                                                               63
+

@@ -1,0 +1,1269 @@
+NIST Special Publication 800-49
+                                        Federal S/MIME V3 Client
+                                        Profile
+
+                                        C. Michael Chernick
+
+
+
+
+    C O M P U T E R                       S E C U R I T Y
+
+
+
+                                  November 2002
+NIST Special Publication 800-49   Federal S/MIME V3 Client
+                                  Profile
+                                  Recommendations of the
+                                  National Institute of Standards and Technology
+
+
+
+
+                                  C. Michael Chernick
+
+
+
+
+  C O M P U T E R                        S E C U R I T Y
+
+
+                                  Computer Security Division
+                                  Information Technology Laboratory
+                                  National Institute of Standards and Technology
+                                  Gaithersburg, MD 20899-8930
+
+
+
+
+                                  November 2002
+
+
+
+
+                                  U.S. Department of Commerce
+                                  Donald L. Evans, Secretary
+
+
+
+                                  Technology Administration
+                                  Phillip J. Bond, Under Secretary of Commerce for Technology
+
+
+
+                                  National Institute of Standards and Technology
+                                  Arden L. Bement, Jr., Director
+                       Reports on Information Security Technology
+The Information Technology Laboratory (ITL) at the National Institute of Standards and Technology
+(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the
+Nation’s measurement and standards infrastructure. ITL develops tests, test methods, reference data,
+proof of concept implementations, and technical analysis to advance the development and productive
+use of information technology. ITL’s responsibilities include the development of technical, physical,
+administrative, and management standards and guidelines for the cost-effective security and privacy of
+sensitive unclassified information in Federal computer systems. This Special Publication 800-series
+reports on ITL’s research, guidance, and outreach efforts in computer security and its collaborative
+activities with industry, government, and academic organizations.
+
+
+
+
+Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+endorsement by the National Institute of Standards and Technology, nor is it intended to imply that the entities,
+materials, or equipment are necessarily the best available for the purpose.
+
+
+
+
+                 National Institute of Standards and Technology Special Publication 800-46
+                 Natl. Inst. Stand. Technol. Spec. Publ. 800-31, 26 pages (November 2002)
+                                             CODEN: NSPUE2
+
+
+
+
+                                           Acknowledgments
+
+NIST would like to thank the many people who assisted with the development of this profile. We are
+grateful for the support that we received from members of the Internet Engineering Task Force (IETF),
+IETF’s Public-Key Infrastructure Group (X.509) (PKIX) and S/MIME Working Groups. Special
+thanks are due to John Pawling, Jim Schaad, Russ Housley, Blake Ramsdell, and Tim Polk.
+  Executive Summary to the Federal S/MIME V3 Client Profile
+
+(For Procurement Officials, Implementers, Vendors and Others Interested in Specifying
+S/MIME Technology)
+
+S/MIME (Secure / Multipurpose Internet Mail Extensions) is a set of specifications for securing
+electronic mail. S/MIME is based upon the widely used MIME standard [MIME] and describes a
+protocol for adding cryptographic security services through MIME encapsulation of digitally
+signed and encrypted objects. The basic security services offered by S/MIME are authentication,
+non-repudiation of origin, message integrity, and message privacy. Optional security services
+include signed receipts, security labels, secure mailing lists, and an extended method of
+identifying the signer’s certificate(s).
+
+To understand S/MIME it is useful to understand some of the history of Internet e-mail. In the
+past twenty-five years or so, Internet e-mail has evolved from a simple text-based (ASCII)
+transfer of messages designed for researchers into a more sophisticated messaging system
+capable of communicating a wealth of digital information (e.g., photographic images, computer
+files, sound clips, cinema) to many millions of people around the world.
+
+Internet e-mail was designed for a small community of trusted researchers (primarily at
+university and government sites) for exchanging text-based messages, and thus security was not
+a goal in its design. Over the years many deficiencies in Internet e-mail have been overcome to a
+certain extent through the use of a technology called Multipurpose Internet Mail Extensions
+(MIME). Employing MIME for messaging allows the use of multiple-text effects (e.g., bold,
+italic, various font sizes, and colors) as well as the transfer of digital information. MIME by
+itself also does not address security issues. However, a set of security features has been
+developed and added to MIME to form what is known as S/MIME (Secure MIME).
+
+S/MIME adds features to e-mail messaging including privacy (using encryption), authentication
+of sending party (using digital signatures), integrity (non-alteration of messages), etc. S/MIME
+V3 is the latest version of S/MIME and is supported in whole or part by several vendors with
+“Commercial-Off-The-Shelf” (COTS) products.
+
+Because S/MIME still uses the same extant Internet e-mail technology that has been widely
+deployed for many years, it is not necessary to modify or replace e-mail “servers” to
+accommodate S/MIME. Rather S/MIME functionality may be added to e-mail “client” software.
+By not disturbing the underlying e-mail server/message transfer system, S/MIME allows gradual
+migration from non-secure to secure e-mail messaging, rather than requiring a large, possibly
+abrupt change in technology.
+
+Like other services and protocols used by the Internet community, S/MIME has been under
+development for many years, with the main components specified by the Internet Engineering
+Task Force (IETF), a technical body that issues specifications that serve as standards for vendor
+
+
+
+
+                                            iii
+implementation. These specifications are known as "Request for Comments"1 (RFCs). The
+IETF RFCs for S/MIME reference important standards issued by the International Organization
+for Standardization (ISO) and the International Telecommunication Union (ITU). In addition,
+the U.S. National Institute of Standards and Technology (NIST) has issued certain Federal
+Information Processing Standards (FIPS) that are used to specify requirements for cryptographic
+algorithms and related hardware/software modules used by S/MIME. Thus, implementers and
+users must adhere to a very large set of “standards.”
+
+Furthermore, because standards developers allow many options within communications systems,
+even if all standards are rigidly adhered to, interoperability may not be possible due to differing
+choices of options selected by different vendors. For example, if vendor A chooses to implement
+signed receipts and vendor B chooses not to, then the signed receipts requested by the user of
+vendor A's products will never be sent by vendor B's product although neither implementation
+violates the standards.
+
+To help assure that S/MIME products can interoperate and meet the e-mail security needs of
+federal agencies both with respect to security features, and adequate cryptographic algorithms,
+NIST has developed this Federal S/MIME V3 Client Profile. This profile states requirements for
+implementing sets of cryptographic algorithm suites specified elsewhere by the standards
+development organizations. The profile specifies a set of e-mail security features (e.g.,
+encrypted e-mail, signed receipts) that are mandatory to be implemented. In the definition of this
+Profile, NIST’s intention is never to violate underlying S/MIME standards, but rather to provide
+additional specificity within the standards.
+
+While NIST believes that use of this profile will help assure interoperability of the near term
+secure e-mail products, NIST anticipates that future revisions of the profile will be required to
+reflect new cryptographic algorithms and related attacks, new underlying S/MIME standards,
+and new e-mail security features required by federal agencies.
+
+The use of S/MIME requires the establishment of a Public Key Infrastructure (PKI) to support
+each sender and recipient of S/MIME messages. While the details of PKI are out of scope for
+this document, it is important to note that PKI is used to provide mechanisms to establish the
+identity of S/MIME users (known as authentication) and to provide for digital signatures,
+confidentiality, non-repudiation of sender, etc. X.509 Certificates are used to bind an entity’s
+identity and public key for secure operations for S/MIME and other PKI-enabled secure
+applications. For a further understanding of PKI, see [Kuhn01], [Housley01], or [Adams00] in
+the References clause.
+
+
+
+
+1
+ (Note: The RFC name is a misnomer, but is retained for historic purposes, and is well-known in the Internet
+development community.)
+
+
+                                                    iv
+      Summary of E-mail Security Features Mandated by the Federal
+                       S/MIME V3 Client Profile
+
+    Feature                                 Requirement
+
+    Signed Messages                         Send and receive
+
+    Encrypted Messages                      Send and receive
+
+    Signed and Encrypted                    Send and receive
+    Messages
+
+    Signed Receipt Processing               Request, send, and process signed receipts
+
+    Receipt of Messages from                Process messages from secure mail list agents
+    Secure Mail List Agents                 (includes suppressing of receipts as required and non-
+                                            disclosure of list recipients as required)
+
+    Cryptographic Modules                   FIPS 140-1 or FIPS 140-2, Security Requirements for
+                                            Cryptographic Modules2
+
+    Cryptographic Algorithm                 RSA for digital signature [RFC2313] with SHA-1
+    Suite 1 (ALS1)                          hash algorithm [FIPS180-1], RSA for key transport
+                                            [RFC2313], Triple-DES [FIPS46-3] for content
+                                            encryption (RSA Key Sizes >= 1024 bits)
+
+    Cryptographic Algorithm                 DSA for digital signature [FIPS186-2] with SHA-1
+    Suite 2 (ALS2)                          hash algorithm [FIPS180-1], RSA [RFC2313] for key
+                                            transport, Triple-DES [FIPS46-3] for content
+                                            encryption (DSA Key Size =1024 bits) (RSA Key
+                                            Size >= 1024 bits)
+
+    Public Key Infrastructure               Senders/receivers require valid X.509 certificates
+    (PKI)                                   (Conformance to Federal PKI X.509 Certificate and
+                                            CRL Extensions Profile required)
+
+Note that compliant implementations can generate “clear” signed messages using RSA or DSA
+signature algorithms. (“Clear” signed messages can be read by non S/MIME-enabled clients,
+although signatures cannot be automatically processed and verified by such clients.) S/MIME
+signed messages may include the time that signatures were generated as well as the sender’s PKI
+certificates. The sender’s PKI certificates (also known as X.509 certificates) can be used to
+verify the sender’s identity and help to enable other security services.
+
+
+2
+ FIPS-140 defines four levels of security. The appropriate security level is determined by the sensitivity of the
+data. Cryptographic module security levels are thus chosen on the basis of data sensitivity, and this selection is
+beyond the scope of this profile. See Clause 1 of [FIPS 140-2] for a description of security levels.
+
+
+                                                      v
+Compliant implementations process both “clear” and “opaque” signed messages. (“Opaque”
+signed messages are encoded such that the recipient requires an S/MIME-enabled e-mail client to
+automatically read the message.) Each implementation uses the Lightweight Directory Access
+Protocol (LDAP) to obtain certificates and certificate revocation lists (CRLs) and checks that the
+proper fields within each certificate match the sender’s name.
+
+Compliant implementations must be able to encrypt messages for one or more recipients.
+
+
+Optional Services
+
+The profile identifies three optional cryptographic algorithm suites. These are desirable to
+implement but not mandatory. These suites are:
+
+       ALS3: {RSA [RFC 2313] for digital signature with SHA-1 hash algorithm [FIPS180-1],
+       RSA [RFC 2313] for key transport, AES [FIPS197] for content encryption}
+
+       ALS4: {DSA for digital signature [FIPS186-2] with SHA-1 hash algorithm [FIPS180-1],
+       Diffie-Hellman [RFC2631] for key agreement, Triple-DES for content encryption
+       [FIPS46-3].}
+
+       ALS5: {DSA for digital signature [FIPS186-2] with SHA-256 hash algorithm [FIPS180-
+       2], Diffie-Hellman [RFC2631] for key agreement, AES [FIPS197] for content
+       encryption}
+       Note: Newer versions of DSA are anticipated with support for key sizes greater than 1024
+       bits. New standards for D-H and AES usage are anticipated to require the use of the
+       SHA-256 hash algorithm. The SHA-256 algorithm is now available. [FIPS180-2]
+
+Optional services in this profile include the ability to send and process e-mail with security labels
+(as defined in the S/MIME V3 standards [RFC2634]). Another optional service is the ability to
+securely bind sender’s certificates to their signatures through the signing certificate attribute (as
+defined in [RFC2634]).
+
+Mail list agent processing (also defined in [RFC2634]) is out-of-scope (i.e., will not be tested for
+conformance) with respect to this protocol. However, S/MIME-enabled e-mail client software
+MUST be able to properly process messages from secure mail list agents.
+
+
+
+
+                                             vi
+                                              Federal S/MIME V3 Client Profile
+
+
+                                                     Table of Contents
+1    Introduction..............................................................................................................................1
+2    S/MIME Profile Requirements ................................................................................................2
+  2.1      Fundamental Technologies ............................................................................................. 2
+     2.1.1      Cryptographic Algorithm Suite Conformance........................................................ 3
+     2.1.2      PKI Profile Conformance ....................................................................................... 4
+     2.1.3      Cryptographic Messaging Systems (CMS) Content Types .................................... 5
+     2.1.4      MIME Encoding ..................................................................................................... 5
+     2.1.5      Mail Access Protocols (POP/IMAP) ...................................................................... 6
+  2.2      S/MIME Message Generation......................................................................................... 6
+     2.2.1      Sending Signed Messages....................................................................................... 6
+     2.2.2      Sending Encrypted Messages ................................................................................. 6
+     2.2.3      Sending Signed and Encrypted Messages............................................................... 7
+     2.2.4      Building MIME Header .......................................................................................... 7
+  2.3      S/MIME Message Reception and Processing ................................................................. 7
+     2.3.1      Parsing MIME Header ............................................................................................ 7
+     2.3.2      Receiving Signed Messages.................................................................................... 7
+     2.3.3      Receiving Encrypted Messages .............................................................................. 8
+     2.3.4      Receiving Signed and Encrypted Messages ........................................................... 9
+     2.3.5      Processing Return Receipts..................................................................................... 9
+  2.4      Certificate Processing ..................................................................................................... 9
+     2.4.1      X.509 Certificate Processing .................................................................................. 9
+     2.4.2      X.509 CRL Processing............................................................................................ 9
+     2.4.3      Path Validation........................................................................................................ 9
+     2.4.4      Path Building ........................................................................................................ 10
+3    Support for Enhanced Security Services for S/MIME (RFC 2634) ......................................11
+  3.1      Signed Receipts............................................................................................................. 11
+  3.2      Security Labels.............................................................................................................. 11
+  3.3      Secure Mailing Lists ..................................................................................................... 12
+  3.4      Signing Certificate Attribute......................................................................................... 12
+4    Optional Features and Notes on Testing................................................................................12
+  4.1      Generate Application/pkcs7-signature MIME Type (Opaque) Signed Messages........ 12
+  4.2      Self-Signed Certificates ................................................................................................ 12
+  4.3      Sending CRLs ............................................................................................................... 12
+  4.4      Selective Trust of Certificates....................................................................................... 12
+  4.5      Acquiring Certificates................................................................................................... 12
+  4.6      Importing/Exporting PKCS #12 Credentials ................................................................ 13
+  4.7      Notes on Testing and Scope.......................................................................................... 13
+5 References..............................................................................................................................13
+A. Appendix A Cryptographic Algorithms (Non-Normative)..................................................16
+  A.1      One-Way Hash Algorithms........................................................................................... 16
+  A.2      Symmetric Encryption Algorithms ............................................................................... 16
+  A.3      Digital Signature Algorithms........................................................................................ 17
+  A.4      Key Management Algorithms....................................................................................... 17
+  A.5      Algorithm Suites ........................................................................................................... 18
+
+
+
+                                                                vii
+                               Federal S/MIME V3 Client Profile
+
+
+
+
+1 Introduction
+S/MIME (Secure / Multipurpose Internet Mail Extensions) is a set of specifications for securing
+electronic mail. S/MIME is based upon the widely used MIME standard [MIME] and describes a
+protocol for adding cryptographic security services through MIME encapsulation of digitally
+signed and encrypted objects. The basic security services offered by S/MIME are authentication,
+non-repudiation of origin, message integrity, and message privacy. Optional security services
+include signed receipts, security labels, secure mailing lists, and an extended method of
+identifying the signer’s certificate(s).
+
+S/MIME Version 3 is the latest version of S/MIME. Version 3 is specified in IETF RFCs 2630
+through 2634 ([RFC2630], [RFC2631], [RFC2632], [RFC2633], and [RFC2634]).
+
+The S/MIME specifications were designed to promote interoperable secure electronic mail, such
+that two compliant implementations would be able to communicate securely with one another.
+However, implementations may support different optional services, and the specifications may
+unintentionally allow multiple interpretations. As a result, different implementations of S/MIME
+may not be fully interoperable or provide the desired level of security.
+
+The S/MIME specifications rely on cryptographic mechanisms and public key infrastructures
+(PKI) to provide security services. If the cryptographic and PKI components that are used to
+support the S/MIME implementation are sufficiently robust, users can obtain additional
+assurance that sufficiently strong cryptographic algorithms are used, and that procedures are in
+place to protect sensitive information.
+
+Conformance to this profile helps to assure that S/MIME implementations will be able to
+interoperate and provide reasonable assurance to users.
+
+The National Institute of Standards and Technology (NIST), Information Technology
+Laboratory, Computer Security Division, has developed this S/MIME client profile as guidance
+in the development and procurement of commercial-off-the-shelf (COTS) S/MIME-compliant
+products. This profile document identifies requirements for a secure and interoperable S/MIME
+V3 client implementation. NIST is developing tests and testing tools to determine the level of
+conformance of an S/MIME V3 client implementation with this profile.
+
+This profile does not address requirements for network infrastructure components that implement
+S/MIME V3, such as mail list agents (MLAs) and secure mail gateways (e.g., security guards).
+Such systems will have significant overlap but will have additional requirements specific to their
+function.
+
+The remainder of this document is organized into four principal sections: (a) S/MIME Profile
+requirements; (b) Support for Enhanced Security Services (ESS); (c) Optional Features and
+Notes on Testing; and (d) References. In addition, there is a non-Normative Appendix on
+Cryptographic Algorithms. The profile requirements describe the minimum functionality
+required to support secure and interoperable S/MIME client implementations. The support for
+
+
+
+                                             1
+                               Federal S/MIME V3 Client Profile
+
+
+ESS section discusses requirements for ESS conformance. The optional features and notes on
+testing section specifies desirable, but optional features for S/MIME client implementations as
+well as useful notes for testing. These features will be useful to “power” users, but fall outside
+the core services required to support mainstream S/MIME users. The references section provides
+current URL as well as document titles when documents are on-line. The non-normative
+appendix on cryptographic algorithms provides guidance on cryptographic algorithms.
+
+
+2 S/MIME Profile Requirements
+
+Important S/MIME interoperability and security features are identified in this section. First,
+underlying technologies are examined, including cryptography, public key infrastructure (PKI),
+and formatting of cryptographically protected data. The following subsection describes
+requirements in these areas. Using these technologies, S/MIME clients perform two fundamental
+operations: they generate electronic mail messages and process electronic mail messages. The
+second and third sections describe the minimum functionality for S/MIME message generation
+and reception, respectively.
+
+Conformant implementations MUST be able to generate and process signed, encrypted, and
+signed and encrypted messages as detailed in the paragraphs that follow. Conformant
+implementations MUST be able to support all of the mandatory clauses of the IETF RFCs 2630,
+2632, and 2633 with the exception that implementation of RFC 2631 Ephemeral-Static Diffie-
+Hellman Key Agreement [RFC2631] algorithm mandated in [RFC2630] is NOT required by this
+Profile. However, implementation of the Ephemeral-Static Diffie-Hellman Key Agreement
+algorithm in RFC 2631 is recommended. The terms “MUST,” “SHOULD,” and “MAY” are
+used as defined in RFC 2119 [MUSTSHOULD].
+
+Conformance to this profile also assumes implementations of Federal Information Processing
+Standards (FIPS) approved cryptographic algorithms as specified in Clause 2.1.1.
+
+
+2.1   Fundamental Technologies
+
+S/MIME relies on four fundamental technologies to format and protect electronic mail messages.
+These fundamental technologies are cryptographic algorithms, public key infrastructure (PKI),
+the cryptographic message syntax (CMS) data format, and MIME. Correct implementation of
+these mechanisms is essential to the security and interoperability of every S/MIME client. While
+these technologies will not be tested in isolation, they will be tested indirectly.
+
+However, not all features available through these technologies are required for S/MIME. To that
+end, we describe the features that are required by this profile.
+
+
+
+
+                                            2
+                                      Federal S/MIME V3 Client Profile
+
+
+2.1.1 Cryptographic Algorithm Suite Conformance
+To help ensure that cryptographic functions are correctly implemented, software modules
+implementing cryptographic functions MUST conform to either FIPS 140-1, or FIPS 140-2,
+Security Requirements For Cryptographic Modules [FIPS140-1] [FIPS140-2]3.
+
+2.1.1.1 Mandatory to Implement Algorithm Suites
+Conforming Federal S/MIME Profile implementations MUST support the following suites of
+cryptographic algorithms:
+       ALS1: {RSA for digital signature [RFC2313] with SHA-1 hash algorithm [FIPS180-1],
+       RSA for key transport [RFC2313], Triple-DES [FIPS46-3] for content encryption}
+       Conforming implementations MUST support a RSA key size of at least 1024 bits. For
+       Triple-DES, when generating messages at least two independent keys MUST be
+       supported using the Cipher Block Chaining (CBC) Mode. This algorithm is also known
+       as DES EDE3 CBC.
+
+         ALS2: {DSA for digital signature [FIPS186-2] with SHA-1 hash algorithm [FIPS180-1],
+         RSA [RFC2313] for key transport, Triple-DES [FIPS46-3] for content encryption}
+         Conforming implementations MUST support a DSA key size of 1024 bits.
+
+This profile requires that implementations MUST be able to verify signatures on certificates and
+messages using either of the above algorithm suites. However for message generation only one
+of these algorithm suites MUST be supported. This implies that both the RSA digital signature
+and DSA algorithms MUST be supported for message verification, but only one of these
+algorithms MUST be supported for message generation. However, implementations SHOULD
+support both signature algorithms for message generation.
+
+2.1.1.2 Recommended Algorithm Suites
+In addition to supporting ALS1 or ALS2, conforming implementations SHOULD support the
+following additional algorithm suites:
+
+         ALS3: {RSA [RFC 2313] for digital signature with SHA-1 hash algorithm [FIPS180-1],
+         RSA [RFC 2313] for key transport, Advanced Encryption Standard [FIPS197] for content
+         encryption}
+
+         ALS4: {DSA for digital signature [FIPS186-2] with SHA-1 hash algorithm [FIPS180-1],
+         Diffie-Hellman [RFC2631] for key agreement, Triple-DES for content encryption
+         [FIPS46-3].}
+
+         ALS5: {DSA for digital signature [FIPS186-2] with SHA-256 hash algorithm [FIPS180-
+         2], Diffie-Hellman [RFC2631] for key agreement, AES [FIPS197] for content
+         encryption}
+
+
+
+3
+ FIPS-140 defines four levels of security. The appropriate security level is determined by the sensitivity of the
+data. Cryptographic module security levels are thus chosen on the basis of data sensitivity, and this selection is
+beyond the scope of this profile. See Clause 1 of [FIPS 140-2] for a description of security levels.
+
+
+
+                                                      3
+                                Federal S/MIME V3 Client Profile
+
+
+       Note: Newer versions of DSA will become available with support for key sizes greater
+       than 1024 bits. New standards for D-H and AES usage are anticipated to require the use
+       of the SHA-256 hash algorithm. The SHA-256 algorithm is now available in draft form.
+
+Related recommendations on public key sizes:
+       • If an implementation supports AES in conjunction with RSA, the implementation
+           SHOULD also support RSA public key sizes greater than 1024 bits.
+       • If an implementation supports AES in conjunction with D-H, the implementation
+           SHOULD also support D-H public key sizes greater than 1024 bits.
+       • If an implementation supports public key sizes greater than 1024 bits when using
+           either DSA or RSA for digital signature, the implementation SHOULD also support
+           SHA-256.
+
+Additional algorithm suites will be identified in the future.
+
+Note: The current Digital Signature Algorithm (DSA) defined in [FIPS186-2] uses a key size of
+at least 1024 bits. Future versions of FIPS 186 will be defined to allow for key sizes of 1024 bits
+or longer.
+
+Support of additional algorithm suites, especially using other FIPS approved algorithms (e.g., the
+Elliptical Curve Digital Signature Algorithm ECDSA [ANSIX9.62]) or other FIPS approved
+algorithms [FIPS140-1] or [FIPS140-2], is encouraged to promote interoperability and backward
+compatibility.
+
+However, some older and weaker algorithm suites should be avoided and not trusted. For
+example, the MD2 message digest algorithm and 512 bit RSA are now considered to be weak by
+many cryptographers.
+
+Further information on cryptographic algorithm suites is provided in Appendix A.
+
+2.1.1.3 Key Wrap Specifications
+In S/MIME V3, management of symmetric cryptographic keys often leads to situations where
+one symmetric key is used to encrypt (or wrap) another (e.g., sending enveloped data to several
+recipients). In situations where Triple-DES [FIPS46-3] is used for symmetric key encryption
+and key wrapping is required, the method for encoding the key wrap is as specified in
+[RFC3217] (or its successor document) MUST be used. In situations where AES [FIPS197] is
+used for symmetric key encryption and key wrapping is required, the method for encoding the
+key wrap as specified in [RFC3394] MUST be used.
+
+2.1.2 PKI Profile Conformance
+In order to help ensure that S/MIME V3 implementations interoperate securely, it is useful to
+adopt a profile of the X.509 standard. The most widely accepted PKI profile is the IETF Public
+Key Infrastructure using X.509 (PKIX) profile developed by the PKIX working group. The
+PKIX profile [RFC3280] identifies the format and semantics of certificates and CRLs for use on
+the Internet. Procedures are described for processing and validating certification paths in the
+Internet environment. The PKIX profile has also been adopted by the Federal PKI Technical
+
+
+
+                                              4
+                               Federal S/MIME V3 Client Profile
+
+
+Working Group in the “Federal Public Key Infrastructure (PKI) X.509 Certificate and CRL
+Extensions Profile” [CERTCRL]. Conformance to this S/MIME V3 Profile requires
+conformance to [CERTCRL].
+
+2.1.3 Cryptographic Messaging Systems (CMS) Content Types
+Conforming implementations MUST be able to generate and receive the following CMS Content
+Types embedded in a ContentInfo object as defined in [RFC2630]:
+
+   •   SignedData
+   •   EnvelopedData
+   •   Receipt
+
+Conforming implementations MUST be able to generate and receive the following CMS content
+types as embedded content:
+
+   •   Data
+
+Note: The inclusion of Signed Receipts in Sections 2.2, 2.3, and 3.1 implies that implementations
+MUST include the Receipt content type from [RFC2634].
+
+In S/MIME messages, the Data content type is only used within SignedData or EnvelopedData
+content types and always contains a MIME-encoded message.
+
+Conforming implementations MUST be able to process nested S/MIME security layers such that
+signed data may appear within enveloped data and enveloped data may appear within signed
+data. Details of nesting of content types within MIME types are contained in [RFC2634]
+Clauses 1.1 and 1.2. Nesting beyond triple wrapping as defined in [RFC2634] Clauses 1.1 and
+1.2 is not required.
+
+2.1.4 MIME Encoding
+S/MIME is used to secure MIME content. Traditionally S/MIME implementations have used
+Base64 MIME encoding for all information. (Base64 encoding is used to transfer binary
+information through Internet (SMTP) mail because Internet mail was originally designed to
+transfer ASCII information only. Therefore to ensure that binary information is passed through
+the Internet without modification, it is necessary to translate the information into an ASCII
+representation such as Base64.) Unfortunately Base64 encoding applied to binary information
+causes an increase of message size of at least 33 percent and thus represents a waste of network
+bandwidth, and possibly storage at either end.
+
+S/MIME uses ASN.1 Basic Encoding Rules (BER) to represent data [X.208] [X.209]. There are
+multiple layers of BER encoded data in S/MIME messages, each usually “wrapped” in Base64
+encoding. While it is necessary to have the outermost binary (BER) representation Base64
+encoded for passage through the Internet, inner binary representations need not have Base64
+encoding applied, although most implementations apply Base64 even to inner binary
+representations.
+
+
+
+
+                                            5
+                               Federal S/MIME V3 Client Profile
+
+
+Conforming implementations MUST be able to receive messages where inner MIME encodings
+are not individually Base64 encoded. There is no requirement that S/MIME implementations
+generate messages with inner MIME encodings without Base64, although S/MIME
+implementations SHOULD be able to generate messages with Base64 encoding applied only to
+the outermost binary data.
+
+2.1.5 Mail Access Protocols (POP/IMAP)
+To send S/MIME messages over the Internet each end user (e.g., e-mail client) must have one or
+more e-mail accounts on an SMTP-enabled server (i.e., a standard Internet mail server).
+Normally, each client also needs a “mail access” protocol, (e.g., POP, IMAP) to support transfer
+of messages to/from the e-mail server and their local computer. With respect to this S/MIME V3
+Client Profile, the “mail access” protocol is out-of-scope.
+
+
+2.2 S/MIME Message Generation
+S/MIME implementations MUST be able to generate S/MIME messages that are correctly
+formatted as per IETF S/MIME V3 specifications and include sufficient information for the
+recipient to verify the signature or decrypt the data. In addition, these messages MAY include
+information to allow the recipient to generate secure responses.
+
+2.2.1 Sending Signed Messages
+    • S/MIME implementations MUST be able to generate SignerInfo including signed
+      attributes.
+    • S/MIME implementations MUST be able to generate SMIMECapabilities and
+      signingTime attributes.
+    • S/MIME implementations SHOULD be able to generate signingCertificate attributes.
+    • S/MIME implementations MUST be able to include user certificates and appropriate
+      CRLs.
+    • S/MIME implementations MUST be able to generate multipart/signed (i.e., "clear")
+      messages.
+    • S/MIME implementations MUST be able to request return signed receipt messages (as
+      specified in [RFC 2634]) where the receipt goes to the message originator. (Requesting a
+      return signed receipt where the receipt is directed to a third party is out of scope for this
+      profile, and thus claims to conformance will not be tested. However, correctly
+      responding to the reception of such a signed receipt request is required, as stated in
+      Clause 2.3.2)
+
+2.2.2 Sending Encrypted Messages
+    • S/MIME implementations MUST be able to generate symmetric keys, encrypt messages
+      using these keys, and encrypt symmetric keys using PKCS#1 v1.5 RSA keys as defined
+      in [RFC2313].
+    • S/MIME implementations SHOULD be able to generate Diffie-Hellman keys and derive
+      pairwise symmetric key-encryption keys (KEK) as defined in [RFC2631], and then use
+      the KEK to encrypt the content-encryption key as specified in [RFC2630].
+    • S/MIME implementations MUST be able to encrypt a message for multiple recipients.
+
+
+
+
+                                             6
+                              Federal S/MIME V3 Client Profile
+
+
+   • When the sender supports more than one method for key management, the
+     implementation SHOULD automatically select an appropriate method based on the
+     contents of each recipient’s key management certificates (usually obtained from
+     previously received messages).
+   • When the sender supports more than one method for symmetric encryption, the
+     implementation SHOULD automatically select the appropriate encryption method based
+     on each recipient’s SMIMECapabilities attributes from previously received messages.
+   • S/MIME implementations MUST be able to construct a certification path for the
+     receiver’s key management certificate, including CRLs, using the Lightweight Directory
+     Access Protocol (LDAP). This includes:
+    • the ability to build the path.
+    • the ability to fetch the recipient’s certificate using LDAP.
+    • the ability to fetch CRLs using LDAP.
+    • the ability to fetch issuer certificates using LDAP.
+   • S/MIME implementations MUST validate the certification path where the end certificate
+     is the receiver’s key management certificate or reject the certificate.
+
+2.2.3 Sending Signed and Encrypted Messages
+    • S/MIME implementations MUST be able to satisfy the requirements for sending signed
+      messages as in Clause 2.2.1 above and MUST be able to satisfy the requirements for
+      sending encrypted messages as in Clause 2.2.2 above.
+    • S/MIME implementations MUST be able to generate signed and then encrypted
+      messages. This includes generating a symmetric key and encrypting the message.
+    • S/MIME implementations SHOULD be able to use the application/pkcs7-mime type to
+      generate signed then encrypted messages.
+
+2.2.4 Building MIME Header
+    • S/MIME implementations MUST be able to create properly formatted MIME headers as
+      per [RFC2633] for each of the message types above.
+    • S/MIME implementations MUST be able to create the intermediate MIME wrappers.
+
+
+2.3 S/MIME Message Reception and Processing
+S/MIME implementations MUST be able to receive and process S/MIME messages that are
+correctly formatted. Recipients MUST be able to verify the signature or decrypt the data using
+the information provided by the sender. Where necessary, the recipient MUST be able to
+augment sender-provided information with certificates, CRLs, or other status information. (For
+example, the recipient may use LDAP for retrievals of CRLs.)
+
+2.3.1 Parsing MIME Header
+    • S/MIME implementations MUST be able to process properly formatted MIME headers.
+
+2.3.2 Receiving Signed Messages
+    • S/MIME implementations MUST be able to process SignerInfo including signed
+      attributes.
+
+
+
+                                           7
+                               Federal S/MIME V3 Client Profile
+
+
+   •   S/MIME implementations MUST be able to process both multipart/signed (i.e., "clear")
+       and application/pkcs7-signature MIME Type (i.e., "opaque") signed messages.
+   •   S/MIME implementations MUST be able to acquire certificates by extracting certificates
+       from incoming signed messages.
+   •   S/MIME implementations MUST handle unknown attributes gracefully by accepting the
+       message and informing the user.
+   •   S/MIME implementations MUST be able to construct a certification path for the sender’s
+       signature certificate, including CRLs, using LDAP. This is further described in Clause
+       2.4.4. below.
+   •   S/MIME implementations MUST validate the certification path where the end certificate
+       is the sender’s signature certificate or reject the certificate.
+   •   Whenever an S/MIME implementation indicates the signature on a message is valid, that
+       implementation MUST display an authenticated name (e.g., the subject name or a
+       subjectAltName) from the signer’s certificate.
+   •   S/MIME implementations MUST compare the SubjectAltName.rfc822Name or PKCS#9
+       emailAddress in the signer's certificate with the actual e-mail address used in the received
+       message's “From” or “Sender” field (See [RFC3280] and [RFC2632].).
+       1. If the addresses do not match or the certificate does not contain any e-mail addresses,
+            the S/MIME implementation MUST display information to the user to allow the user
+            to accept or reject the message. This information MUST be displayed the first time
+            that an e-mail message arrives with a unique pair of “From” address and signer
+            certificate.
+       2. To avoid continual display of information in environments where certificates either
+            do not contain e-mail address, or there are frequent mismatches between e-mail
+            addresses used in the “From” field of RFC822 messages and those in the signer’s
+            certificate, the implementation SHOULD allow the user the option of suppressing
+            further display of information on subsequent messages received with the same unique
+            pair of “From” address and signer certificate.
+       3. The implementation MUST clearly differentiate between authenticated names (from
+            the signer’s certificate) and unauthenticated names (e.g., the rfc822 “phrase” in
+            “mailbox” in the address specification in the “From” field) when displaying signature
+            validation information.
+   •   S/MIME implementations MUST be able to generate return signed receipt messages as
+       specified in [RFC2634]. Signed receipts SHOULD be sent to the entities named in the
+       receiptsTo field of the receipt request according to the processing described in Section 2
+       of [RFC2634]. Note: As specified in [RFC2634], this processing may cause modification
+       in determining if return signed receipts should be sent according to the value of the
+       mlExpansionHistory attribute (if any) contained in received messages.
+
+2.3.3 Receiving Encrypted Messages
+    • S/MIME implementations MUST be able to process encrypted messages. This includes
+      recovering the symmetric key and using the key to decrypt the message.
+    • S/MIME implementations MUST be able to process messages for one or more recipients.
+    • Receiving agents SHOULD allow a transparent selection of the appropriate private key
+      for decryption of an incoming message when the recipient has multiple certificates (each
+      associated with a private key) used for key management.
+
+
+                                            8
+                              Federal S/MIME V3 Client Profile
+
+
+
+2.3.4 Receiving Signed and Encrypted Messages
+    • S/MIME implementations MUST be able to receive and process messages that are signed
+      and then encrypted. Implementations SHOULD be able to receive and process messages
+      that are signed, encrypted, and then signed again. (Triple wrapping as defined in
+      [RFC2634].) Implementations that can process arbitrary layers of wrapping are
+      preferable.
+
+2.3.5 Processing Return Receipts
+    • S/MIME implementations MUST be able to process return signed receipts as specified in
+      [RFC2634] for messages that the implementation generated and are still retained on the
+      client system. Receipts for messages generated by a third party are out of scope for this
+      profile, and thus claims to conformance will not be tested.
+    • S/MIME implementations MUST be able to match receipts to messages automatically.
+    • When S/MIME implementations process return signed receipt messages, the
+      requirements for receiving signed messages as in Clause 2.3.2 above MUST be satisfied.
+
+
+2.4 Certificate Processing
+S/MIME is a PKI-enabled secure application. Specifically, S/MIME V3 implementations MUST
+obtain and validate X.509 public key certificates to validate the signature on a message or
+exchange symmetric key material. If critical PKI features are not present or are weak, the
+security of S/MIME implementations will be adversely affected. PKI features are described in
+detail in [RFC3280], "Internet X.509 Public Key Infrastructure Certificate and Certificate
+Revocation List (CRL) Profile."
+
+The PKI features may be divided into four basic categories. These categories are explained in
+detail below.
+
+2.4.1 X.509 Certificate Processing
+      S/MIME implementations MUST be able to process all critical or optionally critical
+      certificate extensions in the Federal Certificate and CRL Profile [CERTCRL]. S/MIME
+      implementations MUST not reject certificates with unrecognized non-critical extensions.
+      S/MIME agents MUST have the capability to support distinct certificates for digital
+      signature and key management security services for both message origination and
+      reception.
+
+2.4.2 X.509 CRL Processing
+      S/MIME implementations MUST be able to process all critical or optionally critical CRL
+      extensions in the Federal Certificate and CRL Profile [CERTCRL]. S/MIME
+      implementations MUST not reject CRLs with unrecognized non-critical extensions.
+
+2.4.3   Path Validation
+        S/MIME implementations MUST be able to validate a certification path according to
+        [RFC3280], Section 6. S/MIME implementations MUST be able to use X.509 CRLs to
+
+
+
+
+                                           9
+                                Federal S/MIME V3 Client Profile
+
+
+        establish certificate status for path validation. At a minimum, the following aspects of
+        path validation MUST be implemented:
+            • certificate policies, policy constraints, and policy mapping
+            • basic constraints
+            • name constraints for distinguished names and RFC822 names
+            • DSA parameter inheritance
+            • processing certification paths with multiple signature algorithms
+            • name chaining
+            • signature verification
+            • validity date checking
+            • revocation checking by processing CRLs
+            • key usage/extended key usage
+            • CRL distribution points
+            • CRL entry extensions: invalidity date, reason code.
+
+2.4.4   Path Building
+        Although not described in [RFC3280], path building is an important aspect of PKI-
+        enabled applications. S/MIME implementations MUST be able to construct certification
+        paths between an accepted trust point and a sender's or a recipient's certificate(s). Path
+        building algorithms are not specified in any standard or specification. However, a variety
+        of resources are available to assist in path building using heuristic methods. These
+        resources include standard directory attributes and a variety of supplementary
+        information in certificate extensions. S/MIME implementations MUST be able to take
+        advantage of this information to provide complete path building services. At a minimum,
+        the following features MUST be supported:
+        • retrieve CRLs using LDAP from the following directory attributes:
+            • certificate revocation list, and
+            • authority revocation list.
+        • retrieve certificates using LDAP from the following directory attributes:
+            • Cross certificate pair,
+            • CA certificate, and
+            • user certificate.
+        • locate certificates in directory entries through at least one of the following methods:
+            • Authority Information Access (AIA) extension,
+            • Subject Information Access (SIA) extension, or
+            • retrieval from a well-known directory.
+        • locate CRLs in directory entries through both of the following methods:
+            • CRL distribution point extension, and
+            • retrieval from a well-known directory.
+
+        The use of the above features is intended to allow implementations to build certification
+        paths in non-hierarchical PKIs (e.g., across bridge PKIs.)
+
+
+
+
+                                             10
+                                 Federal S/MIME V3 Client Profile
+
+
+3 Support for Enhanced Security Services for S/MIME (RFC 2634)
+      The IETF has defined a set of Enhanced Security Services (ESS) for S/MIME in
+      [RFC2634]. The services defined include signed receipts, security labels, secure mailing
+      lists, and an extended method of identifying the signer’s certificate(s). This profile does not
+      require conformance to [RFC2634] with the exception that signed receipt requesting,
+      processing, and generation is required as specified in Clause 3.1 of this profile. However,
+      mail agents that include support for any of these ESS services may optionally claim support
+      for any or all of these services, either in origination of messages, receipt of messages, or
+      both. Note that some optional services defined in [RFC2634] are out of scope for this
+      profile as specified below, and thus claims to conformance will not be tested.
+
+3.1    Signed Receipts
+      Support for signed receipts is one of the four optional security services defined in
+      [RFC2634]. For the purposes of this Profile, e-mail agents MUST be able to request,
+      generate, and process signed receipts as described in [RFC2634].
+         • S/MIME agents that originate messages MUST be able to generate signed receipt
+            requests for signed messages as defined in [RFC2634]. (See Clause 2.2.1 above.)
+         • S/MIME agents that receive messages MUST be able to generate signed receipts for
+            signed messages that they receive containing signed receipt requests as defined in
+            [RFC2634]. (See Clause 2.3.2 above.)
+         • S/MIME agents that receive messages MUST be able to process signed receipts
+            (including signature verification) as defined in [RFC2634]. (See Clause 2.3.5 above.)
+         • Mail list agent processing is beyond the scope of this profile. However, S/MIME
+            agents MUST be able to process mlExpansionHistory attributes as defined in Section
+            2 of [RFC2634].
+
+3.2    Security Labels
+      Support for security labels is one of the four optional security services defined in
+      [RFC2634]. If an S/MIME implementation claims to conform to the security label service
+      defined in Clause 3 of [RFC2634], then the following requirements are imposed on the
+      implementation:
+         • S/MIME agents that originate messages MUST be able to generate security labels as
+            defined in [RFC2634].
+         • S/MIME agents MUST be able to display security labels in received messages as
+            defined in [RFC2634]. S/MIME agents MUST be able to examine the security label
+            on a received message and determine whether the recipient is allowed to see the
+            contents of the message. If the recipient is not allowed to see the message contents
+            then the agent MUST not display the message contents.
+         • The generation and processing of Equivalent Security Labels is beyond the scope of
+            this profile, but may be added to a future profile. However, as stated in [RFC2634],
+            “[a]ll receiving agents SHOULD recognize equivalentLabels attributes even if they
+            do not process them.”
+
+
+
+
+                                              11
+                                Federal S/MIME V3 Client Profile
+
+
+3.3 Secure Mailing Lists
+Support for Secure Mailing Lists (“Mail List Management”) is one of the four optional security
+services defined in [RFC2634]. Mail list agent processing is beyond the scope of this profile but
+may be added to a future profile. However, S/MIME implementations MUST be able to process
+received signed messages that contain the mlExpansionHistory attribute as described in Clause
+3.1 above.
+
+3.4 Signing Certificate Attribute
+Support for Signing Certificate Attributes is one of the four optional security services defined in
+[RFC2634]. If an S/MIME implementation claims to conform to the Signing Certificate
+Attribute requirements defined in Clause 5 of [RFC2634], then the following requirements are
+imposed on the implementation:
+       • S/MIME agents that originate messages MUST be able to generate messages that
+            contain a signing certificate attribute as defined in [RFC2634].
+       • S/MIME agents that receive messages MUST be able to properly process messages
+            that contain a signing certificate attribute as defined in [RFC2634].
+
+
+4 Optional Features and Notes on Testing
+Since the functionality offered by these optional features may be achieved through other means,
+inclusion of these options in S/MIME implementations is recommended, but not required.
+
+4.1  Generate Application/pkcs7-signature MIME Type (Opaque) Signed
+     Messages
+Sending agents SHOULD have the capability to generate application/pkcs7-signature MIME
+Type (i.e., “opaque”) signed messages.
+
+4.2 Self-Signed Certificates
+Sending and receiving agents SHOULD have the capability to support self-signed certificates by
+accepting them as trust anchors.
+
+4.3 Sending CRLs
+Sending agents SHOULD have the capability to include appropriate CRLs with outgoing
+messages (i.e., CRLs which are associated with the sender's certificates).
+
+4.4 Selective Trust of Certificates
+S/MIME agents SHOULD provide the capability to configure the set of trust anchors, (i.e., set
+the root trust certificates).
+
+4.5 Acquiring Certificates
+S/MIME agents SHOULD have the capability to acquire certificates in either of the following
+ways:
+      1) Loading certificates (or chains of certificates) from *.p7c and *.p7m files (file
+         extension types) and messages as defined in [RFC2633].
+
+
+
+
+                                             12
+                              Federal S/MIME V3 Client Profile
+
+
+        2) Loading certificates from commonly used (e.g., *.cer and *.crt (binary encoded
+           certificates)) file extension types.
+      Note: Lookup of certificates (and chains of certificates) from a LDAP repository is
+      required as stated in Clause 2.2.2.
+
+4.6 Importing/Exporting PKCS #12 Credentials
+S/MIME agents SHOULD have the capability to import PKCS #12 objects as defined in
+[PKCS#12].
+
+4.7 Notes on Testing and Scope
+   • Some testing requires “human scoring” because a user interface is involved. For example,
+     as stated in Clause 2.3.2:
+       “S/MIME implementations MUST ensure that either the SubjectAltName.rfc822Name
+       or PKCS#9 emailAddress in the signer's certificate matches the actual e-mail address
+       used in the received message's “From” or “Sender” field (See [RFC3280] and
+       [RFC2632].) If the addresses do not match, the S/MIME implementation MUST
+       display information to the user to allow the user to accept or reject the message.
+
+        There is no efficient method to automate verification that the S/MIME implementation
+        actually displays the mismatch information. Thus, human scoring is required to
+        evaluate the implementation’s conformance to this requirement.
+
+  •   Security of operating system and e-mail mechanisms are beyond the scope of this profile.
+      For example, system operators must ensure that the operating system itself is secured, and
+      that the e-mail system is secure. This profile addresses only the security aspects of IETF-
+      developed S/MIME extensions.
+
+
+5 References
+  •   [Adams00] Understanding Public-Key Infrastructure, Carlisle Adams and Steve Lloyd,
+      Macmillan Technical Publishing, Indianapolis, Indiana, 2000
+  •   [ANSIX9.31] ANSI X9.31-1997, X9.31 Digital Signatures Using Reversible Public Key
+      Cryptography for the Financial Services Industry (rDSA), 1997
+  •   [ANSIX9.44] ANSI X9.44-2001, Public Key Cryptography for the Financial Services
+      Industry: Key Agreement and Key Transport Using Factoring-Based Cryptography.
+      Working Draft, January 12, 2001
+  •   [ANSIX9.57] ANSI X9.57-1997, Public Key Cryptography for the Financial Services
+      Industry: Certificate Management, 1997
+  •   [ANSIX9.62] ANSI X9.62-1999, Public Key Cryptography for the Financial Services
+      Industry: The Elliptic Curve Digital Signature Algorithm (ECDSA), 1998
+  •   [ANSIX9.63] ANSIX9.63-2001, Public Key Cryptography for the Financial Services
+      Industry: Key Agreement and Key Transport Using Elliptic Curve Cryptography. Working
+      Draft, May 8, 2001
+
+
+
+
+                                           13
+                            Federal S/MIME V3 Client Profile
+
+
+•   [CERTCRL], Federal Public Key Infrastructure (PKI) X.509 Certificate and CRL
+    Extensions Profile, http://csrc.nist.gov/pki/twg/y2002/papers/twg-02-04.xls (Note: In
+    Excel Format), 15 February 2002
+•   [FIPS46-3], FIPS 46-3, Data Encryption Standard (DES), Defines and specifies the use of
+    DES and Triple DES, http://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf,
+    November 1999
+•   [FIPS140-1], FIPS 140-1, Security Requirements For Cryptographic Modules,
+    http://csrc.nist.gov/publications/fips/fips140-1/fips1401.pdf
+•   [FIPS140-2], FIPS 140-2, Security Requirements For Cryptographic Modules,
+    http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf
+•   [FIPS180-1], Secure Hash Standard, http://www.itl.nist.gov/fipspubs/fip180-1.htm
+•   [FIPS180-2], Secure Hash Standard, http://csrc.nist.gov/publications/fips/fips180-
+    2/fips180-2.pdf
+•   [FIPS186-2], FIPS 186-2, Digital Signature Standard,
+    http://csrc.nist.gov/publications/fips/fips186-2/fips186-2.pdf, Feb. 2000
+•   [FIPS197], Specification for the Advanced Encryption Standard (AES),
+    http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf, November 26, 2001
+•   [Housley01] Planning for PKI, Russ Housley and Tim Polk, John Wiley & Sons, New
+    York, 2001
+•   [Kuhn01] Introduction to Public Key Technology and the Federal PKI Infrastructure,
+    Rick Kuhn, Vincent Hu, Tim Polk, and Shu-jen Chang,
+    http://csrc.nist.gov/publications/nistpubs/800-32/sp800-32.pdf, 26 February 2001
+•   [MUSTSHOULD] Bradner, S., Key words for use in RFCs to Indicate Requirement
+    Levels, BCP 14, RFC 2119, March 1997
+•   [MIME], RFC 1341, N. Borenstein, and N. Freed, Mechanisms for Specifying and
+    Describing the Format of Internet Message Bodies, June 1992.
+•   [PKCS #1], RSA Cryptography Standard, ftp://ftp.rsasecurity.com/pub/pkcs/ascii/pkcs-
+    1.asc, (See [RFC2313].)
+•   [RFC2313], RFC 2313, Kaliski, B., PKCS #1: RSA Encryption Version 1.5, March 1998
+•   [RFC2587], RFC 2587, Internet X.509 Public Key Infrastructure LDAPv2 Schema, S.
+    Boeyen, T. Howes, P. Richard, June 1999
+•   [RFC2630], RFC 2630, Cryptographic Message Syntax, defines a cryptographic
+    algorithm independent format for signed and encrypted data, June 1999
+•   [RFC2631], RFC 2631, Diffie-Hellman Key Agreement Method, defines a variant of the
+    Diffie-Hellman cryptographic algorithm as the mandatory key agreement method for
+    S/MIME V3, June 1999
+•   [RFC2632], RFC 2632, S/MIME Version 3 Certificate Handling, describes how an
+    S/MIME V3 client uses public key infrastructure (PKI) to establish that a public key is
+    valid, June 1999
+•   [RFC2633], RFC 2633, S/MIME Version 3 Message Specification, describes the protocol
+    for adding cryptographic signature and encryption services to MIME data, June 1999
+•   [RFC 2634], RFC 2634, Enhanced Security Services for S/MIME, describes four optional
+    security service extensions: signed receipts; security labels; secure mailing lists; and
+    signing certificates, June 1999
+•   [RFC3217], RFC3217, Triple-DES and RC2 Key Wrapping, September, 2001
+
+
+
+                                        14
+                           Federal S/MIME V3 Client Profile
+
+
+•   [RFC3280], RFC3280, Internet X.509 Public Key Infrastructure Certificate and
+    Certificate Revocation List (CRL) Profile, R. Housley, W. Polk, W. Ford, and D. Solo,
+    April 2002.
+•   [RFC3394], Advanced Encryption Standard (AES) Key Wrap Algorithm, J. Schaad, R.
+    Housley, September 2002.
+•   [X.208], CCITT Recommendation X.208 (1988) | ISO/IEC 8824:1990, Information
+    technology – Abstract Syntax Notation One (ASN.1): Specification of Basic Notation,
+    1988
+•   [X.209] CCITT. Recommendation X.209 (1988) | ISO/IEC 8825:1990, Information
+    technology – Abstract Syntax Notation One (ASN.1): Specification of Basic Encoding
+    Rules (BER), 1990
+•   [X.690], ITU-T Recommendation X.690 (1997) | ISO/IEC 8825-1:1998, Information
+    technology – Abstract Syntax Notation One (ASN.1): Specification of Basic Encoding
+    Rules (BER), Canonical Encoding Rules (CER) and Distinguished Encoding Rules (DER),
+    December 1997
+•   [X.509] ITU-T Recommendation X.509 (1997 E): Information Technology - Open
+    Systems Interconnection - The Directory: Authentication Framework, June 1997.
+
+
+
+
+Note: All RFCs and Internet-Drafts are available from the IETF at
+http://www.ietf.org/rfc.html and http://www.ietf.org/ID.html, respectively.
+
+
+
+
+                                        15
+                               Federal S/MIME V3 Client Profile
+
+
+
+A. Appendix A Cryptographic Algorithms (Non-Normative)
+
+The availability and implementation of cryptographic algorithms affect both the security and
+interoperability of S/MIME implementations. If a message is hashed or signed with an algorithm
+not supported by the recipient, the recipient cannot verify the signature. If the symmetric key
+(for message encryption) is derived or transferred with a key management algorithm not
+supported by the recipient, the recipient will not be able to recover the symmetric key and
+decrypt the message. If a message is encrypted with a symmetric algorithm not supported by the
+recipient, the recipient will not be able to recover the clear text.
+
+In addition, cryptographic algorithms offer different levels of protection [ORMAN]. Users of
+S/MIME products need to make their systems resistant to some predetermined level of attack.
+That level-of-attack resistance is the strength of the system. The one-way hash algorithm, digital
+signature algorithm, key management algorithm, and symmetric algorithm SHOULD be at least
+as strong as the system strength requirements.
+
+Selecting and matching appropriate cryptographic algorithms is a complex task. This document
+identifies algorithms that offer currently viable levels of security and identifies suites of
+algorithms that may be used together.
+
+To help ensure that cryptographic functions are correctly implemented, software modules
+implementing cryptographic functions MUST conform to either FIPS 140-1 or to FIPS 140-2,
+Security Requirements For Cryptographic Modules [FIPS140-1] [FIPS140-2] as specified in
+Clause 2.1.1 of this profile.
+
+A.1 One-Way Hash Algorithms
+     Hash algorithms map arbitrarily long inputs into a fixed-size output such that it is very
+     difficult (computationally infeasible) to find two different hash inputs that produce the
+     same output. Such algorithms are an essential part of the process of producing fixed-size
+     digital signatures that can both authenticate the signer and provide for data integrity
+     checking (detection of input modification after signature) in a S/MIME message. For
+     S/MIME V3, the following hash algorithms are identified:
+
+               SHA-1:     S/MIME agents MUST support the Secure Hash Algorithm (SHA-1)
+                     as specified in [FIPS180-1] in agreement with Clause 2.1.1.1 of this
+                     profile.
+
+               SHA-256: This enhanced secure hash algorithm has been published. When it
+                    becomes widely available, S/MIME agents SHOULD be capable of using
+                    [FIPS180-2].
+
+A.2 Symmetric Encryption Algorithms
+     Symmetric encryption algorithms use the same secret key for data encryption and
+     decryption. The Data Encryption Standard (DES) [FIPS46-3] algorithm using 56-bit
+     keys has been available since the late 1970s and is now considered weak. The much
+
+
+
+                                            16
+                              Federal S/MIME V3 Client Profile
+
+
+       stronger Advanced Encryption Standard (AES) [FIPS197] algorithm allowing up to 256-
+       bit keys has recently been approved and implementations are expected to be widely
+       available soon. In the interim, the triple DES algorithm, which uses multiple passes of
+       the DES algorithm (significantly stronger than DES) is specified for use within S/MIME
+       V3. Thus for S/MIME V3, the following symmetric encryption algorithms are identified:
+
+              3DES: The Triple DES algorithm [FIPS46-3] for encryption and decryption
+                    MUST be supported by sending and receiving agents as specified in
+                    Clause 2.1.1.1 of this profile. When generating messages, at least two
+                    independent keys MUST be supported. The Cipher Block Chaining Mode
+                    (CBC) MUST be supported. This algorithm is also known as DES EDE3
+                    CBC.
+
+              AES: The Cipher Block Chaining (CBC) mode of the Advanced Encryption
+                   Standard [FIPS197] with 128-bit keys SHOULD be supported by sending
+                   and receiving agents when it becomes widely available. (See Clause
+                   2.1.1.2.)
+
+A.3 Digital Signature Algorithms
+     Digital signature algorithms are asymmetric (using public-private key pairs) algorithms
+     that are used for digitally signing data. Use of signature algorithms in S/MIME V3
+     provides authentication, message integrity, and non-repudiation of origin. For S/MIME
+     V3, the following digital signature algorithms are identified:
+
+              RSA: The RSA Public Key digital signature algorithm identified in [RFC2313]
+                   MUST be supported in combination with the SHA-1 hash algorithm as
+                   specified in Clause 2.1.1.1 of this profile.
+
+              DSA: The DSA algorithm defined in [FIPS186-2] MUST be supported in
+                   combination with the SHA-1 hash algorithm as specified in Clause 2.1.1.1
+                   of this profile.
+
+              rDSA: Implementations MAY support digital signatures using reversible public
+                    key cryptography (rDSA) as defined in [ANSIX9.31]
+
+              ECDSA: Implementations MAY support elliptic curve digital signatures as
+                   defined in [ANSIX9.62]
+
+       Note: Currently no standard methods (e.g., appropriate algorithm identifying OIDs) are
+             defined for using rDSA or ECDSA with S/MIME.
+
+A.4 Key Management Algorithms
+     Key management algorithms are used for either key transport or for key agreement in a
+     secure manner.
+
+       The following key management algorithms are identified:
+
+
+
+                                          17
+                              Federal S/MIME V3 Client Profile
+
+
+
+              RSA (RFC2313): The RSA key exchange algorithm identified in [RFC2313]
+                    MUST be supported as specified in Clause 2.1.1.1 of this profile.
+
+              Diffie-Hellman: Implementations SHOULD support the Diffie-Hellman Key
+                     Agreement method as defined in [RFC2631] as specified in Clause 2.1.1.2
+                     of this profile.
+
+              RSA (X9.44): The RSA Key Exchange Algorithm identified in [ANSIX9.44]
+                    MAY be supported.
+
+              Elliptic Curve Diffie-Hellman (X9.63): The Elliptic Curve Diffie-Hellman Key
+                      Agreement Algorithm identified in X9.63 [ANSIX9.63] MAY be
+                      supported.
+
+       Note: Currently no standard methods are defined for using RSA (X9.44) or Elliptic
+             Curve Diffie-Hellman (X9.63) with S/MIME.
+
+A.5 Algorithm Suites
+     Secure Hash Algorithms (Message Digest Algorithms), Symmetric Encryption
+     Algorithms, Digital Signature Algorithms, and Key Management Algorithms are used
+     together in algorithm suites to provide a full set of cryptographic security services for
+     S/MIME. Each algorithm suite contains one of each of the cryptographic algorithm types
+     to provide the cryptographic services. It is important that all of the components of each
+     suite provide comparable protection against cryptographic attack. The following list of
+     algorithm suites is identified for use within S/MIME V3:
+
+              SHA-1 hash algorithm, RSA (RFC 2313) for digital signature, RSA (RFC 2313)
+                    for key transport, Triple-DES [FIPS46-3] for content encryption.
+                    Implementations of S/MIME V3 MUST support this suite of algorithms.
+                    (See Clause 2.1.1.1.)
+
+              SHA-1 hash algorithm, DSA for digital signature, RSA (RFC 2313) for key
+                    transport, Triple-DES for content encryption. Implementations of
+                    S/MIME V3 MUST support this suite of algorithms. (See Clause 2.1.1.1)
+
+              SHA-1 hash algorithm, DSA for digital signature, Diffie-Hellman (RFC2631) for
+                    key agreement, Triple-DES for content encryption. Implementations of
+                    S/MIME V3 SHOULD support this suite of algorithms. (See Clause
+                    2.1.1.2.)
+
+              SHA-1 hash algorithm, rDSA for digital signature, RSA [ANSIX9.44] for key
+                    transport, Triple-DES for content encryption. Implementations of
+                    S/MIME V3 MAY support this suite of algorithms.
+
+
+
+
+                                          18
+                               Federal S/MIME V3 Client Profile
+
+
+              SHA-1 hash algorithm, ECDSA for digital signature, ECDH for key agreement,
+                    Triple-DES for content encryption. Implementations of S/MIME V3
+                    MAY support this suite of algorithms.
+
+    Recommendations: (These recommendations also appear in Clause 2.1.1.2.)
+      • If an implementation supports AES, the implementation SHOULD also support RSA
+         public key sizes greater than 1024 bits.
+      • If an implementation supports AES and D-H, the implementation SHOULD also
+         support D-H public key sizes greater than 1024 bits.
+      • If an implementation supports RSA or DSA public key sizes greater than 1024 bits,
+         the implementation SHOULD also support SHA-256.
+
+Additional algorithm suites may be identified in the future as advanced algorithms including
+AES, SHA-256, and extended versions of DSA emerge.
+
+
+
+
+                                           19
+

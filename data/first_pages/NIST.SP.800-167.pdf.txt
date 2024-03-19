@@ -1,0 +1,1115 @@
+        NIST Special Publication 800-167
+
+
+
+Guide to Application Whitelisting
+
+
+                                        Adam Sedgewick
+                                       Murugiah Souppaya
+                                          Karen Scarfone
+
+
+
+
+              This publication is available free of charge from:
+                     http://dx.doi.org/10.6028/NIST.SP.800-167
+
+
+
+
+C O M P U T E R      S E C U R I T Y
+                 NIST Special Publication 800-167
+
+Guide to Application Whitelisting
+                                                             Adam Sedgewick
+                                            Information Technology Laboratory
+
+                                                           Murugiah Souppaya
+                                                   Computer Security Division
+                                            Information Technology Laboratory
+
+                                                                  Karen Scarfone
+                                                           Scarfone Cybersecurity
+                                                                      Clifton, VA
+
+
+
+
+                              This publication is available free of charge from:
+                                     http://dx.doi.org/10.6028/NIST.SP.800-167
+
+
+
+
+                                                                      October 2015
+
+
+
+
+                                                     U.S. Department of Commerce
+                                                             Penny Pritzker, Secretary
+
+                                        National Institute of Standards and Technology
+    Willie May, Under Secretary of Commerce for Standards and Technology and Director
+                                                   Authority
+
+This publication has been developed by NIST in accordance with its statutory responsibilities under the
+Federal Information Security Modernization Act (FISMA) of 2014, 44 U.S.C. § 3541 et seq., Public Law
+113-283. NIST is responsible for developing information security standards and guidelines, including
+minimum requirements for federal information systems, but such standards and guidelines shall not apply
+to national security systems without the express approval of appropriate federal officials exercising policy
+authority over such systems. This guideline is consistent with the requirements of the Office
+of Management and Budget (OMB) Circular A-130.
+
+Nothing in this publication should be taken to contradict the standards and guidelines made
+mandatory and binding on federal agencies by the Secretary of Commerce under statutory authority.
+Nor should these guidelines be interpreted as altering or superseding the existing authorities of the
+Secretary of Commerce, Director of the OMB, or any other federal official. This publication may
+be used by nongovernmental organizations on a voluntary basis and is not subject to copyright in the
+United States. Attribution would, however, be appreciated by NIST.
+
+            National Institute of Standards and Technology Special Publication 800-167
+                  Natl. Inst. Stand. Technol. Spec. Publ. 800-167, 24 pages (October 2015)
+                                               CODEN: NSPUE2
+
+                                This publication is available free of charge from:
+                                  http://dx.doi.org/10.6028/NIST.SP.800-167
+
+
+
+
+Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+endorsement by NIST, nor is it intended to imply that the entities, materials, or equipment are necessarily the best
+available for the purpose.
+There may be references in this publication to other publications currently under development by NIST in
+accordance with its assigned statutory responsibilities. The information in this publication, including concepts and
+methodologies, may be used by federal agencies even before the completion of such companion publications. Thus,
+until each publication is completed, current requirements, guidelines, and procedures, where they exist, remain
+operative. For planning and transition purposes, federal agencies may wish to closely follow the development of
+these new publications by NIST.
+Organizations are encouraged to review all draft publications during public comment periods and provide feedback
+to NIST. All NIST Computer Security Division publications, other than the ones noted above, are available at
+http://csrc.nist.gov/publications.
+
+
+
+
+                        Comments on this publication may be submitted to:
+                              National Institute of Standards and Technology
+                    Attn: Computer Security Division, Information Technology Laboratory
+                     100 Bureau Drive (Mail Stop 8930) Gaithersburg, MD 20899-8930
+
+
+
+
+                                                         ii
+                            Reports on Computer Systems Technology
+
+The Information Technology Laboratory (ITL) at the National Institute of Standards and Technology
+(NIST) promotes the U.S. economy and public welfare by providing technical leadership for the Nation’s
+measurement and standards infrastructure. ITL develops tests, test methods, reference data, proof of
+concept implementations, and technical analyses to advance the development and productive use of
+information technology. ITL’s responsibilities include the development of management, administrative,
+technical, and physical standards and guidelines for the cost-effective security and privacy of other than
+national security-related information in federal information systems. The Special Publication 800-series
+reports on ITL’s research, guidelines, and outreach efforts in information system security, and its
+collaborative activities with industry, government, and academic organizations.
+
+
+                                                  Abstract
+
+An application whitelist is a list of applications and application components that are authorized for use in
+an organization. Application whitelisting technologies use whitelists to control which applications are
+permitted to execute on a host. This helps to stop the execution of malware, unlicensed software, and
+other unauthorized software. This publication is intended to assist organizations in understanding the
+basics of application whitelisting. It also explains planning and implementation for whitelisting
+technologies throughout the security deployment lifecycle.
+
+
+
+                                                 Keywords
+
+access control; application control; application whitelisting; information security; software security;
+whitelisting
+
+
+
+                                            Acknowledgments
+
+The authors, Adam Sedgewick and Murugiah Souppaya of the National Institute of Standards and
+Technology (NIST) and Karen Scarfone of Scarfone Cybersecurity, wish to thank their colleagues, in
+particular Eric Chudow from the National Security Agency, who contributed to this publication, as well
+as the reviewers who provided feedback.
+
+
+
+                                         Trademark Information
+
+All registered trademarks belong to their respective organizations.
+
+
+
+
+                                                      3
+                                                        Table of Contents
+
+Executive Summary ................................................................................................................. v
+ 1. Introduction ...................................................................................................................... 1
+       1.1     Purpose and Scope ................................................................................................... 1
+       1.2     Audience ................................................................................................................... 1
+       1.3     Document Structure ................................................................................................... 1
+ 2. The Basics of Application Whitelisting ........................................................................... 2
+       2.1     Threats ...................................................................................................................... 2
+       2.2     Types of Application Whitelisting................................................................................ 3
+               2.2.1 File and Folder Attributes............................................................................... 3
+               2.2.2 Application Resources ................................................................................... 4
+               2.2.3 Whitelist Generation and Maintenance .......................................................... 5
+       2.3     Application Whitelisting Modes ..................................................................................... 5
+       2.4     Uses of Application Whitelisting Technologies ...........................................................6
+       2.5     Operational Environment Differences.........................................................................7
+       2.6     Evaluating Application Whitelisting Solutions .............................................................7
+       2.7     Additional Considerations ..........................................................................................8
+ 3.     Application Whitelisting Planning and Implementation ............................................... 9
+       3.1     Initiation .....................................................................................................................9
+       3.2     Design ..................................................................................................................... 11
+       3.3     Prototype Testing..................................................................................................... 11
+       3.4     Deployment ................................................................................................................. 12
+       3.5     Management ........................................................................................................... 13
+
+
+
+                                                       List of Appendices
+
+Appendix A— Security and Compliance Mapping .................................................................. 14
+Appendix B— Applying Application Whitelisting to Mobile Platforms ................................15
+Appendix C— Acronyms and Abbreviations ........................................................................... 16
+Appendix D— Bibliography .................................................................................................... 17
+
+
+
+
+                                                                     4
+NIST SP 800-167                                                                 GUIDE TO APPLICATION W HITELISTING
+
+
+Executive Summary
+
+An application whitelist is a list of applications and application components (libraries, configuration files,
+etc.) that are authorized to be present or active on a host according to a well-defined baseline. The
+technologies used to apply application whitelists—to control which applications are permitted to install or
+execute on a host—are called whitelisting programs, application control programs, or application
+whitelisting technologies. Application whitelisting technologies are intended to stop the execution of
+malware and other unauthorized software. Unlike security technologies such as antivirus software, which
+block known bad activity and permit all other, application whitelisting technologies are designed to permit
+known good activity and block all other. The purpose of this publication is to assist organizations
+in understanding the basics of application whitelisting and planning for its implementation.
+
+Implementing the following recommendations should facilitate more efficient and effective application
+whitelisting use for federal departments and agencies.
+
+Consider using application whitelisting technologies already built into the host operating system.
+
+Organizations should consider these technologies, particularly for centrally managed desktops, laptops,
+and servers, because of the relative ease in managing these solutions and the minimal additional cost. If
+built-in application whitelisting capabilities are not available or are determined to be unsuitable, then the
+alternative is to examine third-party solutions with robust centralized management capabilities.
+
+Use products that support more sophisticated application whitelisting attributes.
+
+Choosing attributes is largely a matter of achieving the right balance of security, maintainability, and
+usability. Simpler attributes such as file path, filename, and file size should not be used by themselves
+unless there are strict access controls in place to tightly restrict file activity, and even then there are often
+significant benefits to pairing them with other attributes. A combination of digital signature/publisher and
+cryptographic hash techniques generally provides the most accurate and comprehensive application
+whitelisting capability, but usability and maintainability requirements can put significant burdens on the
+organization.
+
+Test prospective application whitelisting technology in monitoring mode.
+
+It is highly recommended to test any prospective application whitelisting technology in a monitoring
+mode to see how it behaves before solution deployment. This testing should include a thorough
+evaluation of how the solution reacts to changes in software, such as installing an update. An application
+whitelisting technology might be considered unsuitable if, for instance, it had to be disabled in order to
+install security updates for the operating system or particular applications.
+
+Address application whitelisting technology planning and deployment in a phased approach.
+
+A successful deployment will require a clear, step-by-step planning and implementation process. The use
+of a phased approach for deployment can minimize unforeseen issues and identify potential pitfalls early
+in the process. This model also allows for incorporating advances in new technology and adapting the
+technology to the ever-changing enterprise. In addition to following the security recommendations
+presented in this publication, organizations implementing application whitelisting technologies should
+also follow the recommendations from NIST Special Publication (SP) 800-53 Revision 4, Security and
+Privacy Controls for Federal Information Systems and Organizations, which defines minimum
+recommended management, operational, and technical controls for information systems based on impact
+categories.
+
+
+                                                        5
+NIST SP 800-167                                                             GUIDE TO APPLICATION W HITELISTING
+
+
+When evaluating the possibility of deploying application whitelisting, analyze the environment or
+environments in which the application whitelisting will be running.
+
+It is more practical to implement whitelisting on hosts that are centrally managed and have a consistent
+application workload. Application whitelisting solutions are generally strongly recommended for hosts in
+high-risk environments where security outweighs unrestricted functionality. Suitability for typical
+managed environments depends on how tightly the hosts are managed and the extent of the risks that they
+face. Organizations considering application whitelisting deployment in a typical managed environment
+should perform a risk assessment to determine whether the security benefits provided by application
+whitelisting outweigh its possible negative impact on operations. Organizations should also be mindful
+that they will need dedicated staff managing and maintaining the application whitelisting solution
+depending on the scale and specifics of the solution implemented, similar to handling an enterprise
+antivirus or intrusion detection solution. An organization that can dedicate the necessary trained staff to
+solution maintenance and has built-in application whitelisting technology should generally implement
+application whitelisting at least in a monitoring mode.
+
+
+
+
+                                                     6
+NIST SP 800-167                                                             GUIDE TO APPLICATION W HITELISTING
+
+
+1.      Introduction
+
+1.1     Purpose and Scope
+
+The purpose of this publication is to assist organizations in understanding the basics of application
+whitelisting (also known as application control). All other forms of whitelisting, such as email, network
+traffic, and mobile code whitelisting, are out of the scope of this publication.
+
+1.2     Audience
+
+This document is intended for security managers, engineers, administrators, and others who are
+responsible for acquiring, testing, implementing, and maintaining application whitelisting technologies.
+
+1.3     Document Structure
+
+The remainder of this document is organized into the following sections and appendices:
+
+     Section 2 examines the basics of application whitelisting.
+     Section 3 explains planning and implementation for application whitelisting technologies throughout
+      the security deployment lifecycle.
+     Appendix A provides a mapping to existing standards and guidelines that support using application
+      whitelisting technologies.
+     Appendix B discusses considerations involved in applying application whitelisting technologies to
+      mobile platforms.
+     Appendix C defines selected acronyms and abbreviations used in the document.
+     Appendix D provides a bibliography for the publication.
+
+
+
+
+                                                       1
+NIST SP 800-167                                                                          GUIDE TO APPLICATION W HITELISTING
+
+
+2.      The Basics of Application Whitelisting
+
+A whitelist is a list of discrete entities, such as hosts, email addresses, network port numbers, runtime
+processes, or applications that are authorized to be present or active on a system according to a well-
+defined baseline. A blacklist is a list of discrete entities that have been previously determined to be
+associated with malicious activity. A graylist is a list of discrete entities that have not yet been established
+as benign or malicious; more information is needed to move graylist items onto a whitelist or a blacklist.
+Whitelists, blacklists, and graylists are primarily used as a form of access control: permitting activity
+corresponding to the whitelist and not permitting activity corresponding to the blacklist. Graylist
+treatment depends on the type of entities it contains. An example of how a graylist might be handled is
+prompting the user to make a decision or notifying an administrator that the entity needs to have its
+security evaluated before use.
+
+An application whitelist is a list of applications and application components (libraries, configuration files,
+etc.) that are authorized to be present or active on a host according to a well-defined baseline. The
+technologies used to enforce application whitelists—to control which applications are permitted to be
+installed or executed on a host—are called whitelisting programs, application control programs, or
+application whitelisting technologies. Application whitelisting technologies are intended to stop the
+execution of malware and other unauthorized software. Unlike security technologies such as antivirus
+software, which use blacklists to block known bad activity and permit all other, application whitelisting
+technologies are designed to permit known good activity and block all other.
+
+This section examines the basics of application whitelisting. It first discusses the categories of threats that
+application whitelisting can mitigate and the types of application whitelisting. Next, it defines the types of
+operational runtime modes available for application whitelisting technologies. The section also explains
+the motivations for application whitelisting and discusses uses of application whitelisting technologies
+other than application access control. Finally, the section concludes by examining differences in
+deployment based on operational environment, as well as considerations for evaluating the relative
+effectiveness of application whitelisting solutions.
+
+2.1     Threats
+
+As previously discussed, application whitelisting software prevents installation and/or execution of any
+application that is not specifically authorized for use on a particular host. This mitigates multiple
+categories of threats, including malware and other unauthorized software.
+
+Malware, also known as malicious code, refers to an application that is covertly inserted into another piece
+of software (e.g., operating system, application) with the intent to steal or destroy data, run destructive
+or intrusive programs, or otherwise compromise the confidentiality, integrity, or availability of
+the victim’s data, applications, or operating system.1 Many of today’s threats are malware-based,
+attempting to infect hosts (install their malicious code) and execute on those hosts to steal their data or
+perform other harmful activities. When properly configured, application whitelisting technologies can stop
+most malware from being executed (and often from being installed in the first place). Application
+whitelisting technologies can be significantly more effective at stopping unknown malware threats than
+conventional antivirus software and other traditional antimalware security controls. This is important
+because today’s malware threats are increasingly customized and targeted, making traditional detection
+technologies largely ineffective.
+
+
+1     This definition is based on the one provided in NIST Special Publication (SP) 800-83 Revision 1, Guide to Malware
+      Incident Prevention and Handling for Desktops and Laptops (July 2013). http://dx.doi.org/10.6028/NIST.SP.800-83r1.
+
+
+                                                               2
+NIST SP 800-167                                                                                GUIDE TO APPLICATION W HITELISTING
+
+
+The other major category of threats that application whitelisting technology can mitigate is other
+unauthorized software (unauthorized software besides malware). This software can pose multiple
+problems. For example, it can introduce unmanaged vulnerable software into the environment, which can
+then be used by attackers to exploit hosts and further compromise them. There can also be legal issues
+with the installation of unauthorized software, such as violations of licensing agreements.
+
+Application whitelisting is most readily used to stop threats on managed hosts where users are not able to
+install or run applications without authorization. An example is a kiosk workstation where users are
+limited to running a web browser; installation and execution of all applications other than the selected
+web browser and authorized application-based security controls (such as antivirus software) would be
+prohibited. Another example is a laptop that has all authorized applications preinstalled for the user, and
+the user does not have the administrative privileges necessary to install additional applications or disable
+the application whitelisting software. Application whitelisting may also be beneficial on servers,
+particularly if there is concern about malware spreading to these servers from other hosts (e.g.,
+administrator laptops).
+
+2.2      Types of Application Whitelisting
+
+This section discusses the types of application whitelisting. This includes the application file and folder
+attributes that can be analyzed; the types of application resources handled, such as executables, libraries,
+and scripts; and techniques for whitelist generation.
+
+2.2.1      File and Folder Attributes
+
+Application whitelisting can be based on a variety of application file and folder attributes, including the
+following:2
+
+     File path. This is the most general attribute: to permit all applications contained within a particular
+      path (directory/folder). Used by itself, this is a very weak attribute, because it allows any malicious
+      files placed within the directory to be executed. However, if the path is protected by strict access
+      controls that only allow authorized administrators to add or modify files, this becomes a stronger
+      attribute. Paths can be beneficial by not requiring each file within the path to be listed separately,
+      which reduces the need to update the whitelist for every new application and patch.
+     Filename. This attribute, for the name of an application file, is too general to be used on its own. If a
+      file were to become infected or be replaced, its name would be unchanged so the file would still be
+      executed under the whitelist. Also, an attacker could simply place a malicious file onto a host and use
+      the same name as a common benign file. Because of these weaknesses, this attribute should not be
+      used on its own; rather, it should be paired with other attributes. For example, it would be stronger to
+      combine path and filename attributes with strict access controls or to combine a filename attribute
+      with a digital signature attribute (described below).
+     File size. This attribute is typically used only in combination with other attributes, such as filename.
+      Monitoring the file size assumes that a malicious version of an application would have a different file
+      size than the original; however, attackers can craft malicious files to have the same length as their
+      benign counterparts. Other attributes, such as digital signature and cryptographic hash, provide
+
+
+2     This list of attributes is not intended to be all-inclusive. Also, it is expected that new forms of attributes may arise as
+      technologies advance. Another set of attributes is the software identification tags (SWID tags) which define unique
+      information about an installed software application, including its name, edition, version, whether it’s part of a bundle and
+      more (http://tagvault.org/swid-tags/).
+
+
+
+                                                                   3
+NIST SP 800-167                                                                                GUIDE TO APPLICATION W HITELISTING
+
+
+    substantially better unique identification of files than file size does, and should be used instead of file
+    size whenever feasible.
+   Digital signature or publisher. Application files are increasingly being digitally signed by their
+    publishers. A digital signature provides a reliable, unique value for an application file that is to be
+    verified by the recipient to ensure that the file is legitimate and has not been altered. Unfortunately,
+    many application files are not yet signed by their publishers, so using only publisher-provided digital
+    signatures as attributes is generally not feasible. Some application whitelists can be based on
+    verifying the publisher’s identity instead of verifying individual digital signatures; this is based on the
+    assumption that all applications from trusted publishers can themselves be trusted.3 This assumption
+    may be faulty if the software vendor has multiple applications and the organization wants to restrict
+    which of those applications can be executed. Also, relying on the publisher’s verified identity only
+    would allow older software versions with known vulnerabilities to be executed. However, the benefit
+    of basing a whitelist on publisher identities is that the whitelist only needs updates when there is a
+    new publisher (i.e., software vendor) or when a publisher updates its signature key.4
+   Cryptographic hash. A cryptographic hash provides a reliable, unique value for an application file,
+    so long as the cryptography being used is strong and the hash is already known to be associated with a
+    good file. Cryptographic hashes are accurate no matter where the file is placed, what it is named, or
+    how it is signed. However, a cryptographic hash is not helpful when a file is updated, such as when an
+    application is patched; the patched version will have a different hash. In these cases the patch should
+    be identified as legitimate through its digital signature, then its cryptographic hash should be added to
+    the whitelist. Note that if the whitelist is not continuously updated with new hashes for new and
+    updated applications, there is a significant risk of software not functioning correctly, and if the
+    whitelist is not continuously updated to remove existing hashes for older software versions with
+    known vulnerabilities, there is a significant risk of vulnerable software being allowed to run.
+As the discussions above indicate, choosing attributes is largely a matter of achieving the right balance of
+security, maintainability, and usability. Simpler attributes such as file path, filename, and file size should
+not be used by themselves unless there are strict access controls in place to tightly restrict file activity,
+and even then there are often significant benefits to pairing them with other attributes. A combination of
+digital signature/publisher and cryptographic hash techniques generally provides the most accurate and
+comprehensive application whitelisting capability, but usability and maintainability requirements can put
+significant burdens on the organization.
+
+2.2.2    Application Resources
+
+Application whitelisting is most often associated with monitoring executables. However, most application
+whitelisting technologies also have the ability to monitor at least some other types of application-related
+files, such as libraries, scripts, macros, browser plug-ins (or add-ons or extensions), configuration files,
+and application-related registry entries (on Windows hosts). The granularity of this monitoring varies
+significantly among application whitelisting technologies; for example, some can only permit or block
+whole classes of scripts (e.g., JavaScript)5, while others can permit or block individual scripts within a
+class of scripts.
+
+
+
+3   For its internal applications, an organization can issue its own internal signing key to anchor its root of trust, instead of
+    depending on a signing key from an external publisher.
+4   An alternative approach is to employ cross-signing, where both the software vendor and the organization sign each
+    application, thus indicating that it is both authentic and approved by the organization.
+5   Generally this means that the application is blocking the executable for the scripting language, instead of blocking the
+    scripts themselves.
+
+
+
+                                                                  4
+NIST SP 800-167                                                                            GUIDE TO APPLICATION W HITELISTING
+
+
+2.2.3      Whitelist Generation and Maintenance
+
+There are two primary methods of generating an application whitelist for a host. One is to use vendor-
+provided information on the characteristics of known good applications, supplemented with organization-
+generated information on the characteristics of organization-specific applications (i.e., in-house custom
+applications). The other method of generating an application whitelist is to scan the files on a clean host6
+to build a good known baseline.7
+
+Both of these methods are effective on their own, except when applications are updated (e.g., patched) or
+new applications are installed. If the vendor is providing the whitelist information, the vendor will have to
+acquire the patch or new application, record its files’ characteristics, and send the corresponding
+information to customers. If the organization is building its own whitelist information, it will have to:
+acquire each patch or new application, record its files’ characteristics, and update its whitelists with the
+new information; or, redo its known good baseline to serve as the new reference baseline. Any of these
+methods may cause problematic delays for organizations that apply patches quickly, especially
+automatically; patched software may be seen as unknown software and prohibited from running. Certain
+attributes, such as file path and publisher, generally do not change with each patch and so whitelists
+utilizing those attributes do not need to be updated as often and should cause fewer of these delays.
+
+To avoid these problems with updates, most application whitelisting technologies offer maintenance
+options. For example, many technologies allow the administrator to select certain services (e.g., patch
+management software) to be trusted updaters. This means that any files that they add to or modify on a
+host are automatically added to the whitelist. Similar options are available for designating trusted
+publishers (i.e., software vendors), users (e.g., system administrators), sources (e.g., trusted network
+paths), and other trusted entities that may update whitelists.
+
+Another option available with some application whitelisting technologies is the use of reputation services.
+These services determine if a service, publisher, or other external entity is generally associated with benign
+or malicious content. This allows application whitelisting software to make decisions about how to handle
+new or modified files based on the reputation of the associated service, publisher, etc., instead of simply
+adding them to a graylist for subsequent manual processing.
+
+2.3       Application Whitelisting Modes
+
+Most application whitelisting technologies offer two operational runtime modes:
+
+     Audit mode allows items, including those not on the whitelist to be executed and logs their
+      execution. This mode provides data for continuous monitoring processes to analyze.
+     Enforcement mode automatically permits execution of whitelisted items and/or blocks execution of
+      blacklisted items. There are different forms of enforcement mode, which are differentiated by how
+      they handle items that are not whitelisted or blacklisted. These forms include the following:
+      o    Whitelist enforcement permits only whitelist items to be executed and blocks execution of all
+           others;
+
+
+
+6 “Clean host” refers to a host with an operating system installation that has never been accessed by end users, such as a host
+
+      freshly built from a fully-patched security baseline image. Using anything other than a clean host for whitelist generation
+      poses significant risks of inadvertently categorizing malware on the host as whitelisted software.
+7     NIST hosts the National Software Reference Library (NSRL), which contains metadata for application files for forensic
+      investigation purposes. See http://www.nsrl.nist.gov/ for additional information.
+
+
+
+                                                                5
+NIST SP 800-167                                                                GUIDE TO APPLICATION W HITELISTING
+
+
+      o    User prompting asks the user (or, in some cases, the administrator) to accept or reject each
+           attempt to execute a file that is not whitelisted or blacklisted; and
+      o    Blacklist enforcement blocks execution of blacklisted items but allows everything else to be
+           executed.
+An application whitelisting technology run in audit mode is strictly informative; it can log the execution
+of malware and other unauthorized executables, but it cannot do anything to stop them. Audit mode is
+primarily intended for use when first deploying an application whitelisting technology, to help an
+organization evaluate and fine-tune the technology before switching it to enforcement mode.
+
+Many application whitelisting technologies have granular options for setting modes. Some features could
+be configured to run in enforcement mode while other features run in audit mode. For example, Windows
+registry changes might be permitted (audit mode) while operating system file changes would be
+prohibited (enforcement mode). Some products also support multiple enforcement modes and allow
+granular setting of those for different types of monitored entities.
+
+2.4       Uses of Application Whitelisting Technologies
+
+As stated in the Section 2 introduction, the primary purpose of application whitelisting technologies is to
+provide application access control, i.e., to stop the execution of unauthorized software. However, most
+application whitelisting technologies can be used for other purposes as well, including the following:
+
+     Software inventory. Application whitelisting technologies can keep an inventory of the applications
+      and application versions installed on each host. This allows an organization to identify unauthorized
+      applications—unlicensed applications, prohibited applications, etc.—as well as to identify “wrong”
+      versions of software (both too old and too new). This software inventory capability is also useful for
+      forensic investigations, such as finding modified applications, unauthorized applications, malware,
+      unknown applications, etc. on a given host.
+     File integrity monitoring. Most application whitelisting technologies can perform frequent or
+      continuous monitoring of attempted changes to application files. Some technologies can prevent files
+      from being changed, while other technologies cannot prevent changes but can immediately report
+      when changes occur.
+     Incident response. An organization responding to an incident on a host could capture the
+      characteristics of the malicious files on that host (e.g., generate cryptographic file hashes) and use
+      application whitelisting technologies to check other hosts for the same files, indicating that they have
+      been compromised as well.
+Some application whitelisting technologies may have additional capabilities, including the following:
+
+     Access control for portable storage devices, such as restricting file reads, writes, and executes for all
+      files on removable media; only permitting the use of encrypted devices; and only permitting the use
+      of drives with particular serial numbers.
+     Memory protection, primarily involving stopping certain attacks (e.g., buffer overflows) that directly
+      affect files in memory, not files in storage. Most application whitelisting technologies only focus on
+      the files in storage, but do not ensure that the files in memory are not altered or exploited.
+     Software reputation services, such as reviewing what other software a particular application is often
+      bundled with, and determining if an application is known to pose a substantial security risk.
+
+
+
+
+                                                        6
+NIST SP 800-167                                                                  GUIDE TO APPLICATION W HITELISTING
+
+
+     Anti-malware technology integration; for example, attempting to identify known malicious content by
+      running graylisted files through an online scanner with many antivirus scanning engines or other
+      types of malware analysis products. Malware analysis products can inform application whitelisting
+      decision making processes.
+2.5     Operational Environment Differences
+
+As discussed in NIST SP 800-70 Revision 2, National Checklist Program for IT Products—Guidelines
+for Checklist Users and Developers,8 there are significant differences among operational environments.
+These differences are important in terms of selecting and deploying application whitelisting technologies.
+The major categories of operational environments are as follows:
+
+     Standalone. Also referred to as Small Office/Home Office (SOHO), a Standalone environment
+      refers to a small, informal computer installation that is used for home or business purposes. For
+      technical and business (economic) reasons, Standalone environment hosts are generally not managed
+      remotely. Standalone environments are typically the least secured.
+     Managed. The Managed environment, also called an Enterprise environment, typically contains
+      large organizational systems with defined suites of hardware and software configurations, usually
+      consisting of centrally managed IT products (e.g., workstations and servers). The managed nature of
+      these environments gives administrators centralized control over various settings on IT products.
+      Because of the supported and largely homogeneous nature of the Managed environment, it is typically
+      easier to use more functionally restrictive settings in Managed environments than in Standalone
+      environments.
+     Specialized Security-Limited Functionality (Custom). A Custom environment contains systems in
+      which the functionality and degree of security do not fit the Standalone or Managed environments.
+      Specialized Security-Limited Functionality (SSLF) is a Custom environment that is highly restrictive
+      and secure; it is usually reserved for hosts that have the highest threats and associated impacts.
+      Because hosts in an SSLF environment are at high risk of attack or data exposure, security takes high
+      precedence over functionality.
+2.6     Evaluating Application Whitelisting Solutions
+
+The first step in evaluating the possibility of deploying an application whitelisting solution should be an
+analysis of the environment or environments in which the hosts will be running. Generally it is not
+feasible to implement whitelisting on Standalone environment hosts because of the lack of centralized
+management. Application whitelisting solutions are generally strongly recommended for hosts in SSLF
+environments because of the high risks that they face. Suitability for Managed environments depends on
+how tightly the hosts are managed and the extent of the risks that they face; organizations considering
+application whitelisting deployment in a Managed environment should perform a risk assessment to
+determine whether the security benefits provided by application whitelisting outweigh its possible
+negative impact on operations. Organizations should also be mindful that they will need dedicated staff
+managing and maintaining the application whitelisting solution, similar to handling an enterprise antivirus
+or intrusion detection solution.
+
+Once it has been determined that application whitelisting technologies are merited for a particular
+environment, the next step is to consider which technologies might be feasible. Organizations should
+consider application whitelisting technologies already built into the operating system, particularly for
+centrally managed hosts (e.g., desktops, laptops, servers), because of the relative ease and minimal
+
+8     http://csrc.nist.gov/publications/nistpubs/800-70-rev2/SP800-70-rev2.pdf
+
+
+
+                                                                7
+NIST SP 800-167                                                                     GUIDE TO APPLICATION W HITELISTING
+
+
+additional cost in managing these solutions. If built-in application whitelisting capabilities are not
+available or are determined to be unsuitable, then the alternative is to examine third-party solutions with
+robust centralized management capabilities. An organization that can dedicate the necessary trained staff
+to solution maintenance and has built-in application whitelisting technology should generally implement
+application whitelisting at least in a monitoring mode.
+
+It is highly recommended to test any prospective application whitelisting technology in a monitoring
+mode to see how it behaves before solution deployment. This testing should include a thorough
+evaluation of how the solution reacts to changes in software, such as installing an update. An application
+whitelisting technology might be considered unsuitable if, for instance, it had to be disabled in order to
+install security updates for the operating system or particular applications.
+
+2.7    Additional Considerations
+
+This section describes additional considerations that organizations should examine when evaluating the
+likely effectiveness of potential application whitelisting technology solutions.
+
+      Effectiveness Consideration                                      Further Explanation
+
+How easily can a solution be bypassed?       If a solution can be bypassed easily, some users will choose to do so
+                                             in order to run unauthorized software, and malware may take
+                                             advantage of the configuration weakness to execute on the host.
+
+How complex is a solution (hash-based        Generally, more complex solutions will be harder for an attacker to
+versus signature-based, etc.)?               circumvent. A relatively simple solution lacks the features necessary
+                                             to minimize false positives and false negatives. However, more
+                                             complex solutions may have higher administrative and maintenance
+                                             overhead.
+
+What are the relative costs of a solution?   It is important to consider not only the implementation costs of a
+                                             solution, but also the ongoing operational costs. The implementation
+                                             and operational costs of solutions may vary widely.
+
+What impact does the solution have on        Using application whitelisting technologies generally should not be
+standard performance?                        noticeable to users in terms of significantly slowing host performance.
+
+What impact does the solution have on        If the solution does not minimize false positives, users may frequently
+business/mission?                            be prevented from running authorized software. If the solution does
+                                             not minimize false negatives, malware infections are more likely to
+                                             occur. Both of these circumstances could seriously impact the
+                                             organization’s mission, depending on the value of the relevant hosts.
+
+How usable is the solution for both users    A more usable solution will not only minimize false positives, to
+and administrators?                          minimize user disruption, but it will also provide pertinent information
+                                             to users and administrators when software is blocked from installation
+                                             or execution.
+
+What are the long-term maintenance           As new applications are added to the environment and existing
+demands for running the solution?            applications are updated, there may be technical difficulties in keeping
+                                             whitelists updated in a timely manner, and significant costs associated
+                                             with maintenance. Certain types of whitelisting require more frequent
+                                             whitelist changes than others. However, the amount of maintenance
+                                             needed must be balanced with the effectiveness of the solution; a
+                                             higher-maintenance solution that prevents more incidents may
+                                             actually be less expensive in the long term since it includes the cost to
+                                             remediate incidents, versus a lower-maintenance solution that has
+                                             limited effectiveness in stopping threats.
+
+
+
+
+                                                          8
+NIST SP 800-167                                                                              GUIDE TO APPLICATION W HITELISTING
+
+
+3.       Application Whitelisting Planning and Implementation
+
+This section discusses considerations for planning and implementing application whitelisting technologies
+for end user devices. As with any new technology deployment, application whitelisting technology
+planning and implementation should be addressed in a phased approach. A successful deployment can be
+achieved by following a clear, step-by-step planning and implementation process. The use of a phased
+approach for deployment can minimize unforeseen issues and identify potential pitfalls early in the
+process. This model also allows for incorporating advances in new technology and adapting the
+technology to the ever-changing enterprise. The following is an example of planning and implementation
+phases:
+
+      1. Initiate the Solution. The first phase involves identifying current and future needs for application
+         whitelisting; specifying requirements for performance, functionality, and security; and developing
+         necessary policies.
+
+      2. Design the Solution. The second phase involves all facets of designing the application
+         whitelisting solution. Examples include architectural considerations, whitelist management,
+         cryptography policy, and security aspects of the solution itself.
+
+      3. Implement and Test a Prototype. The next phase involves implementing and testing a prototype
+         of the designed solution in a lab or test environment. The primary goals of the testing are to
+         evaluate the functionality, management, performance, and security of the solution.
+
+      4. Deploy the Solution. Once the testing is completed and all issues are resolved, the next phase
+         includes the gradual deployment of the application whitelisting technology throughout the
+         enterprise.
+
+      5. Manage the Solution. After the solution has been deployed, it is managed throughout its
+         lifecycle. Management includes solution maintenance and support for operational issues. The
+         lifecycle process is repeated when enhancements or significant changes need to be incorporated
+         into the solution.
+
+This document does not describe the planning and implementation process in depth because the same
+basic steps are performed for any security technology. This section only highlights those considerations
+that are of particular interest for application whitelisting technologies.9 These considerations are not
+intended to be comprehensive, nor is there any implication that particular security elements not listed here
+are unimportant or unnecessary. In addition to following the security recommendations presented in this
+publication, organizations implementing application whitelisting technologies should also follow the
+recommendations from NIST Special Publication (SP) 800-53 Revision 4, Security and Privacy Controls
+for Federal Information Systems and Organizations10, which defines minimum recommended
+management, operational, and technical controls for information systems based on impact categories.
+
+3.1      Initiation
+
+The purpose of this phase is to identify the current and future needs for application whitelisting and to
+determine how those needs can best be met. Requirements specific to application whitelisting that should
+
+
+9     Section 3 only addresses application whitelisting technology planning and implementation, not other phases such as solution
+      retirement, because there is nothing unique to application whitelisting to discuss for other phases. Organizations can simply
+      follow their existing processes for solution retirement and for any other security technology phases.
+10    http://dx.doi.org/10.6028/NIST.SP.800-53r4
+
+
+                                                                  9
+NIST SP 800-167                                                                         GUIDE TO APPLICATION W HITELISTING
+
+
+be considered include the following:
+
+    External Requirements. The organization may be subject to oversight or review by another
+     organization that requires application whitelisting.
+    System and Network Environments. It is important to understand the characteristics of the
+     organization’s system and network environments to select compatible application whitelisting
+     solutions with the necessary functionality. Aspects to consider include the following:
+     o   Characteristics of the devices that need application whitelisting, especially the operating systems
+         (OSs) and applications; and
+     o   Technical attributes of the interfaces of other systems with which the application whitelisting
+         solution might be integrated, such as centralized logging servers and security information and
+         event management (SIEM) software.
+The outcome of the organization’s requirements analysis should be a determination of the types of
+applications or application components (executables, libraries, registry entries, configuration files, etc.)
+that need to be monitored; the types of threats the application whitelisting should protect against (Section
+2.1); and the types of application whitelisting that should be used to balance security, usability, and
+maintainability (Section 2.2). For example, the organization may decide to block execution of all
+unauthorized application components on higher-risk client systems, while monitoring (but not blocking)
+execution of unauthorized application components on lower-risk client systems. These decisions should
+be captured in policy.
+
+Another outcome of the analysis is the documentation of the requirements for the application whitelisting
+technologies themselves, including security capabilities (e.g., authentication, cryptography, key
+management), performance requirements, management requirements (including reliability,
+interoperability, and scalability), the security of the technology itself, usability, and maintenance
+requirements (e.g., applying updates).
+
+In many cases, a single application whitelisting product cannot meet all of the organization’s identified
+needs. For example, the organization may need to monitor applications on devices running several
+different OSs, yet no appropriate product can work on all those platforms. Also, some operating systems
+may have application whitelisting technologies built-in. Organizations can solve this problem in several
+ways, such as acquiring multiple products or replacing older devices. Organizations should ensure that
+effective solutions are identified for all the types of end user devices that need their applications
+monitored, if possible, and that a waiver and risk management process is created for unusual cases that
+cannot be addressed by the identified solutions.
+
+Examples of challenging platforms for application whitelisting include mobile devices11 and industrial
+control systems (ICS)12. One of the main benefits of using mobile devices is being able to acquire a wide
+variety of applications easily, quickly, and cheaply (often free). Unfortunately, this philosophy makes it
+infeasible in many cases to implement whitelisting for mobile devices. If mobile devices are tightly
+managed, much like some desktops or laptops, and only allowed to acquire approved apps from an
+enterprise-sponsored app store, then whitelisting may be practical, but for user-controlled unmanaged
+mobile devices, whitelisting may not be an option as of this writing.
+
+
+11   For more information on mobile device security, see NIST SP 800-124 Revision 1, Guidelines for Managing the Security of
+     Mobile Devices in the Enterprise (http://dx.doi.org/10.6028/NIST.SP.800-124r1).
+12   More information on ICS is available from NIST SP 800-82, Guide to Industrial Control Systems (ICS) Security
+     (http://dx.doi.org/10.6028/NIST.SP.800-82r2).
+
+
+
+                                                             10
+NIST SP 800-167                                                                          GUIDE TO APPLICATION W HITELISTING
+
+
+An ICS is a challenging platform for whitelisting in part because, unlike most other computing devices,
+ICSs strongly favor availability over confidentiality. It is critical that ICSs continue to function properly
+no matter what is happening to them, including cyber attacks. Because application whitelisting can
+inadvertently prevent benign applications from being executed, its use for ICSs must be carefully
+analyzed and tested for feasibility. Another problem with ICSs is that they often use atypical platforms,
+which may not be supported by any acceptable application whitelisting solutions. However, since ICSs
+are used for specific functionality and run only certain ICS software, in some cases they are actually
+easier to whitelist than more dynamic, heterogeneous environments.
+
+3.2     Design
+
+Once the needs have been identified and the appropriate application whitelisting technologies have been
+chosen, the next phase is to design a solution that meets those needs. If these design decisions are
+incorrect, then the application whitelisting implementation will be more susceptible to compromise and
+failure. Major aspects of solution design that are particularly important for application whitelisting are as
+follows:
+
+     Cryptography. Cryptography is used in at least three ways for application whitelisting technologies:
+      1) to generate and verify cryptographic hashes for files and other application components; 2) to
+      validate digital signatures for files; and 3) to protect the confidentiality and integrity of
+      communications between individual hosts and centralized management (for example, encrypting lists
+      of installed applications and application versions). For all of these functions, Federal agencies must
+      use Federal Information Processing Standard (FIPS) approved or NIST-recommended algorithms
+      contained in validated cryptographic modules.13 Organizations should consider how easily the
+      solution can be updated when stronger algorithms and key sizes become available in the future.
+     Solution architecture. The architecture of the application whitelisting technology refers to the
+      selection of devices and software to provide application whitelisting services and the placement of
+      centralized elements within the existing network infrastructure, such as management servers. Most
+      application whitelisting technologies can only operate as a centrally managed solution; there may be
+      copies of whitelists on individual hosts, but enterprise management is centralized. Each end user
+      device must have software that provides application whitelisting enforcement or auditing. Designing
+      the architecture includes component placement, redundancy, reliability, and interoperability.
+     Whitelist management. As discussed in Section 2.2.3, whitelist management can involve the
+      establishment of trusted publishers, users, updaters, etc. Organizations should choose these trusted
+      entities carefully because a compromise in a trusted entity could lead to the compromise of the
+      application whitelisting technology, and consequently to the hosts it protects. However, failure to
+      identify necessary entities as trusted will likely lead to operational problems, such as when files
+      updated by patch installation are not automatically trusted by the application whitelisting technology.
+3.3     Prototype Testing
+
+After the solution has been designed, the next step is to implement and test a prototype of the design.
+Ideally, implementation and testing should first be performed on lab or test devices. Only solutions in the
+final phase of testing should be implemented on production devices. Aspects of the prototype solution
+that require evaluation include the following:
+
+
+
+13    For more information on validated implementations of cryptographic algorithms and modules, see
+      http://csrc.nist.gov/groups/STM/cavp/ and http://csrc.nist.gov/groups/STM/cmvp/, respectively.
+
+
+
+                                                              11
+NIST SP 800-167                                                                           GUIDE TO APPLICATION W HITELISTING
+
+
+     Application control functionality. Basic functionality will need to be checked during the prototype
+      testing. Examples include allowing the execution of whitelisted applications, blocking the execution
+      of blacklisted applications, and detecting modifications to whitelisted applications. These functions
+      should be verified by: installing patches and other updates; manually modifying executables; and
+      making other changes to applications to confirm that the application control policies can be properly
+      enforced and cannot be easily circumvented.
+     Management. Administrators should be able to configure and manage all components of the solution
+      effectively and securely. It is particularly important to evaluate the ease of deployment and
+      configuration, including how easily the solution can be managed as the solution is scaled to larger
+      deployments. Management concerns should include the effects of patching/upgrading the application
+      whitelisting software, changing software settings (e.g., changing cryptographic algorithms or key
+      sizes), and managing cryptographic keys. Another important management concern that needs special
+      attention is whitelist generation and maintenance, such as how the whitelists accommodate software
+      patching.
+     Logging/alerting. The logging, alerting, and data management functions should work properly in
+      accordance with the organization’s policies and strategies.
+     Performance. The solution should be able to provide adequate performance during normal and peak
+      usage. Testing should incorporate a variety of devices, OSs, and applications.
+     Security of the implementation. The application whitelisting technology itself may contain
+      vulnerabilities and weaknesses that attackers could exploit. Organizations with high security needs
+      may want to perform extensive vulnerability assessments against the application whitelisting
+      components.14
+Before installing application whitelisting software on a host, organizations should scan the host for
+malware and either remove any malware that is detected or rebuild the host. The scan will ensure that
+malware files are not included in the whitelist generation process. Organizations should also ensure that
+the host’s OS is secured properly, including that it is fully patched and that other necessary security
+controls are installed and configured properly. If the OS is not secured properly, the host is more likely to
+be compromised, which could weaken the protection provided by the application whitelisting technology.
+
+3.4     Deployment
+
+Once testing is complete and any issues have been resolved, the next phase of the planning and
+implementation model involves deploying the solution. When the components are being deployed into
+production, organizations should initially use application whitelisting on a small number of hosts.
+Deploying it to many hosts at once might overwhelm the management servers or identify other
+bottlenecks through loss of availability. Many of the problems that occur are likely to occur on multiple
+hosts, so it is helpful to identify such problems either during the testing process or when deploying the
+first hosts, so that those problems can be addressed before widespread deployment. A phased deployment
+provides administrators an opportunity to evaluate the impact of the solution and resolve issues prior to
+enterprise-wide deployment. It also provides time for the IT staff (e.g., system administrators, help desk)
+and users to be trained and to become accustomed to the operational lifecycle of the implementation.
+
+Most of the issues that can occur during deployment are the same types of issues that occur during any
+large IT deployment. In addition to potential problems described earlier in this publication, another
+
+
+14    For more information on the fundamentals of testing and assessing security, see NIST SP 800-115, Technical Guide to
+      Information Security Testing and Assessment (http://csrc.nist.gov/publications/nistpubs/800-115/SP800-115.pdf).
+
+
+
+                                                               12
+NIST SP 800-167                                                                GUIDE TO APPLICATION W HITELISTING
+
+
+typical issue is end users discovering and disabling the application whitelisting software. Many products
+run in a stealth mode so that users cannot readily tell that they are running.
+
+3.5     Management
+
+The last phase of the planning and implementation model is the longest lasting. Managing the solution
+involves operating the deployed solution and maintaining the application whitelisting architecture,
+policies, software, and other solution components. Examples of typical actions include:
+
+     Updating the whitelist to include new or updated applications;
+     Testing and applying patches to the application whitelisting software;
+     Deploying application whitelisting to additional platforms;
+     Performing key management duties;
+     Adapting policies as requirements change;
+     Monitoring the components for operational and security issues;
+     Periodically performing testing to ensure that application whitelisting is functioning properly; and
+     Performing regular vulnerability assessments.
+Organizations should pay particular attention to the ongoing whitelist updates. Although many, if not
+most, whitelist updates can be automated, administrators should be prepared to make manual updates
+quickly when needed, in order to identify emerging threats and correct false positives or negatives.
+Organizations should also monitor any graylists and transfer their entries to whitelists or blacklists, as
+appropriate.
+
+
+
+
+                                                       13
+NIST SP 800-167                                                                           GUIDE TO APPLICATION W HITELISTING
+
+
+Appendix A—Security and Compliance Mapping
+
+This appendix provides a mapping to selected standards and guidelines that support using application
+whitelisting technologies.
+
+NIST Special Publication 800-53 Revision 4, Security and Privacy Controls for Federal Information
+Systems and Organizations15
+
+    Control CM-7 (Least Functionality), control enhancement 5 (Authorized Software/Whitelisting):
+     “The organization:
+              (a) Identifies [Assignment: organization-defined software programs authorized to execute on
+                  the information system];
+              (b) Employs a deny-all, permit-by-exception policy to allow the execution of authorized
+                  software programs on the information system; and
+
+              (c) Reviews and updates the list of authorized software programs [Assignment: organization-
+                  defined frequency].”
+
+Framework for Improving Critical Infrastructure Cybersecurity, Version 1.016
+
+    Subcategory PR.IP-1:17 “A baseline configuration of information technology/industrial control
+     systems is created and maintained.” This refers to determining which applications are authorized to be
+     run on each system.
+    Subcategory PR.PT-3:18 “Access to systems and assets is controlled, incorporating the principle of
+     least functionality.” This refers to the enforcement of the whitelist established through subcategory
+     PR.IP-1.
+Critical Controls for Effective Cyber Defense, Version 5.119
+
+    Critical Control 2: Inventory of Authorized and Unauthorized Software: “Actively manage (inventory,
+     track, and correct) all software on the network so that only authorized software is installed and can
+     execute, and that unauthorized and unmanaged software is found and prevented from
+     installation or execution.”
+
+
+
+
+15   http://dx.doi.org/10.6028/NIST.SP.800-53r4
+16   http://www.nist.gov/cyberframework/
+17
+     PR.IP stands for Protect: Information Protection Processes and Procedures. This is defined as follows: “Security policies
+     (that address purpose, scope, roles, responsibilities, management commitment, and coordination among organizational
+     entities), processes, and procedures are maintained and used to manage protection of information systems and assets.”
+18   PR.PT stands for Protect: Protective Technology (PT). This is defined as follows: “Technical security solutions are managed
+     to ensure the security and resilience of systems and assets, consistent with related policies, procedures, and agreements.”
+19   http://www.counciloncybersecurity.org/critical-controls/reports/
+
+
+                                                               14
+NIST SP 800-167                                                                          GUIDE TO APPLICATION W HITELISTING
+
+
+Appendix B—Applying Application Whitelisting to Mobile Platforms
+
+This appendix discusses considerations involved in applying application whitelisting to mobile platforms
+(e.g., smartphones, tablets). Typical standalone application whitelisting technologies are generally not
+available for mobile devices as of this writing. Instead, application whitelisting is achieved through one of
+two methods: mobile device management (MDM)/mobile application management (MAM) or an
+enterprise app store.
+
+MDM/MAM
+
+MDM20 and MAM technologies are suites of security controls for protecting mobile devices from
+compromises. MDM and MAM technologies often have application whitelisting capabilities built in.
+Because MDM and MAM technologies are typically centrally managed, they offer a relatively easy way
+to deploy whitelisting capabilities to mobile devices. However, the disadvantage of relying on application
+whitelisting in this environment is that mobile applications are constantly changing and new applications
+are released all the time; it may be prohibitively difficult to maintain application whitelisting solutions
+with that much flux to be addressed.
+
+Enterprise App Store
+
+An alternative to a client-based application whitelisting technology is an enterprise app store21. Many
+organizations, especially those with MDM deployed to their mobile devices, control the app stores from
+which their users may download and install apps. This effectively provides a form of application
+whitelisting, because only those applications that have been approved by the organization for inclusion in
+the app store may be accessed by the organization’s users. There is some maintenance overhead
+associated with relying on an app store for whitelisting, but it is centralized (approving an app once and
+posting it to the app store) instead of distributed (configuring thousands of managed mobile devices to
+recognize the latest apps and app updates).
+
+
+
+
+20   NIST SP 800-124 Revision 1, Guidelines for Managing the Security of Mobile Devices in the Enterprise
+     (http://dx.doi.org/10.6028/NIST.SP.800-124r1).
+21   NIST SP 800-163, Vetting the Security of Mobile Applications (http://dx.doi.org/10.6028/NIST.SP.800-163).
+
+
+
+                                                              15
+NIST SP 800-167                                                            GUIDE TO APPLICATION W HITELISTING
+
+
+Appendix C—Acronyms and Abbreviations
+
+Selected acronyms and abbreviations used in the guide are defined below.
+
+FIPS              Federal Information Processing Standard
+FISMA             Federal Information Security Modernization Act
+ICS               Industrial Control Systems
+IT                Information Technology
+ITL               Information Technology Laboratory
+MAM               Mobile Application Management
+MDM               Mobile Device Management
+NIST              National Institute of Standards and Technology
+NSRL              National Software Reference Library
+OMB               Office of Management and Budget
+OS                Operating System
+SIEM              Security Information and Event Management
+SP                Special Publication
+SSLF              Specialized Security-Limited Functionality
+
+
+
+
+                                                    16
+NIST SP 800-167                                                           GUIDE TO APPLICATION W HITELISTING
+
+
+Appendix D—Bibliography
+
+The following publications were used when writing this guide.
+
+   Council on CyberSecurity, The Critical Controls for Effective Cyber Defense, Version 5.1, [October
+    7, 2014], http://www.counciloncybersecurity.org/critical-controls/reports/ [accessed 8/28/2015].
+   National Security Agency, Application Whitelisting Using Software Restriction Policies, Version 1.1,
+    August 2010, http://www.nsa.gov/ia/_files/os/win2k/application_whitelisting_using_srp.pdf
+    [accessed 8/28/2015].
+   National Security Agency, MIT-006FS-2013, Application Whitelisting [from Top 10 Information
+    Assurance Mitigation Strategies], [October 25, 2013],
+    http://www.nsa.gov/ia/_files/factsheets/I43V_Slick_Sheets/SlickSheet_ApplicationWhitelisting_Stan
+    dard.pdf [accessed 8/28/2015].
+   NIST, Framework for Improving Critical Infrastructure Cybersecurity, Version 1.0, February 12,
+    2014, http://www.nist.gov/cyberframework/upload/cybersecurity-framework-021214.pdf [accessed
+    8/28/2015].
+   NIST, Special Publication (SP) 800-53 Revision 4, Security and Privacy Controls for Federal
+    Information Systems and Organizations, April 2013 (updated 1/22/2015),
+    http://dx.doi.org/10.6028/NIST.SP.800-53r4 [accessed 8/28/2015].
+   NIST, Special Publication (SP) 800-70 Revision 2, National Checklist Program for IT Products—
+    Guidelines for Checklist Users and Developers, February 2011,
+    http://csrc.nist.gov/publications/nistpubs/800-70-rev2/SP800-70-rev2.pdf [accessed 8/28/2015].
+
+
+
+
+                                                   17
+

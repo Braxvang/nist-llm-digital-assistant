@@ -1,0 +1,60 @@
+                                                                                               NIST SP 800-177 REV. 1                                                           TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               certiﬁcate may be self-issued, or it may be issued by a well-known CA. �e certiﬁcate may be
+                                                                                               current or expired. Indeed, operators may employ either a public or a private CA for their DANE
+                                                                                               certiﬁcates and publish a combination of “3 1 1” and “2 1 1” TLSA records, both of which
+                                                                                               should match the server chain and be monitored. �is allows clients to verify the certiﬁcate using
+                                                                                               either DANE or the traditional Certiﬁcate Authority system, signiﬁcantly improving reliability.
+
+                                                                                               Secure SMTP communications involves additional complications because of the use of mail
+                                                                                               exchanger (MX) and canonical name (CNAME) DNS RRs, which may cause mail to be routed
+                                                                                               through intermediate hosts or to ﬁnal destinations that reside at diﬀerent domain names. [RFC
+                                                                                               7671] and [RFC7672] describe a set of rules that are to be used for ﬁnding and interpreting
+                                                                                               DANE policy statements.
+
+                                                                                               As originally deﬁned, TLS did not oﬀer a client the ability to specify a particular hostname when
+                                                                                               connecting to a server; this was a problem in the case where the server oﬀers multiple virtual
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               hosts from one IP address, and there was a desire to associate a single certiﬁcate with a single
+                                                                                               hostname. [RFC6066] deﬁnes a set of extensions to TLS that include the Server Name Indication
+                                                                                               (SNI), allowing a client to speciﬁcally reference the desired server by hostname, and the server
+                                                                                               can respond with the correct certiﬁcate.
+
+                                                                                               [RFC7671] and [RFC7672] require the client to send SNI just in case the server needs this to
+                                                                                               select the correct certificate. There is no obligation on the server to employ virtual hosting, or to
+                                                                                               return a certificate that matches the client's SNI extension. There is no obligation on the client to
+                                                                                               match anything against the SNI extension. Rather, the requirement on the client is to support at
+                                                                                               least the TLSA base domain as a reference identifier for the peer identity when performing name
+                                                                                               checks (matching against a TLSA record other than DANE-EE(3)). With CNAME expansion
+                                                                                               either as part of MX record resolution or address resolution of the MX exchange, additional
+                                                                                               names must be supported as described in [RFC7671] and [RFC7672].
+
+                                                                                               A DANE matching condition also requires that the connecting server match the SubjectAltName
+                                                                                               from the delivered end certiﬁcate to the certiﬁcate indicated in the TLSA RR. DANE-EE
+                                                                                               authentication allows for the server to deliver a self-signed certiﬁcate. In eﬀect, DANE-EE is
+                                                                                               simply a vehicle for delivering the public key. Authentication is inherent in the trust provided by
+                                                                                               DNSSEC, and the SNI check is not required.
+
+                                                                                               5.2.5   SMTP MTA Strict Transport Security (MTA-STS)
+
+                                                                                               Some email providers regard the requirement that DANE records be secured with DNSSEC as a
+                                                                                               major barrier to deployment. As an alternative, they have proposed SMTP Strict Transport
+                                                                                               Security [RFC8461], which relies on records that are announced via DNS but authenticated using
+                                                                                               information distributed via HTTPS. The goal of MTA-STS is the same as DANE: to have a way
+                                                                                               for a receiving MTA to publish its TLS policy and mitigate Man-in-the-Middle (MITM)
+                                                                                               spoofing. SMA-STS can be used with DANE, as neither method precludes the use of the other.
+
+                                                                                               MTA-STS works by publishing both a special TXT RR in the DNS and a policy document at a
+                                                                                               Well-Known URL. The client obtains both artifacts before attempting to establish a connection
+                                                                                               to the receiving domain’s mail servers.
+
+
+                                                                                                                                                66
+

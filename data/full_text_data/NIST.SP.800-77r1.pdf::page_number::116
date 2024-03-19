@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                 GUIDE TO IPSEC VPNS
+
+
+                                                                                                         proposal 2
+                                                                                                         match fvfr any
+
+                                                                                                   6. Disable the default IKEv2 proposal. This proposal contains a base set of cryptographic
+                                                                                                      primitives that can be disabled if not used.
+
+                                                                                                       no crypto ikev2 proposal default
+
+                                                                                                   7. Specify the IKE authentication method. In this case, each router needs to be configured
+                                                                                                      to use a PSK as illustrated by the following configuration entries. 80 Instead of IP
+                                                                                                      addresses as identifiers, fully qualified domain names (FQDNs) will be used. An easy
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      way to create a strong random PSK is to use the openssl command: openssl rand -
+                                                                                                      base64 64
+
+                                                                                                       crypto ikev2 profile default
+                                                                                                        identity local fqdn west.example.gov
+                                                                                                        match identity remote fqdn east.example.gov
+                                                                                                        authentication local pre-share key XXXXXXXXX
+                                                                                                        authentication remote pre-share key XXXXXXXXX
+
+                                                                                              Steps 8 through 11 are specific to using policy-based crypto maps; if using tunnel interfaces, skip
+                                                                                              to step 12.
+
+                                                                                                   8. Specify the IPsec mode and cryptographic algorithms. The following configuration
+                                                                                                      entry on each router specifies ESP tunnel mode, preferring AES-GCM over AES-CBC-
+                                                                                                      128 encryption with HMAC-SHA256 integrity protection:
+
+                                                                                                       crypto ipsec transform-set 1 esp-gcm-128 81
+                                                                                                        mode tunnel
+                                                                                                       crypto ipsec transform-set 2 esp-cbc-128 esp-sha256-hmac
+                                                                                                        mode tunnel
+                                                                                                   9. Define the packet filters. The following configuration entry tells the routers which
+                                                                                                      packets should be permitted to use IPsec:
+
+                                                                                                       ip access-list extended 100
+                                                                                                        permit ip 192.0.0.0 0.0.0.255 192.0.2.0 0.0.0.255
+                                                                                                   10. Tie the IPsec settings together in a crypto map. On Cisco routers, the settings created
+                                                                                                       in steps 5, 6, and 7 need to be connected. This can be done through the following
+                                                                                                       configuration settings, which create a crypto map called west-east:
+
+
+
+
+                                                                                              80   Secure transport for the PSK is provided by one of the network administrators who physically carries a copy of the key from
+                                                                                                   the main office to the remote office.
+                                                                                              81   The term transform set refers to the VPN algorithms and security protocols.
+
+
+
+                                                                                                                                                            99
+

@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-77 REV. 1                                                           GUIDE TO IPSEC VPNS
+
+
+                                                                                              If the application is sending packets close to the MTU size, using ESP encryption (which adds a
+                                                                                              few bytes in size compared to the unencrypted packet size) might lead to fragmentation, which
+                                                                                              will reduce performance. If the IPsec SA is a connection within a data center or over a dedicated
+                                                                                              fiber cable, it might be possible to increase the MTU size (e.g., to 9000 bytes) to prevent
+                                                                                              fragmentation. The MTU of the internal-facing network card can also be reduced to force the
+                                                                                              LAN to send packets that are smaller than 1500 bytes so that once the host encrypts the packet to
+                                                                                              send it out over the external interface, the ESP packet will not exceed an MTU of 1500 bytes.
+                                                                                              TCP MSS clamping can be used on both IPsec endpoints to ensure that TCP sessions will use a
+                                                                                              lower MTU that prevents fragmentation.
+
+                                                                                              7.2.4.2 IKE performance considerations
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              While IKE performance in most cases does not matter, it does matter for remote access VPN
+                                                                                              servers that have a continuous stream of clients connecting and disconnecting. If IKE uses too
+                                                                                              much of the CPU resources, ESP processing times will be impacted as well. If a remote access
+                                                                                              VPN server is too busy and has degraded to the point where an IKE session takes more than a
+                                                                                              few seconds to establish, the server will completely collapse under the load. IKE clients usually
+                                                                                              time out after 5 to 10 seconds and will start a new IKE attempt. This will put even more load on
+                                                                                              the already loaded server. That is, the load based on the number of IKE clients connecting will
+                                                                                              slowly rise until it hits a breaking point. If the IKE REDIRECT [44] extension is supported, the
+                                                                                              server can be configured to start redirecting clients to another server before it becomes too busy.
+                                                                                              See Section 3.8 for more information.
+
+                                                                                              The most computationally expensive part of IKE is the DH calculation that is performed during a
+                                                                                              key exchange. DH implemented using ECP groups (elliptic curve group modulo a prime) takes
+                                                                                              fewer resources than the use of finite field groups (i.e., modular exponential or MODP groups),
+                                                                                              such as DH group 14. The DH 19, DH 20, and DH 21 ECP groups are also considered more
+                                                                                              secure than the MODP groups [65]. DH groups 1, 2, 5, and 22 are not NIST-approved because
+                                                                                              these groups do not supply the minimum of 112 bits of security. See NIST SP 800-56A [64] for
+                                                                                              further information about approved DH groups.
+
+                                                                                              MOBIKE should be enabled on remote access VPN servers. Mobile devices will switch between
+                                                                                              WiFi and mobile data. Without MOBIKE, this requires a new IKE session for each network
+                                                                                              switch, which will increase the number of DH calculations that need to be supported. IKE clients
+                                                                                              on unreliable WiFi can result in many IKE sessions being reset and restarted. When MOBIKE is
+                                                                                              used, an encrypted informational exchange message is sent to modify the existing IKE and ESP
+                                                                                              sessions to use the new IP address of the other interface and avoid starting new sessions with
+                                                                                              new, expensive DH group calculations.
+
+                                                                                              Liveness 59 probes can be used by a server to detect remote clients that have vanished without
+                                                                                              sending a delete notification. The timer for these probes should not be set too short or else the
+                                                                                              server will need to send frequent IKE packets with DPD probes for idle IKE clients. If the
+                                                                                              timeout value is set very short (on the order of a few seconds), there is the additional risk of IKE
+
+
+                                                                                              59   This was formerly called DPD.
+
+
+
+                                                                                                                                               72
+

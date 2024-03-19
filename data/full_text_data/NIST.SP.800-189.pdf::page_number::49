@@ -1,0 +1,60 @@
+                                                                                             NIST SP 800-189                                                       RESILIENT INTERDOMAIN TRAFFIC EXCHANGE:
+                                                                                                                                                                           BGP SECURITY & DDOS MITIGATION
+
+                                                                                                       Security Recommendation 57: To limit exploitation, an enterprise internal DNS
+                                                                                                       recursive resolver should limit the scope of clients from which it accepts requests. The
+                                                                                                       clients normally come from within the same enterprise network where the DNS resolver
+                                                                                                       resides. Hence, the DNS recursive resolver can maintain access lists in the configuration so
+                                                                                                       that it is not open to the entire internet [ISOC] [TA14-017A].
+
+                                                                                                       Security Recommendation 58: An enterprise should block UDP/Port 53 and TCP/Port
+                                                                                                       53 for ingress and egress at the network boundary; exceptions 27 to this include designated
+                                                                                                       enterprise recursive resolvers that need to send queries and designated enterprise
+                                                                                                       authoritative servers that must listen for queries.
+
+                                                                                             Concerning Security Recommendation 58, the purpose of blocking on egress is to block stub
+                                                                                             resolvers (on hosts) from sending their own queries out to the Internet and instead make sure
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-189
+
+
+
+
+                                                                                             they use an enterprise recursive resolver. Likewise, the purpose of blocking on ingress is to block
+                                                                                             attacks or “rogue” recursive resolvers from being used in attacks by blocking traffic from
+                                                                                             reaching them.
+
+                                                                                             DNS, LDAP, and other open service protocols used in DDoS amplification generate significant
+                                                                                             amounts of UDP fragment traffic. It is possible to reduce the impact of DDoS amplification
+                                                                                             traffic by rate limiting non-initial UDP fragments at an ISP’s peering edges. These are UDP
+                                                                                             packets where the fragment offset is greater than 0.
+
+                                                                                                       Security Recommendation 59: An ISP should perform rate limiting of non-initial
+                                                                                                       UDP fragments at edge routers facing customers and lateral peers.
+
+                                                                                             5.5       BGP Flow Specification (Flowspec)
+
+                                                                                             Destination-based remotely triggered black-holing (D/RTBH) [RFC3882] [RFC7999] and
+                                                                                             source-based remotely triggered black-holing (S/RTBH) [RFC5635] (the latter in conjunction
+                                                                                             with uRPF) have been used as techniques for DDoS mitigation. However, with the
+                                                                                             standardization and vendor support of Flowspec [RFC5575] [RFC7674] [RFC5575bis] [Ryburn]
+                                                                                             [Cisco4] [Juniper4], the basic principles of D/RTBH and S/RTBH are significantly enhanced and
+                                                                                             can be operationally deployed in a fine-grained, dynamic, and efficient way. Operational
+                                                                                             experience with Flowspec for DDoS mitigation has been reported in [Levy2] [Compton] [Hinze].
+
+                                                                                             In D/RTBH, a BGP message is sent to trigger the provider edge (PE) routers (within the victim’s
+                                                                                             AS or its transit provider AS) to block ingress traffic to the specified IP address where the
+                                                                                             affected server resides. In S/RTBH, a BGP message is sent to trigger the provider edge (PE)
+                                                                                             routers (within the victim’s AS or its transit provider AS) to block ingress traffic from the
+                                                                                             specified IP address that is the source address employed by the attacker. In S/RTBH, loose uRPF
+                                                                                             is used to filter traffic from the specified source address. In the BGP Flowspec mechanism, a
+                                                                                             flow specification NLRI is defined and used to convey information about filtering rules for
+                                                                                             traffic that should be discarded [RFC5575] [RFC5575bis]. This mechanism allows an upstream
+                                                                                             AS to perform inbound filtering in their edge routers of traffic that a given downstream AS
+
+
+                                                                                             27
+                                                                                                  For example, Google’s 8.8.8.8, Cloudflare’s 1.1.1.1, etc.
+
+
+                                                                                                                                                              38
+

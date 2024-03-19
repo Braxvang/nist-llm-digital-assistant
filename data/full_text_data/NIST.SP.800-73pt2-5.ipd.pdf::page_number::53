@@ -1,0 +1,60 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                 Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                                    PIV Card Application Card Command Interface
+
+1154   The card commands sent to the PIV Card Application to generate a signature are listed below. It
+1155   is assumed that the cardholder PIN or OCC data has been successfully verified prior to sending
+1156   the GENERAL AUTHENTICATE command.
+
+1157   A.4.1. RSA
+1158   This example illustrates signature generation using RSA 2048 27 (i.e., algorithm identifier '07').
+1159   Command chaining is used in the first command since the padded hash value sent to the card for
+1160   signature generation is bigger than the length of the data field.
+1161   Command 1 — GENERAL AUTHENTICATE (first chain)
+                      CLA                       '10' indicating command chaining
+                      INS                       '87'
+                      P1                        '07'
+                      P2                        '9C'
+                      Lc                        Length of data field
+                                                '7C' – L1 { '82' '00' '81' L2 {first part of the PKCS #1 v1.5 or PSS
+                      Data Field
+                                                padded message hash value }}
+                      Le                        Absent (no response expected)
+
+1162   Response 1
+                      Data Field                Absent
+                      SW1-SW2                   '90 00' (Status word)
+
+1163   Command 2 — GENERAL AUTHENTICATE (last chain)
+                      CLA                       '00' indicates last command of the chain
+                      INS                       '87'
+                      P1                        '07'
+                      P2                        '9C'
+                      Lc                        Length of data field
+                                                {second and last part of the PKCS #1 v1.5 or PSS padded message
+                      Data Field
+                                                hash value}
+                      Le                        '00'
+
+1164    Response 2
+                      Data Field                '7C' – L1 {'82' L2 {first part of signature} }
+                                                '61 xx', where xx indicates the number of bytes remaining to send by
+                      SW1-SW2
+                                                the PIV Card Application
+
+1165   Command 3 — GET RESPONSE APDU)
+                      CLA                       '00'
+                      INS                       'C0'
+                      P1                        '00'
+                      P2                        '00'
+                      Le                        xx length of remaining response as indicated by previous SW1-SW2
+
+
+
+       27
+         Higher strength keys are recommended per SP 800-56 Part 1 starting in 2031. See SP 800-78-5 Tables 9 and 10 which reflect support for
+       higher strength keys for PIV cards and supporting system, where applicable.
+
+
+
+                                                                            43
+

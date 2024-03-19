@@ -1,0 +1,56 @@
+                                                         Practical Combinatorial Testing
+ _______________________________________________________
+determines combinations that would disprove these claims, outputting these as
+counterexamples. Each counterexample can then be converted to a test with known
+expected result. Every test from the ACTS tool is used, with the model checker supplying
+expected results for each test. (Note that the trivially provable positive claims have been
+commented out. Here we are concerned with producing counterexamples.)
+
+      Recall the structure introduced in Section 9.1: Ci => ~Rj. Here Ci is the set of
+parameter values from the covering array. For example, for configuration #1 in Section:
+
+                           u_l = 0 & f_l = 0 & act = rd
+
+       As can be seen below, for each of the 9 configurations in the covering array
+we create a SPEC claim of the form:
+
+ SPEC AG(( <covering array values> ) -> AX !(access = <result>));
+
+        This process is repeated for each possible result, in this case either “GRANT” or
+“DENY”, so we have 9 claims for each of the two results. The model checker is able to
+determine, using the model defined in Section 9.2.1, which result is the correct one for each
+set of input values, producing a total of 9 tests.
+
+Excerpt:
+...
+-- reflection of the assign for access
+--SPEC AG ((u_l >= f_l & act = rd ) -> AX (access = GRANT));
+--SPEC AG ((f_l >= u_l & act = wr ) -> AX (access = GRANT));
+--SPEC AG (!((u_l >= f_l & act = rd ) | (f_l >= u_l & act = wr ))
+            -> AX (access = DENY));
+
+SPEC AG((u_l = 0 & f_l = 0 & act = rd) -> AX !(access = GRANT));
+SPEC AG((u_l = 0 & f_l = 1 & act = wr) -> AX !(access = GRANT));
+SPEC AG((u_l = 0 & f_l = 2 & act = rd) -> AX !(access = GRANT));
+SPEC AG((u_l = 1 & f_l = 0 & act = wr) -> AX !(access = GRANT));
+SPEC AG((u_l = 1 & f_l = 1 & act = rd) -> AX !(access = GRANT));
+SPEC AG((u_l = 1 & f_l = 2 & act = wr) -> AX !(access = GRANT));
+SPEC AG((u_l = 2 & f_l = 0 & act = rd) -> AX !(access = GRANT));
+SPEC AG((u_l = 2 & f_l = 1 & act = wr) -> AX !(access = GRANT));
+SPEC AG((u_l = 2 & f_l = 2 & act = rd) -> AX !(access = GRANT));
+
+SPEC AG((u_l = 0 & f_l = 0 & act = rd) -> AX !(access = DENY));
+SPEC AG((u_l = 0 & f_l = 1 & act = wr) -> AX !(access = DENY));
+SPEC AG((u_l = 0 & f_l = 2 & act = rd) -> AX !(access = DENY));
+SPEC AG((u_l = 1 & f_l = 0 & act = wr) -> AX !(access = DENY));
+SPEC AG((u_l = 1 & f_l = 1 & act = rd) -> AX !(access = DENY));
+SPEC AG((u_l = 1 & f_l = 2 & act = wr) -> AX !(access = DENY));
+SPEC AG((u_l = 2 & f_l = 0 & act = rd) -> AX !(access = DENY));
+SPEC AG((u_l = 2 & f_l = 1 & act = wr) -> AX !(access = DENY));
+SPEC AG((u_l = 2 & f_l = 2 & act = rd) -> AX !(access = DENY));
+
+
+
+
+                                                                                                53
+

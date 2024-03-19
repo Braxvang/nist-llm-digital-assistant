@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+                            Table 9-2. Impact of Trust Anchor in Labeling Responses
+
+Trust anchor installed                 DNSSEC Response Status for Queries Addressed to
+ on DNSSEC-aware                 www.nist.gov           www.example.com         www.example.org
+       resolver
+none                        insecure                 insecure                insecure
+root                        secure                   insecure                insecure
+.com                        insecure                 secure                  insecure
+example.org                 insecure                 insecure                secure
+
+
+9.6        Zone Signing (DNSSEC-OP4)
+
+The following sequence of actions takes place when a zone file is signed:
+
+       •    The zone file is sorted in canonical order of domain names.
+
+       •    An NSEC RR (or NSEC3) is generated for every owner name in the zone.
+
+       •    The KSK (i.e., KSK-private) is used to sign the DNSKEY RRSet. The KSK is identified by using
+            the SEP flag in the RDATA portion of the DNSKEY RRType.
+
+       •    The ZSK (i.e., ZSK-private) is used to sign all RRsets in the zone (including DNSKEY RRsets
+            and NSEC RRsets).
+
+
+Checklist item 17: Signature generation using the KSK should be done offline, using the KSK-private
+stored offline or using a secure, protected module; then the DNSKEY RRSet, along with its RRSIG RR,
+can be loaded into the primary authoritative name server.
+
+
+
+9.6.1       Zone Signing—Illustrative Example
+
+Use of a zone signer program (dnssec-signzone provided by BIND 9.5.x) to sign the zone is illustrated
+below:
+
+            dnssec-signzone -o <name of the zone> -k <name of the file
+            containing KSK> <location of zone file> <name of file containing
+            ZSK>
+
+To sign the data for the zone example.com with the KSK located in the file
+Kexample.com.+005+76425.key and the ZSK generated earlier the command would be as follows:
+
+            dnssec-signzone -o example.com -k Kexample.com.+005+76425.key \
+            /var/named/zonedb.example.com Kexample.com.+005+28345.key
+
+The process of signing a zone file consists of generating a hash for each RRSet (RRs with the same owner
+name, class, and RRType), generating a signature for the RRSet (using the private key ZSK-private), and
+then capturing this signature information in a new RR of type RRSIG RR. The KSK signs just the
+DNSKEY RRSet, whereas a ZSK signs all RRsets in the zone file. The entity whose private key is used to
+sign the zone data is called the signer or signing authority. In most cases, the signer is the domain
+
+
+                                                      9-10
+

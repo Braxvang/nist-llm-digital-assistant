@@ -1,0 +1,53 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                 Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                    PIV Card Application Card Command Interface
+
+                  SW1       SW2                                    Meaning
+                '69'      '82'       Security status not satisfied
+                '69'      '83'       Authentication method blocked
+                '6A'      '80'       Incorrect parameter in command data field
+                '6A'      '81'       Function not supported
+                '6A'      '86'       Incorrect parameter in P1
+                '6A'      '88'       Key reference not found
+                '90'      '00'       Successful execution
+
+
+584   3.2.2. CHANGE REFERENCE DATA Card Command
+585   The CHANGE REFERENCE DATA card command initiates the comparison of the
+586   authentication data in the command data field with the current value of the reference data and
+587   replaces the reference data with new reference data if the comparison is successful. This
+588   command CAN be used by the PIV Card Application Administrator and the Cardholder.
+589   Only reference data associated with key references '80', '81' specific to the PIV Card Application
+590   (i.e., local key reference), and the Global PIN with key reference '00' MAY be changed by the
+591   PIV Card Application CHANGE REFERENCE DATA command. The PIV Card Application
+592   MAY allow the reference data associated with other key references (e.g., ‘96’ and ‘97’) to be
+593   changed by the PIV Card Application CHANGE REFERENCE DATA if they are used for card
+594   management operations and the requirements specified in Section 2.9.2 of FIPS 201-3 are
+595   satisfied. If any key reference value is specified that is not supported by the card, the PIV Card
+596   Application SHALL return the status word '6A 88'. Key reference '80' reference data SHALL be
+597   changed by the PIV Card Application CHANGE REFERENCE DATA command. The ability to
+598   change reference data associated with key references '81' and '00' using the PIV Card Application
+599   CHANGE REFERENCE DATA command is optional.
+600   If key reference '81' is specified and the command is not submitted over the contact interface,
+601   then the card command SHALL fail. If key reference '00' or '80' is specified and the command is
+602   not submitted over either the contact interface or the VCI, then the card command SHALL fail.
+603   In each case, the security status and the retry counter of the key reference SHALL remain
+604   unchanged.
+605   If the current value of the retry counter associated with the key reference is zero, then the
+606   reference data associated with the key reference SHALL NOT be changed, and the PIV Card
+607   Application SHALL return the status word '69 83'. If the command is submitted over the
+608   contactless interface (VCI) and the current value of the retry counter associated with the key
+609   reference is at or below the issuer-specified intermediate retry value (see Section 3.2.1), then the
+610   reference data associated with the key reference SHALL NOT be changed, and the PIV Card
+611   Application SHALL return the status word '69 83'.
+612   If the authentication data in the command data field does not match the current value of the
+613   reference data or if either the authentication data or the new reference data in the command data
+614   field of the command does not satisfy the criteria in Section 2.4.3, the PIV Card Application
+615   SHALL NOT change the reference data associated with the key reference and SHALL return
+616   either status word '6A 80' or '63 CX', with the following restrictions. If the authentication data in
+617   the command data field satisfies the criteria in Section 2.4.3 and matches the current value of the
+618   reference data, but the new reference data in the command data field of the command does not
+619   satisfy the criteria in Section 2.4.3, the PIV Card Application SHALL return status word '6A 80'.
+
+
+                                                             14
+

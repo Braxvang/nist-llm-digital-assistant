@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              IKE packet, depending on whether or not it sees the SPI number of the non-ESP marker.
+                                                                                              Usually, the kernel receiving an ESPinUDP packet will simply strip the UDP header away
+                                                                                              without bothering with the UDP checksum (which not all NAT routers properly recalculate) and
+                                                                                              process the remaining ESP data as if it was received as an ESP packet without encapsulation. If
+                                                                                              the kernel detects an IKE packet, it will send this packet to the IKE process for processing by the
+                                                                                              IKE daemon.
+
+                                                                                              Starting with IKEv2, even if no NAT was detected, endpoints need to support receiving ESP and
+                                                                                              ESPinUDP packets on all of their IPsec SAs. Each endpoint may decide when to use
+                                                                                              encapsulation and when not to. IKEv2 also allows for initiating a new IKE_SA_INIT on UDP
+                                                                                              port 4500, bypassing UDP port 500 completely.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              4.2.2    TCP Encapsulation of ESP
+
+                                                                                              Implementations supporting TCP encapsulation [53], where ESP packets are wrapped into a TCP
+                                                                                              stream, can also choose to use TCP. This provides a much-needed method to prevent IPsec from
+                                                                                              being easily filtered and blocked. A lack of TCP encapsulation was one of the reasons why SSL
+                                                                                              VPNs came into existence, as these could not be easily blocked by blocking the IPsec protocols
+                                                                                              (UDP port 500 and 4500 and protocol ESP). TCP encapsulation ports cannot be negotiated, as
+                                                                                              this would require that the negotiations start on the well-known port susceptible to blocking.
+                                                                                              Therefore, the TCP port has to be preconfigured manually or via the IPsec client provisioning
+                                                                                              system.
+
+                                                                                              The ESP in TCP encapsulation uses an ASCII prefix tag of “IKETCP” so that an additional layer
+                                                                                              can be used, such as TLS. In that case, encrypted packets are encapsulated using a TCP
+                                                                                              connection that uses TLS. The packet processor can read the prefix and detect the start of an
+                                                                                              IKE/ESP stream, in which case it can send this traffic to the proper handler. Since restrictive
+                                                                                              networks often still (have to) allow access to HTTPS websites, using TLS on port 443 to protect
+                                                                                              (or really, hide) the TCP stream containing the encapsulated ESP packets will yield the best
+                                                                                              results. However, networks are often only misconfigured to drop all UDP traffic. Moving to ESP
+                                                                                              encapsulation on TCP port 4500 without TLS framing will usually be enough to be able to
+                                                                                              establish IPsec connections.
+
+                                                                                              Implementations are encouraged to regularly try to go back to UDP encapsulation. TCP
+                                                                                              encapsulation means there are possibly two TCP layers involved in a packet: the TCP connection
+                                                                                              being encrypted and the TCP connection carrying the ESP packet. These two TCP layers will
+                                                                                              both independently determine retransmissions. Especially when there is packet loss, these two
+                                                                                              TCP streams will badly interfere with each other.
+
+                                                                                              4.3     IP Payload Compression Protocol (IPComp)
+
+                                                                                              ESP can be deployed with IPComp. Before a packet is encrypted, the packet will be considered
+                                                                                              for compression. If the packet is very small already, such as an ICMP message, no compression
+                                                                                              is done, and the packet is encrypted as is; otherwise, the packet is compressed. However, various
+                                                                                              compression algorithms do not guarantee that an attempted compression does not end up being
+                                                                                              larger than the original. If this turns out to be the case, the original packet is encrypted without
+
+
+
+                                                                                                                                               44
+

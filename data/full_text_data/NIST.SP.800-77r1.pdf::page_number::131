@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                 GUIDE TO IPSEC VPNS
+
+
+                                                                                                   •   Using the host key’s ckaid from the previous step to obtain the public key:
+                                                                                                            o Cloud instance: ipsec showhostkey --left --ckaid <ckaid>
+                                                                                                            o Office gateway: ipsec showhostkey --right --ckaid <ckaid>
+                                                                                                   •   Creating the configuration file cloud-office.conf with a conn definition for the
+                                                                                                       connection named cloud-office-ipv4 and cloud-office-ipv6, uploading it to both VPN
+                                                                                                       servers, and placing it in the directory /etc/ipsec.d/
+                                                                                                   •   Customizing the left= entry on both servers as indicated in the configuration file below
+                                                                                                   •   Updating firewall rules to allow traffic from the subnets and exempt these IP destination
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                       ranges from being NAT’ed; adding a firewall rule for TCP MSS clamping 85
+                                                                                                   •   Enabling IP forwarding on the cloud instance. The built-in rp_filter is disabled to avoid
+                                                                                                       false positives; otherwise, the kernel will drop or try to redirect traffic due to the
+                                                                                                       encrypted and decrypted traffic using the same (single) virtual ethernet card.
+
+                                                                                              # /etc/ipsec.d/cloud-office.conf
+
+                                                                                              conn cloud-office-base
+                                                                                                  # On the cloud gateway, use left=%defaultroute to pick up its
+                                                                                                  # internal IP address
+                                                                                                  # left=%defaultroute
+                                                                                                  # on the office gateway, use left=<IP of the cloud’s public IP>
+                                                                                                  left=192.1.2.78
+                                                                                                  leftid=@cloud-vpn
+                                                                                                  leftrsasigkey=<value from above ipsec showhostkey --left command>
+                                                                                                  right=office-gw.example.gov
+                                                                                                  righted=@office-gw
+                                                                                                  leftrsasigkey=<value from above ipsec showhostkey --left command>
+                                                                                                  ikev2=insist
+                                                                                                  mtu=1440
+
+                                                                                              conn cloud-office-ipv4
+                                                                                                  also=cloud-office-base
+                                                                                                  leftsubnets=10.0.2.0/24
+                                                                                                  rightsubnets=192.168.100.0/24,192.168.103.0/24
+                                                                                                  auto=add
+
+                                                                                              conn cloud-office-ipv6
+                                                                                                  also=cloud-office-base
+                                                                                                  leftsubnet=2001:db8:0:1::/64
+                                                                                                  rightsubnet=2001:db8:0:2::/64
+                                                                                                  auto=add
+
+
+
+
+                                                                                              85   Different Linux systems use different firewall management tools. These could be based on iptables, firewalld, or shorewall.
+                                                                                                   Consult the vendor’s documentation.
+
+
+
+                                                                                                                                                            114
+

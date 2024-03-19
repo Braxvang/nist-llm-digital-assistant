@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-204B                                                 ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                             APPLICATIONS USING A SERVICE MESH
+
+                                                                                                ingress gateway, an egress gateway is optional as the sidecar itself can perform its
+                                                                                                functions.
+                                                                                              ● Injection of sidecar proxies (in the form of containers). The consequence of this is that each
+                                                                                                of the application’s deployments in the platform will now have two containers – the
+                                                                                                original microservice container plus the mesh’s sidecar proxy. These sidecar proxies
+                                                                                                enforce authentication and authorization policies during application runtime, thus acting as
+                                                                                                Policy Enforcement Points (PEPs). It must be mentioned that agents (e.g., OPA) can
+                                                                                                sometimes be used to play the role of PDPs for the authorization service. In addition,
+                                                                                                proxies should emit metrics and logs to enable continuous monitoring of the system, which
+                                                                                                can ensure that policies are in place and being enforced.
+                                                                                              ● A certificate authority (CA) module is needed to handle certificate requests from sidecar
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                                proxies, which need a runtime identity presented as an X.509 certificate. This CA
+                                                                                                generates, distributes, and manages keys and certificates used by the mesh and enables the
+                                                                                                mesh to perform automatic certificate rotation. The proof for the validity of the certificate is
+                                                                                                carried in the certificate itself by including a signed and dated “Online Certificate Status
+                                                                                                Protocol (OCSP)” server response as part of the certificate (called "OCSP stapling") via an
+                                                                                                X.509 extension.
+                                                                                              ● A control plane module in the service mesh that monitors configuration data in the hosting
+                                                                                                platform, encodes policies, and distributes those policies in the form of configuration to
+                                                                                                various proxies in the mesh (e.g., ingress, sidecar, and egress).
+
+                                                                                              Having looked at the components in service mesh, we will now look at the minimal
+                                                                                              requirements for setting up mutual TLS authentication [14] for communication between
+                                                                                              Kubernetes workloads using these components as a pre-requisite for configuring and enforcing
+                                                                                              authentication and authorization policies. These requirements or recommendations come under
+                                                                                              initial service mesh configuration and are numbered using the acronym ISMC-SR-X, where
+                                                                                              ISMC stands for initial service mesh configuration, SR stands for security recommendation,
+                                                                                              and X is the sequence number. They include but are not limited to the following.
+
+                                                                                              ISMC-SR-1: If certificate-based authentication is used for authenticating service calls, the
+                                                                                              signing certificate used by the service mesh’s CA module should be rooted in the
+                                                                                              organization’s existing Public Key Infrastructure (PKI) to allow for auditability, rotation, and
+                                                                                              revocation.
+
+                                                                                              Some service meshes come with the ability to encrypt traffic using a self-signed certificate;
+                                                                                              such a certificate should not be used in secure deployments.
+
+                                                                                              ISMC-SR-2: Communication between the service mesh control plane and the application
+                                                                                              orchestration and resource management platform’s configuration server must be authenticated
+                                                                                              and authorized.
+
+                                                                                              In this reference platform, authentication is typically achieved by the Kubernetes API server
+                                                                                              (the configuration server) with simple TLS. Authentication of the client is based on the pod’s
+                                                                                              service account credential. Authorization for the client to receive platform information from the
+                                                                                              API server is enforced by Kubernetes RBAC.
+
+
+
+
+                                                                                                                                               14
+

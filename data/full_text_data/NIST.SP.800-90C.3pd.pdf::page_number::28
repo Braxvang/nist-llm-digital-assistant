@@ -1,0 +1,42 @@
+      NIST SP 800-90C 3pd (Third Public Draft)                               Recommendation for RBG Constructions
+      September 2022
+
+
+
+
+751
+752                                              Fig. 5. Generate_function
+
+753   The Generate_function (shown in Figure 5) requests that a DRBG generate a specified number
+754   of bits. The request may indicate the DRBG instance to be used (using the state handle returned
+755   by an Instantiate_function call; see Section 2.8.1.1), the number of bits to be returned, the security
+756   strength that the DRBG needs to support for generating the bitstring, and whether or not prediction
+757   resistance is to be obtained during this execution of the Generate_function. Optional additional
+758   input may also be incorporated into the function call. As stated in Section 2.4.1, the ability to
+759   handle and use additional input is recommended.
+760   The Generate_function returns status information – either an indication of success or an error. If
+761   the returned status code indicates a success, the requested number of bits is returned.
+762       •   If requested_number_of_bits is equal to or greater than the instantiated security strength,
+763           the security strength that the returned_bits can support (if used as a key) is:
+764                                     ss_key = the instantiated security strength,
+765           where ss_key is the security strength of the key.
+766       •   If the requested_number of bits is less than the instantiated security strength, and the
+767           returned_bits are to be used as a key, the key is capable of supporting a security strength
+768           of:
+769                                      ss_key = requested_number_of_bits.
+770   If the status code indicates an error, the returned_bits shall consist of an invalid (e.g., Null)
+771   bitstring that must not be used. Examples of conditions in which an error indication shall be
+772   returned include the following:
+773       •   The requested_security_strength exceeds the instantiated security strength for the DRBG
+774           (i.e., the security strength recorded in the DRBG’s internal state during instantiation).
+775       •   Prediction resistance has been requested but cannot be obtained at this time.
+776   Details about the Generate_function are provided in Section 9.3 of [SP800-90A].
+
+777   2.8.1.3.        DRBG Reseed Request
+778   The reseeding of a DRBG instantiation is intended to insert additional entropy into that DRBG
+779   instantiation (e.g., to recover from a possible compromise or to provide prediction resistance). This
+780   is accomplished using the following call (note that this does not increase the security strength of
+781   the DRBG):
+
+                                                            15
+

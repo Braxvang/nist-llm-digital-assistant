@@ -1,0 +1,59 @@
+                                                                                               NIST SP 800-177 REV. 1                                                           TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               If it is necessary to revoke or delete a DKIM key, it can be immediately retired by either be
+                                                                                               removing the key’s corresponding DKIM TXT RR or by altering the RR to have a blank p=.
+                                                                                               Either achieves the same eﬀect (the client can no longer validate the signature) but keeping the
+                                                                                               DKIM RR with a blank p= value explicitly signals that the key has been removed.
+
+                                                                                               Revoking a key is similar to deleting it but the enterprise may pre-emptively delete (or change)
+                                                                                               the DKIM RR before the sender has stopped using it. �is scenario is possible when an
+                                                                                               enterprise wishes to break DKIM authentication and does not control the sender (i.e., a third
+                                                                                               party or rogue sender). In these scenarios, the enterprise can delete or change the DKIM RR in
+                                                                                               order to break validation of DKIM signatures. Additional deployment of DMARC (see Section
+                                                                                               4.5) can be used to indicate that this DKIM validation failure should result in the email being
+                                                                                               rejected or deleted.
+
+                                                                                               4.5.9   DKIM on the Receiver Side
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               On the receiver side, email administrators should ﬁrst make sure their MTA implementation has
+                                                                                               the functionality to verify DKIM signatures. Most major implementations have the functionality
+                                                                                               built-in or can be included using open source patches or a mail ﬁlter (i.e., milter). In some cases,
+                                                                                               the administrator may need to install additional cryptographic libraries to perform the actual
+                                                                                               validation.
+
+                                                                                               4.5.9.1 DKIM Queries in the DNS
+
+                                                                                               Just as an organization that deploys DKIM should deploy DNSSEC, receivers that perform
+                                                                                               DKIM processing should also perform DNSSEC validation (if possible) on responses to DKIM
+                                                                                               TXT queries. A mail server should be able to send queries to a validating DNS recursive server if
+                                                                                               it cannot perform its own DNSSEC validation.
+
+                                                                                               Security Recommendation 4-7: Organizations should enable DNSSEC validation on DNS
+                                                                                               servers used by MTAs that verify DKIM signatures.
+
+                                                                                               4.5.10 Issues with Mailing Lists
+
+                                                                                               DKIM assumes that the email came from the MTA domain that generated the signature. �is
+                                                                                               presents some problems when dealing with certain mailing lists. Often, MTAs that process
+                                                                                               mailing lists change the bodies of mailing list messages—for example, adding a footer with
+                                                                                               mailing list information or similar. Such actions are likely to invalidate DKIM signatures, unless
+                                                                                               for example, a message length is speciﬁed in the signature headers, and the additions come
+                                                                                               beyond that length.
+
+                                                                                               Fundamentally, mailing lists act as active mail parties. �ey receive messages from senders and
+                                                                                               resend them to recipients. Sometimes they send messages as they are received, sometimes the
+                                                                                               messages are bundled and sent as a single combined message, and sometimes recipients are able
+                                                                                               to choose their delivery means. As such, mailing lists should verify the DKIM signatures of
+                                                                                               incoming messages, and then re-sign outgoing messages with their own DKIM signature, made
+                                                                                               with the MTA’s public/private key pair. See [RFC6377], “DomainKeys Identiﬁed Mail (DKIM)
+
+
+                                                                                                                                                41
+

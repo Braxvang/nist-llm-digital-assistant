@@ -1,0 +1,50 @@
+Special Publication 800-85B                                         PIV Data Model Testing Specification
+
+
+11.3 Key Management Certificate
+
+11.3.1 SP 800-78 Algorithm Conformance
+
+11.3.1.1 Verify signature algorithm
+
+Purpose                 Confirms that the proper signature algorithm has been used to sign the
+                        certificate as specified in Table 3-4 of SP80078 based on the expiration
+                        date as specified in Table 3-3 of SP80078.
+Reference(s)            1.    SP80078, Section 3.2.1
+                        2.    AS07.03.01
+                        3.    AS07.03.02
+Precondition            1.    A valid PIV card is inserted into the contact reader.
+                        2.    A valid PC/SC connection exists between the test application and
+                              the contact reader.
+                        3.    The test application is currently connected to the card application
+                              which is accessible through card handle.
+                        4.    A key management key and corresponding certificate are present on
+                              the PIV card.
+Test Steps              1. Set cardHandle := <<valid card handle>>
+                        2. Set OID := <<Key Management Certificate
+                           (2.16.840.1.101.3.7.2.1.2)>>
+                        3. Call pivGetData w/
+                           • (IN) cardHandle
+                              • (IN) OID
+                              • (OUT) data
+                        4. Extract signature->algorithm field value from the
+                           certificate
+                        5. Extract validity->notAfter->utcTime field value from
+                           the certificate
+
+Expected Result(s)      1.    From Step 4: The signatureAlgorithm value is in accordance with
+                              Table 3-4 of SP80078
+                        2.    From Step 5: The certificate expiration date value is earlier than or
+                              equal to the sunset date specified in Table 3-3 of SP80078 for the
+                              algorithm from Step 4.
+                        3.    From Step 4: If the algorithm value is id-RSASSA-PSS, verify that
+                              the signature->parameters field is populated with SHA-256 (OID =
+                              2.16.840.1.101.3.4.2.1). For the other RSA algorithms, the
+                              parameters field is populated with NULL. For ECDSA, the
+                              parameters field is absent.
+
+
+
+
+                                                                                                      129
+

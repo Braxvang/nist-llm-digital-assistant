@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-190                                              APPLICATION CONTAINER SECURITY GUIDE
+
+
+                                                                                             image used to create the container. On traditional platforms, with less separation between the OS
+                                                                                             and apps, making this differentiation can be much more difficult.
+
+                                                                                             Organizations that are familiar with process, memory, and disk incident response activities will
+                                                                                             find them largely similar when working with containers. However, there are some differences to
+                                                                                             keep in mind as well.
+
+                                                                                             Containers typically use a layered file system that is virtualized from the host OS. Directly
+                                                                                             examining paths on the hosts typically only reveals the outer boundary of these layers, not the
+                                                                                             files and data within them. Thus, when responding to incidents in containerized environments,
+                                                                                             users should identify the specific storage provider in use and understand how to properly
+                                                                                             examine its contents offline.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-190
+
+
+
+
+                                                                                             Containers are typically connected to each other using virtualized overlay networks. These
+                                                                                             overlay networks frequently use encapsulation and encryption to allow the traffic to be routed
+                                                                                             over existing networks securely. However, this means that when investigating incidents on
+                                                                                             container networks, particularly when doing any live packet analysis, the tools used must be
+                                                                                             aware of these virtualized networks and understand how to extract the embedded IP frames from
+                                                                                             within them for parsing with existing tools.
+
+                                                                                             Process and memory activity within containers is largely similar to that which would be observed
+                                                                                             within traditional apps, but with different parent processes. For example, container runtimes may
+                                                                                             spawn all processes within containers in a nested fashion in which the runtime is the top-level
+                                                                                             process with first-level descendants per container and second-level descendants for each process
+                                                                                             within the container. For example:
+                                                                                             ├─containerd─┬───┬───[container1─┬─bash]
+                                                                                             │            │   │               └─8*[{thread}]]
+                                                                                             │            │   ├─container2────┬─start.sh─┬─mongod───22*[{mongod}]
+                                                                                             │            │   │               │          └─node─┬─4*[{V8 WorkerThread}]
+                                                                                             │            │   │               │                 └─5*[{node}]
+                                                                                             │            │   │               └─8*[{thread}]
+                                                                                             │            │   ├─container3────┬─mysqld───28*[{mysqld}]
+                                                                                             │            │   │               └─8*[{thread}]
+
+                                                                                             6.3   Implementation Phase
+
+                                                                                             After the container technology has been designed, the next step is to implement and test a
+                                                                                             prototype of the design before putting the solution into production. Be aware that container
+                                                                                             technologies do not offer the types of introspection capabilities that VM technologies do.
+
+                                                                                             NIST SP 800-125 [1] cites several aspects of virtualization technologies that should be evaluated
+                                                                                             before production deployment, including authentication, connectivity and networking, app
+                                                                                             functionality, management, performance, and the security of the technology itself. In addition to
+                                                                                             those, it is important to also evaluate the container technology’s isolation capabilities. Ensure
+                                                                                             that processes within the container can access all resources they are permitted to and cannot view
+                                                                                             or access any other resources.
+
+
+
+                                                                                                                                            33
+

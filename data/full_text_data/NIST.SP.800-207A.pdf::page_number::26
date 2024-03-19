@@ -1,0 +1,49 @@
+NIST SP 800-207A                                            ZTA Model for Access Control in Cloud-Native
+September 2023                                                Applications in Multi-Location Environments
+
+
+4.6.2. Prerequisites for the Deployment of Identity-Tier Policies
+Identity-tier policies use contextual, application-driven identifiers (e.g., “order processing front-
+end service can communicate with inventory back-end service”) instead of network parameters
+(e.g., “permit calls from 192.168.10.0/24 subnet to 10.0.0.31”). The identifiers assigned to
+services at runtime are cryptographic identities, which are used for mutual authentication and
+authorization during each service request and response.
+Deploying identity-tier policies requires a standardized infrastructure for creating, issuing, and
+maintaining tamper-proof service identities. Some of the components of this infrastructure are
+outlined below and also discussed in [5]:
+   •   Creation of application identity: The fundamental requirement to enable this is the
+       assignment of a unique identity to each application or service, just like how each user
+       carries a unique identity (e.g., userid). Prior to the era of cloud-based applications,
+       application requests were validated based on the IP subnet or IP address from which they
+       originated. Since ubiquitous access and multi-clouds have eliminated the concept of
+       network perimeters, authentication and authorization based on those parameters are
+       neither feasible nor scalable. Further, the presence of proxies, network address
+       translations, dynamic infrastructures (e.g., migration of applications between VMs), and
+       load balancers make it impossible for the called application to know the IP address of the
+       calling application in order to make authentication or authorization decisions. A unique
+       application identity is required.
+   •   Establishment of trust in application identity: The created application (i.e., workload or
+       service) identity should not be subject to spoofing and should be continuously verifiable.
+       An example of workload identity is a SPIFFE ID [4], which is a string that uniquely and
+       specifically identifies a workload and is encoded as a Uniform Resource Identifier (URI).
+       The SPIFFE ID is carried in a cryptographically verifiable document called a SPIFFE
+       Verifiable Identity Document (SVID). SPIFFE supports multiple SVID formats, but the
+       most commonly used is an X.509 certificate.
+   •   Discovery of application resources: There should be a robust and secure method for
+       discovering all of the application dependencies consumed over the network (e.g.,
+       services, SaaS endpoints, network appliances). This capability is enabled through an
+       authenticated service registry.
+These allowable flows can be based on either (a) the structure of the application (i.e., “the front
+end of application 1 can call the back end of application 1”) or (b) a legitimate business
+transaction (e.g., “order processing application can call the shipping application”). Often,
+organizations do not know all of the allowable service requests in their infrastructure. However,
+the observability capabilities of the infrastructure (e.g., the metrics provided by the service mesh)
+can be leveraged to build a view of “requests made today”. From that view, the organization can
+create fine-grained policies for allowable service requests. Utilizing this observe-and-lock-down
+methodology builds the organizational processes required to maintain the life cycle of these
+policies over time.
+
+
+
+                                                  18
+

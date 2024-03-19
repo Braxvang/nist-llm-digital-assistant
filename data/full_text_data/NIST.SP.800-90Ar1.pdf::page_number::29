@@ -1,0 +1,50 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+    1. A random value that is generated anew for each nonce, using an approved random bit
+       generator.
+   2. A timestamp of sufficient resolution (detail) so that it is different each time it is used.
+    3. A monotonically increasing sequence number, or
+   4. A combination of a timestamp and a monotonically increasing sequence number, such
+      that the sequence number is reset when and only when the timestamp changes. For
+      example, a timestamp may show the date but not the time of day, so a sequence number
+      is appended that will not repeat during a particular day.
+For case 1 above, the random value could be acquired from the same source and at the same time
+as the entropy input. In this case, the seed could be considered to be constructed from an “extra
+strong” entropy input and the optional personalization string, where the entropy for the entropy
+input is equal to or greater than (3/2 security_strength) bits.
+For case 2 above, the timestamp must be trusted. A trusted timestamp is generated and signed by
+an entity that is trusted to provide accurate time information.
+The nonce provides greater assurance that the DRBG provides security_strength bits of security
+to the consuming application. If a DRBG were instantiated many times without a nonce, a
+compromise could become more likely. In some consuming applications, a single DRBG
+compromise could reveal long-term secrets (e.g., a compromise of the DSA per-message secret
+could reveal the signing key).
+A nonce shall be generated within a cryptographic module boundary. This requirement does not
+preclude the generation of the nonce within a cryptographic module that is different from the
+cryptographic boundary containing the DRBG function with which the nonce is used (e.g., the
+cryptographic module boundary containing an instantiate function). However, in this scenario,
+there needs to be a secure channel to transport the nonce between the cryptographic-module
+boundaries. See the discussion of distributed DRBGs in Section 8.5 and distributed RBGs in [SP
+800-90C].
+
+8.6.8      Reseeding
+
+Generating too many outputs from a seed (and other input information) may provide sufficient
+information for successfully predicting future outputs (see Section 8.8). Periodic reseeding will
+reduce security risks, reducing the likelihood of a compromise of the data that is protected by
+cryptographic mechanisms that use the DRBG.
+Seeds have a finite seedlife (i.e., the number of outputs that are produced during a seed period);
+the maximum seedlife is dependent on the DRBG mechanism used. Implementations shall
+enforce the limits on seedlife specified for the DRBG mechanism used or more stringent limits
+selected by the implementer. When a DRBG's maximum seedlife is reached, the DRBG shall
+not generate outputs until it has been reseeded.
+Reseeding is accomplished 1) by an explicit reseeding of the DRBG by the consuming
+application, 2) by the generate function when prediction resistance is requested (see Section 8.8)
+or 3) when the end of the seed life is determined during the generate function (see Section 9.3.1).
+The reseeding of the DRBG shall be performed in accordance with the specification for a given
+DRBG mechanism. The DRBG reseed specifications within this Recommendation are designed
+
+                                                 20
+

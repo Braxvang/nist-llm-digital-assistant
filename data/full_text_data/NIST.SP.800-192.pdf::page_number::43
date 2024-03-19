@@ -1,0 +1,62 @@
+                                                                                             NIST SP 800-192                                                              VERIFICATION & TEST METHODS FOR
+                                                                                                                                                                          ACCESS CONTROL POLICIES/MODELS
+
+                                                                                             The next step is to assign values from the covering array to parameters used in the model. For each
+                                                                                             test, we claim that the expected result will not occur. The model checker determines combinations
+                                                                                             that would disprove these claims, outputting these as counterexamples. Each counterexample can
+                                                                                             then be converted to a test with known expected result. As can be seen below, for each of the 9
+                                                                                             configurations in the covering array of Figure 20, we create a SPEC claim of the form:
+
+                                                                                                     SPEC AG(( <covering array values> ) -> AX !(access = <result>))
+
+                                                                                             (the SPEC is the syntax of the model checker for the safety requirement specification); This
+                                                                                             process is repeated for each possible result, in this case either “GRANT” or “DENY”, so we have
+                                                                                             9 claims for each of the two results as in Figure 21.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-192
+
+
+
+
+                                                                                             Excerpt:
+                                                                                             ...
+                                                                                             -- reflection of the assign for access
+                                                                                             --SPEC AG ((u_l >= f_l & act = rd ) -> AX (access = GRANT));
+                                                                                             --SPEC AG ((f_l >= u_l & act = wr ) -> AX (access = GRANT));
+                                                                                             --SPEC AG (!( (u_l >= f_l & act = rd ) | (f_l >= u_l & act = wr ) )
+                                                                                                      -> AX (access = DENY));
+
+                                                                                             * SPEC AG((u_l = 0 & f_l = 0 & act = rd) -> AX !(access = GRANT));
+                                                                                             * SPEC AG((u_l = 0 & f_l = 1 & act = wr) -> AX !(access = GRANT));
+                                                                                               SPEC AG((u_l = 0 & f_l = 2 & act = rd) -> AX !(access = GRANT));
+                                                                                               SPEC AG((u_l = 1 & f_l = 0 & act = wr) -> AX !(access = GRANT));
+                                                                                             * SPEC AG((u_l = 1 & f_l = 1 & act = rd) -> AX !(access = GRANT));
+                                                                                             * SPEC AG((u_l = 1 & f_l = 2 & act = wr) -> AX !(access = GRANT));
+                                                                                             * SPEC AG((u_l = 2 & f_l = 0 & act = rd) -> AX !(access = GRANT));
+                                                                                               SPEC AG((u_l = 2 & f_l = 1 & act = wr) -> AX !(access = GRANT));
+                                                                                             * SPEC AG((u_l = 2 & f_l = 2 & act = rd) -> AX !(access = GRANT));
+                                                                                               SPEC AG((u_l = 0 & f_l = 0 & act = rd) -> AX !(access = DENY));
+                                                                                               SPEC AG((u_l = 0 & f_l = 1 & act = wr) -> AX !(access = DENY));
+                                                                                             * SPEC AG((u_l = 0 & f_l = 2 & act = rd) -> AX !(access = DENY));
+                                                                                             * SPEC AG((u_l = 1 & f_l = 0 & act = wr) -> AX !(access = DENY));
+                                                                                               SPEC AG((u_l = 1 & f_l = 1 & act = rd) -> AX !(access = DENY));
+                                                                                               SPEC AG((u_l = 1 & f_l = 2 & act = wr) -> AX !(access = DENY));
+                                                                                               SPEC AG((u_l = 2 & f_l = 0 & act = rd) -> AX !(access = DENY));
+                                                                                             * SPEC AG((u_l = 2 & f_l = 1 & act = wr) -> AX !(access = DENY));
+                                                                                               SPEC AG((u_l = 2 & f_l = 2 & act = rd) -> AX !(access = DENY));
+                                                                                                                                   Figure 21 Test cases for test oracle
+
+
+                                                                                             A model checker produces counterexamples where the input values would disprove the claims
+                                                                                             specified in Figure 21. Each of these counterexamples is thus a set of test data that would have
+                                                                                             the expected result of GRANT or DENY (as listed by a * in Figure 21). We now strip out the
+                                                                                             parameter names and values, from Figure 21 giving tests that can be applied to the system under
+                                                                                             test. The tests produced are shown below:
+
+                                                                                             u_l = 0 & f_l = 0 & act = rd -> access = GRANT
+                                                                                             u_l = 0 & f_l = 1 & act = wr -> access = GRANT
+                                                                                             u_l = 1 & f_l = 1 & act = rd -> access = GRANT
+                                                                                             u_l = 1 & f_l = 2 & act = wr -> access = GRANT
+                                                                                             u_l = 2 & f_l = 0 & act = rd -> access = GRANT
+
+                                                                                                                                                    36
+

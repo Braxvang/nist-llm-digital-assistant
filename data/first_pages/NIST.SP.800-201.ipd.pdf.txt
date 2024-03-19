@@ -1,0 +1,1641 @@
+ 1                NIST Special Publication
+ 2                    NIST SP 800-201 ipd
+
+ 3   NIST Cloud Computing Forensic
+ 4           Reference Architecture
+ 5                                        Initial Public Draft
+
+ 6                                            Martin Herman
+ 7                                             Michaela Iorga
+ 8                                       Ahsen Michael Salim
+ 9                                          Robert H. Jackson
+10                                             Mark R. Hurst
+11                                               Ross A. Leo
+12                                       Anand Kumar Mishra
+13                                       Nancy M. Landreville
+14                                                Yien Wang
+
+15                This publication is available free of charge from:
+16                   https://doi.org/10.6028/NIST.SP.800-201.ipd
+17                                                  NIST Special Publication
+18                                                      NIST SP 800-201 ipd
+
+19    NIST Cloud Computing Forensic
+20            Reference Architecture
+21                                                                                Initial Public Draft
+ 22                    Martin Herman*              36                                       Michaela Iorga
+ 23          Information Access Division           37                      Computer Security Division
+ 24   Information Technology Laboratory            38               Information Technology Laboratory
+
+ 25             Ahsen Michael Salim                39                                  Robert H. Jackson
+ 26      American Data Technology, Inc.            40                                     Mark R. Hurst
+                                                   41                         SphereCom Enterprises, Inc.
+ 27                          Ross A. Leo
+ 28     University of Houston-Clear Lake           42                             Anand Kumar Mishra
+ 29           The CyberSecurity Institute          43           National Institute of Technology Sikkim
+
+ 30            Nancy M. Landreville                44                                            Yien Wang
+ 31    Graduate School of Cybersecurity            45                                      Auburn University
+ 32        and Information Technology              46
+ 33        University of Maryland (GC)             47                 *Former NIST employee; all work for this
+ 34                                                48                     publication was done while at NIST.
+
+ 35
+
+49                                                  This publication is available free of charge from:
+50                                                     https://doi.org/10.6028/NIST.SP.800-201.ipd
+
+51                                                                                              February 2023
+
+
+
+
+52
+53                                                                                   U.S. Department of Commerce
+54                                                                                    Gina M. Raimondo, Secretary
+
+55                                                                   National Institute of Standards and Technology
+56                Laurie E. Locascio, NIST Director and Under Secretary of Commerce for Standards and Technology
+     NIST SP 800-201 ipd (Initial Public Draft)                                                 Cloud Computing Forensic
+     February 2023                                                                                 Reference Architecture
+
+
+57   Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+58   experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+59   endorsement by the National Institute of Standards and Technology, nor is it intended to imply that the entities,
+60   materials, or equipment are necessarily the best available for the purpose.
+
+61   There may be references in this publication to other publications currently under development by NIST in
+62   accordance with its assigned statutory responsibilities. The information in this publication, including concepts and
+63   methodologies, may be used by federal agencies even before the completion of such companion publications. Thus,
+64   until each publication is completed, current requirements, guidelines, and procedures, where they exist, remain
+65   operative. For planning and transition purposes, federal agencies may wish to closely follow the development of
+66   these new publications by NIST.
+
+67   Organizations are encouraged to review all draft publications during public comment periods and provide feedback
+68   to NIST. Many NIST cybersecurity publications, other than the ones noted above, are available at
+69   https://csrc.nist.gov/publications.
+
+
+70   Authority
+71   This publication has been developed by NIST in accordance with its statutory responsibilities under the Federal
+72   Information Security Modernization Act (FISMA) of 2014, 44 U.S.C. § 3551 et seq., Public Law (P.L.) 113-283.
+73   NIST is responsible for developing information security standards and guidelines, including minimum requirements
+74   for federal information systems, but such standards and guidelines shall not apply to national security systems
+75   without the express approval of appropriate federal officials exercising policy authority over such systems. This
+76   guideline is consistent with the requirements of the Office of Management and Budget (OMB) Circular A-130.
+77
+78   Nothing in this publication should be taken to contradict the standards and guidelines made mandatory and binding
+79   on federal agencies by the Secretary of Commerce under statutory authority. Nor should these guidelines be
+80   interpreted as altering or superseding the existing authorities of the Secretary of Commerce, Director of the OMB, or
+81   any other federal official. This publication may be used by nongovernmental organizations on a voluntary basis and
+82   is not subject to copyright in the United States. Attribution would, however, be appreciated by NIST.
+
+83   NIST Technical Series Policies
+84   Copyright, Use, and Licensing Statements
+85   NIST Technical Series Publication Identifier Syntax
+
+86   Publication History
+87   Approved by the NIST Editorial Review Board on YYYY-MM-DD [will be added upon final publication]
+
+88   How to Cite this NIST Technical Series Publication
+89   Herman M, Iorga M, Salim AM, Jackson RH, Hurst MR, Leo RA, Mishra AK, Landreville NM, Wang Y (2022)
+90   NIST Cloud Computing Forensic Reference Architecture. (National Institute of Standards and Technology,
+91   Gaithersburg, MD), NIST Special Publication (SP) 800-201 ipd. https://doi.org/10.6028/NIST.SP.800-201.ipd
+
+
+92   Author ORCID iDs
+93   Martin Herman: 0000-0001-9315-6458
+94   Michaela Iorga: 0000-0001-7880-6045
+
+95   Public Comment Period
+96   February 8, 2022 - March 31, 2023
+      NIST SP 800-201 ipd (Initial Public Draft)                               Cloud Computing Forensic
+      February 2023                                                               Reference Architecture
+
+ 97   Submit Comments
+ 98   sp800-201@nist.gov
+ 99
+100   National Institute of Standards and Technology
+101   Attn: Computer Security Division, Information Technology Laboratory
+102   100 Bureau Drive (Mail Stop 8930) Gaithersburg, MD 20899-8930
+
+
+103   All comments are subject to release under the Freedom of Information Act (FOIA).
+      NIST SP 800-201 ipd (Initial Public Draft)                                     Cloud Computing Forensic
+      February 2023                                                                     Reference Architecture
+
+
+
+104   Abstract
+105   This document summarizes research performed by the members of the NIST Cloud Computing
+106   Forensic Science Working Group and presents the NIST Cloud Computing Forensic Reference
+107   Architecture (CC FRA, also referred to as FRA for the sake of brevity), whose goal is to provide
+108   support for a cloud system’s forensic readiness. The CC FRA is meant to help users understand
+109   which cloud forensic challenges might exist for an organization’s cloud system. It identifies
+110   challenges that require at least partial mitigation strategies and how a forensic investigator would
+111   apply that to a particular forensic investigation. The CC FRA presented here is both a
+112   methodology and an initial implementation. Users are encouraged to customize this initial
+113   implementation for their specific situations and needs.
+
+114   Keywords
+115   civil litigation; criminal investigation; cybersecurity; digital forensics; enterprise architecture;
+116   enterprise operations; forensic readiness; incident response.
+
+117   Reports on Computer Systems Technology
+118   The Information Technology Laboratory (ITL) at the National Institute of Standards and
+119   Technology (NIST) promotes the U.S. economy and public welfare by providing technical
+120   leadership for the Nation’s measurement and standards infrastructure. ITL develops tests, test
+121   methods, reference data, proof of concept implementations, and technical analyses to advance
+122   the development and productive use of information technology. ITL’s responsibilities include the
+123   development of management, administrative, technical, and physical standards and guidelines for
+124   the cost-effective security and privacy of other than national security-related information in
+125   federal information systems. The Special Publication 800-series reports on ITL’s research,
+126   guidelines, and outreach efforts in information system security, and its collaborative activities
+127   with industry, government, and academic organizations.
+128
+
+
+
+
+                                                         i
+      NIST SP 800-201 ipd (Initial Public Draft)                                   Cloud Computing Forensic
+      February 2023                                                                   Reference Architecture
+
+129   Call for Patent Claims
+130   This public review includes a call for information on essential patent claims (claims whose use
+131   would be required for compliance with the guidance or requirements in this Information
+132   Technology Laboratory (ITL) draft publication). Such guidance and/or requirements may be
+133   directly stated in this ITL Publication or by reference to another publication. This call also
+134   includes disclosure, where known, of the existence of pending U.S. or foreign patent applications
+135   relating to this ITL draft publication and of any relevant unexpired U.S. or foreign patents.
+136   ITL may require from the patent holder, or a party authorized to make assurances on its behalf,
+137   in written or electronic form, either:
+138       a) assurance in the form of a general disclaimer to the effect that such party does not hold
+139          and does not currently intend holding any essential patent claim(s); or
+140       b) assurance that a license to such essential patent claim(s) will be made available to
+141          applicants desiring to utilize the license for the purpose of complying with the guidance
+142          or requirements in this ITL draft publication either:
+143              i.    under reasonable terms and conditions that are demonstrably free of any unfair
+144                    discrimination; or
+145             ii.    without compensation and under reasonable terms and conditions that are
+146                    demonstrably free of any unfair discrimination.
+147   Such assurance shall indicate that the patent holder (or third party authorized to make assurances
+148   on its behalf) will include in any documents transferring ownership of patents subject to the
+149   assurance, provisions sufficient to ensure that the commitments in the assurance are binding on
+150   the transferee, and that the transferee will similarly include appropriate provisions in the event of
+151   future transfers with the goal of binding each successor-in-interest.
+152   The assurance shall also indicate that it is intended to be binding on successors-in-interest
+153   regardless of whether such provisions are included in the relevant transfer documents.
+154   Such statements should be addressed to: sp800-201@nist.gov
+155
+
+
+
+
+                                                        ii
+      NIST SP 800-201 ipd (Initial Public Draft)                                                                    Cloud Computing Forensic
+      February 2023                                                                                                    Reference Architecture
+
+156   Table of Contents
+157   Executive Summary .................................................................................................................... 1
+158          Introduction ......................................................................................................................... 2
+159
+160
+161          Overview of NIST Cloud Forensic Challenges ................................................................. 7
+162          Overview of CSA’s Enterprise Architecture ..................................................................... 9
+163          The Forensic Reference Architecture Methodology ..................................................... 11
+164          The Forensic Reference Architecture Data .................................................................... 17
+165          Conclusion ........................................................................................................................ 20
+166   References ................................................................................................................................. 21
+167   Appendix A.              Acronyms ....................................................................................................... 23
+168   Appendix B.              Glossary ......................................................................................................... 25
+169   Appendix C.              CSA’s Enterprise Architecture ..................................................................... 27
+170   Appendix D.              NIST’s Forensic Reference Architecture Data Set ..................................... 28
+
+
+171   List of Figures
+172   Fig. 1. Forensic Reference Architecture Overlaying Approach .................................................... 6
+173   Fig. 2. Mapping Flowchart .......................................................................................................... 12
+174   Fig. 3. Excerpt of the Forensic Reference Architecture (Challenges vs. Capabilities Mapping
+175           Table). ............................................................................................................................. 18
+176   Fig. 4. CSA’s Enterprise Architecture (v1.1) ............................................................................... 27
+177   Fig. 5. NIST’s FRA Data Set ....................................................................................................... 28
+178
+
+
+
+
+                                                                            iii
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+179   Acknowledgments
+
+180                 This report is dedicated to the memory of our colleague, collaborator,
+181                 and friend, Ernesto F. Rojas of Forensic & Security Services Inc., who
+182                 passed away unexpectedly.
+
+183   This publication was developed by the NIST Cloud Computing Forensic Science Working Group
+184   (NCC FSWG) co-chaired by Dr. Martin Herman and Dr. Michaela Iorga. NIST and the co-chairs
+185   wish to gratefully acknowledge and thank the members whose dedicated efforts contributed
+186   significantly to researching this topic and to generating the data included in this publication,
+187   which constitutes the foundation of NIST’s Cloud Computing Forensic Reference Architecture.
+188   The authors thank Richard Lee of Citizens Financial Group, who served as our reviewer;
+189   Rodrigo Sardinas of Auburn University; Pw Carey of Grapevine Solutions; Richard Austin,
+190   formerly of Hewlett-Packard Enterprise; Dr. Kevin Stavinoha, formerly with Cisco Systems; and
+191   Otto Scot Reemelin – who was with Ipro Tech during this work – for contributing to the data
+192   collection, analysis, and review. The authors would also like to thank their peers who
+193   continuously provided feedback during the research and development stages of this document.
+
+
+
+
+                                                       iv
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+
+
+194   Executive Summary
+195   The rapid adoption of cloud computing technology has led to the need to apply digital forensics
+196   to this domain. New methodologies are required for the identification, acquisition, preservation,
+197   examination, and interpretation of digital evidence in multi-tenant cloud environments that offer
+198   rapid provisioning, global elasticity, and broad network accessibility. This is necessary to
+199   provide capabilities for incident response, secure internal enterprise operations, and support for
+200   the U.S. criminal justice and civil litigation systems.
+201   This document presents the NIST Cloud Computing Forensic Reference Architecture (CC FRA,
+202   also referred to as FRA for the sake of brevity), whose goal is to provide support for a cloud
+203   system’s forensic readiness. The CC FRA is meant to help users understand the cloud forensic
+204   challenges that might exist for an organization’s cloud system. It identifies forensic challenges
+205   that require mitigation strategies and how a forensic investigator would apply that to a particular
+206   forensic investigation.
+207   The CC FRA provides a useful starting point for all cloud forensic stakeholders to analyze the
+208   impacts of cloud forensic challenges previously reported by NIST. It does so by considering each
+209   cloud forensic challenge in the context of each functional capability presented in the Cloud
+210   Security Alliance’s Enterprise Architecture.
+211   While the CC FRA can be used by any cloud computing practitioner, it is specifically designed
+212   to allow cloud system architects, cloud engineers, forensic practitioners, and cloud consumers to
+213   ask specific questions related to their cloud computing architectures. The CC FRA is both a
+214   methodology and an initial implementation, and users are encouraged to customize this initial
+215   implementation for their specific situations and needs.
+216
+
+
+
+
+                                                       1
+      NIST SP 800-201 ipd (Initial Public Draft)                                   Cloud Computing Forensic
+      February 2023                                                                   Reference Architecture
+
+217       Introduction
+218   The NIST Cloud Computing Forensic Science Working Group (NCC FSWG) previously
+219   published NIST IR 8006, NIST Cloud Computing Forensic Science Challenges [1], which was
+220   the result of collaboration between volunteers from the private and public sector. That document
+221   highlighted digital forensic challenges triggered by the specific characteristics and business
+222   model of public cloud computing services.
+223   The approach to examining digital forensics in the cloud was to first understand cloud computing
+224   technology and to identify and elucidate its essential and unique characteristics, which play a
+225   significant part in three aspects of operation: normal operations, adverse operations when cloud
+226   computing resources are under attack, and operations during criminal exploitation.
+227   The second phase of this approach was a close examination of the challenges that were identified
+228   in the previous NIST report. This examination involved analyzing the Cloud Security Alliance’s
+229   (CSA’s) Enterprise Architecture (EA) [2], its various functional capabilities and processes, and
+230   the potential impact of each challenge on performing a forensic investigation if a specific
+231   functional capability or process were involved in an attack and breach or were used during
+232   criminal exploitation. The analysis presumed fictive use case scenarios that would exploit
+233   potential weaknesses, vulnerabilities, exposures, or cloud technology for criminal activities. Such
+234   elements are of fundamental concern in forensic analysis as they present points that adversaries
+235   may seek to exploit or characteristics that can be used by criminals. In either case, there will be
+236   evidence of the attack or criminal exploitation for future forensic analysis. The EA is composed
+237   of a large number of specific functional capabilities that enable detailed consideration of the
+238   effects of each forensic challenge on each of the capabilities.
+239   The third phase of this work has been to examine the nature of each challenge (i.e., whether the
+240   challenge is technological or non-technological) to determine its role and impact on the forensic
+241   examination process. As each challenge was analyzed, the applicability of techniques or
+242   technologies became clearer in terms of how they function and ultimately contribute to the
+243   forensic processes of identification, acquisition, preservation, examination, and interpretation of
+244   evidence.
+245   This work brings value by clarifying how forensics in the cloud can achieve the same acceptance
+246   as forensics in traditional computing models. This document, the associated research, and NIST
+247   IR 8006 [1] proactively address the White House Executive Order of May 12, 2021, entitled
+248   Executive Order on Improving the Nation’s Cybersecurity [3], which points out the importance
+249   of having forensic-ready information systems, including cloud systems, to improve the Nation’s
+250   cybersecurity.
+
+251           The Need for a Cloud-specific Forensic Reference Architecture
+252   Digital forensics is the application of science and technology to the discovery and examination of
+253   digital artifacts within information systems and networks to establish facts and evidence
+254   concerning events and conditions that occur within them. Digital forensics is traditionally used
+255   for judicial proceedings and regulatory issues but may also be used for other purposes as
+256   described below.
+257   Digital forensics continues to evolve in step with computer and information science. As these
+258   technologies, their implementations, and their operations have changed, digital forensics has
+
+
+                                                       2
+      NIST SP 800-201 ipd (Initial Public Draft)                                    Cloud Computing Forensic
+      February 2023                                                                    Reference Architecture
+
+259   adapted. The number of scenarios that may require the application of digital forensic techniques
+260   have increased along with the complexity of the underlying architectures .
+261   One common scenario involves the detailed investigation of criminal activities. As computers
+262   become widely available and develop greater capabilities, criminal elements worldwide have
+263   adopted them as tools to manage their endeavors. These include both “traditional” forms of
+264   crime (e.g., violent crime, property crime, drug trafficking, human trafficking, white-collar
+265   crime) and crimes that occur in cyberspace (e.g., ransomware attacks, data breaches, identity
+266   theft, cyber-terrorism, distributed denial of service, illicit cryptocurrency mining, child
+267   pornography, and attacks against governments, key corporations, or power grids). Forensic
+268   procedures involve locating and analyzing digital traces that can help solve the crime and/or
+269   allow for incident response.
+270   Forensic procedures are also used to investigate civil actions, such as divorce proceedings, asset
+271   discovery, insurance claims, lawsuits, and similar cases that often require forensic methods to
+272   determine the presence, absence, and movement of data and funds.
+273   An example of how forensic techniques are used involves the collection of a laptop computer
+274   while apprehending a presumed perpetrator of an illegal act. The suspected act could involve –
+275   for instance –financial exploitation of stolen identities, hacking into a hospital’s records
+276   management system to implant ransomware, electronic entry of a corporate system in attempted
+277   commercial espionage, or penetrating a government or military computer. Similarly, civil actions
+278   can require forensic examination, such as discovering financial assets for a divorce proceeding.
+279   In each of these cases, forensics plays an essential role in determining facts; assisting in the
+280   analysis, validation, and authentication of data; and enabling documentation of findings to
+281   present to a court and attorneys.
+282   The application of forensic methods may also be required for normal business operations. For
+283   example, forensic methods may be employed to recover data that, at first, appears to be lost or
+284   destroyed on computer drives. During incident response, additional goals of using forensic
+285   methods may include mitigating future cyberattacks, preventing system failure, or minimizing
+286   data loss.
+287   In the commercial context, the use of forensics in incident response can help determine the root
+288   cause of an outage event, such as a component failure, corrupted software, or intentional
+289   sabotage. Other scenarios may involve close examination of system configurations, potentially
+290   questionable employee data storage and activities, and operational aspects related to compliance
+291   matters. In any of these cases, forensic methods may supply insights that are not available
+292   through any other means.
+293   For decades, information processing systems have enabled the storage, processing, and
+294   transmission of information for public and private organizations and individuals. The
+295   maintenance, operations, and protection of these information systems have become paramount
+296   concerns since a disruption of sufficient magnitude or specific type could threaten business
+297   activities. In addition, the use of these systems in support of criminal activities has been of major
+298   concern.
+299   Industry and government have an array of authoritative sources that guide the design,
+300   engineering, and operations of information systems. Each of the frameworks listed below can
+
+
+
+                                                        3
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+301   provide core support for the design, implementation, assessment, monitoring, and operations of
+302   information systems:
+303       •   NIST Risk Management Framework (RMF) [4] – A focused guide to information system
+304           risk management
+305       •   ISO 27000 Series [5] – A series of standards dealing with a wide range of information
+306           security topics, such as:
+307           o ISO/IEC 27001 [6] – Information Security Management
+308           o ISO/IEC 27002 [7] – Information Security Controls
+309           o ISO/IEC 27018 [8] – Security of Personally Identifiable Information (PII) in the
+310             Cloud
+311           o ISO/IEC 27035 [9] – Incident Response
+312           o ISO/IEC 27037 [10] – Digital Evidence Collection and Preservation
+313       •   IT Infrastructure Library (ITIL) [11] – A service-oriented architecture (SOA)
+314       •   Sherwood Applied Business Security Architecture (SABSA) [12]
+315       •   The Open Group Architecture Framework (TOGAF) [13] – A general security
+316           framework
+317       •   Cloud Security Alliance STAR program [14] – A progressive security certification
+318   The focus of each of these frameworks varies but generally facilitates architecting,
+319   implementing, and operating secure and resilient information systems. The RMF is focused on
+320   security from a risk identification and management perspective. As varied as the ISO 27000
+321   series [5] is, it contains standards that address digital evidence and incident response.
+322   Interestingly, however, there is not a readily apparent, in-depth exploration of cloud-system
+323   forensics.
+324   The endeavor presented here deals with the matter of forensics performed within a cloud
+325   computing environment. The advent of cloud computing has simplified business operations and
+326   introduced a level of business agility not previously experienced with traditional or on-premises
+327   computing. However, cloud computing has also introduced a range of security and forensics
+328   challenges. Enhanced capabilities enjoyed by legitimate businesses and friendly governments are
+329   often equally available to opposing nation-states, terrorist groups, and international criminal
+330   elements and assets. As a result, targets that were once unassailable by nefarious actors may now
+331   be vulnerable to attack or exploitation.
+332   To a great extent, cloud computing runs on virtualization – that is, the creation of processing
+333   resources that have hardware as their basis but run as multiplexed programs and are thus
+334   functionally multiplied through it. Cloud forensics involves performing analysis on “virtual
+335   machines” using techniques that rely on having “real machines” on which to work. In addition,
+336   there is the issue of the information obtained. If the “machine” is essentially “unreal,” what does
+337   that say about any evidence derived from it? This evidence is therefore different from traditional
+338   digital evidence.
+339   Cloud computing has become increasingly pervasive as more entities discover its advantages.
+340   These entities include legitimate businesses, governments, and individuals who use SaaS cloud
+
+
+
+
+                                                       4
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+341   platforms, as well as criminal and terrorist organizations and opposing nation-states. For
+342   legitimate consumers, cloud computing provides capabilities such as:
+343       •   More rapid business continuity and disaster recovery
+344       •   More effective incident response
+345       •   Improved information access, management, and archiving
+346       •   Easier and more immediate collaboration between widely separated individuals and groups
+347   This research has adapted solutions that originated in the on-premises data center to the
+348   significant differences presented by the cloud.
+349   As important as they are for addressing significant events related to business operations (as
+350   described above), forensic methods have at least equal importance when contributing to matters
+351   of compliance, legality, and criminal exploitation. Careful treatment has been given to these
+352   questions during this research to ensure that the findings do not merely consider technical aspects
+353   but also address the broader aspects of their material application. Unquestionably, close
+354   examination of these adverse events is required to understand their incipience and progression
+355   and – in particular – to ensure that remediation, event reconstruction, and attribution are
+356   effectively and credibly realized.
+357   Thus, it has been the specific focus and goal of this effort to research these issues, examine and
+358   clarify the forensic challenges, and ultimately formulate and validate the capabilities required to
+359   apply accepted forensic techniques and technologies to this unique computing environment. The
+360   result is the Cloud Computing Forensic Reference Architecture.
+361   In as much as a security reference architecture is required to incorporate standards and
+362   requirements that will inform system actualization and operation with respect to security,
+363   applying the forensic reference architecture will likewise inform that system actualization and
+364   operation with the capability to more effectively examine, understand, reconstruct, and remediate
+365   the variety of system events and disruptions being experienced.
+366   The goal of the CC FRA is to provide support for a cloud system’s forensic readiness. It is meant
+367   to help the user understand the cloud forensic challenges that might exist for an organization’s
+368   cloud system. It identifies which forensic challenges require mitigation strategies and how a
+369   forensic investigator would apply that to a particular forensic investigation. The CC FRA
+370   presented here will likely evolve over time with more use and research.
+
+371           The Approach
+372   The CC FRA builds on several foundational layers. We begin with the understanding that this
+373   reference architecture addresses forensics in the context of a cloud computing environment.
+374   Building upon the fundamental relationship between security, incident response, and forensics,
+375   the CC FRA is designed as an overlay to NIST SP 500-299/SP 800-200, NIST Cloud Computing
+376   Security Reference Architecture (Draft) [15]. This document discusses the Security Reference
+377   Architecture (SRA) and leverages the CSA’s Enterprise Architecture (EA). Section 3 provides
+378   descriptions of the CSA’s EA and its use in the SRA, while Section 4 elaborates on the overlay
+379   approach employed for the CC FRA.
+
+
+
+                                                       5
+      NIST SP 800-201 ipd (Initial Public Draft)                                      Cloud Computing Forensic
+      February 2023                                                                      Reference Architecture
+
+380   Figure 1 depicts the overlaying approach in which cloud functional capabilities comprising the
+381   EA are analyzed using the NIST cloud computing forensic challenges to identify the functional
+382   capabilities’ potential for supporting a cloud system’s forensic readiness.
+383
+
+
+
+
+384
+385                           Fig. 1. Forensic Reference Architecture Overlaying Approach
+
+386   The bottom layer in Figure 1 graphically represents the NIST cloud security reference
+387   architecture (SRA). The middle layer represents the NIST cloud forensic challenges. The top
+388   layer represents the NIST forensic reference architecture (FRA) described in the current
+389   document as an overlay (subset) of the graphical representation of the CSA EA – more precisely,
+390   the CSA TCI v1.1, which is the initial version of the CSA’s EA (see Appendix C).
+391   In Figure 1, the FRA layer leverages the two layers graphically represented beneath it by
+392   analyzing each capability of the SRA (these capabilities being derived from the CSA EA) in the
+393   context of the challenges documented in NIST IR 8006 [1]. For each challenge, the analysis
+394   determines whether the challenge affects the capability if implemented in a cloud environment as
+395   part of a cloud service or solution. If the challenge affects the capability, then the functional
+396   capability is considered to have forensic importance, and it is imported to or considered being a
+397   capability of the FRA.
+398
+
+
+
+
+                                                          6
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+399       Overview of NIST Cloud Forensic Challenges
+400   The NIST Cloud Computing Forensic Science Working Group (NCC FSWG) was established to
+401   research forensic science challenges and architectures related to the cloud environment. The
+402   Working Group surveyed the literature and identified a set of challenges related to cloud
+403   computing forensics. These challenges are presented in NIST IR 8006 [1], where each of 62
+404   challenges is described along with potential results of overcoming each challenge. In addition,
+405   the document provides a preliminary analysis of these challenges by including 1) the relationship
+406   between each challenge and the five essential characteristics of cloud computing, as defined in
+407   the NIST cloud computing model [16]; 2) how the challenges correlate to cloud technology; and
+408   3) nine categories to which the challenges belong. The analysis also considers logging data, data
+409   in media, and issues associated with time, location, and sensitive data. In addition, the relevance
+410   of topics such as rapid elasticity, multi-tenancy, and hypervisor/virtual machine layers is
+411   discussed. These 62 challenges support the criminal justice and civil litigation systems, security
+412   incident response, and internal enterprise operations.
+413   The nine categories to which the challenges belong are reproduced below (from NIST IR 8006
+414   [1], pp. 8-9):
+
+415   1. Architecture (e.g., diversity, complexity, provenance, multi-tenancy, data segregation).
+416      Architecture challenges in cloud forensics include:
+417         a. Dealing with variability in cloud architectures between providers
+418         b. Tenant data compartmentalization and isolation during resource provisioning
+419         c. Proliferation of systems, locations, and endpoints that can store data
+420         d. Accurate and secure provenance for maintaining and preserving chain of custody
+421   2. Data collection (e.g., data integrity, data recovery, data location, imaging). Data collection
+422      challenges in cloud forensics include:
+423         a. Locating forensic artifacts in large, distributed, and dynamic systems
+424         b. Locating and collecting volatile data
+425         c. Data collection from virtual machines
+426         d. Data integrity in a multi-tenant environment where data is shared among multiple
+427             computers in multiple locations and accessible by multiple parties
+428         e. Inability to image all of the forensic artifacts in the cloud
+429         f. Accessing the data of one tenant without breaching the confidentiality of other tenants
+430         g. Recovery of deleted data in a shared and distributed virtual environment
+431   3. Analysis (e.g., correlation, reconstruction, time synchronization, logs, metadata, timelines).
+432      Analysis challenges in cloud forensics include:
+433         a. Correlation of forensic artifacts across and within cloud providers
+434         b. Reconstruction of events from virtual images or storage
+435         c. Integrity of metadata
+436         d. Timeline analysis of log data, including synchronization of timestamps
+437   4. Anti-forensics (e.g., obfuscation, data hiding, malware). Anti-forensics are a set of
+438      techniques used specifically to prevent or mislead forensic analysis. Anti-forensic challenges
+439      in cloud forensics include:
+440          a. The use of obfuscation, malware, data hiding, or other techniques to compromise the
+441             integrity of evidence
+
+
+                                                       7
+      NIST SP 800-201 ipd (Initial Public Draft)                                   Cloud Computing Forensic
+      February 2023                                                                   Reference Architecture
+
+442           b. Malware may circumvent virtual machine isolation methods
+443   5. Incident first responders (e.g., trustworthiness of cloud providers, response time,
+444      reconstruction). Incident first responder challenges in cloud forensics include:
+445          a. Confidence, competence, and trustworthiness of the cloud providers to act as first
+446             responders and perform data collection
+447          b. Difficulty in performing initial triage
+448          c. Processing a large volume of collected forensic artifacts
+449   6. Role management (e.g., data owners, identity management, users, access control). Role
+450      management challenges in cloud forensics include:
+451         a. Uniquely identifying the owner of an account
+452         b. Decoupling between cloud user credentials and physical users
+453         c. Ease of anonymity and creating fictitious identities online
+454         d. Determining exact ownership of data
+455         e. Authentication and access control
+456   7. Legal (e.g., jurisdictions, laws, service level agreements, contracts, subpoenas, international
+457      cooperation, privacy, ethics). Legal challenges in cloud forensics include:
+458         a. Identifying and addressing issues of jurisdictions for legal access to data
+459         b. Lack of effective channels for international communication and cooperation during an
+460             investigation
+461         c. Data acquisition that relies on the cooperation, competence, and trustworthiness of
+462             cloud providers
+463         d. Missing terms in contracts and service-level agreements
+464         e. Issuing subpoenas without knowledge of the physical location of data
+465   8. Standards (e.g., standard operating procedures, interoperability, testing, validation).
+466      Standards challenges in cloud forensics include:
+467         a. Lack of minimum/basic SOPs, practices, and tools
+468         b. Lack of interoperability among cloud providers
+469         c. Lack of test and validation procedures
+470   9. Training (e.g., forensic investigators, cloud providers, qualification, certification). Training
+471      challenges in cloud forensics include:
+472         a. Misuse of digital forensic training materials that are not applicable to cloud forensics
+473         b. Lack of cloud forensic training and expertise for both investigators and instructors
+474         c. Limited knowledge about evidence by record-keeping personnel in cloud providers
+
+475
+
+
+
+
+                                                       8
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+476       Overview of CSA’s Enterprise Architecture
+477   The Cloud Security Alliance’s Enterprise Architecture (CSA’s EA) [2] is both a methodology
+478   and a set of tools that enable security architects, enterprise architects, and risk management
+479   professionals to leverage a common set of solutions and controls. These solutions and controls
+480   fulfill common requirements that risk managers must assess regarding the operational status of
+481   internal IT security and cloud provider controls. These controls are expressed in terms of security
+482   capabilities and designed to create a common roadmap to meet the security needs of businesses.
+483   CSA designed the EA understanding that business requirements must guide the architecture. In
+484   the case of the Enterprise Architecture, these requirements come from a controls matrix partly
+485   driven by regulations such as Sarbanes-Oxley [17] and Gramm-Leach-Bliley [18], standards
+486   frameworks such as ISO-27002 [7], the Payment Card Industry Data Security Standards [19],
+487   and the IT Audit Frameworks such as COBIT [20], all in the context of cloud service delivery
+488   models such as software as a service (SaaS), platform as a service (PaaS), and infrastructure as a
+489   service (IaaS).
+490   From these requirements, a set of security capabilities have been defined and organized
+491   according to the following best practice architecture frameworks. The Sherwood Applied
+492   Business Security Architecture (SABSA) [12] defines a security model from a business
+493   perspective. The Information Technology Infrastructure Library (ITIL) [11] specifies the schema
+494   needed to manage a company’s IT services, including the security guidelines to manage those
+495   services securely. The Jericho Forum [21] designates technical security specifications that arise
+496   from the reality of traditional technology environments in the data center and shift to one where
+497   solutions span the internet across multiple data centers, some owned by the business and some
+498   purely used as outsourced services. Lastly, The Open Group Architecture Framework (TOGAF)
+499   [13] provides an enterprise architecture framework and methodology for planning, designing,
+500   and governing information architectures, concluding in a common framework to integrate the
+501   work of the security architect with the enterprise architecture of an organization.
+502   The CSA EA is reproduced in Appendix C, and the domains covered are:
+503       1. Business Operation Support Services (BOSS) – These functional capabilities are
+504          associated with cloud IT services that support an organization’s business needs. BOSS
+505          embodies the direction of the business and objectives of the cloud consumer. BOSS
+506          capabilities cover compliance, data governance, operational risk management, human
+507          resources security, security monitoring, internal investigations, and legal services.
+508       2. Information Technology Operation and Support (ITOS) – These functional capabilities
+509          are associated with managing the cloud IT services of an organization. ITOS capabilities
+510          cover IT operation, service delivery, and service support.
+511       3. Security and Risk Management (S&RM) – These functional capabilities are associated
+512          with safeguarding cloud IT assets and detecting, assessing, and monitoring cloud IT risks.
+513          S&RM capabilities cover identity and access management, GRC (governance, risk
+514          management, and compliance), policies and standards, threat and vulnerability
+515          management, and infrastructure and data protection.
+516       4. Presentation Services – These functional capabilities are associated with the end user
+517          interacting with a cloud IT solution. The capabilities cover presentation modalities and
+518          presentation platforms (including end points, handwriting, and speech recognition).
+
+
+                                                       9
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+519       5. Application Services – These functional capabilities are associated with the development
+520          and use of cloud applications provided by an organization. The capabilities cover
+521          programming interfaces, security knowledge life cycle, development processes,
+522          integration middleware, connectivity and delivery, and abstraction.
+523       6. Information Services – These functional capabilities are associated with the storage and
+524          use of cloud information and data. The capabilities cover service delivery, service
+525          support, reporting services, information technology operation and support, business
+526          operations and support, data governance, user directory services, risk management, and
+527          security monitoring.
+528       7. Infrastructure Services – These functional capabilities are associated with core functions
+529          that support the cloud IT infrastructure. The capabilities cover facilities, hardware,
+530          networks, and virtual environments.
+531   Together, there are 347 functional capabilities within these domains.
+532   As mentioned above, the CSA’s EA functional capabilities are leveraged by the NIST Cloud
+533   Security Reference Architecture (SRA) [15], which is comprised of a formal model designed as a
+534   security overlay to the NIST Cloud Computing Reference Architecture [22] and a methodology
+535   for architecting and orchestrating a cloud-based solution. The methodology allows cloud
+536   architects to identify the system’s functional capabilities. The orchestration employs a risk-based
+537   approach that follows the Risk Management Framework (RMF) [4] applied to cloud-based
+538   systems.
+539   The SRA’s risk-based approach for determining a cloud actor’s responsibilities for implementing
+540   specific system components supports a clear delineation between the security responsibilities of
+541   cloud providers and consumers and a clear understanding of the customer responsibility matrix.
+542   Specifically, for each cloud service model, system components are analyzed to identify the level
+543   of involvement of each cloud actor when implementing those components.
+544
+
+
+
+
+                                                      10
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+545       The Forensic Reference Architecture Methodology
+546   The Cloud Computing Forensic Reference Architecture introduced in this document aims to help
+547   the user understand the cloud forensic challenges that might exist for an organization’s cloud
+548   systems. When architecting or orchestrating a new cloud system, cloud architects and cloud
+549   security and forensic practitioners are encouraged to use the CC FRA to identify which
+550   challenges could impact the system and therefore require at least partial mitigation strategies to
+551   minimize the risk incurred during operations by, for example, allowing real-time interventions
+552   based on the proactively generated forensic data and to eliminate potential negative impacts on
+553   digital forensic investigations if the need arises.
+554   While the FRA can be used by any cloud computing practitioner, it is specifically designed to
+555   help the following target audiences by finding answers for specific questions related to their
+556   cloud computing architectures:
+557       •   Target Audience #1: Cloud System Architects and Engineers. This target audience
+558           might ask: “To what extent does the cloud system I’m designing facilitate the use of
+559           digital forensics?” The architectural methodology and initial architecture presented in
+560           this paper can help this audience identify where there could be potential challenges for
+561           conducting forensics and can allow them to focus on areas of potential concern. System
+562           trade-offs can be considered as well (e.g., the more that a system facilitates the use of
+563           forensics, the greater the negative operational or economic impacts might be, or the
+564           greater the chance that privacy might be impacted negatively).
+565       •   Target Audience #2: Forensic Practitioners. This target audience might ask: “What
+566           items do I need to be aware of to conduct digital forensics in the cloud environment
+567           versus a traditional or on-premises computing environment?”
+568       •   Target Audience #3: Consumers Who Want to Procure Cloud Services from Providers.
+569           This target audience might ask: “What forensic questions and issues do I need to consider
+570           when discussing what a cloud provider has to offer?”
+571   The Cloud Computing Forensic Reference Architecture provides a useful starting point for all
+572   cloud security and forensic stakeholders to analyze the extent to which the cloud forensic
+573   challenges identified in NIST IR 8006 [1] are impacting their systems.
+574   The 62 forensic challenges and 347 functional capabilities described in Section 2 and Section 3,
+575   respectively, provide the basis for determining which capabilities are affected by each of the
+576   challenges. All possible pairs of challenges and capabilities are considered. The capabilities help
+577   focus possible mitigation efforts as follows. If a challenge affects a capability, there may be
+578   mitigation approaches that can be used to perform better forensics with regard to that capability.
+579   Such information could prove useful for forensic practitioners, developers, and researchers.
+580   The NCC FSWG has developed a mapping between functional capabilities and forensic
+581   challenges. For each functional capability, the mapping shows all of the forensic challenges that
+582   affect that capability. This has resulted in a Mapping Table of 347 rows (one for each capability)
+583   and 62 columns (one for each challenge). An entry in the table is YES if the associated challenge
+584   affects the associated capability; otherwise, the entry is NO. (See Figure 3 for an excerpt of this
+585   table.)
+
+
+
+                                                      11
+      NIST SP 800-201 ipd (Initial Public Draft)                                     Cloud Computing Forensic
+      February 2023                                                                     Reference Architecture
+
+586   When the question is asked: does a forensic challenge affect a functional capability, it is defined
+587   to mean: if the challenge were overcome, would that make it easier to conduct a cloud forensic
+588   investigation on the considered functional capability? This is the relationship that the mapping
+589   between challenges and capabilities is attempting to capture.
+590   To help answer this question, the NCC FSWG developed a summary for each of the 62 challenges.
+591   This summary answers the following question for each specific challenge: What advantages would
+592   be provided to a forensic investigator if this challenge were overcome (or mitigated)? If these
+593   advantages imply that the quality of forensics that can be performed on the functional capability
+594   could be improved, then the answer is YES, overcoming the challenge could make it easier to
+595   perform a forensic investigation on the capability. The summaries for the 62 challenges are found
+596   in NIST IR 8006 [1], Annex A, Table 1.
+597   The goal was to provide a narrow, precise mapping between challenges and capabilities. A
+598   flowchart was developed that was followed to achieve this mapping, as shown in Fig. 2.
+599
+
+
+
+
+600
+601                                                Fig. 2. Mapping Flowchart
+
+602   The flowchart provides users with a uniform method for determining the applicability of a
+603   challenge to a particular capability. In conducting the analysis, the NCC FSWG placed each
+604   cloud forensic challenge into one of two groups: 1) challenges that are primarily technical in
+605   nature (e.g., architecture), or 2) challenges that are primarily non-technical in nature (e.g., legal).
+606   This led to the creation of questions Q2-a, Q2-b, Q2-c, and Q2-d in the flowchart, which perform
+607   the placement into the two groups. If a challenge deals primarily with standards, legal issues,
+608   contracts, service-level agreements, jurisdiction issues, privacy, ethical issues, training,
+609   qualifications, or certifications, then the challenge is considered non-technical. Otherwise, it is
+
+
+                                                              12
+      NIST SP 800-201 ipd (Initial Public Draft)                                      Cloud Computing Forensic
+      February 2023                                                                      Reference Architecture
+
+610   considered technical. This grouping provides a simple and straightforward method for analyzing
+611   the high-level characteristics of each challenge.
+612   Similarly, the NCC FSWG placed each of the cloud functional capabilities into one of two
+613   groups: 1) primarily technical or 2) primarily non-technical in nature. If a capability deals
+614   primarily with standards, legal issues, contracts, service-level agreements, jurisdiction issues,
+615   privacy, ethical issues, training, qualification, or certification, then the capability is considered
+616   non-technical. Otherwise, it is considered technical. This led to the creation of questions Q3-a
+617   and Q3-b.
+618   The flowchart attempts to map challenges that are primarily technical only to capabilities that are
+619   primarily technical and challenges that are primarily non-technical only to capabilities that are
+620   primarily non-technical. This results in a precise and limited mapping. If a challenge and a
+621   capability pair are assigned to the same group, the questioned is asked whether overcoming the
+622   challenge makes it easier to conduct forensics on the capability. The answer determines whether
+623   the capability is affected by the challenge. In summary, if the appropriate grouping is done and
+624   overcoming the challenge makes it easier to conduct forensics, then the challenge is considered
+625   to affect the capability (i.e., the mapping is YES; otherwise, the mapping is NO).
+626   There can, of course, be challenges in one group that affect capabilities in another group, but that
+627   does not provide the precise, limited mapping. In such cases, the mapping is considered to be
+628   NO.
+629   The following is an example of what is meant by a precise, limited mapping. Suppose the
+630   challenge deals with training (e.g., Challenge FC-65: There is a lack of training materials that
+631   educate investigators on cloud computing technology and cloud forensic operating policies and
+632   procedures; see [1], page 52). This is a non-technical challenge. In addition, suppose the
+633   capability under consideration is technical. Enhanced training would clearly provide significant
+634   benefit to forensic investigators and cloud providers because training is so broadly applicable
+635   and would help to perform forensics more easily on most capabilities. However, a cloud forensic
+636   architecture in which training affects almost every capability is undesirable because then the
+637   architecture applies too broadly; most of the capabilities are not affected by this challenge in an
+638   important way. This makes the architecture less useful because the architecture will have many
+639   challenges that affect too many capabilities. Rather than this broad mapping of challenges to
+640   capabilities, a narrower mapping is preferred. Narrowing the number of capabilities affected by
+641   the challenge allows the mapping to be more powerful because the challenge can be used as an
+642   effective tool of identifying the capabilities that are more likely to be affected by the challenge in
+643   an important way. The architecture with a narrower mapping is also more practical because the
+644   fewer YESs in the mappings, the easier for an investigator to apply the mappings in real-world
+645   scenarios.
+646   As described above and shown in Figure 2, if both the challenge and the capability being
+647   evaluated deal with the same type of issue (i.e., technical or non-technical), then the following
+648   question is asked: “If the challenge were overcome, would that make it easier to conduct a cloud
+649   forensic investigation on the functional capability?” If the answer is “yes,” then the mapping is
+650   YES.
+651   However, if the challenge is primarily technical in nature and the capability is non-technical in
+652   nature (or vice versa), then an analysis is conducted to determine whether the use of technical or
+653   non-technical solutions to implement the capability would significantly enhance the ability of a
+
+
+                                                         13
+      NIST SP 800-201 ipd (Initial Public Draft)                                         Cloud Computing Forensic
+      February 2023                                                                         Reference Architecture
+
+654   forensic investigator to overcome the challenge, as illustrated in questions Q2-c and Q2-d. If the
+655   answer to this question is “no,” then no further analysis is required. If the answer to question Q2-
+656   c or Q2-d is “yes,” then the analysis will continue to determine: “If the challenge were overcome,
+657   would that make it easier to conduct a cloud forensic investigation on the functional capability?”
+658   Using this methodology, it is possible to determine in a well-defined, structured fashion whether
+659   it would be easier to conduct a cloud forensic investigation on a functional capability if the
+660   forensic challenge were overcome. As a result, the flowchart will help cloud designers, forensic
+661   investigators, and other interested parties focus specifically on those functional capabilities that
+662   are affected by a specific cloud forensic challenge.
+663   The process of traversing the flowchart involves asking questions about the particular challenge
+664   and capability pair that is being analyzed. Starting at the top right of the flowchart (labeled “Q2-
+665   a”), each box asks a question about the challenge or the capability. The answer to each question
+666   – YES or NO – then leads to either another box with a question or to one of the circles shown in
+667   Table 1.
+668
+669                         Table 1. The meaning of the circles within the flowchart of Fig. 2
+
+                               When following the logical flowchart and answering the guiding
+                               questions, if the final answer is a YES marked with a green circle, then
+                               the challenge DOES affect the capability.
+                               When following the logical flowchart and answering the guiding
+                               questions, if the final answer is a NO marked with an orange circle, then
+                               the challenge DOES NOT affect the capability.
+                               When following the logical flowchart and answering the guiding
+                               questions, if the final answer is a NO marked with a purple circle, then the
+                               challenge DOES NOT affect the capability for reasons explained in
+                               NOTE 1 and NOTE 2, below.
+670
+671   To determine whether the forensic challenge affects the functional capability, three fundamental
+672   types of questions are asked:
+673       1. Question 1 (Q1) – If the challenge were overcome, would that make it easier to conduct a
+674          cloud forensic investigation on the functional capability? Note that the term “cloud
+675          forensic investigation” means the identification, acquisition, preservation, examination,
+676          interpretation, and reporting of potential digital evidence in the cloud. When analyzing
+677          Question 1, it is narrowly considered only with regard to the particular functional
+678          capability, ignoring all other capabilities as if they do not exist. So, the question really
+679          asked is: If the challenge were overcome, would that make it easier to conduct a cloud
+680          forensic investigation on this functional capability only while ignoring other capabilities?
+681       2. Question 2 (Q2-a, Q2-b, Q2-c, and Q2-d) – These questions relate only to the challenges
+682          and not capabilities. The purpose of these questions is to determine whether the challenge
+683          deals with technical or non-technical issues and if either technical solutions or non-
+684          technical solutions significantly amplify the ability to overcome the challenge.
+
+
+
+
+                                                           14
+      NIST SP 800-201 ipd (Initial Public Draft)                                      Cloud Computing Forensic
+      February 2023                                                                      Reference Architecture
+
+685       3. Question 3 (Q3-a and Q3-b) – These questions relate only to the capabilities and not the
+686          challenges. The purpose of these questions is to determine whether the capability deals
+687          primarily with technical or non-technical issues.
+688   Questions 2 and 3 ask about the issues that a challenge or capability deals with, which are
+689   determined as follows. As discussed in Section 2, the NCC FSWG labeled each of the 62
+690   challenges according to the following nine categories: architecture, data collection, analysis, anti-
+691   forensics, incident first responders, role management, legal, standards, and training. The labels
+692   for each challenge may be found in [1], Annex A, Table 2, in the columns labeled “Primary
+693   Category” and “Related Category.” These categories and the challenge descriptions are used to
+694   determine the type of issue each challenge deals with. If the primary issues are standards, legal
+695   issues, contracts, service-level agreements, jurisdiction issues, privacy, ethical issues, training,
+696   qualification, or certification, then the challenge is considered non-technical. Otherwise, it is
+697   considered technical.
+698   Similarly, if a capability deals primarily with standards, legal issues, contracts, service level
+699   agreements, jurisdiction issues, privacy, ethical issues, training, qualification, or certification,
+700   then the capability is considered non-technical. Otherwise, it is considered technical.
+701   The NCC FSWG developed consensus answers for all of the questions related to Question 2 and
+702   Question 3 in the flowchart. Therefore, when a particular challenge and capability pair was
+703   considered, all questions – except for Question 1 – were already answered. This resulted in much
+704   more consistent mappings across all challenges and capabilities.
+705   When traversing the flowchart starting at the box labeled “Q2-a,” if a NO node is not reached,
+706   then the box labeled “Q1” is eventually reached. For any challenge and capability pair, it may lie
+707   in one of two groups when Q1 is reached (see Figure 2). As discussed above, Group 1 is the
+708   “Technical Group,” and Group 2 is the “Non-technical Group.” They are defined as follows:
+
+709   •   Group 1 (Technical Group) –
+
+       [The challenge is technical, OR the
+                                                         AND      [The functional capability is technical.]
+       challenge is non-technical but requires
+       technology (at least partially) to overcome
+       the challenge.]
+710
+
+711   •   Group 2 (Non-Technical Group) –
+712
+       [The challenge is non-technical, OR the
+       challenge is technical but requires non-                   [The functional capability is non-
+       technical solutions (at least partially) to       AND
+                                                                 technical.]
+       overcome the challenge.]
+
+713
+714   The reason for these groups – to map technical challenges to technical capabilities and non-
+715   technical challenges to non-technical capabilities – was explained above. Once a challenge and
+716   capability pair is assigned to the appropriate group, the question of whether overcoming the
+
+
+
+                                                         15
+      NIST SP 800-201 ipd (Initial Public Draft)                                     Cloud Computing Forensic
+      February 2023                                                                     Reference Architecture
+
+717   challenge makes it easier to conduct forensics on the capability is asked. This determines
+718   whether the capability is affected by the challenge. If the grouping is appropriate and
+719   overcoming the challenge makes it easier to conduct forensics, then the challenge is considered
+720   to affect the capability (i.e., the mapping is YES).
+721   However, suppose a challenge is non-technical but requires technology to overcome the
+722   challenge. Examples of non-technical challenges that have both non-technical and technical
+723   solutions include the following ([1], Annex A):
+724       •   FC-56 (Confidentially and PII) deals with legal/privacy issues (a non-technical
+725           challenge). Privacy issues can be resolved with a combination of legal steps (e.g.,
+726           legislation) and technology steps (privacy-enhancing technologies).
+727       •   FC-64 and FC-65 deal with training (non-technical challenges). Training issues can be
+728           resolved with better and more widely available training classes, but they can also be
+729           resolved with better technology to perform the training.
+730   There are non-technical challenges that require solutions that are non-technical, technical, or a
+731   combination of both. If the non-technical challenge requires only a non-technical solution (and
+732   the capability is non-technical), it is in Group 2. If it requires only a technical solution (and the
+733   capability is technical), it is in Group 1. If it requires both, then it is in Group 1 or Group 2,
+734   depending on whether the capability is technical or non-technical.
+735   When a challenge is technical but requires a non-technical solution to overcome the challenge
+736   (and the capability is non-technical), then this challenge is in Group 2.
+737   In Fig. 2, the two purple circles refer to two notes, as follows:
+738       •   NOTE 1: When this circle is reached, the challenge does not fit in either of the two
+739           groups. It is neither technical nor non-technical. Fortunately, none of the challenges reach
+740           this node as none have this property. This node is included simply for logical
+741           completeness of the flowchart, so that every node has both a YES exit path and a NO exit
+742           path.
+743       •   NOTE 2: When this circle is reached, the capability does not fit in either of the two
+744           groups. It is neither technical nor non-technical. There are a few capabilities that reach
+745           this node. However, these capabilities do not deal with issues directly related to digital
+746           forensics for cloud computing. Instead, they involve controlling physical access to
+747           facilities (e.g., using barriers, security patrols, checking physical ID cards, etc.). They
+748           also involve mitigating physical threats to facilities, such as installing fire suppression
+749           equipment.
+750   The process described in this section, which is employed for the analysis of any pair consisting
+751   of a cloud functional capability and a cloud forensic challenge, represents a core component of
+752   the CC FRA – the methodology – and can be applied to any set of capability-challenge pairs,
+753   either modified from the sets used in this document or adapted from a different architectural
+754   framework or empirical data.
+755
+
+
+
+
+                                                        16
+      NIST SP 800-201 ipd (Initial Public Draft)                                                                          Cloud Computing Forensic
+      February 2023                                                                                                          Reference Architecture
+
+756           The Forensic Reference Architecture Data
+757   The data that supplements the CC FRA methodology described in Section 4 represents the result
+758   of an analysis performed by the NCC FSWG members. The methodology was applied to all
+759   possible pairings of cloud forensic challenges (62 total challenges) with cloud functional
+760   capabilities (347 capabilities). In total, 21,514 challenge-capability pairings were evaluated using
+761   the flowchart in Figure 1.
+762   All users of CC FRA data are encouraged to use the data as an initial implementation of the
+763   methodology but use their own judgment when employing the CC FRA methodology in the
+764   context of their cloud systems and modify or customize NIST’s initial dataset for their specific
+765   situations and needs.
+766   For example, if the existing capabilities are not appropriate for the user’s situation, some or all
+767   can be removed, and new ones can be added. Similarly, new challenges appropriate for the user’s
+768   situation can be added, or those challenges that have been adequately mitigated can be removed.
+769   This architectural methodology has the advantage of helping to focus on how challenges can be
+770   mitigated because it considers each challenge specifically in the context of affected capabilities.
+771   The results of the NCC FSWG’s analysis are summarized in a Mapping Table (MT). An entry in
+772   the MT is YES if the associated challenge was identified as affecting the paired capability.
+773   Otherwise, the entry is NO.
+774   The CC FRA data set provides all interested parties with the responses for every challenge-
+775   capability pairing based on the analysis performed by the authors and collaborators of this
+776   document. A sample excerpt of the table is displayed in Figure 3. The full CC FRA Mapping
+777   Table is available for download (see Appendix D for a partial image and a link for downloading
+778   the data).
+779   The CC FRA data has 62 cloud forensic challenges obtained from NISTIR 8006 [1]. In the CC
+780   FRA Mapping Table, each cloud forensic challenge is shown across the top row (i.e., Forensic
+781   Challenge 1 [FC01], Forensic Challenge 2 [FC02], etc.). In Figure 3, only FC01-FC09 and
+782   FC58-FC65 are shown, and the rest of the challenges are hidden for the sake of readability in the
+783   figure. See Appendix D for the full Mapping Table.
+784   The CC FRA data has 347 cloud functional capabilities. In the CC FRA Mapping Table, each
+785   cloud functional capability is listed on the left column labeled “CAPABILITY” (see Figure 3).
+786   The CC FRA data set preserves the grouping of the cloud functional capabilities provided by the
+787   CSA EA [2] into “CONTAINERS” and “DOMAINS.”
+788   In Figure 3, the first nine capabilities are shown, as are the last nine; the rest are hidden. Each
+789   row, therefore, represents a separate capability and includes the following information: the
+790   domain of the capability (all of the domains are described in Section 3), the container (the
+791   highest-level elements within the architectural diagram in Appendix D 1), the name of the
+792   capability, and a description of the capability (not shown in Figure 3 but shown in Appendix D).
+
+
+
+
+      1
+          The container is a high-level collection of capabilities consisting of related processes and procedures within the domain.
+
+
+
+                                                                                 17
+      NIST SP 800-201 ipd (Initial Public Draft)                                                                                                               Cloud Computing Forensic
+      February 2023                                                                                                                                               Reference Architecture
+
+
+
+
+                                                                                                                                                         ...HIDDEN…
+                                                                                          FC01
+                                                                                                 FC02
+                                                                                                        FC03
+                                                                                                               FC04
+                                                                                                                      FC05
+                                                                                                                             FC06
+                                                                                                                                    FC07
+                                                                                                                                           FC08
+                                                                                                                                                  FC09
+
+
+                                                                                                                                                                      FC58
+                                                                                                                                                                             FC59
+                                                                                                                                                                                    FC60
+                                                                                                                                                                                           FC61
+                                                                                                                                                                                                  FC62
+                                                                                                                                                                                                         FC63
+                                                                                                                                                                                                                FC64
+                                                                                                                                                                                                                       FC65
+                                                                                2a
+
+
+
+
+                                                                                                        Yes
+
+
+
+
+                                                                                                                             Yes
+
+
+
+
+                                                                                                                                                  Yes
+
+
+                                                                                                                                                                      Yes
+
+
+                                                                                                                                                                                    Yes
+
+
+                                                                                                                                                                                                  Yes
+                                                                                                                                                                                                         Yes
+                                                                                                                                                                                                                Yes
+                                                                                                                                                                                                                       Yes
+                                                                                          No
+                                                                                                 No
+
+
+                                                                                                               No
+                                                                                                                      No
+
+
+                                                                                                                                    No
+                                                                                                                                           No
+
+
+
+
+                                                                                                                                                                             No
+
+
+                                                                                                                                                                                           No
+                                                                                2b
+
+
+
+
+                                                                                          Yes
+                                                                                                 Yes
+
+
+                                                                                                               Yes
+                                                                                                                      Yes
+
+
+                                                                                                                                    Yes
+                                                                                                                                           Yes
+
+
+
+
+                                                                                                                                                                             Yes
+
+
+                                                                                                                                                                                           Yes
+              Components descriptions also available on CSA's inte
+              https://research.cloudsecurityalliance.org/tci/
+
+
+
+
+                                                                                                        Yes
+
+
+
+
+                                                                                                                             Yes
+
+
+
+
+                                                                                                                                                  Yes
+
+
+                                                                                                                                                                      Yes
+
+
+
+
+                                                                                                                                                                                                  Yes
+
+
+                                                                                                                                                                                                                Yes
+                                                                                2c
+
+
+
+
+                                                                                                                                                                                    No
+
+
+
+
+                                                                                                                                                                                                         No
+
+
+                                                                                                                                                                                                                       No
+                  DOMAIN       CONTAINER            CAPABILITY                  \
+      Index
+
+
+
+
+                                                (process or solution)   3a     3b \
+
+
+
+
+                                                                                                                                                                             Yes
+
+
+                                                                                                                                                                                           Yes
+                                                                                          No
+                                                                                                 No
+
+
+                                                                                                               No
+                                                                                                                      No
+
+
+                                                                                                                                    No
+                                                                                                                                           No
+                                                                              2d
+                                                                                      \
+        4     BOSS           Compliance        Intellectual Property    Yes     No        NO* NO* NO NO* NO* NO NO* NO* NO                                            YES YES YES NO NO NO NO NO
+
+        5     BOSS           Data              P t ti Labeling/
+                                               Handling/                Yes    No         NO* NO* NO NO* NO* NO NO* NO* NO                                            YES YES YES NO NO NO YES YES
+        6     BOSS           Data              Clear Desk Policy        Yes    No         NO* NO* NO NO* NO* NO NO* NO* NO                                            NO NO NO NO NO NO NO NO
+        7     BOSS           Data              Rules for Information    No     Yes        YES YES NO YES YES YES YES YES NO                                           NO NO NO* NO NO NO* YES NO*
+        8     BOSS           Human             Employee Awareness       No     Yes        YES YES NO YES YES YES YES YES NO                                           NO NO NO* NO NO NO* YES NO*
+        9     BOSS           Security          Market Threat            No     Yes        YES YES NO YES YES YES YES YES NO                                           NO NO NO* NO NO NO* YES NO*
+       10     BOSS           Security          Knowledge Base           No     Yes        YES YES NO YES YES YES YES YES NO                                           NO NO NO* NO NO NO* YES NO*
+       11     BOSS           Compliance        Audit Planning           Yes    No         NO* NO* NO NO* NO* NO NO* NO* NO                                            YES YES YES NO NO NO NO NO
+       12     BOSS           Compliance        Internal Audits          No     Yes        YES YES NO YES YES YES YES YES NO                                           YES YES NO* NO NO NO* YES NO*
+              …HIDDEN…
+      342 S & RM             Infrastructure    Network                  No     Yes        YES YES YES YES YES YES YES Yes NO                                          YES YES NO* YES YES NO* YES NO*
+      343 S & RM             Data Protection   Data Lifecycle           No     Yes        YES YES YES YES YES YES YES NO NO                                           YES YES NO* YES YES NO* YES NO*
+      344 S & RM             Cryptographic     Signature Services       No     Yes        YES YES YES YES YES YES YES NO NO                                           YES YES NO* YES YES NO* YES NO*
+      345 S & RM             Governance        IT Risk Management       Yes    No         NO* NO* NO NO* NO* YES NO* NO* NO                                           NO NO NO NO NO NO NO NO
+      346 S & RM             InfoSec           Risk Portfolio           Yes    No         NO* NO* NO NO* NO* YES NO* NO* NO                                           NO NO NO NO NO NO NO NO
+      347 S & RM             Privilege         Authorization Services   No     Yes        YES YES YES YES YES YES YES NO NO                                           YES YES NO* YES YES NO* YES NO*
+      348 S & RM             Privilege         Authorization Services   No     Yes        YES YES YES YES YES YES YES NO NO                                           YES YES NO* YES YES NO* YES NO*
+      349 S & RM             Policies and      Information Security     Yes    No         NO* NO* NO NO* NO* YES NO* NO* NO                                           NO NO NO NO NO NO NO NO
+
+793   350 S & RM             Privilege         Privilege Usage          No     Yes        YES YES YES YES YES YES YES NO NO                                           YES YES NO* YES YES NO* YES NO*
+
+
+794         Fig. 3. Excerpt of the Forensic Reference Architecture (Challenges vs. Capabilities Mapping Table).
+
+795   The entry in the table that corresponds to a specific row and column (i.e., a specific challenge-
+796   capability pair) is either YES or NO based on the result of traversing the mapping flowchart in
+797   Figure 2. Traversing the flowchart requires answers to Questions 1 (Q1), 2 (Q2-a, Q2-b, Q2-c,
+798   Q2-d), and 3 (Q3-a, Q3-b). As described in Section 4, Q1 must be answered for each individual
+799   challenge-capability pair that reaches Q1 when the flowchart is traversed. However, Questions 2
+800   and 3, which relate only to challenges and capabilities separately, can be answered ahead of time,
+801   and consensus answers were developed for these by the NCC FSWG. These answers are shown
+802   in the table in Figure 3. The second row in the table has the answers for Q2-a, the third row for
+803   Q2-b, the fourth row for Q-2c, and the fifth row for Q2-d. The fifth column in the table has the
+804   answers for Q3-a and the sixth column for Q3-b.
+805   Each entry in the table is color-coded as follows:
+806           •    Orange – A NO is obtained before reaching question Q1 in the flowchart. These entries
+807                can be filled in automatically once the answers to questions Q2-a, Q2-b, Q2-c, Q2-d, Q3-
+808                a, and Q3-b are entered.
+809           •    Red – A NO is obtained as a result of answering Q1.
+810           •    Green – A YES is obtained as a result of answering Q1.
+811   Analysis of the correlation between the forensic science challenges and the functional
+812   capabilities constitutes the foundation for achieving consistent and repeatable answers to the
+
+
+                                                                                      18
+      NIST SP 800-201 ipd (Initial Public Draft)                                       Cloud Computing Forensic
+      February 2023                                                                       Reference Architecture
+
+813   questions identified in the CC FRA methodology. Each challenge is further categorized based on
+814   its overall impact on cloud functional capabilities. This categorization is focused on the overall
+815   number of affected capabilities, identifying if only a limited set of capabilities is impacted versus
+816   most capabilities composing the cloud ecosystem being impacted. The term impact is used to
+817   indicate how broadly or narrowly a challenge affects the set of functional capabilities. Therefore,
+818   the impact of each challenge was categorized along a generic-to-specific scale as follows (see
+819   NIST IR 8006 [1], Annex A, Table 2, column 4):
+820       •   Generic (G) – A challenge is labeled generic if it affects most of the capabilities.
+821       •   Specific (S) – A challenge is labeled specific if it affects a limited set of capabilities.
+822       •   Quasi (Q) – A challenge is labeled quasi if it falls somewhere between generic and
+823           specific.
+824   A specific challenge applies narrowly and affects only a limited number of capabilities, while a
+825   generic challenge affects a broad set of capabilities. The specific challenge affects a capability in
+826   a direct manner that is determined by the particular issues addressed by the capability. This
+827   results in the capability being affected in an important and profound way. On the other hand,
+828   because the generic challenge affects most of the capabilities, the affect is not tied closely to the
+829   issues addressed in each capability, and the capabilities are affected in a much less important and
+830   profound way. (See Section 4 in which the “precise, limited mapping” is explained.) Thus, a
+831   specific challenge is more impactful overall than a generic one when it comes to conducting a
+832   cloud forensic investigation. The generic-to-specific label of each challenge is also part of the
+833   Forensic Reference Architecture, as shown in Appendix D. The NCC FSWG developed
+834   consensus labels for all of the challenges [1].
+835
+
+
+
+
+                                                         19
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+836       Conclusion
+837   This document presents the NIST Cloud Computing Forensic Reference Architecture (CC FRA)
+838   comprised of:
+839       a) A methodology for analyzing the functional capabilities of an existing architecture –
+840          preferably a security architecture like the Cloud Security Alliance’s (CSA’s) Enterprise
+841          Architecture (EA) [2] – through a set of cloud forensic challenges, such as the set
+842          identified in NIST IR 8006 [1]
+843       b) A data set that aggregates the results of the above methodology applied to the CSA’s EA
+844          [2] and the NIST IR 8006 [1] set of cloud forensic challenges
+845   The goal of the FRA is to enable the analysis of cloud systems to determine the extent to which a
+846   system proactively supports digital forensics. More precisely, the FRA is meant to help users
+847   understand how the previously identified cloud forensic challenges might impact an
+848   organization’s cloud-based system. When developing a new system or analyzing an existing one,
+849   the FRA helps identify those cloud forensic challenges that could affect the system’s capabilities
+850   and, therefore, require at least partial mitigation strategies to support a complete forensic
+851   investigation. The FRA also identifies how a forensic investigator would apply the mitigation
+852   strategies to a particular investigation. While the FRA can be used by any cloud computing
+853   practitioner, it is specifically designed to enable cloud system architects, cloud engineers,
+854   forensic practitioners, and even cloud consumers to analyze and review their cloud computing
+855   architectures for forensic readiness.
+856   The FRA data provided in this document offers an initial implementation of the FRA
+857   methodology and a useful starting point for all cloud forensic stakeholders to analyze how the
+858   NIST cloud forensic challenges presented in NIST IR 8006 [1] affect each functional capability
+859   present in the CSA’s EA [2].
+860   All users are encouraged to customize this initial implementation (shown in Appendix D) for
+861   their specific situations and needs. For example, if the existing functional capabilities are not
+862   appropriate for the user’s situation, some or all can be removed, and new ones can be added.
+863   Similarly, new forensic challenges appropriate for the user’s situation can be added, and
+864   challenges that have been adequately mitigated can be removed. The FRA methodology
+865   promotes analysis of how cloud forensic challenges affect particular functional capabilities and
+866   helps determine whether mitigations are necessary to ensure forensic readiness related to the
+867   respective capability. This means that users can replace all cloud forensics challenges or
+868   functional capabilities used in the current FRA data set with their own.
+869   The FRA presented here will likely evolve over time, and methods for quantifying impact will be
+870   developed to enhance FRA usability.
+871
+
+
+
+
+                                                      20
+      NIST SP 800-201 ipd (Initial Public Draft)                              Cloud Computing Forensic
+      February 2023                                                              Reference Architecture
+
+872   References
+873   [1]     Herman M, Iorga M, Salim AS, Jackson R, Hurst M, Leo R, Lee R, Landreville N,
+874           Mishra AK, Wang Y, Sardinas R (2020). NIST Cloud Computing Forensic Science
+875           Challenges. (National Institute of Standards and Technology, Gaithersburg, MD), NIST
+876           Interagency or Internal Report (IR) 8006. https://doi.org/10.6028/NIST.IR.8006
+877   [2]     Cloud Security Alliance Enterprise Architecture. Available at
+878           https://ea.cloudsecurityalliance.org/
+879   [3]     The White House, Executive Order on Improving the Nation’s Cybersecurity, May 12,
+880           2021. Available at https://www.whitehouse.gov/briefing-room/presidential-
+881           actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/
+882   [4]     Joint Task Force (2018). Risk Management Framework for Information Systems and
+883           Organizations: A System Life Cycle Approach for Security and Privacy. (National
+884           Institute of Standards and Technology, Gaithersburg, MD), NIST Special Publication
+885           (SP) 800-37, Rev. 2. https://doi.org/10.6028/NIST.SP.800-37r2
+886   [5]     International Organization for Standardization, ISO 2700 Standards. Available at
+887           https://www.27000.org/index.htm
+888   [6]     ISO/IEC 27001, Information Technology — Security Techniques — Information
+889           Security Management Systems — Requirements, 2013. Available at
+890           https://www.iso.org/standard/54534.html
+891   [7]     ISO/IEC 27002, Information Security, Cybersecurity and Privacy Protection —
+892           Information Security Controls, 2022. Available at
+893           https://www.iso.org/standard/75652.html
+894   [8]     ISO/IEC 27018, Information Technology — Security Techniques — Code of Practice for
+895           Protection of Personally Identifiable Information (PII) in Public Clouds Acting as PII
+896           Processors, 2019. Available at https://www.iso.org/standard/76559.html
+897   [9]     ISO/IEC 27035-2, Information Technology — Security Techniques — Information
+898           Security Incident Management — Part 2: Guidelines to Plan and Prepare for Incident
+899           Response, 2016. Available at https://www.iso.org/standard/62071.html
+900   [10]    ISO/IEC 27037, Information Technology — Security Techniques — Guidelines for
+901           Identification, Collection, Acquisition and Preservation of Digital Evidence, 2012.
+902           Available at https://www.iso.org/standard/44381.html
+903   [11]    IT Infrastructure Library (ITIL). Available at https://www.ibm.com/cloud/learn/it-
+904           infrastructure-library
+905   [12]    The SABSA Institute, SABSA Enterprise Security Architecture. Available at
+906           https://sabsa.org/
+907   [13]    The Open Group, The TOGAF Standard, Version 9.2. Available at
+908           https://www.opengroup.org/togaf
+909   [14]    Cloud Security Alliance – Security, Trust, Assurance and Risk (STAR). Available at
+910           https://cloudsecurityalliance.org/star
+911   [15]    NIST Cloud Computing Security Reference Architecture (Draft). (National Institute of
+912           Standards and Technology, Gaithersburg, MD). NIST Special Publication (SP) 500-
+913           299/800-200. Available at https://github.com/usnistgov/CloudSecurityArchitectureTool-
+914           CSAT-v0.1/blob/master/Documents/NIST%20SP%20800-200-
+915           SRA_DRAFT_20180414.pdf
+
+
+
+
+                                                    21
+      NIST SP 800-201 ipd (Initial Public Draft)                               Cloud Computing Forensic
+      February 2023                                                               Reference Architecture
+
+916   [16]    Mell PM, Grance T (2011) The NIST Definition of Cloud Computing. (National Institute
+917           of Standards and Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-
+918           145. https://doi.org/10.6028/NIST.SP.800-145
+919   [17]    United States Congress, Sarbanes-Oxley Act of 2002, Public Law 107–204, 107th
+920           Congress. Available at https://www.govinfo.gov/content/pkg/PLAW-
+921           107publ204/pdf/PLAW-107publ204.pdf
+922   [18]    Federal Trade Commission, Gramm-Leach-Bliley Act (Financial Services Modernization
+923           Act of 1999). Available at https://www.ftc.gov/tips-advice/business-center/privacy-and-
+924           security/gramm-leach-bliley-act
+925   [19]    PCI Security Standards Council, Payment Card Industry (PCI) Security. Available at
+926           https://www.pcisecuritystandards.org/pci_security/
+927   [20]    ISACA, COBIT – Control Objectives for Information Technologies. Available at
+928           https://www.isaca.org/resources/cobit
+929   [21]    Jericho Forum. Available at https://en.wikipedia.org/wiki/Jericho_Forum (information
+930           aggregator) or
+931           https://publications.opengroup.org/catalogsearch/result/?q=jericho+security+reference+ar
+932           chitecture
+933   [22]    Liu F, Tong J, Mao J, Bohn R, Messina J, Badger L, Leaf D (2011). NIST Cloud
+934           Computing Reference Architecture. (National Institute of Standards and Technology,
+935           Gaithersburg, MD), NIST Special Publication (SP) 500-292.
+936           https://doi.org/10.6028/NIST.SP.500-292
+937   [23]    SWGDE Digital and Multimedia Evidence (Digital Forensics) as a Forensic Science
+938           Discipline, Version 2.0, September 5, 2014. Available at
+939           https://drive.google.com/file/d/1OBux0n7VZQe7HSgObwAtmhz5LgwvX0oY/view
+940   [24]    ISO/IEC 2382, Information technology - Vocabulary, 2015. Available at
+941           https://www.iso.org/standard/63598.html
+942   [25]    Scarfone K, Souppaya M, Hoffman P (2011). Guide to Security for Full Virtualization
+943           Technologies. (National Institute of Standards and Technology, Gaithersburg, MD),
+944           NIST Special Publication (SP) 800-125. https://doi.org/10.6028/NIST.SP.800-125
+
+
+
+
+                                                     22
+      NIST SP 800-201 ipd (Initial Public Draft)                                  Cloud Computing Forensic
+      February 2023                                                                  Reference Architecture
+
+945   Appendix A. Acronyms
+946   Selected acronyms and abbreviations used in this paper are defined below.
+947   BOSS
+948   Business Operation Support Services
+
+949   CC FRA
+950   Cloud Computing Forensic Reference Architecture
+
+951   COBIT
+952   Control Objectives for Information Technologies
+
+953   CSA
+954   Cloud Security Alliance
+
+955   EA
+956   Enterprise Architecture
+
+957   FC
+958   Forensic Challenge
+
+959   FISMA
+960   Federal Information Security Modernization Act
+
+961   FRA
+962   Forensic Reference Architecture
+
+963   GRC
+964   Governance, Risk management, and Compliance
+
+965   IaaS
+966   Infrastructure as a Service
+
+967   ID
+968   Identification
+
+969   IEC
+970   International Electrotechnical Commission
+
+971   ISACA
+972   Information Systems Audit and Control Association
+
+973   ISO
+974   International Organization for Standardization
+
+975   ITIL
+976   Information Technology Infrastructure Library
+
+977   ITL
+978   Information Technology Laboratory
+
+979   ITOS
+980   Information Technology Operation and Support
+
+981   NCC FSWG
+982   NIST Cloud Computing Forensic Science Working Group
+
+983   NIST IR
+984   NIST Interagency or Internal Report
+
+
+                                                          23
+       NIST SP 800-201 ipd (Initial Public Draft)             Cloud Computing Forensic
+       February 2023                                             Reference Architecture
+
+ 985   NIST SP
+ 986   NIST Special Publication
+
+ 987   OMB
+ 988   Office of Management and Budget
+
+ 989   PaaS
+ 990   Platform as a Service
+
+ 991   PCI
+ 992   Payment Card Industry
+
+ 993   PII
+ 994   Personally Identifiable Information
+
+ 995   Rev.
+ 996   Revision
+
+ 997   RMF
+ 998   Risk Management Framework
+
+ 999   S&RM
+1000   Security and Risk Management
+
+1001   SaaS
+1002   Software as a Service
+
+1003   SABSA
+1004   Sherwood Applied Business Security Architecture
+
+1005   SLA
+1006   Service Level Agreement
+
+1007   SOA
+1008   Service-Oriented Architecture
+
+1009   SOP
+1010   Standard Operating Procedure
+
+1011   SRA
+1012   Security Reference Architecture
+
+1013   STAR
+1014   Security, Trust, Assurance and Risk
+
+1015   SWGDE
+1016   Scientific Working Group on Digital Evidence
+
+1017   TOGAF
+1018   The Open Group Architecture Framework
+
+
+
+
+                                                         24
+       NIST SP 800-201 ipd (Initial Public Draft)                                                  Cloud Computing Forensic
+       February 2023                                                                                  Reference Architecture
+
+1019   Appendix B. Glossary
+1020   challenge
+1021   For this paper, a currently difficult or impossible task that is either unique to cloud computing or exacerbated by it.
+
+1022   cloud computing
+1023   A model for enabling ubiquitous, convenient, on-demand network access to a shared pool of configurable computing
+1024   resources (e.g., networks, servers, storage, applications, and services) that can be rapidly provisioned and released
+1025   with minimal management effort or service provider interaction. This cloud model is composed of five essential
+1026   characteristics, three service models, and four deployment models. [16]
+
+1027   cloud consumer
+1028   A person or organization that maintains a business relationship with and uses service from cloud providers. [22]
+
+1029   cloud provider
+1030   The entity (a person or an organization) responsible for making a service available to interested parties. [22,
+1031   adapted]
+
+1032   criminal exploitation
+1033   The exploitation of computing resources by criminals. Criminal activities are planned and/or carried out using these
+1034   computing resources.
+
+1035   digital forensics
+1036   The process used to acquire, preserve, analyze, and report on digital evidence using scientific methods that are
+1037   demonstrably reliable, accurate, and repeatable such that it may be used in judicial proceedings. [23, adapted]
+
+1038   flowchart
+1039   A diagram that shows step-by-step progression through a process using boxes to show the steps and connecting
+1040   arrows between the boxes to show their order.
+
+1041   forensic investigator
+1042   A person who is an expert in acquiring, preserving, analyzing, and presenting digital evidence from computers and
+1043   other digital media. This evidence may be related to both computer-based and non-cybercrimes, including security
+1044   threats, cyber-attacks, and other illegal activities.
+
+1045   forensic readiness
+1046   The ability to collect digital evidence effectively and quickly with minimal investigation costs. This involves being
+1047   able to define the digital evidence required to reconstruct past computing events of interest.
+
+1048   functional capability
+1049   Cloud processes or solutions in the Cloud Security Alliance’s Enterprise Architecture that cover business operations,
+1050   IT operations, security and risk management, presentation services, application services, information services, and
+1051   infrastructure services. [2, adapted]
+
+1052   incident response
+1053   The mitigation of violations of security policies and recommended practices. Addressing and managing the
+1054   consequences of a security breach or cyberattack.
+
+1055   mapping
+1056   An operation that associates each element of a given set with one or more elements of a second set.
+
+1057   security
+1058   Measures and controls that ensure the confidentiality, integrity, and availability of the information processed and
+1059   stored by a computer.
+
+
+
+
+                                                                  25
+       NIST SP 800-201 ipd (Initial Public Draft)                                                 Cloud Computing Forensic
+       February 2023                                                                                 Reference Architecture
+
+1060   virtual machine
+1061   A virtual data processing system that appears to be at the exclusive disposal of a particular user but whose functions
+1062   are accomplished by sharing the resources of a real data processing system. [24]
+
+1063   virtualization
+1064   The simulation of the software and/or hardware upon which other software runs. This simulated environment is
+1065   called a virtual machine. [25, adapted]
+
+
+
+
+                                                                 26
+       NIST SP 800-201 ipd (Initial Public Draft)                                                                     Cloud Computing Forensic
+       February 2023                                                                                                     Reference Architecture
+
+
+
+1066   Appendix C. CSA’s Enterprise Architecture
+
+
+
+
+1067
+1068                                                  Fig. 4. CSA’s Enterprise Architecture (v1.1)
+
+1069   The CSA’s Enterprise Architecture v1.1 and v2.0 are available for download as PDF files that can be easily enlarged for further
+1070   review at NIST’s FRA GitHub repository and the NCC FSWG website.
+
+
+                                                                          27
+       NIST SP 800-201 ipd (Initial Public Draft)                                 Cloud Computing Forensic
+       February 2023                                                                 Reference Architecture
+
+
+
+1071   Appendix D. NIST’s Forensic Reference Architecture Data Set
+1072   Section 5 of this document describes how the FRA methodology can be applied to analyze and
+1073   review the functional capabilities of a cloud system by using a known set of forensic challenges
+1074   to determine forensic readiness as related to these capabilities. To demonstrate its use, NIST
+1075   provides an initial implementation of the FRA methodology by generating the FRA data set
+1076   captured in the workbook available for download at the FRA’s GitHub repository or the NCC
+1077   FSWG website. The workbook contains the summary of data analyzed by the NIST Cloud
+1078   Computing Forensic Science Working Group using the FRA methodology that leverages NIST
+1079   IR 8006, NIST Cloud Forensic Science Challenges, applied to the Cloud Security Alliance’s
+1080   Enterprise Architecture. The FRA dataset can be found under the “Capabilities vs. Challenges
+1081   Data” tab of the downloadable workbook.
+1082
+
+
+
+
+1083
+1084                                            Fig. 5. NIST’s FRA Data Set
+
+
+
+
+                                                            28
+

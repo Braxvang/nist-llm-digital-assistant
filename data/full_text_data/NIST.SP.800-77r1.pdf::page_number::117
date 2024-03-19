@@ -1,0 +1,55 @@
+                                                                                              NIST SP 800-77 REV. 1                                                           GUIDE TO IPSEC VPNS
+
+
+                                                                                                       crypto map west-east 1 ipsec-isakmp
+                                                                                                       set peer 203.0.113.1
+                                                                                                       set transform-set 1 2
+                                                                                                       set pfs group19 82
+                                                                                                       set ikev2-profile default
+                                                                                                       match address 100
+                                                                                                   11. Apply the IPsec settings to the external interface. Because the external interface of the
+                                                                                                       router will provide IPsec services, the crypto map created in the previous step must be
+                                                                                                       applied to the external interface. This is done through the following commands:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                       interface g1/1
+                                                                                                       crypto map west-east
+                                                                                              For routing-based VPNs, steps 12 to 16 are used, where Configuration Payload is utilized to
+                                                                                              exchange prefixes in the IKEv2 exchange. For policy-based VPNs, skip to step 17.
+
+                                                                                                   12. Advertise prefixes via IKEv2 configuration payload. Prefixes can be sent between
+                                                                                                       devices in the IKEv2 exchange. These will then be populated in the routing table of the
+                                                                                                       peer.
+
+                                                                                                       crypto ikev2 authorization policy default
+                                                                                                        route set remote ipv4 192.0.0.0 255.255.255.0
+                                                                                                        route set remote ipv6 2001:db8:0:1::/64
+
+                                                                                                   13. Specify the IKE authentication method. In this case, each router needs to be configured
+                                                                                                       to use a symmetric secret, as illustrated by the following configuration entries. Instead of
+                                                                                                       using IP addresses as identifiers, FQDNs will be used. An easy way to create a strong,
+                                                                                                       random PSK is to use the openssl command: openssl rand - base64 64.
+
+                                                                                                       crypto ikev2 profile default
+                                                                                                        identity local fqdn west.example.gov
+                                                                                                        match identity remote fqdn east.example.gov
+                                                                                                        authentication local pre-share key <SECRET>
+                                                                                                        authentication remote pre-share key <SECRET>
+                                                                                                        aaa authorization group psk list default default
+
+                                                                                                   14. Specify the IPsec mode and cryptographic algorithms. The following configuration
+                                                                                                       entry on each router specifies ESP tunnel mode, preferring AES-GCM over AES- CBC-
+                                                                                                       128 encryption with HMAC-SHA256 integrity protection:
+
+
+
+
+                                                                                              82   For devices not supporting DH 19, use DH 14 and/or DH 15.
+
+
+
+                                                                                                                                                        100
+

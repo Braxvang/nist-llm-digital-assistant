@@ -1,0 +1,53 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                       Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                          PIV Card Application Card Command Interface
+
+520   If P1='00' and L c and the command data field are present, then the authentication data in the
+521   command data field SHALL be compared against the reference data associated with the key
+522   reference, as specified in the following subsections. However, if the key reference is '00', '80',
+523   '96', or '97' and the current value of the retry counter associated with the key reference is zero,
+524   then the PIV Card Application SHALL return the status word '69 83'. 6 In order to protect against
+525   blocking over the contactless interface, PIV Card Applications that implement secure messaging
+526   SHALL define an issuer-specified intermediate retry value for each of these key references and
+527   return '69 83' if the command is submitted over the contactless interface (over secure messaging
+528   or the VCI, as required for the key reference) and the current value of the retry counter
+529   associated with the key reference is at or below the issuer-specified intermediate retry value. If
+530   status word '69 83' is returned, then the comparison SHALL NOT be made, and the security
+531   status and the retry counter of the key reference SHALL remain unchanged.
+532   If P1='FF', and L c and the command data field are absent, the command SHALL reset the
+533   security status of the key reference in P2. The security status of the key reference specified in P2
+534   SHALL be set to FALSE, and the retry counter associated with the key reference SHALL remain
+535   unchanged.
+
+536   3.2.1.1.                 PIV Card Application PIN and Global PIN
+537   If the key reference is '00' or '80' and the authentication data in the command data field does not
+538   satisfy the criteria in Section 2.4.3, then the card command SHALL fail, and the PIV Card
+539   Application SHALL return either the status word '6A 80' or '63 CX'. If status word '6A 80' is
+540   returned, the security status and the retry counter of the key reference SHALL remain
+541   unchanged. 7 If status word '63 CX' is returned, the security status of the key reference SHALL
+542   be set to FALSE, and the retry counter associated with the key reference SHALL be decremented
+543   by one.
+544   If the authentication data in the command data field is properly formatted (see previous
+545   paragraph) and does not match reference data associated with the key reference, then the card
+546   command SHALL fail, the PIV Card Application SHALL return the status word '63 CX', the
+547   security status of the key reference SHALL be set to FALSE, and the retry counter associated
+548   with the key reference SHALL be decremented by one.
+549   If the card command succeeds, then the security status of the key reference SHALL be set to
+550   TRUE, and the retry counter associated with the key reference SHALL be set to the reset retry
+551   value associated with the key reference. The initial value of the retry counter and the reset retry
+552   value associated with the key reference (i.e., the number of successive failures/retries before the
+553   retry counter associated with the key reference reaches zero) is 10 or less for both key references
+554   in accordance with FIPS 201 Section 2.9.3.
+
+555   3.2.1.2.                 On-Card Biometric Comparison
+556   If the key reference is '96' or '97' and the authentication data in the command data field is not of
+557   length 3N, where N satisfies the requirements for the minimum and maximum number of
+558   minutiae specified in the BIT, then the card command SHALL fail, and the PIV Card
+      6
+          There is no retry counter associated with the pairing code, so the authentication method cannot be blocked for that key reference.
+      7
+          It is recommended that in this case the authentication data not be compared to the on-card reference data.
+
+
+
+                                                                                12
+

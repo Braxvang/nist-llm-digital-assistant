@@ -1,0 +1,61 @@
+NIST SP 800-166                                                                      DERIVED PIV APPLICATION AND
+                                                                                     DATA MODEL TEST GUIDELINES
+
+                                        1. '00' if command chaining is not needed or
+                                        2. '10' if command chaining is used. (The last
+                                           chain of the command sets CLA to '00')
+                                    • P1, algorithm reference, is set to '07', '11' or
+                                       '14'
+                                    • P2, key reference, is set to '9D' indicating the
+                                       key management key
+                                    • Data field in the command is to include one of
+                                       the following:
+                                        1. If P1 = '07', the template '81' contains an
+                                           encrypted key
+                                        2. If P1 = '11' or '14', the template '85'
+                                           contain the other party’s public key. 10
+                              3. Send the VERIFY command with
+                                    • P2, key reference value, is set to '80'
+                                    • Data field of the command will contain the
+                                       correct Derived PIV Application Password value,
+                                       padded with 'FF' (if necessary) to complete the
+                                       total length of the value to 8 bytes
+                              4. Repeat Step 2
+                              5. Send the GENERAL AUTHENTICATE command
+                                    • CLA is set to:
+                                        1. '00' if command chaining is not needed or
+                                        2. '10' if command chaining is used. (The last
+                                           chain of the command sets CLA to '00')
+                                    • P1, algorithm reference, is set to something
+                                       other than '07', '11' or '14' (indicating
+                                       incorrect algorithm)
+                                    • P2, key reference, is set to '9D' indicating the
+                                       key management key
+                                    • Data field in the command is to include a
+                                       template appropriate for the '9D' key.
+                              6. Send the GENERAL AUTHENTICATE command
+                                    • CLA is set to:
+                                        1. '00' if command chaining is not needed or
+                                        2. '10' if command chaining is used. (The last
+                                           chain of the command sets CLA to '00')
+                                    • P1, algorithm reference, is set to '07', '11' or
+                                       '14'
+                                    • P2, key reference, is set to '9D' indicating the
+                                       key management key
+                                    • Data field in the command is to include a
+                                       malformed template.
+ Expected Result(s)           1. From Step 1, the command returns the application property template
+                                 with the status word '90 00'.
+                              2. From Step 2, the command returns status word '69 82' (security
+                                 status not satisfied).
+                              3. From Step 3, the command returns status word '90 00'.
+                              4. From Step 4, for algorithm reference '07' as P1 value, the command
+                                 returns the transported key with status word '90 00'. Compare the
+
+10
+  Template '85' contains the other party’s public key, a point on Curve P-256 or P-384, encoded as '04' || X || Y,
+without the use of point compression, as described in Section 2.3.3 of [SEC1].
+
+
+                                                          56
+

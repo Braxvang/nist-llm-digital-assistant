@@ -1,0 +1,50 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                       Recommendation for RBG Constructions
+       September 2022
+
+1652        •     If full-entropy output is provided by all validated physical entropy sources used by the
+1653              RBG3(XOR) implementation, and non-physical entropy sources are not used, 31 step 1
+1654              becomes:
+1655                                            (status, ES_bits) = Get_ES_Bitstring(n).
+1656              The Get_ES_Bitstring function 32 shall use Method 1 in Section 2.3 to obtain the n full-
+1657              entropy bits that were requested in order to produce the ES_bits bitstring.
+1658        •     If full-entropy output is not provided by all physical entropy sources, or the output of both
+1659              physical and non-physical entropy sources is also used by the implementation, step 1
+1660              becomes:
+1661                                 (status, ES_bits) = Get_conditioned_full_entopy_input(n).
+1662              The Get_conditioned_full_entropy_input construction is specified in Section 3.3.2. It
+1663              requests entropy from the entropy sources in step 3.1 of that construction with a
+1664              Get_ES_Bitstring call. The Get_ES_Bitstring call shall use Method 1 (as specified in
+1665              Section 3.3) when collecting the output of the entropy sources (i.e., only the entropy
+1666              provided by physical entropy sources is counted).
+1667   In step 2, if the request in step 1 is not successful, abort the RBG3(XOR)_Generate function,
+1668   returning the status received in step 1 and an invalid bitstring as the returned_bits (e.g., a Null
+1669   bitstring). If status indicates a success, ES_bits is the full-entropy bitstring to be used in step 5.
+1670   In step 3, the RBG3(XOR)’s DRBG instantiation is requested to generate n bits at a security
+1671   strength of 256 bits. The DRBG instantiation is indicated by the RBG3(XOR)_state_handle, which
+1672   was obtained during instantiation (see Section 6.2.1.1). If a prediction-resistance request and/or
+1673   additional input are provided in the RBG.3(XOR)_Generate call, they shall be included in the
+1674   Generate_function call.
+1675   Note that it is possible that the DRBG would require reseeding during the Generate_function call
+1676   in step 3 (e.g., because of a prediction-resistance request, or the end of the seedlife of the DRBG
+1677   has been reached). If a reseed of the DRBG is required during Generate-function execution, the
+1678   DRBG shall be reseeded as specified in Section 6.2.1.3 with bits not otherwise used by the RBG.
+1679   In step 4, if the Generate_function request is not successful, the RBG3(XOR)_Generate
+1680   function is aborted, and the status received in step 3 and an invalid bitstring (e.g., a Null bitstring)
+1681   are returned to the consuming application. If status indicates a success, DRBG_bits is the
+1682   pseudorandom bitstring to be used in step 5.
+1683   Step 5 combines the bitstrings returned from the entropy sources (from step 1) and the DRBG
+1684   (from step 3) using an XOR operation. The resulting bitstring is returned to the consuming
+1685   application in step 6.
+
+
+
+
+       31
+          Since non-physical entropy sources are assumed to be incapable of providing full-entropy output, they cannot contribute to the bitstring provided
+       by the Get_ES_Bitstring function.
+       32
+          See Section 3.10.2.2.
+
+
+                                                                               47
+

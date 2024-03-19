@@ -1,0 +1,979 @@
+          NIST Special Publication 800-38B
+
+
+Recommendation for Block Cipher
+           Modes of Operation:
+             The CMAC Mode for Authentication
+
+                                            Morris Dworkin
+
+
+
+
+           This publication is available free of charge from:
+                  https://doi.org/10.6028/NIST.SP.800-38B
+
+
+C O M P U T E R      S E C U R I T Y
+                 NIST Special Publication 800-38B
+
+
+Recommendation for Block Cipher
+           Modes of Operation:
+                        The CMAC Mode for Authentication
+
+                                                        Morris Dworkin
+                                             Computer Security Division
+                                      Information Technology Laboratory
+
+
+
+
+                     This publication is available free of charge from:
+                            https://doi.org/10.6028/NIST.SP.800-38B
+
+
+                                                                        May 2005
+                                          INCLUDES UPDATES AS OF 10-06-2016: PAGE II
+
+
+
+
+                                                     U.S. Department of Commerce
+                                                             Penny Pritzker, Secretary
+
+                                        National Institute of Standards and Technology
+    Willie May, Under Secretary of Commerce for Standards and Technology and Director
+                                                     Authority
+
+This publication has been developed by NIST in accordance with its statutory responsibilities under the
+Federal Information Security Modernization Act (FISMA) of 2014, 44 U.S.C. § 3551 et seq., Public Law
+(P.L.) 113-283. NIST is responsible for developing information security standards and guidelines, including
+minimum requirements for federal information systems, but such standards and guidelines shall not apply
+to national security systems without the express approval of appropriate federal officials exercising policy
+authority over such systems. This guideline is consistent with the requirements of the Office of Management
+and Budget (OMB) Circular A-130.
+
+Nothing in this publication should be taken to contradict the standards and guidelines made mandatory and
+binding on federal agencies by the Secretary of Commerce under statutory authority. Nor should these
+guidelines be interpreted as altering or superseding the existing authorities of the Secretary of Commerce,
+Director of the OMB, or any other federal official. This publication may be used by nongovernmental
+organizations on a voluntary basis and is not subject to copyright in the United States. Attribution would,
+however, be appreciated by NIST.
+
+            National Institute of Standards and Technology Special Publication 800-38B
+                    Natl. Inst. Stand. Technol. Spec. Publ. 800-38B, 21 pages (May 2005)
+                                               CODEN: NSPUE2
+
+                                This publication is available free of charge from:
+                                   https://doi.org/10.6028/NIST.SP.800-38B
+
+Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+endorsement by NIST, nor is it intended to imply that the entities, materials, or equipment are necessarily the best
+available for the purpose.
+There may be references in this publication to other publications currently under development by NIST in accordance
+with its assigned statutory responsibilities. The information in this publication, including concepts and methodologies,
+may be used by federal agencies even before the completion of such companion publications. Thus, until each
+publication is completed, current requirements, guidelines, and procedures, where they exist, remain operative. For
+planning and transition purposes, federal agencies may wish to closely follow the development of these new
+publications by NIST.
+Organizations are encouraged to review all draft publications during public comment periods and provide feedback to
+NIST. Many NIST cybersecurity publications, other than the ones noted above, are available at
+http://csrc.nist.gov/publications.
+
+
+                         Comments on this publication may be submitted to:
+                              National Institute of Standards and Technology
+                    Attn: Computer Security Division, Information Technology Laboratory
+                     100 Bureau Drive (Mail Stop 8930) Gaithersburg, MD 20899-8930
+                                    Email: encryptionmodes@nist.gov
+
+         All comments are subject to release under the Freedom of Information Act (FOIA).
+                                                                                             NIST SP 800-38B                                                                  BLOCK CIPHER MODES:
+                                                                                                                                                                      CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                                                     Reports on Computer Systems Technology
+                                                                                             The Information Technology Laboratory (ITL) at the National Institute of Standards and
+                                                                                             Technology (NIST) promotes the U.S. economy and public welfare by providing technical
+                                                                                             leadership for the Nation’s measurement and standards infrastructure. ITL develops tests, test
+                                                                                             methods, reference data, proof of concept implementations, and technical analyses to advance the
+                                                                                             development and productive use of information technology. ITL’s responsibilities include the
+                                                                                             development of management, administrative, technical, and physical standards and guidelines for
+                                                                                             the cost-effective security and privacy of other than national security-related information in federal
+                                                                                             information systems. The Special Publication 800-series reports on ITL’s research, guidelines, and
+                                                                                             outreach efforts in information system security, and its collaborative activities with industry,
+                                                                                             government, and academic organizations.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                                                          Abstract
+
+                                                                                             This Recommendation specifies a message authentication code (MAC) algorithm based on a
+                                                                                             symmetric key block cipher. This block cipher-based MAC algorithm, called CMAC, may be
+                                                                                             used to provide assurance of the authenticity and, hence, the integrity of binary data.
+
+
+
+                                                                                                                                         Keywords
+
+                                                                                             authentication; block cipher; cryptography; information security; integrity; message authentication
+                                                                                             code; mode of operation
+
+
+
+                                                                                                                                            Errata
+
+                                                                                             The following changes have been incorporated into Special Publication 800-38B. Errata updates
+                                                                                             include corrections, clarifications, or other minor changes in the publication that are either
+                                                                                             editorial or substantive in nature.
+
+                                                                                                  Date            Type                                Change                             Pages
+
+                                                                                               10-06-2016      Substantive     Updated the document’s front matter (including            i-iv, 1
+                                                                                                                               pagination), and moved most of the Authority text (Sec.
+                                                                                                                               2) to the Authority statement on p. i. Renamed Sec. 2
+                                                                                                                               from “Authority” to “Conformance Testing.”
+
+                                                                                               10-06-2016      Substantive     The CMAC examples originally included in Appendix D         15
+                                                                                                                               have been removed and are now available at
+                                                                                                                               http://csrc.nist.gov/groups/ST/toolkit/examples.html.
+
+                                                                                               10-06-2016      Substantive     Updated several references in Appendix E                    16
+                                                                                                                               (Bibliography).
+
+
+
+
+                                                                                                                                               ii
+                                                                                             NIST SP 800-38B                                                                                                                      BLOCK CIPHER MODES:
+                                                                                                                                                                                                                          CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                                                                                             Table of Contents
+
+                                                                                             1       PURPOSE ........................................................................................................................................................... 1
+                                                                                             2       CONFORMANCE TESTING........................................................................................................................... 1
+                                                                                             3       INTRODUCTION .............................................................................................................................................. 1
+                                                                                             4       DEFINITIONS, ABBREVIATIONS, AND SYMBOLS ................................................................................. 2
+                                                                                                 4.1 DEFINITIONS AND ABBREVIATIONS .................................................................................................................. 2
+                                                                                                 4.2 SYMBOLS ......................................................................................................................................................... 3
+                                                                                                    4.2.1 Variables ................................................................................................................................................ 3
+                                                                                                    4.2.2 Operations and Functions ..................................................................................................................... 4
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             5       PRELIMINARIES ............................................................................................................................................. 4
+                                                                                                 5.1     EXAMPLES OF OPERATIONS AND FUNCTIONS ................................................................................................... 5
+                                                                                                 5.2     BLOCK CIPHER ................................................................................................................................................. 5
+                                                                                                 5.3     SUBKEYS .......................................................................................................................................................... 6
+                                                                                                 5.4     MAC GENERATION AND VERIFICATION........................................................................................................... 6
+                                                                                                 5.5     INPUT AND OUTPUT DATA ............................................................................................................................... 6
+                                                                                             6       CMAC SPECIFICATION................................................................................................................................. 6
+                                                                                                 6.1     SUBKEY GENERATION ...................................................................................................................................... 7
+                                                                                                 6.2     MAC GENERATION .......................................................................................................................................... 7
+                                                                                                 6.3     MAC VERIFICATION ........................................................................................................................................ 9
+                                                                                             APPENDIX A: LENGTH OF THE MAC .............................................................................................................. 11
+                                                                                                 A.1          ASSURANCE AGAINST GUESSING ATTACKS .............................................................................................. 11
+                                                                                                 A.2          SELECTION OF THE MAC LENGTH............................................................................................................. 11
+                                                                                             APPENDIX B: MESSAGE SPAN OF THE KEY ................................................................................................. 13
+                                                                                             APPENDIX C: PROTECTION AGAINST REPLAY OF MESSAGES ............................................................. 14
+                                                                                             APPENDIX D: EXAMPLES ................................................................................................................................... 15
+                                                                                             APPENDIX E: BIBLIOGRAPHY .......................................................................................................................... 16
+
+
+
+
+                                                                                             Figures
+
+                                                                                             Figure 1: Illustration of the two cases of MAC Generation........................................................... 9
+
+
+
+
+                                                                                                                                                                                  iii
+                                                                                             NIST SP 800-38B                                                               BLOCK CIPHER MODES:
+                                                                                                                                                                   CMAC MODE FOR AUTHENTICATION
+
+
+
+                                                                                             1   Purpose
+
+                                                                                             This publication is the second Part in a series of Recommendations regarding modes of operation
+                                                                                             of symmetric key block ciphers.
+
+                                                                                             2   Conformance Testing
+
+
+                                                                                             Conformance testing for implementations of the mode of operation that is specified in this Part of
+                                                                                             the Recommendation will be conducted within the framework of the Cryptographic Module
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             Validation Program (CMVP), a joint effort of NIST and the Communications Security
+                                                                                             Establishment of the Government of Canada. An implementation of a mode of operation must
+                                                                                             adhere to the requirements in this Recommendation in order to be validated under the CMVP. The
+                                                                                             requirements of this Recommendation are indicated by the word “shall.”
+
+                                                                                             3   Introduction
+
+                                                                                             This Recommendation specifies a message authentication code (MAC) algorithm that is based on
+                                                                                             a symmetric key block cipher. This cipher-based MAC is abbreviated CMAC, analogous to the
+                                                                                             abbreviation for the hash function-based MAC, HMAC, that is standardized in FIPS Pub. 198 [4].
+                                                                                             CMAC may be appropriate for information systems in which an approved block cipher is more
+                                                                                             readily available than an approved hash function.
+
+                                                                                             The basic Cipher Block Chaining MAC algorithm (CBC-MAC) has security deficiencies [9]. The
+                                                                                             core of the CMAC algorithm is a variation of CBC-MAC that Black and Rogaway proposed and
+                                                                                             analyzed under the name XCBC in Ref. [2] and submitted to NIST in Ref. [1]. The XCBC
+                                                                                             algorithm efficiently addresses the security deficiencies of CBC-MAC. Iwata and Kurosawa
+                                                                                             proposed an improvement of XCBC and named the resulting algorithm One-Key CBC-MAC
+                                                                                             (OMAC) in Ref. [6] and in Ref. [5], their initial submission to NIST; they later submitted OMAC1
+                                                                                             [7], a refinement of OMAC, and additional security analysis [8]. The OMAC1 variation efficiently
+                                                                                             reduces the key size of XCBC. CMAC is equivalent to OMAC1.
+
+                                                                                             Because CMAC is based on an approved symmetric key block cipher, such as the Advanced
+                                                                                             Encryption Standard (AES) algorithm that is specified in Federal Information Processing Standard
+                                                                                             (FIPS) Pub. 197 [3], CMAC can be considered a mode of operation of the block cipher. CMAC
+                                                                                             is also an approved mode of the Triple Data Encryption Algorithm (TDEA) [10]; however, as
+                                                                                             discussed in Appendix B, the recommended default message span for TDEA is much more
+                                                                                             restrictive than for the AES algorithm, due to the smaller block size of TDEA.
+
+                                                                                             CMAC, like any well-designed MAC algorithm, provides stronger assurance of data integrity than
+                                                                                             a checksum or an error detecting code. The verification of a checksum or an error detecting code
+                                                                                             is designed to detect only accidental modifications of the data, while CMAC is designed to detect
+                                                                                             intentional, unauthorized modifications of the data, as well as accidental modifications.
+
+
+
+                                                                                                                                             1
+                                                                                             NIST SP 800-38B                                                                 BLOCK CIPHER MODES:
+                                                                                                                                                                     CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             4      Definitions, Abbreviations, and Symbols
+                                                                                             4.1     Definitions and Abbreviations
+
+                                                                                              AES                         Advanced Encryption Standard.
+
+                                                                                              Approved                    FIPS approved or NIST recommended: an algorithm or technique that
+                                                                                                                          is either 1) specified in a FIPS or a NIST Recommendation, or 2)
+                                                                                                                          adopted in a FIPS or a NIST Recommendation.
+
+                                                                                              Authenticity                The property that data originated from its purported source.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                              Bit                         A binary digit: 0 or 1.
+
+                                                                                              Bit String                  A finite, ordered sequence of bits.
+
+                                                                                              Block                      For a given block cipher, a bit string whose length is the block size of
+                                                                                                                         the block cipher.
+
+                                                                                              Block Cipher                An algorithm for a parameterized family of permutations on bit strings
+                                                                                                                          of a fixed length.
+
+                                                                                              Block Size                  For a given block cipher, the fixed length of the input (or output) bit
+                                                                                                                          strings.
+
+                                                                                              CBC                         Cipher Block Chaining.
+
+                                                                                              Collision                   For a given function, a pair of distinct input values that yield the same
+                                                                                                                          output value.
+
+                                                                                              Exclusive-OR                The bitwise addition, modulo 2, of two bit strings of equal length.
+
+                                                                                              FIPS                        Federal Information Processing Standard.
+
+                                                                                              Forward Cipher              A permutation on blocks that is determined by the choice of a key for
+                                                                                              Function                    a given block cipher.
+
+                                                                                              Integrity                   The property that received data has not been altered.
+
+                                                                                              Inverse Cipher Function     The inverse function of the forward cipher function for a given block
+                                                                                                                          cipher key.
+
+                                                                                              Key                         The parameter of the block cipher that determines the selection of the
+                                                                                              (Block Cipher Key)          forward cipher function from the family of permutations.
+
+
+
+                                                                                                                                              2
+                                                                                             NIST SP 800-38B                                                                   BLOCK CIPHER MODES:
+                                                                                                                                                                       CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                              Least Significant Bit(s)      The right-most bit(s) of a bit string.
+
+                                                                                              Message                       A bit string of fixed length, computed by a MAC generation algorithm,
+                                                                                              Authentication Code           that is used to establish the authenticity and, hence, the integrity of a
+                                                                                              (MAC)                         message.
+
+                                                                                              MAC Generation                An algorithm that computes a MAC from a message and a key.
+                                                                                              (Generation)
+
+                                                                                              MAC Verification              An algorithm that verifies if a purported MAC is valid for a given
+                                                                                              (Verification)                message and key.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                              Mode of Operation             An algorithm for the cryptographic transformation of data that features
+                                                                                              (Mode)                        a symmetric key block cipher.
+
+                                                                                              Most Significant Bit(s)       The left-most bit(s) of a bit string.
+
+                                                                                              NIST                          National Institute of Standards and Technology.
+
+                                                                                              Permutation                   An invertible function.
+
+                                                                                              Subkey                        A secret string that is derived from the key.
+
+                                                                                              Subkey Generation             An algorithm that derives subkeys from a key.
+
+                                                                                              TDEA                          Triple Data Encryption Algorithm.
+
+
+                                                                                             4.2     Symbols
+
+                                                                                             4.2.1      Variables
+
+                                                                                             b                 The bit length of a block.
+
+                                                                                             Rb                The constant string for subkey generation for a cipher with block size b.
+
+                                                                                             K                 The block cipher key.
+
+                                                                                             K1                The first subkey.
+
+                                                                                             K2                The second subkey.
+
+                                                                                             Key1              The first component of a TDEA key.
+
+                                                                                             Key2              The second component of a TDEA key.
+
+
+
+                                                                                                                                                 3
+                                                                                             NIST SP 800-38B                                                                      BLOCK CIPHER MODES:
+                                                                                                                                                                          CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Key3              The third component of a TDEA key.
+
+                                                                                             M                 The message.
+
+                                                                                             Mi                The ith block of the formatted message.
+
+                                                                                             Mn *              The final block, possibly a partial block, of the formatted message.
+
+                                                                                             Mlen              The bit length of the message.
+
+                                                                                             n                 The number of blocks in the formatted message.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             T                 The MAC.
+
+                                                                                             Tlen              The bit length of the MAC.
+
+                                                                                             4.2.2      Operations and Functions
+
+                                                                                             x               The least integer that is not less than the real number x.
+
+                                                                                             X || Y            The concatenation of two bit strings X and Y.
+
+                                                                                             X ⊕Y              The bitwise exclusive-OR of two bit strings X and Y of the same length.
+
+                                                                                             CIPHK(X)          The output of the forward cipher function of the block cipher under the key K
+                                                                                                               applied to the block X.
+
+                                                                                             LSBs(X)           The bit string consisting of the s right-most bits of the bit string X.
+
+                                                                                             MSBs(X)           The bit string consisting of the s left-most bits of the bit string X.
+
+                                                                                             X << 1            The bit string that results from discarding the leftmost bit of the bit string X and
+                                                                                                               appending a ‘0’ bit on the right.
+
+                                                                                             lg(x)             The base 2 logarithm of the positive real number x.
+
+                                                                                             0s                The bit string that consists of s ‘0’ bits.
+
+                                                                                             5      Preliminaries
+
+                                                                                             The elements of CMAC and the associated notation are introduced in the five sections below.
+                                                                                             Examples of operations and functions are given in Sec. 5.1. The underlying block cipher and key
+                                                                                             are discussed in Sec. 5.2. The two subkeys that are derived from the key are discussed in Sec. 5.3.
+                                                                                             MAC generation and verification are discussed in Sec. 5.4. The input and output data for MAC
+                                                                                             generation are discussed in Sec. 5.5.
+
+
+                                                                                                                                                   4
+                                                                                             NIST SP 800-38B                                                                  BLOCK CIPHER MODES:
+                                                                                                                                                                      CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             5.1   Examples of Operations and Functions
+
+                                                                                             Given a positive integer s, 0s denotes the string that consists of s ‘0’ bits. For example, 08 =
+                                                                                             00000000.
+
+                                                                                             Given a real number x, the ceiling function, denoted x, is the least integer that is not less than x.
+                                                                                             For example, 2.1 = 3, and 4 = 4.
+
+                                                                                             The concatenation operation on bit strings is denoted ||; for example, 001 || 10111 = 00110111.
+
+                                                                                             Given bit strings of equal length, the exclusive-OR operation, denoted ⊕, specifies the addition,
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             modulo 2, of the bits in each bit position, i.e., without carries. For example, 10011 ⊕ 10101 =
+                                                                                             00110.
+
+                                                                                             Given a bit string X, the functions LSBs(X) and MSBs(X) return the s least significant (i.e., right-
+                                                                                             most) bits and the s most significant (i.e., left-most) bits, respectively, of X. For example,
+                                                                                             LSB3(111011010) = 010, and MSB4(111011010) = 1110.
+
+                                                                                             Given a bit string X that consists of Xlen bits, the (single) left-shift function, denoted X << 1, is
+                                                                                             LSBXlen(X || 0). For example, 1101110 << 1 = 1011100.
+
+                                                                                             Given a positive real number x, its base 2 logarithm is denoted lg(x). For example, lg(210) = 10.
+
+                                                                                             5.2   Block Cipher
+
+                                                                                             The CMAC algorithm depends on the choice of an underlying symmetric key block cipher. The
+                                                                                             CMAC algorithm is thus a mode of operation (a mode, for short) of the block cipher. The CMAC
+                                                                                             key is the block cipher key (the key, for short).
+
+                                                                                             For any given key, the underlying block cipher of the mode consists of two functions that are
+                                                                                             inverses of each other. The choice of the block cipher includes the designation of one of the two
+                                                                                             functions of the block cipher as the forward function/transformation, and the other as the inverse
+                                                                                             function, as in the specifications of the AES algorithm and TDEA in Ref. [3] and Ref. [10],
+                                                                                             respectively. The CMAC mode does not employ the inverse function.
+
+                                                                                             The forward cipher function is a permutation on bit strings of a fixed length; the strings are called
+                                                                                             blocks. The bit length of a block is denoted b, and the length of a block is called the block size.
+                                                                                             For the AES algorithm, b = 128; for TDEA, b = 64. The key is denoted K, and the resulting
+                                                                                             forward cipher function of the block cipher is denoted CIPHK.
+
+                                                                                             The underlying block cipher shall be approved, and the key shall be generated uniformly at
+                                                                                             random, or close to uniformly at random, i.e., so that each possible key is (nearly) equally likely
+                                                                                             to be generated. The key shall be secret and shall be used exclusively for the CMAC mode of the
+                                                                                             chosen block cipher. The message span of the key is discussed in Appendix B. To fulfill the
+                                                                                             requirements on the key, the key should be established among the parties to the information within
+                                                                                             an approved key management structure; the details of the establishment and management of keys
+
+
+                                                                                                                                               5
+                                                                                             NIST SP 800-38B                                                                   BLOCK CIPHER MODES:
+                                                                                                                                                                       CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             are outside the scope of this Recommendation.
+
+                                                                                             5.3    Subkeys
+
+                                                                                             The block cipher key is used to derive two additional secret values, called the subkeys, denoted
+                                                                                             K1 and K2. The length of each subkey is the block size. The subkeys are fixed for any invocation
+                                                                                             of CMAC with the given key. Consequently, the subkeys may be precomputed and stored with
+                                                                                             the key for repeated use; alternatively, the subkeys may be computed anew for each invocation.
+
+                                                                                             Any intermediate value in the computation of the subkey, in particular, CIPHK(0b), shall also be
+                                                                                             secret. This requirement precludes the system in which CMAC is implemented from using this
+                                                                                             intermediate value publicly for some other purpose, for example, as an unpredictable value or as
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             an integrity check value on the key.
+
+                                                                                             One of the elements of the subkey generation process is a bit string, denoted Rb, that is completely
+                                                                                             determined by the number of bits in a block. In particular, for the two block sizes of the currently
+                                                                                             approved block ciphers, R128 = 012010000111, and R64 = 05911011.
+
+                                                                                             In general, Rb is a representation of a certain irreducible binary polynomial of degree b, namely,
+                                                                                             the lexicographically first among all such polynomials with the minimum possible number of
+                                                                                             nonzero terms. If this polynomial is expressed as ub+cb-1ub-1+...+c2u2+c1u+c0, where the
+                                                                                             coefficients cb-1, cb-2, ..., c2, c1, c0 are either 0 or 1, then Rb is the bit string cb-1cb-2...c2c1c0.
+
+                                                                                             5.4    MAC Generation and Verification
+
+                                                                                             As for any MAC algorithm, an authorized party applies the MAC generation process to the data to
+                                                                                             be authenticated to produce a MAC for the data. Subsequently, any authorized party can apply the
+                                                                                             verification process to the received data and the received MAC. Successful verification provides
+                                                                                             assurance of data authenticity, as discussed in Appendix A, and, hence, of integrity.
+
+                                                                                             5.5    Input and Output Data
+
+                                                                                             For a given block cipher and key, the input to the MAC generation function is a bit string called
+                                                                                             the message, denoted M. The bit length of M is denoted Mlen. The value of Mlen is not an essential
+                                                                                             input for the MAC generation algorithm if the implementation has some other means of identifying
+                                                                                             the last block in the partition of the message, as discussed in Sec. 6.2. Thus, in such a case, the
+                                                                                             computation of the MAC may begin “on-line” before the entire message is available. In principle,
+                                                                                             there is no restriction on the lengths of messages. In practice, however, the system in which CMAC
+                                                                                             is implemented may restrict the length of the input messages to the MAC generation function.
+
+                                                                                             The output of the MAC generation function is a bit string called the MAC, denoted T. The length
+                                                                                             of T, denoted Tlen, is a parameter that shall be fixed for all invocations of CMAC with the given
+                                                                                             key. The requirements for the selection of Tlen are given in Appendix A.
+
+                                                                                             6     CMAC Specification
+
+
+
+                                                                                                                                                6
+                                                                                             NIST SP 800-38B                                                                              BLOCK CIPHER MODES:
+                                                                                                                                                                                  CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Subkey generation, MAC generation, and MAC verification are specified in Sections 6.1, 6.2,
+                                                                                             and 6.3 below. The specifications include the inputs, the outputs, a suggested notation for the
+                                                                                             function, the steps, and a summary; for MAC generation, a diagram is also given. The inputs
+                                                                                             that are typically fixed across many invocations of CMAC are called the prerequisites. The
+                                                                                             prerequisites and the other inputs shall meet the requirements in Sec. 5. The suggested notation
+                                                                                             does not include the block cipher.
+
+                                                                                             6.1    Subkey Generation
+
+                                                                                             The following is a specification of the subkey generation process of CMAC:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                      Prerequisites:
+                                                                                                      block cipher CIPH with block size b;
+                                                                                                      key K.
+
+                                                                                                      Output:
+                                                                                                      subkeys K1, K2.
+
+                                                                                                      Suggested Notation:
+                                                                                                      SUBK(K).
+
+                                                                                                      Steps:
+                                                                                                      1.     Let L = CIPHK(0b).
+                                                                                                      2.     If MSB1(L) = 0, then K1 = L << 1;
+                                                                                                             Else K1 = (L << 1) ⊕ Rb; see Sec. 5.3 for the definition of Rb.
+                                                                                                      3.     If MSB1(K1) = 0, then K2 = K1 << 1;
+                                                                                                             Else K2 = (K1 << 1) ⊕ Rb.
+                                                                                                      4.     Return K1, K2.
+
+                                                                                             In Step 1, the block cipher is applied to the block that consists entirely of ‘0’ bits. In Step 2, the
+                                                                                             first subkey is derived from the resulting string by a left shift of one bit, and, conditionally, by
+                                                                                             XORing a constant that depends on the block size. In Step 3, the second subkey is derived in the
+                                                                                             same manner from the first subkey. 1 As discussed in Sec. 5.3, any intermediate value in the
+                                                                                             computation of the subkey, in particular, CIPHK(0b), shall be secret.
+
+                                                                                             6.2    MAC Generation
+
+                                                                                             The following is a specification of the MAC generation process of CMAC:
+
+                                                                                                      Prerequisites:
+                                                                                                      block cipher CIPH with block size b;
+                                                                                                      key K;
+                                                                                                      MAC length parameter Tlen.
+
+                                                                                             1
+                                                                                               As detailed in Ref. [5], the generation of K1 and K2 is essentially equivalent to multiplication by u and u2,
+                                                                                             respectively, within the Galois field that is determined by the irreducible polynomial that is represented by Rb, which
+                                                                                             is discussed in Sec. 5.3.
+
+                                                                                                                                                       7
+                                                                                             NIST SP 800-38B                                                                      BLOCK CIPHER MODES:
+                                                                                                                                                                          CMAC MODE FOR AUTHENTICATION
+
+
+
+                                                                                                        Input:
+                                                                                                        message M of bit length Mlen.
+
+                                                                                                        Output:
+                                                                                                        MAC T of bit length Tlen.
+
+                                                                                                        Suggested Notation:
+                                                                                                        CMAC(K, M, Tlen) or, if Tlen is understood from the context, CMAC(K, M).
+
+                                                                                                        Steps:
+                                                                                                        1.     Apply the subkey generation process in Sec. 6.1 to K to produce K1 and K2.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                        2.     If Mlen = 0, let n = 1; else, let n = Mlen/b.
+                                                                                                        3.     Let M1, M2, ... , Mn-1, Mn* denote the unique sequence of bit strings such that M =
+                                                                                                               M1 || M2 || ... || Mn-1 || Mn*, where M1, M2,..., Mn-1 are complete blocks. 2
+                                                                                                        4.     If Mn* is a complete block, let Mn = K1 ⊕ Mn*; else, let Mn = K2 ⊕ (Mn*||10j), where
+                                                                                                               j = nb-Mlen-1.
+                                                                                                        5.     Let C0 = 0b.
+                                                                                                        6.     For i = 1 to n, let Ci = CIPHK(Ci-1 ⊕ Mi).
+                                                                                                        7.     Let T = MSBTlen(Cn).
+                                                                                                        8.     Return T.
+
+                                                                                             In Step 1, the subkeys are generated from the key. In Steps 2–4, the input message is formatted
+                                                                                             into a sequence of complete blocks in which the final block has been masked by a subkey. There
+                                                                                             are two cases:
+
+                                                                                                   •    If the message length is a positive multiple of the block size, then the message is partitioned
+                                                                                                        into complete blocks. The final block is masked with the first subkey; in other words, the
+                                                                                                        final block in the partition is replaced with the exclusive-OR of the final block with the
+                                                                                                        first subkey. The resulting sequence of blocks is the formatted message.
+
+                                                                                                   •    If the message length is not a positive multiple of the block size, then the message is
+                                                                                                        partitioned into complete blocks to the greatest extent possible, i.e., into a sequence of
+                                                                                                        complete blocks followed by a final bit string whose length is less than the block size. A
+                                                                                                        padding string is appended to this final bit string, in particular, a single ‘1’ bit followed by
+                                                                                                        the minimum number of ‘0’ bits, possibly none, that are necessary to form a complete
+                                                                                                        block. The complete final block is masked, as described in the previous bullet, with the
+                                                                                                        second subkey. The resulting sequence of blocks is the formatted message.
+
+                                                                                             In Steps 5 and 6, the cipher block chaining (CBC) technique, with the zero block as the
+                                                                                             initialization vector, is applied to the formatted message. In Steps 7 and 8, the final CBC output
+                                                                                             block is truncated according to the MAC length parameter that is associated with the key, and the
+                                                                                             result is returned as the MAC.
+
+
+                                                                                             2
+                                                                                                 Consequently, if Mlen ≤ b, then M = M1*.
+
+                                                                                                                                                   8
+                                                                                             NIST SP 800-38B                                                                    BLOCK CIPHER MODES:
+                                                                                                                                                                        CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Equivalent sets of steps, i.e., procedures that yield the correct output from the same input, are
+                                                                                             permitted. For example, it is not necessary to complete the formatting of the entire message (Steps
+                                                                                             3 and 4) prior to the cipher block chaining (Steps 5 and 6). Instead, the iterations of Step 5 may
+                                                                                             be executed “on the fly,” i.e., on each successive block of the message as soon as it is available for
+                                                                                             processing. Step 4 may be delayed until the final bit string in the partition is available; the
+                                                                                             appropriate case, and value of j, if necessary, can be determined from the length of the final bit
+                                                                                             string. In such an implementation, the determination in Step 2 of the total number of blocks in the
+                                                                                             formatted message may be omitted, assuming that the implementation has another way to identify
+                                                                                             the final string in the partition.
+
+                                                                                             Similarly, the subkeys need not be computed anew for each invocation of CMAC with a given
+                                                                                             key; instead, they may be precomputed and stored along with the key as algorithm inputs.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                    M1           M2      …      Mn*                  M1            M2       …    Mn*       10…0
+
+                                                                                                                 ⊕              ⊕       K1                         ⊕               ⊕        K2
+
+
+                                                                                                   CIPHK       CIPHK          CIPHK                CIPHK         CIPHK           CIPHK
+
+
+                                                                                                                             MSBTlen                                             MSBTlen
+
+                                                                                                                                 T                                                  T
+
+                                                                                                                Figure 1: Illustration of the two cases of MAC Generation.
+
+                                                                                             The two cases of MAC Generation are illustrated in Figure 1 above. On the left is the case
+                                                                                             where the message length is a positive multiple of the block size; on the right is the case where
+                                                                                             the message length is not a positive multiple of the block length.
+
+
+                                                                                             6.3   MAC Verification
+
+                                                                                             The following is a specification of the MAC verification process of CMAC:
+
+                                                                                                    Prerequisites:
+                                                                                                    block cipher CIPH with block size b;
+                                                                                                    key K;
+                                                                                                    subkeys K1, K2;
+                                                                                                    MAC length Tlen.
+
+                                                                                                    Input:
+                                                                                                    message M of bit length Mlen;
+
+
+                                                                                                                                               9
+                                                                                             NIST SP 800-38B                                                             BLOCK CIPHER MODES:
+                                                                                                                                                                 CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                                    received MAC T'.
+
+                                                                                                    Output:
+                                                                                                    VALID or INVALID.
+
+                                                                                                    Suggested Notation:
+                                                                                                    VER(K, M, T').
+
+                                                                                                    Steps:
+                                                                                                    1.     Apply the MAC generation process in Sec. 6.2 to M to produce T.
+                                                                                                    2.     If T = T', return VALID; else, return INVALID.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             In Step 1, the MAC generation process in Sec. 6.2 is applied to the message, and, in Step 2, the
+                                                                                             resulting MAC is compared with the received MAC to determine its validity.
+
+
+
+
+                                                                                                                                           10
+                                                                                             NIST SP 800-38B                                                                 BLOCK CIPHER MODES:
+                                                                                                                                                                     CMAC MODE FOR AUTHENTICATION
+
+
+
+                                                                                             Appendix A: Length of the MAC
+
+                                                                                             The length, Tlen, of the MAC is an important security parameter. The role of this parameter in
+                                                                                             resisting guessing attacks is outlined in Sec. A.1, and guidance in the selection of Tlen is given in
+                                                                                             Sec. A.2.
+
+                                                                                             A.1       Assurance Against Guessing Attacks
+
+                                                                                             The verification process determines whether the purported MAC on a message is the valid output
+                                                                                             of the MAC generation process applied to the message. The output of the MAC verification
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             determines the assurance that the receiver of the message obtains:
+
+                                                                                                   •   If the output is INVALID, then the message is definitely not authentic, i.e., it did not
+                                                                                                       originate from a source that executed the generation process on the message to produce the
+                                                                                                       purported MAC.
+
+                                                                                                   •   If the output is VALID, then the design of the mode provides assurance that the message
+                                                                                                       is authentic and, hence, was not corrupted in transit; however, this assurance, as for any
+                                                                                                       MAC algorithm, is not absolute.
+
+                                                                                             In the second case, an attacker, i.e., a party without access to the key or to the MAC generation
+                                                                                             process, may have simply guessed the correct MAC for the message. In particular, if the attacker
+                                                                                             selects a MAC at random from the set of strings of length Tlen bits, then the probability is 1 in
+                                                                                             2Tlen that the MAC will be valid. Consequently, larger values of Tlen provide greater protection
+                                                                                             against such an event. Of course, an attacker may attempt to systematically guess many different
+                                                                                             MACs for a message, or for different messages, and thereby increase the probability that one (or
+                                                                                             more) of them will be accepted as valid. For this reason, a system should limit the number of
+                                                                                             unsuccessful verification attempts for each key.
+
+                                                                                             A.2       Selection of the MAC Length
+
+                                                                                             Larger values of Tlen provide greater assurance against guessing attacks. The performance
+                                                                                             tradeoff is that larger values of Tlen require more bandwidth/storage for the MAC.
+
+                                                                                             For most applications, a value for Tlen that is at least 64 should provide sufficient protection
+                                                                                             against guessing attacks. A value of Tlen that is less than 64 shall only be used in conjunction
+                                                                                             with a careful analysis of the risks of accepting an inauthentic message as authentic.
+
+                                                                                             In particular, a value of Tlen smaller than 64 should not be used unless the controlling protocol or
+                                                                                             system sufficiently restricts the number of times that the verification process can return INVALID,
+                                                                                             across all implementations with any given key. For example, the short duration of a session or,
+                                                                                             more generally, the low bandwidth of the communication channel may preclude many repeated
+                                                                                             trials.
+
+
+
+
+                                                                                                                                               11
+                                                                                             NIST SP 800-38B                                                                    BLOCK CIPHER MODES:
+                                                                                                                                                                        CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             This guidance can be quantified in terms of the following two bounds: 1) the highest acceptable
+                                                                                             probability for an inauthentic message to pass the verification process, and 2) a limit on the number
+                                                                                             of times that the output is the error message INVALID before the key is retired, across all
+                                                                                             implementations of the verification process for the key. Given estimates of these quantities,
+                                                                                             denoted Risk and MaxInvalids, respectively, Tlen should satisfy the following inequality:
+
+                                                                                                     Tlen ≥ lg( MaxInvalids / Risk ) .
+
+                                                                                             For example, suppose that the MAC verification process(es) within a system will not output
+                                                                                             INVALID for more than 1024 messages before the key is retired (i.e., MaxInvalids = 210), and that
+                                                                                             the users can tolerate about a one in a million chance that the system will accept an inauthentic
+                                                                                             message (i.e., Risk = 2-20). In this case, any value of Tlen that is greater than or equal to 30 satisfies
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             the inequality.
+
+
+
+
+                                                                                                                                                12
+                                                                                             NIST SP 800-38B                                                                                BLOCK CIPHER MODES:
+                                                                                                                                                                                    CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Appendix B: Message Span of the Key
+
+                                                                                             The message span of a key is the total number of messages for which MACs are generated across
+                                                                                             all implementations of CMAC with that key. The message span of the key affects the security of
+                                                                                             the system against attacks that are based on the detection of a pair of distinct messages with the
+                                                                                             same MAC before its truncation 3. Such a pair is called a collision 4 in this appendix. As with other
+                                                                                             block cipher-based MAC algorithms, an attacker may be able to exploit a collision to produce the
+                                                                                             valid MAC for a new message, the content of which may be largely of the attacker's choosing.
+                                                                                             Such an event would be a fundamental breach of the expected authentication assurance.
+
+                                                                                             In principle, collisions must exist because there are many more possible messages than MACs; in
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             practice, however, collisions may not occur among the messages for which MACs are actually
+                                                                                             generated during the lifetime of the key. The probability that at least one collision will occur
+                                                                                             depends mostly on the message span of the key relative to the block size, b, of the underlying block
+                                                                                             cipher. For example, a collision is expected to exist among a set of 2b/2 arbitrary messages; in
+                                                                                             other words, 264 messages for the AES algorithm, and 232 messages for TDEA. This property was
+                                                                                             one of the motivations to develop the AES with a block size of 128 bits.
+
+                                                                                             For any system in which CMAC is implemented, the risk that an attacker can detect and exploit a
+                                                                                             collision shall be limited to a level that is appropriate to the value of the data. A simple and prudent
+                                                                                             method to achieve this goal is to establish and enforce an appropriate limit on the message span of
+                                                                                             any CMAC key, which in turn limits the probability that a collision will even occur. For general-
+                                                                                             purpose applications, the default recommendation is to limit the key to no more than 248 messages
+                                                                                             when the block size of the underlying block cipher is 128 bits, as with the AES algorithm, and 221
+                                                                                             messages when the block size is 64 bits, as with TDEA. Within these limits, the probability that
+                                                                                             a collision will occur is expected to be less than one in a billion for the AES algorithm, and less
+                                                                                             than one in a million for TDEA.
+
+                                                                                             For applications where higher confidence in the security is required, the message span of a key
+                                                                                             may be measured in terms of the total number of message blocks. The recommendation in this
+                                                                                             case is to limit the key to no more than 248 message blocks (222 Gbytes) when the block size is 128
+                                                                                             bits, and 221 message blocks (16 Mbytes) when the block size is 64 bits. Within these limits, the
+                                                                                             probability that a collision will occur is proved to be less than one in a billion for the AES
+                                                                                             algorithm, and less than one in a million for TDEA, assuming that the underlying block cipher has
+                                                                                             no weakness, as modeled in Ref. [6].
+
+                                                                                             In some cases, a limit on the message span of a key may be established and enforced within a key
+                                                                                             management infrastructure by an appropriate constraint on the time span during which the key
+                                                                                             remains in effect, i.e., its cryptoperiod.
+
+
+
+
+                                                                                             3
+                                                                                              The MAC before truncation is denoted Cm in Sec. 6.2.
+                                                                                             4
+                                                                                              The standard definition of a collision, in Ref. [9], for example, is more general: for a given function, a collision is a
+                                                                                             pair of distinct input values that yield the same output value.
+
+                                                                                                                                                        13
+                                                                                             NIST SP 800-38B                                                                BLOCK CIPHER MODES:
+                                                                                                                                                                    CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Appendix C: Protection Against Replay of Messages
+
+                                                                                             As described in Appendix A, the successful verification of a MAC for a message gives assurance
+                                                                                             that the source of the message executed the MAC generation algorithm to create the MAC;
+                                                                                             however, the party that presented the message and MAC for verification may not be the original
+                                                                                             source of the message. Therefore, the CMAC algorithm does not inherently prevent an attacker
+                                                                                             from intercepting a legitimate message and its MAC and “replaying” them for verification at a
+                                                                                             later time, for example, in an attempt to impersonate a party that has access to the key. In some
+                                                                                             protocols an attacker may even be able to present to a verifier a message-MAC pair that the verifier
+                                                                                             itself generated earlier in the protocol.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             The controlling protocol or application may protect against such an event by incorporating certain
+                                                                                             identifying information into the initial bits of every message. Examples of such information
+                                                                                             include a sequential message number, a timestamp, or a nonce. Upon successful verification of
+                                                                                             the message, this information may provide a means for the detection of replayed messages, out-
+                                                                                             of-sequence messages, or missing messages.
+
+
+
+
+                                                                                                                                             14
+                                                                                             NIST SP 800-38B                                                        BLOCK CIPHER MODES:
+                                                                                                                                                            CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Appendix D: Examples
+
+                                                                                             Examples for CMAC are available at the examples page on NIST’s Computer Security Resource
+                                                                                             Center (CSRC) website: http://csrc.nist.gov/groups/ST/toolkit/examples.html.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                                                        15
+                                                                                             NIST SP 800-38B                                                           BLOCK CIPHER MODES:
+                                                                                                                                                               CMAC MODE FOR AUTHENTICATION
+
+
+                                                                                             Appendix E: Bibliography
+
+                                                                                             [1]    J. Black, P. Rogaway, A Suggestion for Handling Arbitrary-Length Messages with the
+                                                                                                    CBC MAC, Natl. Inst. Stand. Technol. [Web page],
+                                                                                                    http://csrc.nist.gov/groups/ST/toolkit/BCM/workshops.html#01.
+
+                                                                                             [2]    J. Black, P. Rogaway, “CBC MACs for arbitrary-length messages: The three-key
+                                                                                                    constructions,” in Advances in Cryptology—Crypto 2000, Lecture Notes in Computer
+                                                                                                    Science, Vol. 1880, Mihir Bellare, ed., Springer-Verlag (2000), pp. 197–215.
+                                                                                                    https://doi.org/10.1007/3-540-44598-6_12.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                             [3]    FIPS Publication 197, The Advanced Encryption Standard (AES), U.S. DoC/NIST,
+                                                                                                    November 26, 2001. http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf.
+
+                                                                                             [4]    FIPS Publication 198-1, The Keyed-Hash Message Authentication Code (HMAC), U.S.
+                                                                                                    DoC/NIST, July 2008. http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-
+                                                                                                    1_final.pdf.
+
+                                                                                             [5]    T. Iwata, K. Kurosawa, OMAC: One-Key CBC MAC, Natl. Inst. Stand. Technol. [Web
+                                                                                                    page], http://csrc.nist.gov/groups/ST/toolkit/BCM/modes_development.html.
+
+                                                                                             [6]    T. Iwata, K. Kurosawa, “OMAC: One-Key CBC MAC,” in Fast Software Encryption,
+                                                                                                    10th International Workshop, FSE 2003, Lecture Notes in Computer Science, Vol. 2887,
+                                                                                                    Thomas Johansson, ed., Springer-Verlag (2003), pp. 129–153.
+                                                                                                    https://doi.org/10.1007/978-3-540-39887-5_11.
+
+                                                                                             [7]    T. Iwata, K. Kurosawa, OMAC: One-Key CBC MAC—Addendum, Natl. Inst. Stand.
+                                                                                                    Technol. [Web page],
+                                                                                                    http://csrc.nist.gov/groups/ST/toolkit/BCM/modes_development.html.
+
+                                                                                             [8]    T. Iwata, K. Kurosawa, Stronger Security Bounds for OMAC, TMAC, and XCBC, Natl.
+                                                                                                    Inst. Stand. Technol. [Web page],
+                                                                                                    http://csrc.nist.gov/groups/ST/toolkit/BCM/comments.html.
+
+                                                                                             [9]    A. Menezes, P. van Oorschot, S. Vanstone, Handbook of Applied Cryptography, CRC
+                                                                                                    Press, Inc., Boca Raton (1996).
+
+                                                                                             [10]   NIST Special Publication 800-67 Revision 1, Recommendation for the Triple Data
+                                                                                                    Encryption Algorithm (TDEA) Block Cipher, January 2012, Natl. Inst. Stand. Technol.
+                                                                                                    [Web page], https://doi.org/10.6028/NIST.SP.800-67r1.
+
+
+
+
+                                                                                                                                          16
+

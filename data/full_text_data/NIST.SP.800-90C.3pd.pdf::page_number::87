@@ -1,0 +1,42 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                          Recommendation for RBG Constructions
+       September 2022
+
+2466   B.5.2.2.          Get_conditioned_full-entropy_input Function
+2467   The Get_conditioned_full-entropy_input construction is specified in Section 3.3.2. For this
+2468   example, the routine becomes the following:
+2469   Get_conditioned_full_entropy_ input:
+2470      Input: integer n.
+2471       Output: integer status, bitstring Full-entropy_bitstring.
+2472   Process:
+2473      1. temp = the Null string.
+2474       2. ctr = 0.
+2475       3. While ctr < n, do
+2476           3.1    (status, entropy_bitstring) = Get_ES_Bitstring (320).
+2477           3.2   If (status ≠ SUCCESS), then return (status, invalid_string).
+2478           3.3   conditioned_output = HashSHA_256(entropy_bitstring).
+2479           3.4   temp =temp || conditioned_output.
+2480           3.5   ctr = ctr + 256.
+2481       4. Full-entropy_bitstring = leftmost(temp, n).
+2482       5. Return (SUCCESS, Full-entropy_bitstring).
+2483   Steps 1 and 2 initialize the temporary bitstring (temp) for holding the full-entropy bitstring being
+2484   assembled, and the counter (ctr) that counts the number of full-entropy bits produced so far.
+2485   Step 3 obtains and processes the entropy for each iteration.
+2486       •   Step 3.1 requests 320 bits from the entropy source(s) (i.e., output_len + 64 bits, where
+2487           output_len = 256 for SHA-256).
+2488       •   Step 3.2 checks whether or not the status returned in step 3.1 indicated a success. If the
+2489           status did not indicate a success, the status is returned along with an invalid (e.g., Null)
+2490           bitstring as the Full-entropy_bitstring.
+2491       •   Step 3.3 invokes the Hash conditioning function (see Section 3.3.1.2) using SHA-256 for
+2492           processing the entropy_bitstring obtained from step 3.1.
+2493       •   Step 3.4 concatenates the conditioned_output received in step 3.3 to the temporary bitstring
+2494           (temp), and step 3.5 increments the counter for the number of full-entropy bits that have
+2495           been produced so far.
+2496   After at least n bits have been produced in step 3, step 4 selects the leftmost n bits of the temporary
+2497   string (temp) to be returned as the bitstring with full entropy.
+2498   Step 5 returns the result from step 4 (Full-entropy_bitstring).
+
+
+
+
+                                                         74
+

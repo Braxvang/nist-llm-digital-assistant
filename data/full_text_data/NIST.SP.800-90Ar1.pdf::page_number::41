@@ -1,0 +1,49 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+        required; see Sections 9.3.2 and 9.3.3 for more information on reseeding at the end of the
+        seedlife and on handling prediction resistance requests.
+   3. Generates the requested pseudorandom bits using the generate algorithm.
+   4. Updates the working state.
+   5. Returns the requested pseudorandom bits to the consuming application.
+9.3.1      The Generate Function
+
+Let outlen be the length of the output block of the cryptographic primitive (see Section 10). Let
+Generate_algorithm be a call to the appropriate generate algorithm for the DRBG mechanism
+(see Section 10), and let Reseed_function be a call to the reseed function in Section 9.2.
+The following or an equivalent process shall be used to generate pseudorandom bits.
+Generate_function (state_handle, requested_number_of_bits, requested_security_strength,
+   prediction_resistance_request, additional_input):
+   1. state_handle: A pointer or index that indicates the internal state to be used. If a state
+      handle is not used by an implementation because the implementation does not support
+      multiple simultaneous instantiations, a state_handle is not provided as input. The
+      state_handle is then omitted from the input parameter list in process step 7.1, generate
+      process steps 1 and 7.3 are used to obtain the contents of the internal state, and process
+      step 10 replaces the working_state of this internal state.
+   2. requested_number_of_bits: The number of pseudorandom bits to be returned from the
+      generate function. The max_number_of_bits_per_request is implementation dependent,
+      but shall be less than or equal to the value provided in Section 10 for a specific DRBG
+      mechanism.
+   3. requested_security_strength: The security strength to be associated with the requested
+      pseudorandom bits. DRBG implementations that support only one security strength do
+      not require this parameter; however, any consuming application using that DRBG
+      implementation must be aware of the supported security strength.
+   4. prediction_resistance_request: Indicates whether or not prediction resistance is to be
+      provided during the request. DRBGs that are implemented to always provide prediction
+      resistance or that do not support prediction resistance do not require this parameter.
+      However, when prediction resistance is not supported, the user of a consuming
+      application must determine whether or not prediction resistance may be required by the
+      application before electing to use such a DRBG implementation.
+        If prediction resistance is not supported, then the prediction_resistance_request input
+        parameter and steps 5 and 9.2 of the generate process are omitted, and generate process
+        steps 7 and 7.1 are modified to omit the check for the prediction_resistance_request
+        term.
+        If prediction resistance is always performed, then the prediction_resistance_request input
+        parameter and generate process steps 5 and 9.2 may be omitted, and generate process
+        steps 7 and 8 may be replaced by:
+           status = Reseed_function (state_handle, additional_input).
+
+
+                                                32
+

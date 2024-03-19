@@ -1,0 +1,47 @@
+                                                              GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+   ESP header: transport mode, authentication
+
+   Mobility header: BU Acknowledgement Option
+To use IPsec for BUs and BUAs between a MN and its HA, both the MN and HA must have appropriate
+entries in their IPsec Security Policy Database (SPD) and Security Association Database (SAD). The
+following examples show how to do this with Transport Mode. RFC 4877 contains examples using
+Tunnel Mode.
+
+MN SPD:
+
+   SPD in: Use SA1 for: Source = HA; Destination = HoA; Protocol = Mobility Header
+
+   SPD out: Use SA2 for: Source = HoA; Destination = HA; Protocol = Mobility Header
+MN SAD:
+
+   SA1 (IN, SPI, ESP, TRANSPORT): Source = HA; Destination = HoA; Protocol = Mobility Header
+
+   SA2 (OUT, SPI, ESP, TRANSPORT): Source = HA; Destination = HoA; Protocol = Mobility Header
+HA SPD:
+
+   SPD in: Use SA1 for: Source = HoA; Destination = HA; Protocol = Mobility Header
+
+   SPD out: Use SA2 for: Source = HA; Destination = HoA; Protocol = Mobility Header
+HA SAD:
+
+   SA1 (IN, SPI, ESP, TRANSPORT): Source = HoA; Destination = HA; Protocol = Mobility Header
+
+   SA2 (OUT, SPI, ESP, TRANSPORT): Source = HoA; Destination = HA; Protocol = Mobility Header
+Setting up security associations (SAs) with IKEv1 or IKEv2 is optional, but necessary for enabling replay
+detection. It may be done with public keys or pre-shared secrets. With IKEv1 and pre-shared secrets,
+aggressive mode must be used in Phase 1. One cannot use the source address of the MN, which is the
+CoA, to select the pre-shared secret (there is no identity hiding in aggressive mode), and, similarly, one
+cannot use ID_IPV6_ADDR in Phase 1, so the recommendation is to use a Fully Qualified Domain Name
+(FQDN) in Phase 1 and the HoA in Phase 2. The HA must verify the relationship between these. Thus,
+the HoA cannot be dynamically assigned. How the HA does this is not specified, but it could be done
+with DNSSEC, X.509, or Cryptographically Generated Addresses. The general problem of configuring
+MIPv6 is defined in RFC 4640, Problem Statement for Bootstrapping Mobile IPv6 (MIPv6). Figure 4-3
+illustrates the IKEv1 identifiers used between a MN and its HA.
+
+
+
+
+                                                  4-19
+

@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-204B                                                  ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                              APPLICATIONS USING A SERVICE MESH
+
+                                                                                              4.3   Higher-level Security Configuration Parameters for Applications
+
+                                                                                              Since the component microservices of the application are generally implemented as containers,
+                                                                                              the following higher-level security configuration parameters should be set. In the reference
+                                                                                              application orchestration and management platform Kubernetes, containers are implemented in
+                                                                                              pods, which contain a microservice container as well as a sidecar container. These higher-level
+                                                                                              security configurations are set through flags that come under the banner of pod security
+                                                                                              policies. The recommendations for these flag values are numbered using the acronym AHLC-
+                                                                                              SR-X, where AHLC stands for application higher-level configuration, SR stands for security
+                                                                                              recommendation, and X is the sequence number. They include but are not limited to the
+                                                                                              following [5]:
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                              AHLC-SR-1: Containers and applications should not be run as root (thus becoming privileged
+                                                                                              containers).
+                                                                                              In Kubernetes, the configuration setting for this is to set the value TRUE for
+                                                                                              “MustRunAsNonRoot” flag.
+
+                                                                                              AHLC-SR-2: Host path volumes should not be used, because they create tight coupling
+                                                                                              between the container and the node on which it is hosted, constraining the migration and
+                                                                                              flexible resource scheduling process.
+
+                                                                                              AHLC-SR-3: Configure the container file system as read-only by default for all applications,
+                                                                                              overriding only when the underlying application (e.g., database) must write to disk.
+                                                                                              In Kubernetes, the configuration setting for this is to set the value of TRUE to
+                                                                                              “readOnlyRootFilesystem” flag.
+
+                                                                                              AHLC-SR-4: Explicitly prevent privilege escalation for containers.
+                                                                                              In Kubernetes, this is achieved by setting the value FALSE for the
+                                                                                              “allowPrivilegeEscalation” flag.
+
+                                                                                              4.4   Authentication Policies
+
+                                                                                              Authentication policies specify the process for validating identities. The integrity of this
+                                                                                              process and its strength determines the integrity of the authorization process since the latter
+                                                                                              depends on the strength of the authenticated identity. There are two types of identity needed in
+                                                                                              a microservices-based application:
+
+                                                                                              1. Microservices or workload identity
+                                                                                              2. End-user identity
+
+                                                                                              Service (microservice) identity is critical for the following reasons:
+
+                                                                                              ● It enables the client to verify that the server with which it is communicating (server identity
+                                                                                                validated using the certificate it carries) is authorized to run the service. This assurance has
+                                                                                                to be provided by a secure naming service that maps the server identity to the service
+                                                                                                identity. In any orchestration platform (including Kubernetes), services can be moved
+                                                                                                around the nodes (server) for load balancing and service availability reasons. It is the
+                                                                                                responsibility of the control plane of the service mesh to refresh this mapping information
+
+                                                                                                                                                15
+

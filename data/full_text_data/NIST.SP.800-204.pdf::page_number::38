@@ -1,0 +1,59 @@
+                                                                                             NIST SP 800-204                                                             SECURITY STRATEGIES FOR
+                                                                                                                                                         MICROSERVICES-BASED APPLICATION SYSTEMS
+
+                                                                                             A.1.1     An Example Application to Illustrate the Design and Deployment differences
+
+                                                                                             The following example of a small, Online Shopping Application illustrates the design and
+                                                                                             deployment differences discussed above. The main functions of this application are:
+
+                                                                                                •     A module that displays the catalog of products offered by the retailer with pictures of the
+                                                                                                      products, product numbers, product names, and the unit prices;
+                                                                                                •     A module for processing customer orders by gathering information about the customer
+                                                                                                      (e.g., name, address) and the details of the order (e.g., name of the product from the
+                                                                                                      catalog, quantity, unit price) as well as creating a bin containing all the items ordered in
+                                                                                                      that session;
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204
+
+
+
+
+                                                                                                •     A module for preparing the order for shipping, specifying the total bill of lading (i.e., the
+                                                                                                      total package to be shipped, quantity of each item in the order, shipping preferences,
+                                                                                                      shipping address); and
+                                                                                                •     A module for invoicing the customer with a built-in feature for making payments by
+                                                                                                      credit card or bank account.
+
+                                                                                             The differences in the design of this Online Shopping Application as a monolithic versus
+                                                                                             microservices-based are given in Table 4. Schematic diagrams of this application under
+                                                                                             monolithic and microservices architectures are given in Figures 1 and 2 respectively.
+                                                                                               Table 4: Differences in Application Construct between Monolithic and Microservices-based Application
+
+                                                                                                    Application Construct                   Monolith                     Microservices-based
+                                                                                               Communication between               All communications are in the     The shipping functionality
+                                                                                               functional modules                  form of procedure calls or        and the order processing
+                                                                                                                                   some internal data structures     functionality are each
+                                                                                                                                   (e.g., socket). The module        designed as independent
+                                                                                                                                   handling the order                services. Communication
+                                                                                                                                   processing makes a                takes place as an API call
+                                                                                                                                   procedural call to the module     across the network using a
+                                                                                                                                   handling the shipping             web protocol. The order
+                                                                                                                                   function and waits for            processing microservice can
+                                                                                                                                   successful completion             either (a) make a request-
+                                                                                                                                   (blocking type synchronous        response call to the shipping
+                                                                                                                                   communication).                   microservice and wait for a
+                                                                                                                                                                     response or (b) put the
+                                                                                                                                                                     details of the order to be
+                                                                                                                                                                     shipped in a message queue
+                                                                                                                                                                     to be picked up
+                                                                                                                                                                     asynchronously by the
+                                                                                                                                                                     shipping microservice, which
+                                                                                                                                                                     has subscribed to the event.
+                                                                                               Handling changes or                 The entire application must       The invoicing function is
+                                                                                               enhancements (e.g.,                 be recompiled and                 designed as a separate
+                                                                                               invoicing module needs to be        redeployed after making the       microservice, so that service
+                                                                                               changed to accept debit             necessary changes.                can simply be recompiled
+                                                                                               cards)                                                                and redeployed.
+
+
+                                                                                                                                                30
+

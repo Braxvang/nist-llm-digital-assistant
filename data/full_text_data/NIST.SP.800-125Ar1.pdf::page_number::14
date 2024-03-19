@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                                      SECURITY RECOMMENDATIONS FOR
+                                                                         SERVER-BASED HYPERVISOR PLATFORMS
+
+•   Memory Management Unit-MMU (HYP-DV3): The hypervisor runs a software-based Memory
+    Management Unit (MMU) that allocates a shadow page table for each VM since guest VMs cannot be
+    granted direct access to the hardware-based MMU as that would potentially enable them to access memory
+    belonging to the hypervisor and other co-hosted VMs (under some situations). However, a faulty
+    implementation of software-based MMU could lead to disclosure of data in arbitrary address spaces, such
+    as memory segments belonging to the hypervisor and co-located VMs, thus resulting in a breach of
+    memory isolation.
+
+•   Input/Output Memory Management Unit, IOMMU (HY-DV4): The hypervisor leverages the hardware
+    I/O Memory Management Unit to enforce memory separation for device drivers and processes using direct
+    memory access (DMA). This feature is built into the hypervisor and enabled in the hardware using a
+    firmware switch. If unused, it may result in a vulnerability whereby the DMA could potentially be used
+    as a common attack vector by one VM to overwrite physical memory used by other VMs and processes.
+
+Out of these, the vulnerabilities HYP-DV1 and HYP-DV2 should be addressed through proper coding and
+testing of those modules. Therefore, no security protection measures can be applied at the deployment and
+usage stage. However, the memory violation vulnerability HYP-DV3 and DMA violation vulnerability HY-
+DV4 can be addressed by hosting the hypervisor on a hardware platform that provides assistance for memory
+virtualization through a virtualization-aware hardware memory management unit and DMA transfers through
+the re-mapping of DMA transfers, respectively. Due to these two vulnerabilities, the threat HYP-T1, a breach
+of process isolation, has been addressed through security recommendation HY-SR-2 in section 4.
+
+Further, correct execution isolation requires that each VM obtains the proper memory and CPU resources
+necessary for its hosting applications and that there is no denial of service. Ensuring adequate memory through
+proper configuration of memory allocation options is addressed through security recommendation HY-SR-3,
+and ensuring proper allocation of virtual CPUs through the appropriate configuration of vCPU allocation
+options are addressed through security recommendations HY-SR-4 and HY-SR-5.
+
+2.2.2   Potential Threat to HY-BF2
+
+The applications executing in VMs need to access devices such as network and storage. Mediation of access
+to devices is handled in hypervisor hosts through device virtualization (also called IO virtualization). There
+are three common approaches to device virtualization: (a) Emulation, (b) Para-virtualization, and (c)
+Passthrough or self-virtualizing hardware devices.
+
+In emulation, code is implemented to present a virtual device that has a corresponding real (hardware) device
+for which the guest OS already has a driver. This enables running of unmodified guests (VMs), thus
+implementing full virtualization. This emulation code runs in the hypervisor. An I/O call from a guest VM
+application (through its guest OS) is intercepted by the hypervisor kernel and forwarded to this code since
+guest VMs cannot access the physical devices directly under this setup. This emulation code traps all device
+access instructions and converts them to calls on the physical device driver for the physical device attached to
+the hypervisor host. It also multiplexes accesses from guest VMs’ emulated virtual devices to the underlying
+physical device.
+
+In the para-virtualization approach, the hypervisor presents to the guest an interface of an artificial device that
+has no corresponding hardware counterpart. This enables special, simplified hypervisor-aware I/O drivers
+(called para-virtualized drivers) to be installed in the guest. The calls from these para-virtualized device
+drivers in guest VMs are handled by another device driver (called back-end driver) which directly interfaces
+with the physical device and mediates access to that physical device from para-virtualized guests. In some
+instances, the calls from para-virtualized guest drivers are handled directly by the hypervisor through its
+hypercall interface (the corresponding calls are called hypercalls). Analysis of threats due to these hypercalls
+is provided in the next subsection.
+                                                        7
+

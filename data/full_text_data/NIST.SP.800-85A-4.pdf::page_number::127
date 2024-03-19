@@ -1,0 +1,55 @@
+NIST SP 800-85A-4                                      PIV CARD APPLICATION & MIDDLEWARE
+                                                                INTERFACE TEST GUIDELINES
+
+C.2.3        RESET RETRY COUNTER command
+
+C.2.3.1        Contact Interface
+ Purpose              Validates that the PIV Card executes the RESET RETRY COUNTER
+                      command for the following conditions:
+                      1. With the security condition unsatisfied.
+                      2. After the security condition (authenticated with the PUK) is
+                          satisfied.
+                      3. With a valid new PIN value not formatted per SP 800-73-4.
+                      4. With a valid new PIN value (formatted correctly).
+                      5. With a valid new PIN value causing the PUK retry counter to be
+                          optionally reset.
+                      6. With an unsupported key reference.
+                      7. With the security condition unsatisfied (incorrect PUK) until
+                          RESET RETRY COUNTER command is blocked.
+ Reference(s)         1. SP 800-73-4 Part 2, Section 3.2.3
+                      2. AS05.01, AS03.07, AS05.30 through AS05.33
+ Precondition(s)      1. The IUT is inserted into the contact reader.
+                      2. There exists a valid PC/SC connection between the test system
+                          and the contact reader.
+                      3. No application is currently connected to the PIV Card
+                          Application.
+                      4. PIV Card Application PIN reset retry counter value (maximum
+                          number of PIN tries allowed) is recorded.
+                      5. The value of the counter reference data (PUK) is recorded.
+ Test Scenario        1. Send SELECT card command with
+                        • AID == 'A0 00 00 03 08 00 00 10 00 01 00'
+                     2. Send RESET RETRY COUNTER with
+                        • P2, key reference value, is set to '80'
+                        • Data field of the command contains the PUK value for
+                           key reference '80' concatenated with a PIN value that
+                           is not padded to complete 8 bytes
+                     3. Send RESET RETRY COUNTER with
+                        • P2, key reference value is set to '80'
+                        • Data field of the command contains the PUK value for
+                           key reference '80' concatenated with a new PIN value
+                           that is 6 bytes but padded to 8 bytes with 'FF' in byte
+                           7 and 'AA' in byte 8
+                     4. Send VERIFY card command with
+                        • P2, key reference value is set to '80'
+                        • Data field of the command contains an arbitrary, but
+                           correctly formatted, PIN value other than what is
+                           obtained from the vendor, padded with 'FF' to complete
+                           the total length of the value to 8 bytes
+                     5. Send RESET RETRY COUNTER with
+                        • P2, key reference value, is set to '80'
+
+
+
+
+                                     C-26
+

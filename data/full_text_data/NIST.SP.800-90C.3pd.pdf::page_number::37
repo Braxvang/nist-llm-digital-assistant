@@ -1,0 +1,49 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                        Recommendation for RBG Constructions
+       September 2022
+
+1019                CBC-MAC shall only be used as an external conditioning function under the following
+1020                conditions:
+1021                      a. The length of the input is an integer multiple of the block size of the block cipher
+1022                         (e.g., a multiple of 128 bits for AES) − no padding is done by CBC-MAC itself. 11
+1023                      b. All inputs to CBC-MAC in the same RBG shall have the same length.
+1024                      c. If the CBC-MAC conditioning function is used to obtain full entropy from an
+1025                         entropy source for CTR_DRBG instantiation or reseeding:
+1026                                        A personalization string shall not be used during instantiation.
+1027                                        Additional input shall not be used during the reseeding of the
+1028                                         CTR_DRBG but may be used during the generate process.
+1029                CBC-MAC is not approved for any use other than in an RBG (see [SP800-90B]).
+1030           3. Using the Block_cipher_df as specified in [SP800-90A] with an approved block cipher:
+1031                       conditioned_output = Block_cipher_df(entropy_bitstring, block_length),
+1032                where Block_cipher_df operates on the entropy_bitstring using a key specified within the
+1033                function, and the block_length is 128 bits for AES.
+1034   In all three cases, the length of the conditioned output is equal to the length of the output block
+1035   (i.e., 128 bits for AES). If the requested amount of entropy is requested for subsequent use by an
+1036   RBG, 12 then multiple iterations of the conditioning function may be required, each using a different
+1037   entropy_bitstring.
+
+1038   3.3.2. Using a Vetted Conditioning Function to Obtain Full-Entropy Bitstrings
+1039   This construction will produce a bitstring with full entropy using one of the conditioning functions
+1040   identified in Section 3.3.1.1 for an RBG2 or RBG3 construction whenever a bitstring with full
+1041   entropy is required (e.g., to seed or reseed a CTR_DRBG with no derivation function or to provide
+1042   full entropy for the RBG3(XOR) construction). This process is unnecessary if the entropy source
+1043   provides full-entropy output.
+1044   Let output_len be the length of the output block of the vetted conditioning function to be used;
+1045   output_len is the length of the hash function’s output block when a hash-based conditioning
+1046   function is used (see Section 3.3.1.2); output_len = 128 when an AES-based conditioning function
+1047   is used (see Section 3.3.1.3).
+1048   The approach used by this construction is to acquire sufficient entropy from the entropy source to
+1049   produce output_len bits with full entropy in the conditioning function’s output block, where
+1050   output_len is the length of the output block. The amount of entropy required for each use of the
+1051   conditioning function is output_len + 64 bits (see item 11 of Section 2.6). This process is repeated
+1052   until the requested number of full-entropy bits have been produced.
+
+
+
+       11
+            Any padding required could be done before submitting the entropy_bitstring to the CBC-MAC function.
+       12
+            Since the output block of AES is only 128 bits, this will often be the case when seeding or reseeding a DRBG.
+
+
+                                                                                24
+

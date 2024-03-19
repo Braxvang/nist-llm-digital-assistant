@@ -1,0 +1,59 @@
+                                                                  GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+itself forces renumbering. Renumbering affects a large number of components: routers, firewalls, filters,
+DNS, DHCPv6, routing protocols, system configuration tables, applications, network management tools,
+log files, etc.—anything that specifies addresses. Renumbering an ISP, although it presents many of the
+same problems discussed here, is outside the scope of this document.
+
+    4.8.1   Specification Overview
+
+The underlying basis for network prefix renumbering is specified in RFC 4861 and RFC 4862.
+
+Renumbering is facilitated because RAs lease multiple addresses to interfaces. This has two
+consequences: old addresses time out, are deprecated, and eventually disappear; new addresses can be
+immediately available. This ―make-before-break‖ switchover is accomplished by having two lifetimes
+for prefixes in RAs, a preferred lifetime and a valid lifetime. This allows individual addresses to be
+categorized as preferred or deprecated. The intention is to allow upper layer protocols ample time to
+complete using old, deprecated addresses and begin using new, preferred ones. At the same time, link-
+local addresses of routers do not change, so host-to-router ICMPv6, DHCPv6, and such infrastructure
+communications are not interrupted.
+
+RFC 4861 presents an example in which a prefix is initially advertised as having a long preferred lifetime
+that is later shortened. The point is that nodes unplugged from the network may miss the shortened
+announcement, so even after the prefix has expired, the prefix must continue to be advertised with a zero
+lifetime until the original, long period has expired. This example is accompanied with a warning about
+advertising infinite lifetimes.
+
+Another complication is that RAs themselves have lifetimes, in addition to the lifetimes of the prefixes
+they are announcing. Lacking a valid prefix, no global IPv6 address exists; lacking a valid RA, no default
+route exists.
+
+Just because interfaces can pick addresses with a new prefix does not make renumbering work. RFC 4192
+contains a description of the steps one needs to take to renumber a network with a fairly normal
+complement of services. The process involves allocating sub-prefixes of the new prefix to links and
+updating all occurrences of addresses from the old prefix to the new one. These include:
+
+    Manually assigned addresses for interfaces on routers
+
+    Routing information and link prefixes advertised by routers
+
+    Addresses on routers, firewalls, and packet filters used for access control or ingress filtering
+
+    Addresses assigned to interfaces with stateless address autoconfiguration
+
+    Addresses and other information provided by DHCPv6
+
+    DNS records (primarily AAAA and PTR records, as well as DNSSEC)
+
+    All other instances of addresses in applications, command sequences, configuration files, and
+     elsewhere.
+Some parts of a network can be renumbered independently of others, which may allow administrators to
+break the task up and make it more manageable. In other situations, more than one old prefix may be
+combined under a new prefix.
+
+The steps outlined in RFC 4192 can be summarized as follows:
+
+
+                                                     4-36
+

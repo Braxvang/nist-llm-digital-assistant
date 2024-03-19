@@ -1,0 +1,59 @@
+                                                                GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+Packet filters may need to be aware of SHIM6 and modify their actions accordingly. First, along with
+upper layer protocol and port numbers, they may need to match on the upper layer identifiers as well as or
+instead of the IPv6 locator addresses. Second, they may need to understand when established sessions
+begin using shim headers or change locators.
+
+4.2   IPv6 Multicast
+
+Multicast refers to sending a packet to an IP address designated as a multicast address; one or more hosts
+specifically interested in the communication then receive a copy of that single packet. This differs from
+broadcast, which delivers packets to all hosts on a subnet, because multicast traffic is only sent to hosts
+subscribed to the multicast group. Multicasting is often used, for example, to stream audio and video
+more efficiently. Senders achieve two primary advantages by using multicast. First, the sender only
+needs to create and send one packet, instead of creating and sending a separate packet to each recipient.
+Second, the sender does not need to keep track of who the actual recipients are. Multicasting can also be
+advantageous from a network perspective, because it reduces network bandwidth consumption.
+
+This section describes how multicast works in an IPv6 environment. In IPv6, broadcast has been
+eliminated and multicast takes on a much larger role. In addition to replacing broadcast, it also works
+with ICMPv6 neighbor discovery and router discovery on the local link to perform stateless address
+autoconfiguration and address resolution.
+
+First, consider an example of how IPv6 multicast makes Neighbor Discovery in IPv6 more efficient than
+using ARP with IPv4. Running IPv4, when a host has an IP address on its own subnet and needs to know
+the corresponding link layer address, it broadcasts an ARP request containing the IPv4 address. Every
+host on the subnet gets a copy.
+
+Suppose, running IPv6, an interface wants to find the link layer address for the link local IP address
+FE80::4DF2:54C8:B8C7:113A. It takes the low-order 24 bits of this address (C7:113A) and appends
+them to the well-known solicited node multicast prefix, FF02:0:0:0:0:1:FF00::/104 to form the solicited
+node multicast address FF02::1:FFC7:113A. Then it sends an ICMPv6 Neighbor Solicitation message to
+this multicast address. The message gets delivered to the interface at FE80::4DF2:54C8:B8C7:113A
+because it belongs to the multicast group FF02::1:FFC7:113A. Interfaces using any unicast or anycast
+address must join the solicited node multicast group corresponding to the above prefix and low-order 24
+bits of their address. They use ICMPv6 Multicast Listener Discovery (MLD) to join a multicast group.
+The result is a more efficient address resolution procedure, in which a smaller number of hosts are queried
+to determine the address.
+
+The solicited node multicast addresses range from FF02::1:FF00:0 to FF02::1:FFFF:FFFF, so the
+Neighbor Solicitation traffic is partitioned into 224 solicited node multicast groups. This makes receiving a
+Neighbor Solicitation intended for a different address highly unlikely.
+
+IPv6 multicast addresses are easy to recognize. They always begin with eight 1 bits: FF. The next eight
+bits, 02 in this case, specify that this is a well-known multicast address with link local scope. Other
+examples of well-known multicast addresses with link-local scope are:
+
+        FF02::1          All Nodes
+        FF02::2          All Routers
+        FF02::1:2        All DHCP Agents
+
+In addition to scoped multicast addresses, other features such as source-specific multicast have been
+added to IPv6. These different features and their applications are described below, and areas still needing
+
+
+
+                                                    4-5
+

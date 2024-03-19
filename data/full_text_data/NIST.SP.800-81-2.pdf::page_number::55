@@ -1,0 +1,60 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+8.1.1   Restricting DNS Query/Response Transaction Entities
+
+An example of the usage of the allow-query substatement (to specify restrictions for the DNS
+query/response transaction stating the IP addresses/subnets from which DNS queries are accepted) both at
+the server level and at the zone level (for the zone example.com) is given below:
+
+        options {
+             allow-query { 254.10.20.10; 239.10.30.29/25; };
+        };
+
+        zone “example.com.” {
+             type master;
+             file “zonedb.example.com”;
+             allow-query { 192.249.249.1; 192.249.249.4; };
+        };
+
+Specifying the list of IP addresses and IP prefixes within the options and zone statements could clutter the
+configuration file. Furthermore, the list of IP addresses and IP prefixes could be the same for many of the
+access control statements within a name server, and errors could be introduced if any additions or
+subtractions are made for that list. To avoid these problems, BIND provides a means to create named
+address match lists, which are called access control lists (ACL). These ACLs can be used in place of the
+list of IP addresses/IP prefixes (in the address match list argument) in the access control statements.
+
+The ACLs are created by using the acl statement in BIND 9.x. The general syntax of the acl statement
+is as follows:
+
+        acl acl-list-name {
+             address_match_list
+        };
+
+The acl-list-name is a user-defined string (e.g., internal_hosts). The address_match_list can be a list of IP
+addresses, IP address prefixes (denoting subnets), or cryptographic keys. An example of an acl statement
+that uses an IP address and a subnet reference in address_match_list is given below. In the example,
+254.10.20.10 denotes the IP address of a host, and the IP prefix 239.10.30.0/24 denotes a class C subnet.
+
+        acl “internal_hosts” {
+             254.10.20.10;
+             239.10.30.0/24;
+        };
+
+The use of ACL – “internal_hosts” in place of the list of IP addresses/IP prefix in the options and zone
+statement given above is as follows:
+
+        options {
+             allow-query { internal_hosts; };
+        };
+
+        zone “example.com.” {
+             type master;
+             file “zonedb.example.com”;
+             allow-query { internal_hosts; };
+        };
+
+
+                                                     8-3
+

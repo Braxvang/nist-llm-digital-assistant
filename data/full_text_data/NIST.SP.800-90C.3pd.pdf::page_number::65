@@ -1,0 +1,48 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                                                  Recommendation for RBG Constructions
+       September 2022
+
+1798                   The Generate_function generates 128 (full entropy) bits after reseeding the
+1799                   CTR_DRBG with either 256 or 384 bits of entropy (by setting
+1800                   prediction_resistance_request = TRUE). 33
+1801             For a hash-based DRBG (i.e., Hash_DRBG and HMAC_DRBG), a maximum of 256 full-
+1802             entropy bits can be produced from each iteration of the DRBG as follows:
+1803                        3.1.1      (status, additional_entropy) = Get_ES_Bitstring (64).
+1804                        3.1.2      If (status ≠ SUCCESS), then return (status, invalid_bitstring).
+1805                        3.1.3      (status, generated_bits) = Generate_function(RBG3(RS)_state_handle,
+1806                                   256, 256, prediction_resistance_request = TRUE, additional_input ||
+1807                                   additional_entropy).
+1808                   At least 64 bits of entropy beyond the amount obtained during reseeding are required.
+1809                   As shown in Table 3, the reseeding process will acquire 256 bits of entropy. The (256
+1810                   + 64 = 384) bits of entropy are inserted into the DRBG by 1) obtaining a bitstring with
+1811                   at least 64 bits of entropy directly from the entropy sources (step 3.1.1), 2)
+1812                   concatenating the additional entropy bits with any additional_input provided in the
+1813                   RBG3(RS)_Generate call, and 3) requesting the generation of 256 bits with prediction
+1814                   resistance and including the concatenated bitstring. This results in both the reseed of
+1815                   the DRBG with 256 bits of entropy and the insertion of the additional 64 bits of entropy)
+1816                   (step 3.1.3).
+1817             For a hash-based DRBG (i.e., Hash_DRBG and HMAC_DRBG), a maximum of 192 full-
+1818             entropy bits can be produced from each iteration of the DRBG as follows:
+1819                        (status, generated_bits) = Generate_function(RBG3(RS)_state_handle, 192,
+1820                        256, prediction_resistance_request = TRUE, additional_input).
+1821             The DRBG is reseeded with 256 bits of entropy by requesting generation with prediction
+1822             resistance and extracting only (256 − 64 = 192) bits from the DRBG’s output block as
+1823             full-entropy bits.
+1824        In step 3.2, if the Generate_function request invoked in step 3.1 is not successful, the
+1825        RBG3(RS)_Generate function is aborted, and the status received in step 3.1 and an invalid
+1826        bitstring (e.g., a Null bitstring) are returned to the consuming application.
+1827        Step 3.3 combines the full-entropy bitstrings obtained in step 3.1 with previously generated
+1828        full-entropy bits using a concatenation operation.
+1829        Step 3.4 adds the number of full-entropy bits produced in step 3.1 to those generated in
+1830        previous iterations of step 3.
+1831        If sum is less than the requested number of bits (n), repeat step 3 starting at step 3.1.
+1832   In step 4, the leftmost n bits are selected from the collected bitstring (i.e., full-entropy_bits) and
+1833   returned to the consuming application.
+1834   6.3.1.2.2       Generation Using a Directly Accessible DRBG
+
+       33
+         The use of the prediction_resistance_request will handle the differences between the two versions of the CTR_DRBG (i.e., with or without a
+       derivation function).
+
+
+                                                                           52
+

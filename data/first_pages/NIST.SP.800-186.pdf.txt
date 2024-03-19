@@ -1,0 +1,3147 @@
+              NIST Special Publication
+                     NIST SP 800-186
+
+ Recommendations for Discrete
+Logarithm-based Cryptography:
+          Elliptic Curve Domain Parameters
+
+                                               Lily Chen
+                                           Dustin Moody
+                                           Karen Randall
+                                      Andrew Regenscheid
+                                         Angela Robinson
+
+              This publication is available free of charge from:
+                     https://doi.org/10.6028/NIST.SP.800-186
+                                      NIST Special Publication
+                                             NIST SP 800-186
+
+ Recommendations for Discrete
+Logarithm-based Cryptography:
+                             Elliptic Curve Domain Parameters
+
+                                                                              Lily Chen
+                                                                          Dustin Moody
+                                                                     Andrew Regenscheid
+                                                                        Angela Robinson
+                                                             Computer Security Division
+                                                      Information Technology Laboratory
+
+                                                                               Karen Randall
+                                                                            Randall Consulting
+
+                                      This publication is available free of charge from:
+                                             https://doi.org/10.6028/NIST.SP.800-186
+
+                                                                                  February 2023
+
+
+
+
+                                                                       U.S. Department of Commerce
+                                                                        Gina M. Raimondo, Secretary
+
+                                                       National Institute of Standards and Technology
+    Laurie E. Locascio, NIST Director and Under Secretary of Commerce for Standards and Technology
+NIST SP 800-186                                                            Discrete Logarithm-based Cryptography:
+February 2023                                                                    Elliptic Curve Domain Parameters
+
+
+Certain commercial entities, equipment, or materials may be identified in this document in order to describe an
+experimental procedure or concept adequately. Such identification is not intended to imply recommendation or
+endorsement by the National Institute of Standards and Technology (NIST), nor is it intended to imply that the
+entities, materials, or equipment are necessarily the best available for the purpose.
+
+There may be references in this publication to other publications currently under development by NIST in
+accordance with its assigned statutory responsibilities. The information in this publication, including concepts and
+methodologies, may be used by federal agencies even before the completion of such companion publications. Thus,
+until each publication is completed, current requirements, guidelines, and procedures, where they exist, remain
+operative. For planning and transition purposes, federal agencies may wish to closely follow the development of
+these new publications by NIST.
+
+Organizations are encouraged to review all draft publications during public comment periods and provide feedback
+to NIST. Many NIST cybersecurity publications, other than the ones noted above, are available at
+https://csrc.nist.gov/publications.
+
+
+Authority
+This publication has been developed by NIST in accordance with its statutory responsibilities under the Federal
+Information Security Modernization Act (FISMA) of 2014, 44 U.S.C. § 3551 et seq., Public Law (P.L.) 113-283.
+NIST is responsible for developing information security standards and guidelines, including minimum requirements
+for federal information systems, but such standards and guidelines shall not apply to national security systems
+without the express approval of appropriate federal officials exercising policy authority over such systems. This
+guideline is consistent with the requirements of the Office of Management and Budget (OMB) Circular A-130.
+
+Nothing in this publication should be taken to contradict the standards and guidelines made mandatory and binding
+on federal agencies by the Secretary of Commerce under statutory authority. Nor should these guidelines be
+interpreted as altering or superseding the existing authorities of the Secretary of Commerce, Director of the OMB, or
+any other federal official. This publication may be used by nongovernmental organizations on a voluntary basis and
+is not subject to copyright in the United States. Attribution would, however, be appreciated by NIST.
+
+
+NIST Technical Series Policies
+Copyright, Use, and Licensing Statements
+NIST Technical Series Publication Identifier Syntax
+
+
+Publication History
+Approved by the NIST Editorial Review Board on 2022-09-07
+
+
+How to Cite this NIST Technical Series Publication:
+Chen L, Moody D, Regenscheid A, Robinson A, Randall K (2023) Recommendations for Discrete Logarithm-based
+Cryptography: Elliptic Curve Domain Parameters. (National Institute of Standards and Technology, Gaithersburg,
+MD), NIST Special Publication (SP) NIST SP 800-186. https://doi.org/10.6028/NIST.SP.800-186
+
+
+Author ORCID iDs
+Lily Chen: 0000-0003-2726-4279
+Dustin Moody: 0000-0002-4868-6684
+Andrew Regenscheid: 0000-0002-3930-527X
+Angela Robinson: 0000-0002-1209-0379
+NIST SP 800-186                                                       Discrete Logarithm-based Cryptography:
+February 2023                                                               Elliptic Curve Domain Parameters
+
+Contact Information
+sp800-186-comments@nist.gov
+
+National Institute of Standards and Technology
+Attn: Computer Security Division, Information Technology Laboratory
+100 Bureau Drive (Mail Stop 8930) Gaithersburg, MD 20899-8930
+
+
+All comments are subject to release under the Freedom of Information Act (FOIA).
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+
+
+Abstract
+This Recommendation specifies the set of elliptic curves recommended for U.S. Government
+use. In addition to the previously recommended Weierstrass curves defined over prime fields and
+binary fields, this Recommendation includes two newly specified Edwards curves, which
+provide increased performance, side-channel resistance, and simpler implementation when
+compared to traditional curves. This Recommendation also specifies alternative representations
+for these new curves to allow more implementation flexibility. The new curves are interoperable
+with those specified by the Crypto Forum Research Group (CFRG) of the Internet Engineering
+Task Force (IETF).
+
+Keywords
+computer security; discrete logarithm-based groups; domain parameters; elliptic curve
+cryptography.
+
+Reports on Computer Systems Technology
+The Information Technology Laboratory (ITL) at the National Institute of Standards and
+Technology (NIST) promotes the U.S. economy and public welfare by providing technical
+leadership for the Nation’s measurement and standards infrastructure. ITL develops tests, test
+methods, reference data, proof of concept implementations, and technical analyses to advance
+the development and productive use of information technology. ITL’s responsibilities include the
+development of management, administrative, technical, and physical standards and guidelines for
+the cost-effective security and privacy of other than national security-related information in
+federal information systems. The Special Publication 800-series reports on ITL’s research,
+guidelines, and outreach efforts in information system security, and its collaborative activities
+with industry, government, and academic organizations.
+
+
+
+
+                                                i
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Audience
+This document is intended for implementers of cryptographic schemes that include the use of
+elliptic curve cryptography.
+
+Conformance Testing
+Conformance testing for implementations of this Recommendation will be conducted within the
+framework of the Cryptographic Algorithm Validation Program (CAVP) and the Cryptographic
+Module Validation Program (CMVP). The requirements of this Recommendation are indicated
+by the word “shall.” Some of these requirements may be out of scope for CAVP or CMVP
+validation testing and are thus the responsibility of entities using, implementing, installing, or
+configuring applications that incorporate this Recommendation.
+Conformant implementations may perform procedures via an equivalent sequence of operations,
+provided that these include all cryptographic checks included with the specifications in this
+document. This is important because the checks are essential for the prevention of subtle attacks.
+
+
+
+
+                                                 ii
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Patent Disclosure Notice
+NOTICE: ITL has requested that holders of patent claims whose use may be required for
+compliance with the guidance or requirements of this publication disclose such patent claims to
+ITL. However, holders of patents are not obligated to respond to ITL calls for patents and ITL
+has not undertaken a patent search in order to identify which, if any, patents may apply to this
+publication.
+As of the date of publication and following call(s) for the identification of patent claims whose
+use may be required for compliance with the guidance or requirements of this publication, no
+such patent claims have been identified to ITL.
+No representation is made or implied by ITL that licenses are not required to avoid patent
+infringement in the use of this publication.
+
+
+
+
+                                                iii
+NIST SP 800-186                                                                             Discrete Logarithm-based Cryptography:
+February 2023                                                                                     Elliptic Curve Domain Parameters
+
+Table of Contents
+Executive Summary .................................................................................................................... 1
+       Introduction ......................................................................................................................... 2
+
+
+
+
+       Overview of Elliptic Curves ............................................................................................... 4
+
+
+     2.1.1. Curves in Short-Weierstrass Form .............................................................................. 4
+     2.1.2. Montgomery Curves .................................................................................................... 4
+     2.1.3. Twisted Edwards Curves ............................................................................................ 5
+
+
+     2.2.1. Curves in Short-Weierstrass Form .............................................................................. 5
+       Recommended Curves for U.S. Federal Government Use ............................................. 6
+
+
+     3.1.1. Choice of Key Lengths ................................................................................................ 6
+     3.1.2. Choice of Underlying Fields ........................................................................................ 6
+     3.1.3. Choice of Basis for Binary Fields ................................................................................ 7
+     3.1.4. Choice of Curves ........................................................................................................ 8
+
+
+     3.2.1. Weierstrass Curves ..................................................................................................... 9
+     3.2.2. Montgomery Curves .................................................................................................. 15
+     3.2.3. Twisted Edwards Curves .......................................................................................... 17
+
+
+     3.3.1. Koblitz Curves ........................................................................................................... 21
+     3.3.2. Pseudorandom Curves ............................................................................................. 24
+References ................................................................................................................................. 28
+Appendix A.              Details of Elliptic Curve Group Operations ................................................. 30
+
+
+     A.1.1. Group Law for Weierstrass Curves ........................................................................... 30
+     A.1.2. Group Law for Montgomery Curves .......................................................................... 30
+     A.1.3. Group Law for Twisted Edwards Curves .................................................................. 30
+
+
+     A.2.1. Group Law for Weierstrass Curves ........................................................................... 31
+Appendix B.              Relationships Between Curve Models ......................................................... 32
+
+
+                                                                      iv
+NIST SP 800-186                                                                     Discrete Logarithm-based Cryptography:
+February 2023                                                                             Elliptic Curve Domain Parameters
+
+
+
+
+Appendix C.          Generation Details for Recommended Elliptic Curves .............................. 35
+
+
+   C.1.1. Implementation Security Criteria ............................................................................... 35
+
+
+   C.2.1. Weierstrass Curves Over Prime Fields ..................................................................... 35
+   C.2.2. Montgomery Curves .................................................................................................. 36
+   C.2.3. Twisted Edwards Curves .......................................................................................... 37
+   C.2.4. Weierstrass Curves over Binary Fields ..................................................................... 37
+
+
+   C.3.1. Generation of Pseudorandom Curves (Prime Case) ................................................ 38
+   C.3.2. Verification of Curve Generation (Prime Case) ......................................................... 39
+   C.3.3. Generation of Pseudorandom Curves (Binary Case) ............................................... 40
+   C.3.4. Verification of Curve Generation (Binary Case) ........................................................ 41
+Appendix D.          Elliptic Curve Routines ................................................................................. 42
+
+
+   D.1.1. Non-binary Curves in Short-Weierstrass Form ......................................................... 42
+   D.1.2. Montgomery Curves .................................................................................................. 42
+   D.1.3. Twisted Edwards Curves .......................................................................................... 43
+   D.1.4. Binary Curves in Short-Weierstrass Form ................................................................ 44
+
+
+   D.2.1. Prime Curves in Short-Weierstrass Form ................................................................. 45
+   D.2.2. Binary Curves in Short-Weierstrass Form ................................................................ 46
+Appendix E.          Auxiliary Functions ....................................................................................... 48
+
+
+
+
+Appendix F.          Data Conversion ............................................................................................ 50
+
+
+
+
+                                                               v
+NIST SP 800-186                                                                          Discrete Logarithm-based Cryptography:
+February 2023                                                                                  Elliptic Curve Domain Parameters
+
+Appendix G.            Implementation Aspects ............................................................................... 52
+
+
+    G.1.1. Curve P-224 .............................................................................................................. 52
+    G.1.2. Curve P-256 .............................................................................................................. 52
+    G.1.3. Curve P-384 .............................................................................................................. 53
+    G.1.4. Curve P-521 .............................................................................................................. 54
+    G.1.5. Curve25519 .............................................................................................................. 54
+    G.1.6. Curve448 .................................................................................................................. 54
+
+
+
+    G.3.1. Normal Bases ........................................................................................................... 57
+    G.3.2. Polynomial Basis to Normal Basis Conversion ......................................................... 59
+    G.3.3. Normal Basis to Polynomial Basis Conversion ......................................................... 59
+Appendix H.            Other Allowed Elliptic Curves ...................................................................... 61
+
+
+
+Appendix I.            List of Symbols, Abbreviations, and Acronyms ......................................... 62
+Appendix J.            Glossary ......................................................................................................... 64
+
+
+
+List of Tables
+Table 1. Approximate Security Strength of the Recommended Curves ....................................... 6
+Table 2. Allowed Usage of the Specified Curves ......................................................................... 7
+
+
+
+
+                                                                   vi
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+Acknowledgments
+The authors of NIST SP 800-186—Lily Chen, Dustin Moody, Andrew Regenscheid, Karen
+Randall, and Angela Robinson—wish to thank Rene Struik, Rich Davis, and Scott Simon for
+their contributions to this document. The authors also acknowledge and appreciate colleagues
+who reviewed earlier versions of this document, as well as the support from public and private
+sectors whose constructive and beneficial comments greatly enhanced the utility of this
+publication.
+
+
+
+
+                                               vii
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+
+
+Executive Summary
+This Recommendation specifies the set of elliptic curves recommended for U.S. Government
+use. It includes:
+   − Specification of elliptic curves previously specified in Federal Information Processing
+     Standard (FIPS) 186-4, Digital Signature Schemes [FIPS_186-4]. This includes both
+     elliptic curves defined over a prime field and curves defined over a binary field. Although
+     the specifications for elliptic curves over binary fields are included, these curves are now
+     deprecated. It is strongly recommended to use the other prime curves.
+   − Specification of new Montgomery and Edwards curves, which are detailed in Elliptic
+     Curves for Security [RFC_7748].
+   − A reference for the Brainpool curves specified in [RFC_5639]. These curves are allowed
+     to be used for interoperability reasons (i.e., to accommodate inclusion in FIPS-validated
+     products).
+   − A reference for the curve secp256k1 specified in [SEC_2]. This curve is allowed to be
+     used for blockchain-related applications.
+   − Elliptic curves in FIPS 186-4 that do not meet the current bit security requirements put
+     forward in NIST Special Publication (SP) 800-57, Part 1, Recommendation for Key
+     Management: Part 1 – General [SP_800-57], are now legacy-use. They may be used to
+     process already protected information (e.g., decrypt or verify) but not to apply protection
+     to information (e.g., encrypt or sign). Also see NIST SP 800-131A, Transitions:
+     Recommendation for Transitioning the Use of Cryptographic Algorithms and Key
+     Lengths [SP_800-131A].
+
+This Recommendation provides details regarding the group operations for each of the specified
+elliptic curves and the relationship between the various curve models, allowing for flexibility
+regarding the use of curves most suitable in particular applications. It also gives cryptographic
+criteria for the selection of suitable elliptic curves and provides more details on finite field
+arithmetic and data representation than were available in FIPS 186-4.
+
+
+
+
+                                                 1
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+    Introduction
+
+       Background
+Elliptic curve cryptography (ECC) has uses in applications involving digital signatures (e.g.,
+Elliptic Curve Digital Signature Algorithm [ECDSA]) and key agreement schemes (e.g., Elliptic
+Curve Diffie-Hellman [ECDH]). Historically, elliptic curves have usually been expressed in
+short Weierstrass format. However, curves that are expressed using a different format, such as
+Montgomery curves and twisted Edwards curves, have gone from garnering academic interest to
+being deployed in a number of applications. These curves can provide better performance and
+increased side-channel resistance.
+A number of standards-setting organizations besides NIST (e.g., ANSI X9F, ISO, SEC, and
+IETF) have developed elliptic curve standards. In June 2015, NIST organized an ECC workshop
+to discuss the design of alternate elliptic curves that are secure, efficient, and easy to use while
+also being resilient to a wide range of implementation attacks. Subsequently, NIST solicited
+public comments on the Digital Signature Standard FIPS 186-4, requesting specific feedback
+regarding the digital signature schemes in FIPS 186 as well as possible new recommended
+elliptic curves. This publication is the result of that input.
+
+       Purpose and Scope
+This Recommendation provides updated specifications of elliptic curves that are appropriate for
+use by the U.S. Federal Government for digital signatures. It is intended for use in conjunction
+with other NIST publications, such as NIST SP 800-56A, Recommendation for Pair-Wise Key-
+Establishment Schemes Using Discrete Logarithm-Based Cryptography [SP_800-56A]; FIPS
+186-5, Digital Signature Standard [FIPS_186-5]; and related specifications. The key pairs
+specified here are used for digital signature generation and verification or key agreement only
+and should not be used for any other purposes.
+This Recommendation is intended to provide sufficient information for a vendor to implement
+ECC using asymmetric algorithms in FIPS 140-3-validated modules.
+
+       Document Organization
+The remainder of this document includes the following sections and appendices:
+•   Section 2: Overview of Elliptic Curves – This section details the different curve models
+    being used with this Recommendation, including notational conventions.
+•   Section 3: Recommended Curves for Federal Government Use – This section highlights
+    the domain parameters for all elliptic curves recommended for U.S. Government use.
+•   References – This section contains information on the documents referenced in the
+    publication.
+•   Appendix A: Details of Elliptic Curve Group Operations – This appendix discusses the
+    group laws for each of the different curve models specified in this Recommendation.
+
+
+
+
+                                                 2
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+•   Appendix B: Relationship Between Curve Models – This appendix details how different
+    curve models are related and how the coordinates of a point and the domain parameters of a
+    curve in one curve model relate to those in another curve model.
+•   Appendix C: Generation Details for Recommended Elliptic Curves – This appendix
+    describes the cryptographic criteria that guided the selection of suitable elliptic curves and
+    the process by which one of many such suitable elliptic curves is selected.
+•   Appendix D: Elliptic Curve Routines – This appendix details elementary routines for
+    elliptic curves, such as verification that these curves are indeed well-formed, and point
+    compression.
+•   Appendix E: Auxiliary Functions – This appendix covers mathematical functions that are
+    used to describe elliptic curve operations and representation conversions, such as inversion
+    and taking square roots.
+•   Appendix F: Data Conversion – This appendix documents the detailed procedure for the
+    conversion of data elements, such as integers, field elements, bit strings, octet strings, and
+    elliptic curve points.
+•   Appendix G: Implementation Aspects – This appendix discusses the various
+    implementation aspects of binary curves, including conversions between different field
+    representations. For prime curves, it indicates how the special form of the underlying prime
+    field aids in efficient modular reduction.
+•   Appendix H: Other Allowed Elliptic Curves – This appendix lists other elliptic curves that
+    may be used for interoperability reasons.
+•   Appendix I: Symbols, Abbreviations, and Acronyms
+•   Appendix J: Glossary
+
+
+
+
+                                                  3
+NIST SP 800-186                                                   Discrete Logarithm-based Cryptography:
+February 2023                                                           Elliptic Curve Domain Parameters
+
+   Overview of Elliptic Curves
+Let E be an elliptic curve defined over the field GF(q).
+The cardinality |E| of the curve is equal to the number of points defined over GF(q) on the curve
+and satisfies the equation |E| = (q+1)−t, where |t| ≤ 2 �𝑞𝑞. Thus, |E| and q have the same order of
+magnitude.
+The integer t is called the trace of E over the field GF(q).
+The points on E form a commutative group under addition (for the group law for each curve
+form, see Appendix A). Any point P on the curve is the generator of a cyclic subgroup 〈P〉 = {kP
+| k = 0, 1, 2, …} of E. The order of P in E is defined as the cardinality of 〈P〉. A curve is cyclic if
+it is generated by some point on E. All curves of prime order are cyclic, while all curves of order
+|E| = h⋅n, where n is a large prime number and h is a small number, have a large cyclic subgroup
+of prime order n.
+If R is a point on the curve that is also contained in 〈P〉, there is a unique integer k in the interval
+[0, l−1] so that R = kP, where l is the order of P in E. This number is called the discrete logarithm
+of R to the base P. The discrete logarithm problem is the problem of finding the discrete
+logarithm of R to the base P for any two points P and R on the curve, if such a number exists.
+A quadratic twist of E is a curve E’ related to E, with cardinality |E’| = (q+1)+t. If E is a curve in
+one of the curve forms specified in this Recommendation, a quadratic twist of this curve can be
+expressed using the same curve model, although with different curve parameters.
+
+       Non-binary Curves
+
+2.1.1. Curves in Short-Weierstrass Form
+Let GF(q) denote the finite field with q elements, where q is an odd prime power and is not
+divisible by three. Let Wa,b be the Weierstrass curve with the defining equation y2 = x3 + a x + b,
+where a and b are elements of GF(q) with 4 a3 + 27 b2 ≠ 0. When selecting curve parameters, a
+Seed value may be used to generate the parameters a and b as described in Appendix C.2.1.1.
+The points of Wa,b are the ordered pairs (x, y) whose coordinates are elements of GF(q) and that
+satisfy the defining equation (i.e., the affine points) together with the special point ∅ (the “point
+at infinity”). This set forms a group under the operation of addition on elliptic curves via the
+“chord-and-tangent” rule, where the point at infinity serves as the identity element. See
+Appendix A.1.1 for details of the group operation.
+
+2.1.2. Montgomery Curves
+Let GF(q) denote the finite field with q elements, where q is an odd prime power. Let MA,B be the
+Montgomery curve with defining equation B v2 = u (u2 + A u + 1), where A and B are elements
+of GF(q) with A ≠ ± 2 and B ≠ 0. The points of MA,B are the ordered pairs (u, v) whose
+coordinates are elements of GF(q) and that satisfy the defining equation (i.e., the affine points)
+together with the special point ∅ (the “point at infinity”). This set forms a group under the
+
+
+
+                                                  4
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+operation of addition on elliptic curves via the “chord-and-tangent” rule, where the point at
+infinity serves as the identity element. See Appendix A.1.2 for details of the group operation.
+
+2.1.3. Twisted Edwards Curves
+Let GF(q) denote the finite field with q elements, where q is an odd prime power. Let Ea,d be the
+twisted Edwards curve with defining equation a x2 + y2 = 1+ d x2 y2, where a and d are elements
+of GF(q) with a, d ≠ 0, a ≠ d, and a is a square in GF(q) while d is not. The points of Ea,d are the
+ordered pairs (x, y) whose coordinates are elements of GF(q) and that satisfy the defining
+equation (i.e., the affine points). It can be shown that this set forms a group under the operation
+addition, where the point (0, 1) serves as the identity element. The addition formulae are
+complete, meaning that the formulae work for all inputs on the curve. See Appendix A.1.3 for
+details of the group operation.
+An Edwards curve is a twisted Edwards curve with a = 1.
+
+       Binary Curves
+
+2.2.1. Curves in Short-Weierstrass Form
+Let GF(q) denote the finite field with q elements, where q = 2m. Let Ba,b be the Weierstrass curve
+with defining equation y2 + x y = x3 + a x2 + b, where a and b are elements of GF(q) with b ≠ 0.
+The points of Ba,b are the ordered pairs (x, y) whose coordinates are elements of GF(q) and that
+satisfy the defining equation (i.e., the affine points) together with the special point ∅ (the “point
+at infinity”). This set forms a group under the operation of addition on elliptic curves via the
+“chord-and-tangent” rule, where the point at infinity serves as the identity element. See
+Appendix A.2.1 for details of the group operation.
+
+
+
+
+                                                  5
+NIST SP 800-186                                                   Discrete Logarithm-based Cryptography:
+February 2023                                                           Elliptic Curve Domain Parameters
+
+   Recommended Curves for U.S. Federal Government Use
+This section specifies the elliptic curves recommended for U.S. Federal Government use and
+contains choices for the private key length and underlying fields. This includes elliptic curves
+over prime fields (Section 3.2) and elliptic curves over binary fields (Section 3.3), where each
+curve takes one of the forms described in Section 3 (referred to as “Type” below).
+Each recommended curve is uniquely defined by its domain parameters D, which indicate the
+field GF(q) over which the elliptic curve is defined, the parameters of its defining equation, and
+principal parameters, such as the cofactor h of the curve, the order n of its prime-order subgroup,
+and a designated point G on the curve of order n (i.e., the “base point”). In the case 𝑞𝑞 = 2𝑚𝑚 , the
+domain parameters also include a description of the representation chosen for GF(q).
+For details regarding the generation method of the elliptic curves, see Appendix C.
+
+       Choices of Key Lengths, Underlying Fields, Curves, and Base Points
+
+3.1.1. Choice of Key Lengths
+The principal parameters for elliptic curve cryptography are the elliptic curve E and a designated
+point G on E called the base point. The base point has order n, which is a large prime. The
+number of points on the curve is h⋅n for some integer h (the cofactor), which is not divisible by
+n. For efficiency reasons, it is desirable for the cofactor to be small.
+All of the curves given below have cofactors 1, 2, 4, or 8. As a result, the private and public keys
+for a curve are approximately the same length.
+
+3.1.2. Choice of Underlying Fields
+For each key length, two kinds of fields are provided:
+   1. A prime field is the field GF(p), which contains a prime number p of elements. The
+      elements of this field are the integers modulo p, and the field arithmetic is implemented
+      in terms of the arithmetic of integers modulo p.
+   2. A binary field is the field GF(2m), which contains 2m elements for some m (called the
+      degree of the field). The elements of this field are the bit strings of length m, and the field
+      arithmetic is implemented in terms of operations on the bits.
+The approximate security strengths for the elliptic curves specified in this document are given in
+Table 1. The security strength of an elliptic curve is directly related to the order of the basepoint.
+In general, if an elliptic curve has a basepoint of order n, then the security strength will be
+approximately one half of the bit length of n.
+                  Table 1. Approximate Security Strength of the Recommended Curves
+
+  Security Strength                               Recommended Curves
+
+          112                                         P-224, K-233, B-233
+
+
+
+
+                                                  6
+NIST SP 800-186                                                    Discrete Logarithm-based Cryptography:
+February 2023                                                            Elliptic Curve Domain Parameters
+
+  Security Strength                                Recommended Curves
+
+          128                  P-256, W-25519, Curve25519, Edwards25519, K-283, B-283
+
+          192                                          P-384, K-409, B-409
+
+          224                              W-448, Curve448, Edwards448, E448
+
+          256                                          P-521, K-571, B-571
+
+Elliptic curves in FIPS 186-4 that do not meet the current bit security requirements put forward
+in NIST SP 800-57, Part 1, Recommendation for Key Management: Part 1 – General [SP_800-
+57], are now legacy-use. They may be used to process already protected information (e.g.,
+decrypt or verify) but not to apply protection to information (e.g., encrypt or sign). Also see
+NIST SP 800-131A, Transitions: Recommendation for Transitioning the Use of Cryptographic
+Algorithms and Key Lengths [SP_800-131A].
+Each elliptic curve specified in this recommendation is allowed for specific NIST approved
+cryptographic functions. The allowed usages for each curve are summarized in Table 2.
+                            Table 2. Allowed Usage of the Specified Curves
+
+          Specified Curves                                      Allowed Usage
+
+             K-233, B-233                                         Deprecated
+             K-283, B-283
+             K-409, B-409
+             K-571, B-571
+
+                  P-224                     ECDSA, EC key establishment (see [SP_800-56A])
+                  P-256
+                  P-384
+                  P-521
+
+            Edwards25519                                           EdDSA
+             Edwards448
+
+       Curve25519, W-25519                      Alternative representations included for
+       Curve448, E448, W-448              implementation flexibility. Not to be used for ECDSA
+                                                           or EdDSA directly.
+
+3.1.3. Choice of Basis for Binary Fields
+To describe the arithmetic of a binary field, it is first necessary to specify how a bit string is to be
+interpreted. This is referred to as choosing a basis for the field. There are two common types of
+bases: a polynomial basis and a normal basis.
+
+
+
+                                                   7
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+   •   A polynomial basis is specified by an irreducible polynomial modulo 2 called the field
+       polynomial. The bit string (am–1 … a2 a1 a0) is used to represent the polynomial
+
+                                 am–1 t m–1 + …+ a2 t2 + a1 t + a0
+       over GF(2). The field arithmetic is implemented as polynomial arithmetic modulo p(t),
+       where p(t) is the field polynomial.
+   •   A normal basis is specified by an element θ of a particular kind. The bit string (a0 a1 a2
+       … am–1) is used to represent the element
+
+                             a0θ + a1θ 2 + a2θ 2 + … + am–1θ 2
+                                                2                 m–1
+                                                                        .
+       Normal basis field arithmetic is not easy to describe or efficient to implement in general
+       except for a special class called Type T low-complexity normal bases. For a given field of
+       degree m, the choice of T specifies the basis and the field arithmetic (see Appendix G.3).
+There are many polynomial bases and normal bases from which to choose. The following
+procedures are commonly used to select a basis representation:
+   •   Polynomial Basis: If an irreducible trinomial tm + tk + 1 exists over GF(2), then the field
+       polynomial p(t) is chosen to be the irreducible trinomial with the lowest-degree middle
+       term tk. If no irreducible trinomial exists, then a pentanomial tm + ta + tb + tc + 1 is
+       selected. The particular pentanomial chosen has the following properties: the second term
+       ta has the lowest degree among all irreducible pentanomials of degree m; the third term tb
+       has the lowest degree among all irreducible pentanomials of degree m with the second
+       term ta; and the fourth term tc has the lowest degree among all irreducible pentanomials
+       of degree m with the second term ta and third term tb.
+   •   Normal Basis: Choose the Type T low-complexity normal basis with the smallest T.
+For each binary field, the parameters are given for the above basis representations.
+
+3.1.4. Choice of Curves
+Two kinds of curves are given:
+   •   Pseudorandom curves are those whose coefficients are generated from the output of a
+       cryptographic hash function (with input from a random seed). If the domain parameter
+       seed value is given along with the coefficients, it can be easily verified that the
+       coefficients were generated by that method. The generation and verification procedures
+       for the pseudorandom curves in this section are specified in Appendix C.3.
+   •   Special curves are those whose coefficients and underlying fields have been selected to
+       optimize the efficiency of the elliptic curve operations.
+For each curve size range, the following curves are given in Sections 3.2 and 3.3:
+   → A pseudorandom curve over GF(p)
+   → A pseudorandom curve over GF(2m)
+   → A special curve over GF(2m) called a Koblitz curve or anomalous binary curve
+
+
+
+                                                 8
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+In addition, some special Edwards, Weierstrass, and Montgomery curves over GF(p) are given
+for two size ranges.
+
+       Curves Over Prime Fields
+This section specifies elliptic curves over prime fields recommended for U.S. Federal
+Government use, where each curve takes the form of a curve in short-Weierstrass form (Section
+3.2.1), a Montgomery curve (Section 3.2.2), or a twisted Edwards curve (Section 3.2.3).
+
+3.2.1. Weierstrass Curves
+This specification includes pseudorandom Weierstrass curves generated over prime fields P-192,
+P-224, P-256, P-384, and P-521 (see Sections 3.2.1.2 – 3.2.1.5) and special Weierstrass curves
+over prime fields W-25519 (Section 3.2.1.6) and W-448 (Section 3.2.1.7).
+For each Weierstrass curve,
+                              E : y2 ≡ x3 +ax +b mod p,
+the following domain parameters D =( p, h, n, Type, a, b, G, {Seed, c}) are given:
+   •   The prime modulus p
+
+   •   The cofactor h
+           o For pseudorandom curves, the cofactor h = 1, so the order n is prime.
+           o For special curves, the cofactor h > 1, so the order n is not prime.
+
+   •   The Type is “Weierstrass curve”
+
+   •   The coefficient a
+           o For pseudorandom curves, a = –3 was made for reasons of efficiency; see IEEE
+             Std 1363-2000.
+
+   •   The coefficient b
+           o For pseudorandom curves, the coefficient b satisfies b2 c ≡ –27 mod p.
+
+   •   The base point G with x coordinate Gx and y coordinate Gy
+
+   •   The 160-bit input Seed to the SHA-1 hash algorithm in Appendix C.3 for pseudorandom
+       curves. Seed is not used with the special curves W-25519 (Section 3.2.1.6) and W-448
+       (Section 3.2.1.7).
+
+   •   The output c of the SHA-1 hash algorithm used for pseudorandom curves. The value c is
+       not used with the special curves W-25519 (Section 3.2.1.6) and W-448 (Section 3.2.1.7).
+
+All values (except for the cofactor and seed) are provided both in decimal and hexadecimal. The
+cofactor is given in decimal form, and the seed is given in hexadecimal.
+
+
+                                                9
+NIST SP 800-186                                                                        Discrete Logarithm-based Cryptography:
+February 2023                                                                                Elliptic Curve Domain Parameters
+
+3.2.1.1.            P-192
+This curve is for legacy-use only. See [FIPS_186-4] for the specification.
+
+3.2.1.2.            P-224
+The elliptic curve P-224 is a Weierstrass curve Wa,b defined over the prime field GF(p) that has
+order h⋅n, where h = 1, and n is a prime number. The quadratic twist of this curve has order h1⋅n1,
+where h1 = 3^2 × 11 × 47 × 3015283 × 40375823 × 267983539294927, and 𝑛𝑛1 is a prime
+number. 1 This curve has domain parameters D = ( p, h, n, Type, a, b, G, {Seed, c}), where the
+Type is “Weierstrass curve,” and the other parameters are defined as follows:
+p:      2224 − 296 + 1
+        = 26959946667150639794667015087019630673557916260026308143510066298881
+           (=0xffffffff ffffffff ffffffff ffffffff 00000000 00000000 00000001)
+h:      1
+n:       26959946667150639794667015087019625940457807714424391721682722368061
+            (=0xffffffff ffffffff ffffffff ffff16a2 e0b8f03e 13dd2945 5c5c2a3d)
+tr:     4733100108545601916421827343930821
+           (=(p+1) − h⋅ n = 0xe95c 1f470fc1 ec22d6ba a3a3d5c5)
+a:      −3
+        = 26959946667150639794667015087019630673557916260026308143510066298878
+           (=0xffffffff ffffffff ffffffff fffffffe ffffffff ffffffff fffffffe)
+b:      18958286285566608000408668544493926415504680968679321075787234672564
+           (=0xb4050a85 0c04b3ab f5413256 5044b0b7 d7bfd8ba 270b3943 2355ffb4)
+Gx:     19277929113566293071110308034699488026831934219452440156649784352033
+           (=0xb70e0cbd 6bb4bf7f 321390b9 4a03c1d3 56c21122 343280d6 115c1d21)
+Gy:     19926808758034470970197974370888749184205991990603949537637343198772
+           (=0xbd376388 b5f723fb 4c22dfe6 cd4375a0 5a074764 44d58199 85007e34)
+Seed: 0xbd713447 99d5c7fc dc45b59f a3b9ab8f 6a948bc5
+c:    9585649763196999776159690989286240671136085803543320687376622326267
+        (=0x5b056c7e 11dd68f4 0469ee7f 3c7a7d74 f7d12111 6506d031 218291fb)
+
+3.2.1.3.            P-256
+The elliptic curve P-256 is a Weierstrass curve Wa,b defined over the prime field GF(p) that has
+order h⋅n, where h = 1, and n is a prime number. The quadratic twist of this curve has order h1⋅n1,
+where h1 = 3 × 5 × 13 × 179, and 𝑛𝑛1 is a prime number. This curve has domain parameters D =
+(p, h, n, Type, a, b, G, {Seed, c}), where the Type is “Weierstrass curve,” and the other
+parameters are defined as follows:
+p:      2256 − 2224 + 2192 + 296 − 1
+        = 115792089210356248762697446949407573530\
+
+1 For the quadratic twist of P-224, the value of n is the 117-bit number 177594041488131583478651368420021457. This value
+                                                   1
+is significantly smaller than the order n of the basepoint G of P-224. As a result, it is essential to verify domain parameter validity
+to ensure that users are performing operations on P-224 and not on its quadratic twist.
+
+
+
+
+                                                                  10
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+        086143415290314195533631308867097853951
+         (=0xffffffff 00000001 00000000 00000000 00000000 ffffffff ffffffff
+            ffffffff )
+h:    1
+n:     115792089210356248762697446949407573529\
+       996955224135760342422259061068512044369
+         (=0xffffffff 00000000 ffffffff ffffffff bce6faad a7179e84 f3b9cac2
+            fc632551)
+tr:   89188191154553853111372247798585809583
+          (=(p+1) − h⋅ n = 0x43190553 58e8617b 0c46353d 039cdaaf)
+a:    −3
+      = 115792089210356248762697446949407573530\
+         086143415290314195533631308867097853948
+          (=0xffffffff 00000001 00000000 00000000 00000000 ffffffff ffffffff
+              fffffffc)
+b:    41058363725152142129326129780047268409\
+      114441015993725554835256314039467401291
+          (=0x5ac635d8 aa3a93e7 b3ebbd55 769886bc 651d06b0 cc53b0f6 3bce3c3e
+              27d2604b)
+Gx:   48439561293906451759052585252797914202\
+      762949526041747995844080717082404635286
+          (=0x6b17d1f2 e12c4247 f8bce6e5 63a440f2 77037d81 2deb33a0 f4a13945
+               d898c296)
+Gy:   36134250956749795798585127919587881956\
+      611106672985015071877198253568414405109
+          (=0x4fe342e2 fe1a7f9b 8ee7eb4a 7c0f9e16 2bce3357 6b315ece cbb64068
+              37bf51f5)
+Seed: 0xc49d3608 86e70493 6a6678e1 139d26b7 819f7e90
+c:    57436011470200155964173534038266061871\
+      440426244159038175955947309464595790349
+        (=0x7efba166 2985be94 03cb055c 75d4f7e0 ce8d84a9 c5114abc af317768
+           0104fa0d)
+
+
+3.2.1.4.          P-384
+The elliptic curve P-384 is a Weierstrass curve Wa,b defined over the prime field GF(p) that has
+order h⋅n, where h = 1, and n is a prime number. The quadratic twist of this curve has order h1⋅n1,
+where h1 = 1, and 𝑛𝑛1 is a prime number. This curve has domain parameters D = (p, h, n, Type, a,
+b, G, {Seed, c}), where the Type is “Weierstrass curve,” and the other parameters are defined as
+follows:
+p:     2384 − 2128 − 296 + 232 − 1
+       = 3940200619639447921227904010014361380507973927046544666794\
+         8293404245721771496870329047266088258938001861606973112319
+          (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+              ffffffff fffffffe ffffffff 00000000 00000000 ffffffff)
+
+
+
+                                                11
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+h:     1
+n:     3940200619639447921227904010014361380507973927046544666794\
+       6905279627659399113263569398956308152294913554433653942643
+          (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+             c7634d81 f4372ddf 581a0db2 48b0a77a ecec196a ccc52973)
+tr:   1388124618062372383606759648309780106643088307173319169677
+         (=(p+1) − h⋅ n = 0x389cb27e 0bc8d21f a7e5f24c b74f5885 1313e696
+                            333ad68d)
+a:     −3
+       = 3940200619639447921227904010014361380507973927046544666794\
+         8293404245721771496870329047266088258938001861606973112316
+          (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+              ffffffff fffffffe ffffffff 00000000 00000000 fffffffc)
+b:     2758019355995970587784901184038904809305690585636156852142\
+       8707301988689241309860865136260764883745107765439761230575
+          (=0xb3312fa7 e23ee7e4 988e056b e3f82d19 181d9c6e fe814112
+              0314088f 5013875a c656398d 8a2ed19d 2a85c8ed d3ec2aef)
+Gx:    2624703509579968926862315674456698189185292349110921338781\
+       5615900925518854738050089022388053975719786650872476732087
+          (=0xaa87ca22 be8b0537 8eb1c71e f320ad74 6e1d3b62 8ba79b98
+              59f741e0 82542a38 5502f25d bf55296c 3a545e38 72760ab7)
+Gy:    832571096148902998554675128952010817928785304886131559470\
+       9205902480503199884419224438643760392947333078086511627871
+          (=0x3617de4a 96262c6f 5d9e98bf 9292dc29 f8f41dbd 289a147c
+              e9da3113 b5f0b8c0 0a60b1ce 1d7e819d 7a431d7c 90ea0e5f)
+Seed: 0xa335926a a319a27a 1d00896a 6773a482 7acdac73
+c:    1874980186709887347182107097135388878869033900306543902178\
+      0101954060871745882341382251168574711376101826101037376643
+        (=0x79d1e655 f868f02f ff48dcde e14151dd b80643c1 406d0ca1
+          0dfe6fc5 2009540a 495e8042 ea5f744f 6e184667 cc722483)
+
+
+3.2.1.5.          P-521
+The elliptic curve P-521 is a Weierstrass curve Wa,b defined over the prime field GF(p) that has
+order h⋅n, where h = 1, and n is a prime number. The quadratic twist of this curve has order h1⋅n1,
+where h1 is at least 5 × 7 × 69697531 × 635884237, and 𝑛𝑛1 is a prime number. This curve has
+domain parameters D = (p, h, n, Type, a, b, G, {Seed, c}), where the Type is “Weierstrass curve,”
+and the other parameters are defined as follows:
+p:     2521 − 1
+       = 686479766013060971498190079908139321726943530014330540939\
+         446345918554318339765605212255964066145455497729631139148 \
+         0858037121987999716643812574028291115057151
+             (=0x1ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+                          ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+                          ffffffff ffffffff ffffffff ffffffff)
+
+
+
+                                                12
+NIST SP 800-186                                       Discrete Logarithm-based Cryptography:
+February 2023                                               Elliptic Curve Domain Parameters
+
+h:     1
+n:     686479766013060971498190079908139321726943530014330540939\
+       446345918554318339765539424505774633321719753296399637136\
+       3321113864768612440380340372808892707005449
+           (=0x1ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+                     ffffffff fffffffa 51868783 bf2f966b 7fcc0148 f709a5d0
+                     3bb5c9b8 899c47ae bb6fb71e 91386409)
+tr:   657877501894328237357444332315020117536\
+      923257219387276263472201219398408051703
+       (=(p+1) − h⋅ n = 0x5 ae79787c 40d06994 8033feb7 08f65a2f
+                         c44a3647 7663b851 449048e1 6ec79bf7)
+a:    −3
+      = 686479766013060971498190079908139321726943530014330540939\
+        446345918554318339765605212255964066145455497729631139148 \
+        0858037121987999716643812574028291115057148
+          (=0x1ff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+                    ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+                    ffffffff ffffffff ffffffff fffffffc)
+b:    1093849038073734274511112390766805569936207598951683748994\
+      5863944959531161507350160137087375737596232485921322967063\
+      13309438452531591012912142327488478985984
+         (=0x051 953eb961 8e1c9a1f 929a21a0 b68540ee a2da725b 99b315f3
+                   b8b48991 8ef109e1 56193951 ec7e937b 1652c0bd 3bb1bf07
+                   3573df88 3d2c34f1 ef451fd4 6b503f00)
+Gx:   2661740802050217063228768716723360960729859168756973147706\
+      6713684188029449964278084915450806277719023520942412250655\
+      58662157113545570916814161637315895999846
+         (=0xc6 858e06b7 0404e9cd 9e3ecb66 2395b442 9c648139 053fb521
+                  f828af60 6b4d3dba a14b5e77 efe75928 fe1dc127 a2ffa8de
+                  3348b3c1 856a429b f97e7e31 c2e5bd66)
+Gy:   37571800257700204635455072244911836035944551347697624866945\
+      67779615544477440556316691234405012945539562144444537289428\
+      522585666729196580810124344277578376784
+         (=0x118 39296a78 9a3bc004 5c8a5fb4 2c7d1bd9 98f54449 579b4468
+                 17afbd17 273e662c 97ee7299 5ef42640 c550b901 3fad0761
+                 353c7086 a272c240 88be9476 9fd16650)
+Seed: 0xd09e8800 291cb853 96cc6717 393284aa a0da64ba
+c:    2420736670956961470587751833778383872272949280174637971106318\
+      2239560106363555573338990358663426503785752212772688861827046\
+      43828850020061383251826928984446519
+         (=0x0b4 8bfa5f42 0a349495 39d2bdfc 264eeeeb 077688e4 4fbf0ad8
+                   f6d0edb3 7bd6b533 28100051 8e19f1b9 ffbe0fe9 ed8a3c22
+                   00b8f875 e523868c 70c1e5bf 55bad637)
+
+
+
+
+                                         13
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+3.2.1.6.          W-25519
+The elliptic curve W-25519 is a Weierstrass curve Wa,b defined over the prime field GF(p) with p
+= 2255-19 that has order h⋅n, where h = 8, and n is a prime number. The quadratic twist of this
+curve has order h1⋅n1, where h1 = 4, and 𝑛𝑛1 is a prime number. This curve has domain parameters
+D = (p, h, n, Type, a, b, G), where the Type is “Weierstrass curve,” and the other parameters are
+defined as follows:
+p:    2255−19
+         (=0x7fffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+               ffffffed)
+h:    8
+n:    72370055773322622139731865630429942408\
+      57116359379907606001950938285454250989
+          (=2252 + 0x14def9de a2f79cd6 5812631a 5cf5d3ed)
+tr:   −221938542218978828286815502327069187962
+         (=(p+1) − h⋅ n = − 0xa6f7cef5 17bce6b2 c09318d2 e7ae9f7a)
+a:    19298681539552699237261830834781317975\
+      544997444273427339909597334573241639236
+         (=0x2aaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaa98
+              4914a144)
+b:    55751746669818908907645289078257140818\
+      241103727901012315294400837956729358436
+         (=0x7b425ed0 97b425ed 097b425e d097b425 ed097b42 5ed097b4 260b5e9c
+              7710c864)
+Gx:   19298681539552699237261830834781317975\
+      544997444273427339909597334652188435546
+         (=0x2aaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa
+               aaaaaaaa aaad245a)
+Gy:   43114425171068552920764898935933967039\
+       370386198203806730763910166200978582548
+       (=0x5f51e65e 475f794b 1fe122d3 88b72eb3 6dc2b281 92839e4d d6163a5d
+       81312c14)
+
+The curve W-25519 is isomorphic to Curve25519 specified in Section 3.2.2.1. See Appendix
+B.2 for more details.
+
+3.2.1.7.          W-448
+The elliptic curve W-448 is the Weierstrass curve Wa,b defined over the prime field GF(p) with p
+= 2448−2224−1 and has order h⋅n, where h = 4, and n is a prime number. The quadratic twist of this
+curve has order h1⋅n1, where h1 = 4, and n1 is a prime number. This curve has domain parameters
+D = (p, h, n, Type, a, b, G), where the Type is “Weierstrass curve,” and the other parameters are
+defined as follows:
+p:    2448−2224−1
+         (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe
+              ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff)
+
+
+                                               14
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+h:    4
+n:    1817096810739017226373309519720011335884103401718295150703725497951
+      46003961539585716195755291692375963310293709091662304773755859649779
+         (=2446 − 0x8335dc16 3bb124b6 5129c96f de933d8d 723a70aa dc873d6d
+                    54a7bb0d)
+tr:   28312320572429821613362531907042076847709625476988141958474579766324
+         (=(p+1) − h⋅ n = 0x1 0cd77058 eec492d9 44a725bf 7a4cf635 c8e9c2ab
+                              721cf5b5 529eec34)
+a:    4845591495304045936995492052586696895690942404582120401876601327870
+      74885444487181790930922465784363953392589641229091574035657199637535
+         (=0xaaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaa9
+           ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe 1a76d41f)
+b:    2691995275168914409441940029214831608717190224767844667709222959928
+      19380802492878772739401369880202196329216467349495319191685664513904
+        (=0x5ed097b4 25ed097b 425ed097 b425ed09 7b425ed0 97b425ed 097b425e
+             71c71c71 c71c71c7 1c71c71c 71c71c71 c71c71c7 1c72c87b 7cc69f70)
+Gx:   4845591495304045936995492052586696895690942404582120401876601327870\
+      7488544448718179093092246578436395339258964122909157403566534562907
+         (=0xaaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa aaaaaaaa
+                  00000000 00000000 00000000 00000000 00000000 00000000 0000cb91)
+Gy:   3552939267855681752641275020637833348089763993877142718318808984351\
+      69088786967410002932673765864550910142774147268105838985595290606362
+         (=0x7d235d12 95f5b1f6 6c98ab6e 58326fce cbae5d34 f55545d0 60f75dc2
+            8df3f6ed b8027e23 46430d21 1312c4b1 50677af7 6fd7223d 457b5b1a)
+
+The curve W-448 is isomorphic to the curve Curve448 specified in Section 3.2.2.2. See
+Appendix B.2 for more details.
+
+3.2.2. Montgomery Curves
+As a result of simpler addition formulas, Montgomery curves may offer improved performance
+with improved resistance to side-channel attacks. These curves can also provide a bridge
+between short-Weierstrass curves and Edwards curves.
+
+3.2.2.1.          Curve25519
+The elliptic curve Curve25519 is the Montgomery curve MA,B defined over the prime field GF(p)
+with p = 2255-19 and parameters A = 486662 and B = 1 [RFC_7748]. This curve has order h⋅n,
+where h = 8, and n is a prime number. For this curve, A2−4 is not a square in GF(p), whereas A+2
+is. The quadratic twist of this curve has order h1⋅n1, where h1 = 4, and n1 is a prime number. This
+curve has domain parameters D = (p, h, n, Type, A, B, G), where the Type is “Montgomery
+curve,” and the other parameters are defined as follows:
+p:    2255−19
+         (=0x7fffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+              ffffffed)
+h:    8
+
+
+                                                15
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+n:    72370055773322622139731865630429942408\
+      57116359379907606001950938285454250989
+          (=2252 + 0x14def9de a2f79cd6 5812631a 5cf5d3ed)
+tr:   −221938542218978828286815502327069187962
+         (=(p+1) − h⋅ n = − 0xa6f7cef5 17bce6b2 c09318d2 e7ae9f7a)
+A:    486662
+B:    1
+Gu:    9
+         (=0x9)
+Gv:    43114425171068552920764898935933967039\
+       370386198203806730763910166200978582548
+        (=0x5f51e65e 475f794b 1fe122d3 88b72eb3 6dc2b281 92839e4d d6163a5d
+       81312c14)
+
+Curve25519 is isomorphic to the curve W-25519 specified in Section 3.2.2.1 and is birationally
+equivalent to the curve Edwards25519. See Appendices B.1 and B.2 for more details.
+
+3.2.2.2.          Curve448
+The elliptic curve Curve448 is the Montgomery curve MA,B defined over the prime field GF(p)
+with p = 2448−2224−1 and parameters A = 156326 and B = 1 [RFC_7748]. This curve has order
+h⋅n, where h = 4, and n is a prime number. For this curve, A2−4 is not a square in GF(p), whereas
+A-2 is. The quadratic twist of this curve has order h1⋅n1, where h1 = 4, and n1 is a prime number.
+This curve has domain parameters D = (p, h, n, Type, A, B, G), where the Type is “Montgomery
+curve,” and the other parameters are defined as follows:
+
+p:    2448−2224−1
+         (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe
+              ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff)
+h:    4
+n:    1817096810739017226373309519720011335884103401718295150703725497951
+      46003961539585716195755291692375963310293709091662304773755859649779
+         (=2446 − 0x8335dc16 3bb124b6 5129c96f de933d8d 723a70aa dc873d6d
+                    54a7bb0d)
+tr:   28312320572429821613362531907042076847709625476988141958474579766324
+         (=(p+1) − h⋅ n = 0x1 0cd77058 eec492d9 44a725bf 7a4cf635 c8e9c2ab
+                              721cf5b5 529eec34)
+A:    156326
+B:    1
+Gu:   5
+         (=0x5)
+Gv:   3552939267855681752641275020637833348089763993877142718318808984351\
+      69088786967410002932673765864550910142774147268105838985595290606362
+         (=0x7d235d12 95f5b1f6 6c98ab6e 58326fce cbae5d34 f55545d0 60f75dc2
+            8df3f6ed b8027e23 46430d21 1312c4b1 50677af7 6fd7223d 457b5b1a)
+
+
+
+
+                                                16
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+Curve448 is isomorphic to W-448, specified in Section 3.2.1.7 (see Appendix B.2). In addition,
+Curve448 is birationally equivalent to E448. See Appendix B.1 for details.
+
+3.2.3. Twisted Edwards Curves
+Edwards curves offer high performance for elliptic curve calculations and protection against
+side-channel attacks. The Edwards Curve Digital Signature Algorithm (EdDSA) is a digital
+signature scheme based on twisted Edwards curves and is specified in FIPS 186-5.
+
+3.2.3.1.          Edwards25519
+The elliptic curve Edwards25519 is the twisted Edwards curve Ea,d defined over the prime field
+GF(p) with p = 2255-19 and parameters a = −1 and d = −121665/121666 (i.e.,
+37095705934669439343138083508754565189542113879843219016388785533085940283555)
+[RFC_8032]. This curve has order h⋅n, where h = 8, and n is a prime number. For this curve, a is
+a square in GF(p), whereas d is not. The quadratic twist of this curve has order h1⋅𝑛𝑛1 , where h1 =
+4, and n1 is a prime number. This curve has domain parameters D = (p, h, n, Type, a, d, G),
+where the Type is “twisted Edwards curve,” and the other parameters are defined as follows:
+p:    2255−19
+         (=0x7fffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+               ffffffed)
+h:    8
+n:    72370055773322622139731865630429942408\
+      57116359379907606001950938285454250989
+          (=2252 + 0x14def9de a2f79cd6 5812631a 5cf5d3ed)
+tr:   −221938542218978828286815502327069187962
+         (=(p+1) − h⋅ n = − 0xa6f7cef5 17bce6b2 c09318d2 e7ae9f7a)
+a:    −1
+d:    −121665/121666 = 37095705934669439343138083508754565189\
+                         542113879843219016388785533085940283555
+         (=0x52036cee 2b6ffe73 8cc74079 7779e898 00700a4d 4141d8ab 75eb4dca
+            135978a3)
+Gx:   15112221349535400772501151409588531511\
+      454012693041857206046113283949847762202
+         (=0x216936d3 cd6e53fe c0a4e231 fdd6dc5c 692cc760 9525a7b2 c9562d60
+               8f25d51a)
+Gy:    4/5 = 46316835694926478169428394003475163141\
+             307993866256225615783033603165251855960
+         (=0x66666666 66666666 66666666 66666666 66666666 66666666 66666666
+              66666658)
+
+The curve Edwards25519 is birationally equivalent to the curve Curve25519 specified in Section
+3.2.2.1. See Appendix B.1 for more details.
+
+
+
+
+                                                 17
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+3.2.3.2.          Edwards448
+The elliptic curve Edwards448 is the Edwards curve Ea,d defined over the prime field GF(p) with
+p = 2448−2224−1 and parameters a = 1 and d = −39081 [RFC_8032]. This curve has order h⋅n,
+where h = 4, and n is a prime number. For this curve, a is a square in GF(p), whereas d is not.
+The quadratic twist of this curve has order h1⋅𝑛𝑛1 , where h1 = 4, and n1 is a prime number. This
+curve has domain parameters D = (p, h, n, Type, a, d, G), where the Type is “twisted Edwards
+curve,” and the other parameters are defined as follows:
+p:    2448−2224−1
+         (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe
+               ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff)
+h:    4
+n:    1817096810739017226373309519720011335884103401718295150703725497951
+      46003961539585716195755291692375963310293709091662304773755859649779
+          (=2446 − 0x8335dc16 3bb124b6 5129c96f de933d8d 723a70aa dc873d6d
+                     54a7bb0d)
+tr:   28312320572429821613362531907042076847709625476988141958474579766324
+          (=(p+1) − h⋅ n = 0x1 0cd77058 eec492d9 44a725bf 7a4cf635 c8e9c2ab
+                               721cf5b5 529eec34)
+a:    1
+d:    −39081
+      = 7268387242956068905493238078880045343536413606873180602814901991806\
+        12328166730772686396383698676545930088884461843637361053498018326358
+          (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe
+               ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffff6756)
+Gx:   2245800402959243001876043340998960362467896416325641342461254616869\
+      50415467406032909029192869357953282578032075146446173674602635247710
+          (=0x4f1970c6 6bed0ded 221d15a6 22bf36da 9e146570 470f1767 ea6de324
+              a3d3a464 12ae1af7 2ab66511 433b80e1 8b00938e 2626a82b c70cc05e)
+Gy:   2988192100784814926760179304439306734375440401540802420959282413723\
+      31506189835876003536878655418784733982303233503462500531545062832660
+         (=0x693f4671 6eb6bc24 88762037 56c9c762 4bea7373 6ca39840 87789c1e
+            05a0c2d7 3ad3ff1c e67c39c4 fdbd132c 4ed7c8ad 9808795b f230fa14)
+
+The curve Edwards448 is 4-isogenous to both the curves E448 and Curve448. See Appendix B.4
+for details.
+
+3.2.3.3.          E448
+The elliptic curve E448 is the Edwards curve Ea,d defined over the prime field GF(p) with p =
+2448−2224−1 and parameters a = 1 and d = 39082/39081. This curve has order h⋅n, where h = 4,
+and n is a prime number. For this curve, a is a square in GF(p), whereas d is not. The quadratic
+twist of this curve has order h1⋅n1, where h1 = 4, and n1 is a prime number. This curve has domain
+parameters D = (p, h, n, Type, a, d, G), where the Type is a “twisted Edwards curve,” and the
+other parameters are defined as follows:
+
+
+
+                                               18
+NIST SP 800-186                                                   Discrete Logarithm-based Cryptography:
+February 2023                                                           Elliptic Curve Domain Parameters
+
+p:    2448−2224−1
+         (=0xffffffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffffe
+              ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff)
+h:    4
+n:    1817096810739017226373309519720011335884103401718295150703725497951
+      46003961539585716195755291692375963310293709091662304773755859649779
+         (=2446 − 0x8335dc16 3bb124b6 5129c96f de933d8d 723a70aa dc873d6d
+                    54a7bb0d)
+tr:   28312320572429821613362531907042076847709625476988141958474579766324
+         (=(p+1) − h⋅ n = 0x1 0cd77058 eec492d9 44a725bf 7a4cf635 c8e9c2ab
+                              721cf5b5 529eec34)
+a:    1
+d:    39082/39081 =
+         6119758507445291761604232209655533175432196968710166263289689364150\
+         87860042636474891785599283666020414768678979989378147065462815545017
+         (=0xd78b4bdc 7f0daf19 f24f38c2 9373a2cc ad461572 42a50f37 809b1da3
+              412a12e7 9ccc9c81 264cfe9a d0809970 58fb61c4 243cc32d baa156b9)
+Gx:   3453974930397295163740086041505374102666552600751832902164069702816\
+      45695073672344430481787759340633221708391583424041788924124567700732
+         (=0x79a70b2b 70400553 ae7c9df4 16c792c6 1128751a c9296924 0c25a07d
+             728bdc93 e21f7787 ed697224 9de732f3 8496cd11 69871309 3e9c04fc)
+Gy:   3/2 =
+      3634193621478034452746619039440022671768206803436590301407450995903\
+      06164083365386343198191849338272965044442230921818680526749009182721
+        (=0x7fffffff ffffffff ffffffff ffffffff ffffffff ffffffff ffffffff
+      80000000 00000000 00000000 00000000 00000000 00000000 00000001)
+
+The curve E448 is birationally equivalent to Curve448, specified in Section 3.2.2.2. See
+Appendix B.1 for more details. The curve Edwards448 (specified in Section 3.2.3.2) is 4-
+isogenous to the curve E448. See Appendix B.4 for further information.
+
+       Curves Over Binary Fields (Deprecated)
+This section specifies elliptic curves over binary fields where each curve takes the form of a
+curve in short-Weierstrass form and is either a Koblitz curve (Section 3.3.1) or a pseudorandom
+curve (Section 3.3.2). Due to their limited adoption, elliptic curves over binary fields (i.e., all of
+the curves specified in Section 3.3) are deprecated and may be removed from a subsequent
+revision to these guidelines to facilitate interoperability and simplify elliptic curve standards and
+implementations. New implementations should select an appropriate elliptic curve over a prime
+field from Section 3.2.
+Here, the domain parameters a and b for Koblitz curves are elements of the base field GF(2) (i.e.,
+b = 1 and a = 0 or a = 1), whereas for pseudorandom curves, a = 1 and b is a non-zero element of
+GF(2m).
+For each field degree m, a pseudorandom curve is given along with a Koblitz curve. The
+pseudorandom curve has the form
+
+
+                                                  19
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+                              E: y 2 + x y = x 3 + x 2 + b,
+and the Koblitz curve has the form
+                              Ea: y2 + x y = x 3 + ax 2 + 1,
+where a = 0 or 1.
+For each pseudorandom curve, the cofactor is h = 2. The cofactor of each Koblitz curve is h = 2
+if a = 1, and h = 4 if a = 0.
+The coefficients of the pseudorandom curves and the coordinates of the base points of both kinds
+of curves are given in terms of both the polynomial and normal basis representations discussed in
+Section 3.1.3.
+For each m, the following parameters are given:
+Field Representation:
+   •   The normal basis type T
+   •   The field polynomial (a trinomial or pentanomial) f(z)
+
+Koblitz Curve:
+   •   The coefficient a
+   •   The base point order n
+   •   The base point x coordinate Gx
+   •   The base point y coordinate Gy
+
+Pseudorandom curve:
+   •   The base point order n
+
+Pseudorandom curve (Polynomial Basis representation):
+   •   The coefficient b
+   •   The base point x coordinate Gx
+   •   The base point y coordinate Gy
+
+Pseudorandom curve (Normal Basis representation):
+   •   The 160-bit input Seed to the SHA-1 based algorithm (i.e., the domain parameter seed)
+   •   The coefficient b (i.e., the output of the SHA-1 based algorithm)
+   •   The base point x coordinate Gx
+   •   The base point y coordinate Gy
+
+Integers (such as T, m, and n) are given in decimal form. Bit strings and field elements are given
+in hexadecimal.
+
+
+
+
+                                                 20
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+3.3.1. Koblitz Curves
+
+3.3.1.1.          Curve K-163
+This curve is for legacy-use only. See FIPS 186-4 for the specification.
+
+3.3.1.2.          Curve K-233
+The elliptic curve K-233 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 233 and parameters a = 0 and b = 1. This curve has order h⋅n, where h = 4, and n is a prime
+number. This curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where
+the Type is “Koblitz curve,” and the other parameters are defined as follows:
+T:      2
+f(z):   z233 + z74 + 1
+h:      4
+n:      345087317339528189371737793113851276057094098886225212\
+        6328087024741343
+          (=0x80 00000000 00000000 00000000 00069d5b b915bcd4 6efb1ad5 f173abdf)
+tr:      −137381546011108235394987299651366779
+        (=(2m+1) − h⋅ n = −0x1a756e e456f351 bbec6b57 c5ceaf7b)
+a:      0
+        (=0x000 00000000 00000000 00000000 00000000 00000000 00000000 00000000)
+b:      1
+        (=0x000 00000000 00000000 00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+Gx:        0x172 32ba853a 7e731af1 29f22ff4 149563a4 19c26bf5 0a4c9d6e efad6126
+Gy:        0x1db 537dece8 19b7f70f 555a67c4 27a8cd9b f18aeb9b 56e0c110 56fae6a3
+
+Normal basis:
+Gx:        0x0fd e76d9dcd 26e643ac 26f1aa90 1aa12978 4b71fc07 22b2d056 14d650b3
+Gy:        0x064 3e317633 155c9e04 47ba8020 a3c43177 450ee036 d6335014 34cac978
+
+Seed: n/a (binary Koblitz curve)
+
+3.3.1.3.          Curve K-283
+The elliptic curve K-283 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 283 and parameters a = 0 and b = 1. This curve has order h⋅n, where h = 4, and n is a prime
+number. This curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where
+the Type is “Koblitz curve,” and the other parameters are defined as follows:
+T:      6
+f(z):   z283 + z12 + z7 + z5 + 1
+h:      4
+n:      388533778445145814183892381364703781328481\
+        1733793061324295874997529815829704422603873
+
+
+                                                21
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+      (=0x1ffffff ffffffff ffffffff ffffffff ffffe9ae 2ed07577
+                    265dff7f 94451e06 1e163c61)
+tr:    7777244870872830999287791970962823977569917
+      (=(2m+1) − h⋅ n = 0x5947 44be2a23 66880201 aeeb87e7 87a70e7d)
+a:    0
+      (=0x0000000 00000000 00000000 00000000 00000000 00000000
+                    00000000 00000000 00000000)
+b:    1
+      (=0x0000000 00000000 00000000 00000000 00000000 00000000
+                    00000000 00000000 00000001)
+Polynomial basis:
+Gx:        0x503213f 78ca4488 3f1a3b81 62f188e5 53cd265f 23c1567a
+                      16876913 b0c2ac24 58492836
+Gy:        0x1ccda38 0f1c9e31 8d90f95d 07e5426f e87e45c0 e8184698
+                    e4596236 4e341161 77dd2259
+Normal basis:
+Gx:        0x3ab9593 f8db09fc 188f1d7c 4ac9fcc3 e57fcd3b db15024b
+                      212c7022 9de5fcd9 2eb0ea60
+Gy:        0x2118c47 55e7345c d8f603ef 93b98b10 6fe8854f feb9a3b3
+                     04634cc8 3a0e759f 0c2686b1
+Seed: n/a (binary Koblitz curve)
+
+3.3.1.4.          Curve K-409
+The elliptic curve K-409 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 409 and parameters a = 0 and b = 1. This curve has order h⋅n, where h = 4, and n is a prime
+number. This curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where
+the Type is “Koblitz curve,” and the other parameters are defined as follows:
+T:      4
+f(z):   z409 + z87 + 1
+h:      4
+n:      3305279843951242994759576540163855199142023414821406096423243\
+        95022880711289249191050673258457777458014096366590617731358671
+        (= 0x7fffff ffffffff ffffffff ffffffff ffffffff ffffffff fffffe5f
+                       83b2d4ea 20400ec4 557d5ed3 e3e7ca5b 4b5c83b8 e01e5fcf)
+tr:      10457288737315625927447685387048320737638796957687575791173829
+        (=(2m+1) − h⋅ n = 0x681 f134ac57 7effc4ee aa0a84b0 7060d692 d28df11c
+                                7f8680c5)
+a:      0
+        (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000000 00000000 00000000 00000000)
+b:      1
+        (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+
+
+                                               22
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+Gx:        0x060f05f 658f49c1 ad3ab189 0f718421 0efd0987 e307c84c 27accfb8
+                     f9f67cc2 c460189e b5aaaa62 ee222eb1 b35540cf e9023746
+Gy:        0x1e36905 0b7c4e42 acba1dac bf04299c 3460782f 918ea427 e6325165
+                     e9ea10e3 da5f6c42 e9c55215 aa9ca27a 5863ec48 d8e0286b
+Normal basis:
+Gx:        0x1b559c7 cba2422e 3affe133 43e808b5 5e012d72 6ca0b7e6 a63aeafb
+                     c1e3a98e 10ca0fcf 98350c3b 7f89a975 4a8e1dc0 713cec4a
+Gy:        0x16d8c42 052f07e7 713e7490 eff318ba 1abd6fef 8a5433c8 94b24f5c
+                     817aeb79 852496fb ee803a47 bc8a2038 78ebf1c4 99afd7d6
+Seed: n/a (binary Koblitz curve)
+
+3.3.1.5.          Curve K-571
+The elliptic curve K-571 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 571 and parameters a = 0 and b = 1. This curve has order h⋅n, where h = 4, and n is a prime
+number. This curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where
+the Type is “Koblitz curve,” and the other parameters are defined as follows:
+T:      10
+f(z):   z571 + z10 + z5 + z2 + 1
+h:      4
+n:      193226876150862917234767594546599367214946366485321749932\
+        861762572575957114478021226813397852270671183470671280082\
+        5351461273674974066617311929682421617092503555733685276673
+        (=0x 2000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 131850e1 f19a63e4 b391a8db 917f4138
+                       b630d84b e5d63938 1e91deb4 5cfe778f 637c1001)
+
+tr:      −148380926981691413899619140297051490364542\
+        574180493936232912339534208516828973111459843
+        (=(2m+1) − h⋅ n = -0x4c614387 c6698f92 ce46a36e 45fd04e2 d8c3612f
+                             9758e4e0 7a477ad1 73f9de3d 8df04003)
+a:      0
+        (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000000 00000000 00000000 00000000)
+                       00000000 00000000 00000000 00000000 00000000)
+b:      1
+        (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000000 00000000 00000000 00000000)
+                       00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+Gx:        0x26eb7a8 59923fbc 82189631 f8103fe4 ac9ca297 0012d5d4 60248048
+                     01841ca4 43709584 93b205e6 47da304d b4ceb08c bbd1ba39
+                     494776fb 988b4717 4dca88c7 e2945283 a01c8972
+Gy:        0x349dc80 7f4fbf37 4f4aeade 3bca9531 4dd58cec 9f307a54 ffc61efc
+                     006d8a2c 9d4979c0 ac44aea7 4fbebbb9 f772aedc b620b01a
+                    7ba7af1b 320430c8 591984f6 01cd4c14 3ef1c7a3
+
+
+
+                                               23
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Normal basis:
+Gx:        0x04bb2db a418d0db 107adae0 03427e5d 7cc139ac b465e593 4f0bea2a
+                     b2f3622b c29b3d5b 9aa7a1fd fd5d8be6 6057c100 8e71e484
+                     bcd98f22 bf847642 37673674 29ef2ec5 bc3ebcf7
+Gy:        0x44cbb57 de20788d 2c952d7b 56cf39bd 3e89b189 84bd124e 751ceff4
+                     369dd8da c6a59e6e 745df44d 8220ce22 aa2c852c fcbbef49
+                     ebaa98bd 2483e331 80e04286 feaa2530 50caff60
+Seed: n/a (binary Koblitz curve)
+
+3.3.2. Pseudorandom Curves
+
+3.3.2.1.          Curve B-163
+This curve is for legacy-use only. See FIPS 186-4 for the specification.
+
+3.3.2.2.          Curve B-233
+The elliptic curve B-233 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 233 and parameter a = 1. This curve has order h⋅n, where h = 2, and n is a prime number. This
+curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where the Type is
+“Weierstrass curve,” and the other parameters are defined as follows:
+T:      2
+f(z):   z233 + z74 + 1
+h:      2
+n:      690174634679056378743475586227702555583981273734501355\
+        5379383634485463
+        (=0x100 00000000 00000000 00000000 0013e974 e72f8a69 22031d26 03cfe0d7)
+tr:      −206777407530349254000433718821372333
+        (=(2m+1) − h⋅ n = −0x27d2e9 ce5f14d2 44063a4c 079fc1ad)
+a:      1
+        (=0x000 00000000 00000000 00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+b:         0x066 647ede6c 332c7f8c 0923bb58 213b333b 20e9ce42 81fe115f 7d8f90ad
+Gx:        0x0fa c9dfcbac 8313bb21 39f1bb75 5fef65bc 391f8b36 f8f8eb73 71fd558b
+Gy:        0x100 6a08a419 03350678 e58528be bf8a0bef f867a7ca 36716f7e 01f81052
+
+Normal basis:
+b:         0x1a0 03e0962d 4f9a8e40 7c904a95 38163adb 82521260 0c7752ad 52233279
+Gx:        0x18b 863524b3 cdfefb94 f2784e0b 116faac5 4404bc91 62a363ba b84a14c5
+Gy:        0x049 25df77bd 8b8ff1a5 ff519417 822bfedf 2bbd7526 44292c98 c7af6e02
+
+Seed:      0x74d59ff0 7f6b413d 0ea14b34 4b20a2db 049b50c3
+
+
+
+
+                                                24
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+3.3.2.3.          Curve B-283
+The elliptic curve B-283 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 283 and parameter a = 1. This curve has order h⋅n, where h = 2, and n is a prime number. This
+curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where the Type is
+“Weierstrass curve,” and the other parameters are defined as follows:
+T:    6
+f(z): z283 + z12 + z7 + z5 + 1
+h:    2
+n:    7770675568902916283677847627294075626569625924376904889\
+      109196526770044277787378692871
+      (=0x3ffffff ffffffff ffffffff ffffffff ffffef90 399660fc
+                       938a9016 5b042a7c efadb307)
+tr:    2863663306391796106224371145726066910599667
+      (=(2m+1) − h⋅ n = 0x 20df8cd33e06d8eadfd349f7ab0620a499f3)
+a:    1
+      (=0x0000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000001)
+Polynomial basis:
+b:         0x27b680a c8b8596d a5a4af8a 19a0303f ca97fd76 45309fa2
+                     a581485a f6263e31 3b79a2f5
+Gx:        0x5f93925 8db7dd90 e1934f8c 70b0dfec 2eed25b8 557eac9c
+                     80e2e198 f8cdbecd 0x86b12053
+Gy:        0x3676854 fe24141c b98fe6d4 b20d02b4 516ff702 350eddb0
+                     826779c8 13f0df45 be8112f4
+Normal basis:
+b:          0x157261b 894739fb 5a13503f 55f0b3f1 0c560116 66331022
+                      01138cc1 80c0206b dafbc951
+Gx:         0x749468e 464ee468 634b21f7 f61cb700 701817e6 bc36a236
+                      4cb8906e 940948ea a463c35d
+Gy:         0x62968bd 3b489ac5 c9b859da 68475c31 5bafcdc4 ccd0dc90
+                      5b70f624 46f49c05 2f49c08c
+Seed:      0x77e2b073 70eb0f83 2a6dd5b6 2dfc88cd 06bb84be
+
+
+3.3.2.4.          Curve B-409
+The elliptic curve B-409 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 409 and parameter a = 1. This curve has order h⋅n, where h = 2, and n is a prime number. This
+curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where the Type is
+“Weierstrass curve,” and the other parameters are defined as follows:
+T:      4
+f(z):   z409 + z87 + 1
+h:      2
+
+
+
+
+                                               25
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+n:      6610559687902485989519153080327710398284046829642812192846487\
+        98304157774827374805208143723762179110965979867288366567526771
+        (=0x1000000 00000000 00000000 00000000 00000000 00000000 000001e2
+                       aad6a612 f33307be 5fa47c3c 9e052f83 8164cd37 d9a21173)
+tr:      -6059503967182126918765909026644927652236777310526686418445029
+        (=(2m+1) − h⋅ n =        -0x3c5 55ad4c25 e6660f7c bf48f879 3c0a5f07
+                      02c99a6f b34422e5)
+a:      1
+        (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                       00000000 00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+b:         0x021a5c2 c8ee9feb 5c4b9a75 3b7b476b 7fd6422e f1f3dd67 4761fa99
+                    d6ac27c8 a9a197b2 72822f6c d57a55aa 4f50ae31 7b13545f
+Gx:        0x15d4860 d088ddb3 496b0c60 64756260 441cde4a f1771d4d b01ffe5b
+                     34e59703 dc255a86 8a118051 5603aeab 60794e54 bb7996a7
+Gy:        0x061b1cf ab6be5f3 2bbfa783 24ed106a 7636b9c5 a7bd198d 0158aa4f
+                     5488d08f 38514f1f df4b4f40 d2181b36 81c364ba 0273c706
+Normal basis:
+b:        0x124d065 1c3d3772 f7f5a1fe 6e715559 e2129bdf a04d52f7 b6ac7c53
+                    2cf0ed06 f610072d 88ad2fdc c50c6fde 72843670 f8b3742a
+Gx:       0x0ceacbc 9f475767 d8e69f3b 5dfab398 13685262 bcacf22b 84c7b6dd
+                   981899e7 318c96f0 761f77c6 02c016ce d7c548de 830d708f
+Gy:       0x199d64b a8f089c6 db0e0b61 e80bb959 34afd0ca f2e8be76 d1c5e9af
+                    fc7476df 49142691 ad303902 88aa09bc c59c1573 aa3c009a
+Seed:    0x4099b5a4 57f9d69f 79213d09 4c4bcd4d 4262210b
+
+
+3.3.2.5.          Curve B-571
+The elliptic curve B-571 is a Weierstrass curve Ba,b defined over the binary field GF(2m) with m
+= 571 and parameter a = 1. This curve has order h⋅n, where h = 2, and n is a prime number. This
+curve has domain parameters D = (m, f(z), T, h, n, Type, a, b, G, {Seed, c}), where the Type is
+“Weierstrass curve,” and the other parameters are defined as follows:
+T:      10
+f(z):   z571 + z10 + z5 + z2 + 1
+h:      2
+n:      386453752301725834469535189093198734429892732970643499865\
+        723525145151914228956042453614399938941577308313388112192\
+        6944486246872462816813070234528288303332411393191105285703
+        (=0x3fffff ffffffff ffffffff fffffffff ffffffff ffffffff ffffffff
+                      ffffffff ffffffff e661ce18 ff559873 08059b18 6823851e
+                      c7dd9ca1 161de93d 5174d66e 8382e9bb 2fe84e47)
+
+tr:     9953438501360975865946981915046538223641239\
+        6452349171016760770327496674607579419075443
+        (=(2m+1) − h⋅ n =    0x333c63ce 0154cf19 eff4c9cf 2fb8f5c2 7044c6bd
+                               d3c42d85 5d165322 f8fa2c89 a02f6373)
+
+
+
+                                               26
+NIST SP 800-186                                     Discrete Logarithm-based Cryptography:
+February 2023                                             Elliptic Curve Domain Parameters
+
+a:     1
+       (=0x0000000 00000000 00000000 00000000 00000000 00000000 00000000
+                    00000000 00000000 00000000 00000000 00000000 00000000
+                    00000000 00000000 00000000 00000000 00000001)
+Polynomial basis:
+b:      0x2f40e7e 2221f295 de297117 b7f3d62f 5c6a97ff cb8ceff1 cd6ba8ce
+                  4a9a18ad 84ffabbd 8efa5933 2be7ad67 56a66e29 4afd185a
+                  78ff12aa 520e4de7 39baca0c 7ffeff7f 2955727a
+Gx:     0x303001d 34b85629 6c16c0d4 0d3cd775 0a93d1d2 955fa80a a5f40fc8
+                  db7b2abd bde53950 f4c0d293 cdd711a3 5b67fb14 99ae6003
+                  8614f139 4abfa3b4 c850d927 e1e7769c 8eec2d19
+Gy:     0x37bf273 42da639b 6dccfffe b73d69d7 8c6c27a6 009cbbca 1980f853
+                  3921e8a6 84423e43 bab08a57 6291af8f 461bb2a8 b3531d2f
+                  0485c19b 16e2f151 6e23dd3c 1a4827af 1b8ac15b
+Normal basis:
+b:     0x3762d0d 47116006 179da356 88eeaccf 591a5cde a7500011 8d9608c5
+                 9132d434 26101a1d fb377411 5f586623 f75f0000 1ce61198
+                 3c1275fa 31f5bc9f 4be1a0f4 67f01ca8 85c74777
+Gx:    0x0735e03 5def5925 cc33173e b2a8ce77 67522b46 6d278b65 0a291612
+                 7dfea9d2 d361089f 0a7a0247 a184e1c7 0d417866 e0fe0feb
+                 0ff8f2f3 f9176418 f97d117e 624e2015 df1662a8
+Gy:    0x04a3642 0572616c df7e606f ccadaecf c3b76dab 0eb1248d d03fbdfc
+                 9cd3242c 4726be57 9855e812 de7ec5c5 00b4576a 24628048
+                 b6a72d88 0062eed0 dd34b109 6d3acbb6 b01a4a97
+Seed: 0x2aa058f7 3a0e33ab 486b0f61 0410c53a 7f132310
+
+
+
+
+                                        27
+NIST SP 800-186                                            Discrete Logarithm-based Cryptography:
+February 2023                                                    Elliptic Curve Domain Parameters
+
+References
+[FIPS_140-3]        National Institute of Standards and Technology (2019) Security
+                    Requirements for Cryptographic Modules. (U.S. Department of
+                    Commerce, Washington, DC), Federal Information Processing Standards
+                    Publication (FIPS) 140-3. https://doi.org/10.6028/NIST.FIPS.140-3
+[FIPS_186-4]        National Institute of Standards and Technology (2013) Digital Signature
+                    Standard (DSS). (U.S. Department of Commerce, Washington, DC),
+                    [Withdrawn] Federal Information Processing Standards Publication (FIPS)
+                    186-4. https://doi.org/10.6028/NIST.FIPS.186-4
+[FIPS_186-5]        National Institute of Standards and Technology (2023) Digital Signature
+                    Standard (DSS). (U.S. Department of Commerce, Washington, DC),
+                    Federal Information Processing Standards Publication (FIPS) 186-5.
+                    https://doi.org/10.6028/NIST.FIPS.186-5
+[IEEE_1363]         IEEE (2000) IEEE 1363-2000 – IEEE Standard Specifications for Public
+                    Key Cryptography. (IEEE Standards Association, Piscataway, NJ).
+                    Available at https://standards.ieee.org/standard/1363-2000.html
+[IETF_draft_Struik] Struik R (2020) Alternative Elliptic Curve Representations. (Internet
+                    Engineering Task Force (IETF)), Work in Progress, Internet Draft.
+                    Available at https://datatracker.ietf.org/doc/draft-ietf-lwig-curve-
+                    representations/
+[NEON]              Bernstein DJ, Schwabe P (2012) NEON crypto. Cryptographic Hardware
+                    and Embedded Systems – CHES 2012, eds Prouff E, Schaumont P
+                    (Springer, Berlin, Germany) Lecture Notes in Computer Science 7428, pp
+                    320–339. Available at https://cr.yp.to/highspeed/neoncrypto-20120320.pdf
+[RFC_5639]          Lochter M, Merkle J (2010) Elliptic Curve Cryptography (ECC) Brainpool
+                    Standard Curves and Curve Generation. (Internet Engineering Task Force
+                    (IETF)), Request for Comments (RFC) 5639. Available at
+                    https://tools.ietf.org/html/rfc5639
+[RFC_7748]          Langley A, Hamburg M, Turner S (2016) Elliptic Curves for Security.
+                    (Internet Research Task Force (IRTF)), Request for Comments (RFC)
+                    7748. https://doi.org/10.17487/RFC7748
+[RFC_8032]          Josefsson S, Liusvaara I (2017) Edwards-Curve Digital Signature
+                    Algorithm (EdDSA). (Internet Research Task Force (IRTF)), Request for
+                    Comments (RFC) 8032. https://doi.org/10.17487/RFC8032
+[SEC_2]             Certicom Research (2010) Standards for Efficient Cryptography. SEC 2:
+                    Recommended Elliptic Curve Domain Parameters. Available at
+                    http://www.secg.org/sec2-v2.pdf
+[SP_800-56A]        Barker EB, Chen L, Roginsky AL, Vassilev A, Davis R (2018)
+                    Recommendation for Pair-Wise Key-Establishment Schemes Using
+                    Discrete Logarithm Cryptography. (National Institute of Standards and
+                    Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-56A,
+                    Rev. 3. https://doi.org/10.6028/NIST.SP.800-56Ar3
+
+
+
+
+                                             28
+NIST SP 800-186                                          Discrete Logarithm-based Cryptography:
+February 2023                                                  Elliptic Curve Domain Parameters
+
+[SP_800-57]       Barker EB (2020) Recommendation for Key Management: Part 1 –
+                  General. (National Institute of Standards and Technology, Gaithersburg,
+                  MD), NIST Special Publication (SP) 800-57 Part 1, Rev. 5.
+                  https://doi.org/10.6028/NIST.SP.800-57pt1r5
+[SP_800-131A]     Barker EB, Roginsky AL (2019) Transitioning the Use of Cryptographic
+                  Algorithms and Key Lengths. (National Institute of Standards and
+                  Technology, Gaithersburg, MD), NIST Special Publication (SP) 800-
+                  131A, Rev. 2. https://doi.org/10.6028/NIST.SP.800-131Ar2
+
+
+
+
+                                          29
+NIST SP 800-186                                                                Discrete Logarithm-based Cryptography:
+February 2023                                                                        Elliptic Curve Domain Parameters
+
+Appendix A. Details of Elliptic Curve Group Operations
+
+A.1.     Non-binary Curves
+
+A.1.1. Group Law for Weierstrass Curves
+For each point P on the Weierstrass curve Wa,b, the point at infinity ∅ serves as the identity
+element (i.e., P + ∅ = ∅ + P = P).
+For each point P = (x, y) on the Weierstrass curve Wa,b, the point −P is the point (x, −y), and one
+has P + (−P) = ∅.
+Let P1 = (x1, y1) and P2 = (x2, y2) be points on the Weierstrass curve Wa,b, where P1 ≠ ± P2, and let
+Q = P1 + P2. Then Q = (x, y), where
+          𝑥𝑥 = 𝜆𝜆2 − 𝑥𝑥1 − 𝑥𝑥2 and 𝑦𝑦 = λ(𝑥𝑥1 − 𝑥𝑥) − 𝑦𝑦1 , where λ = (𝑦𝑦2 − 𝑦𝑦1 )/(𝑥𝑥2 − 𝑥𝑥1 ).
+Let P = (x1, y1) be a point on the Weierstrass curve Wa,b, where P ≠ − P, and let Q = 2P. Then Q =
+(x, y), where
+               𝑥𝑥 = λ2 − 2𝑥𝑥1 and 𝑦𝑦 = λ(𝑥𝑥1 − 𝑥𝑥) − 𝑦𝑦1 , where λ = (3 x1 2 + 𝑎𝑎)/2𝑦𝑦1 .
+
+A.1.2. Group Law for Montgomery Curves
+For each point P on the Montgomery curve MA,B, the point at infinity ∅ serves as the identity
+element (i.e., P + ∅ = ∅ + P = P).
+For each point P = (u, v) on the Montgomery curve MA,B, the point −P is the point (u, −v), and
+one has P + (−P) = ∅.
+Let P1 = (u1, v1) and P2 = (u2, v2) be points on the Montgomery curve MA,B, where P1 ≠ ± P2, and
+let Q = P1 + P2. Then Q = (u, v), where
+       𝑢𝑢 = 𝐵𝐵 λ2 − 𝐴𝐴 − 𝑢𝑢1 − 𝑢𝑢2 and 𝑣𝑣 = λ(𝑢𝑢1 − 𝑢𝑢) − 𝑣𝑣1 , where λ = (𝑣𝑣2 − 𝑣𝑣1 )/(𝑢𝑢2 − 𝑢𝑢1 ).
+Let P = (u1, v1) be a point on the Montgomery curve MA,B, where P ≠ − P, and let Q = 2P. Then Q
+= (u, v), where
+    𝑢𝑢 = 𝐵𝐵 λ2 − 𝐴𝐴 − 2𝑢𝑢1 and 𝑣𝑣 = λ(𝑢𝑢1 − 𝑢𝑢) − 𝑣𝑣1 , where λ = (3 𝑢𝑢1 2 + 2𝐴𝐴𝑢𝑢1 + 1)/2𝐵𝐵𝑣𝑣1 .
+
+A.1.3. Group Law for Twisted Edwards Curves
+Let P1 = (x1, y1) and P2 = (x2, y2) be points on the twisted Edwards curve Ea,d, and let Q = P1 + P2.
+Then Q = (x, y), where
+
+                                              𝑥𝑥1 𝑦𝑦2 + 𝑥𝑥2 𝑦𝑦1     𝑦𝑦1 𝑦𝑦2 − 𝑎𝑎𝑥𝑥1 𝑥𝑥2
+                             (𝑥𝑥, 𝑦𝑦) = �                         ,                     �.
+                                            1 + 𝑑𝑑𝑥𝑥1 𝑥𝑥2 𝑦𝑦1 𝑦𝑦2 1 − 𝑑𝑑𝑥𝑥1 𝑥𝑥2 𝑦𝑦1 𝑦𝑦2
+For the twisted Edwards curves specified in this Recommendation, the domain parameter a is
+always a square in GF(q), whereas d is not. In this case, the addition formula above is defined for
+
+
+
+                                                          30
+NIST SP 800-186                                                             Discrete Logarithm-based Cryptography:
+February 2023                                                                     Elliptic Curve Domain Parameters
+
+each pair of points. In particular, for each point P = (x1, y1) on the twisted Edwards curve Ea,d,
+point doubling yields the point Q = 2P, where Q = (x, y) and
+                                                2𝑥𝑥1 𝑦𝑦1         𝑦𝑦1 2 − 𝑎𝑎 𝑥𝑥1 2
+                              (𝑥𝑥, 𝑦𝑦) = �                     ,                  �.
+                                             1 + 𝑑𝑑𝑥𝑥1 2 𝑦𝑦1 2 1 − 𝑑𝑑𝑥𝑥1 2 𝑦𝑦1 2
+Note that (0, 1) is the identity element since for each point P = (x, y) on the twisted Edwards
+curve Ea,d, one has P + (0, 1) = (x, y) + (0, 1) = (x, y) = P.
+For each point P = (x, y) on the twisted Edwards curve EA,B, the inverse point −P is the point (-x,
+y), and one has P + (−P) = (0, 1). The point (0, −1) has order 2.
+
+A.2.   Binary Curves
+
+A.2.1. Group Law for Weierstrass Curves
+For each point P on the Weierstrass curve Ba,b, the point at infinity ∅ serves as the identity
+element (i.e., P + ∅ = ∅ + P = P).
+For each point P = (x, y) on the Weierstrass curve Ba,b, the point −P is the point (x, x + y), and
+one has P + (−P) = ∅.
+Let P1 = (x1, y1) and P2 = (x2, y2) be points on the Weierstrass curve Ba,b, where P1 ≠ ± P2, and let
+Q = P1 + P2. Then, Q = (x, y), where
+  𝑥𝑥 = λ2 + λ + 𝑎𝑎 − 𝑥𝑥1 − 𝑥𝑥2 and 𝑦𝑦 = λ(𝑥𝑥1 + 𝑥𝑥) − 𝑥𝑥 − 𝑦𝑦1 , where λ = (𝑦𝑦2 + 𝑦𝑦1 )/(𝑥𝑥2 + 𝑥𝑥1 ).
+Let P = (x1, y1) be a point on the Weierstrass curve Ba,b, where P ≠ − P, and let Q = 2P. Then, Q =
+(x, y), where
+                                     𝑏𝑏
+        𝑥𝑥 = λ2 + λ + 𝑎𝑎 = 𝑥𝑥12 +        and 𝑦𝑦 = λ(𝑥𝑥1 + 𝑥𝑥) − 𝑥𝑥 − 𝑦𝑦1 , where λ = 𝑥𝑥1 + 𝑦𝑦1 /𝑥𝑥1 .
+                                    𝑥𝑥12
+
+
+
+
+                                                        31
+NIST SP 800-186                                                   Discrete Logarithm-based Cryptography:
+February 2023                                                           Elliptic Curve Domain Parameters
+
+Appendix B. Relationships Between Curve Models
+The non-binary curves specified in this Recommendation are expressed in different curve models
+defined over the same field GF(q) – namely as curves in short-Weierstrass form, as Montgomery
+curves, or as twisted Edwards curves. These curve models are related as follows.
+
+B.1.       Mapping Between Twisted Edwards Curves and Montgomery Curves
+One can map points on the Montgomery curve MA,B to points on the twisted Edwards curve Ea,d ,
+where a = (A+2)/B and d = (A-2)/B and, conversely, map points on the twisted Edwards curve
+Ea,d to points on the Montgomery curve MA,B, where A = 2(a+d)/(a-d) and B = 4/(a-d). Here, it is
+assumed that 𝑎𝑎 ≠ 0, 𝑑𝑑 ≠ 0, 𝐴𝐴 ≠ −2,2, and 𝐵𝐵 ≠ 0. For the curves in this specification, this
+defines a birational equivalence between MA,B and Ea,d, thereby showing that the discrete
+logarithm problem in either curve model is equally hard.
+For the Montgomery curves and twisted Edwards curves in this specification, the mapping from
+MA,B to Ea,d is defined by mapping the point at infinity ∅ and the point (0, 0) of order two on
+MA,B to the point (0, 1) and the point (0, −1) , respectively, of order two on Ea,d, while mapping
+every other point (u, v) on MA,B to the point (x, y) = (u/v, (u−1)/(u+1)) on Ea,d. The inverse
+mapping from Ea,d to MA,B is defined by mapping the point (0, 1) and the point (0, −1) of order
+two on Ea,d to the point at infinity ∅ and the point (0, 0), respectively, of order two on MA,B,
+while every other point (x, y) on Ea,d is mapped to the point (u, v) = ((1+y)/(1−y), (1+y)/(1−y)x)
+on MA,B.
+Specifically, for the curves defined in Section 3, the following is true:
+Using the above maps, the base point of Curve25519 corresponds to the base point of
+Edwards25519. For points (u, v) ≠ ∅, (0,0) on Curve25519, the image under the mapping
+corresponds to the point (α u/v, (u − 1)/(u + 1)) on Edwards25519. Here α is the element of
+GF(p) defined by:
+     α:     51042569399160536130206135233146329284\
+             152202253034631822681833788666877215207
+            (=0x70d9120b 9f5ff944 2d84f723 fc03b081 3a5e2c2e b482e57d 3391fb55
+                 00ba81e7).
+
+The inverse mapping from Edwards25519 to Curve25519 maps points (x,y) (other than the points
+(0, 1) and (0, −1)) to ((1 + y)/(1 − y), α(1 + y)/(1−y)x).
+Similarly, the base point of Curve448 corresponds to the base point of E448. Every other point
+(u, v) ≠ ∅ , (0,0) on Curve448 corresponds to the point (α u/v, (u + 1)/(u − 1)) on E448, where α
+is the element of GF(p) defined by:
+α:        1978884672954644395383540097538580382568351525910598021481997791960\
+          87404232002515713604263127793030747855424464185691766453844835192428
+             (=0x45b2c5f7 d649eed0 77ed1ae4 5f44d541 43e34f71 4b71aa96 c945af01
+                2d182975 0734cde9 faddbda4 c066f7ed 54419ca5 2c85de1e 8aae4e6c)
+
+For points that are not the point at infinity ∅ and the point (0,0) of order two, the inverse
+mapping from E448 to Curve448 sends (x, y) to the point ((y + 1)/(y − 1), α(y + 1)/(y−1)x).
+
+
+                                                 32
+NIST SP 800-186                                                     Discrete Logarithm-based Cryptography:
+February 2023                                                             Elliptic Curve Domain Parameters
+
+Implementations may take advantage of these mappings to carry out elliptic curve group
+operations that were originally defined for a twisted Edwards curve on the corresponding
+Montgomery curve, or vice-versa, and translating the result back to the original curve to
+potentially allow code reuse.
+
+B.2.   Mapping Between Montgomery Curves and Weierstrass Curves
+One can map points on the Montgomery curve MA,B to points on the Weierstrass curve Wa,b ,
+where a = (3−A2)/3B2 and b = (2A3−9A)/27B3. For the curves in this specification, this defines a
+one-to-one correspondence, which is an isomorphism between MA,B and Wa,b, thereby showing
+that the discrete logarithm problem in either curve model is equally hard.
+For the Montgomery curves in this specification, the mapping from MA,B to Wa,b is defined by
+mapping the point at infinity ∅ on MA,B to the point at infinity ∅ on Wa,b, while mapping every
+other point (u, v) on MA,B to the point (x, y) = (u/B+A/3B, v/B) on Wa,b.
+Note that not all Weierstrass curves can be mapped to Montgomery curves since the latter have a
+point of order two and the former may not. In particular, if a Weierstrass curve has prime order –
+as with the curves P-224, P-256, P-384, and P-521 specified in this Recommendation – this
+mapping is not defined.
+This mapping can be used to implement elliptic curve group operations that were originally
+defined for a twisted Edwards curve or for a Montgomery curve using group operations on the
+corresponding elliptic curve in short-Weierstrass form and translating the result back to the
+original curve to potentially allow for code reuse.
+Note that implementations for elliptic curves with short-Weierstrass form that hard-code the
+domain parameter a to a = −3 cannot always be used this way since the curve Wa,b may not
+always be expressed in terms of a Weierstrass curve with a = −3 via a coordinate transformation.
+This is, unfortunately, the case with the Montgomery curves and twisted Edwards curves
+specified in this Recommendation.
+Specifically, for the curves in Section 3, the following is true:
+The curve W-25519 is isomorphic to Curve25519, where the base point of Curve25519
+corresponds to the base point of W-25519, the point at infinity ∅ of Curve25519 corresponds to
+the point at infinity ∅ on W-25519, and the point (u, v) on Curve25519 corresponds to the point
+(x, y) = (u+A/3, v) on Wa,b. Note that Curve25519 is not isomorphic with a Weierstrass curve
+with domain parameter a = −3, although it is isogenous to such a Weierstrass curve (see
+[IETF_draft_Struik]).
+The curve W-448 is isomorphic to Curve448, where the base point of Curve448 corresponds to
+the base point of W-448, the point at infinity ∅ of Curve448 corresponds to the point at infinity
+∅ on W-448, and the point (u, v) on Curve448 corresponds to the point (x, y) = (u+A/3, v) on
+Wa,b. Note that Curve448 is not isomorphic with a Weierstrass curve with domain parameter a =
+−3. In particular, this means that one cannot reuse an implementation for curves with short-
+Weierstrass form that hardcodes the domain parameter a to −3 to implement Curve448.
+
+
+
+
+                                                  33
+NIST SP 800-186                                                                         Discrete Logarithm-based Cryptography:
+February 2023                                                                                 Elliptic Curve Domain Parameters
+
+B.3.   Mapping Between Twisted Edwards Curves and Weierstrass Curves
+A straightforward method to map points on a twisted Edwards curve to points on a Weierstrass
+curve is to convert the curve to Montgomery format first. Use the mapping described in
+Appendix B.1 to map points on a twisted Edwards curve to points on a Montgomery curve. Then
+use the mapping described in Appendix B.2 to convert points on the Montgomery curve to points
+on a Weierstrass curve.
+
+B.4.   4-Isogenous Mapping
+The 4-isogeny map between the Montgomery curve Curve448 and the Edwards curve
+Edwards448 is given in [RFC_7748] to be
+                                    𝑦𝑦2 (2 − 𝑥𝑥2 − 𝑦𝑦2 )𝑦𝑦
+                         (u, v) = ( 2 ,                   )
+                                    𝑥𝑥         𝑥𝑥3
+                                        4𝑣𝑣(𝑢𝑢2 − 1)       −(𝑢𝑢5 − 2𝑢𝑢3 − 4𝑢𝑢𝑣𝑣 2 + 𝑢𝑢)
+                        (𝑥𝑥, 𝑦𝑦) = � 4                   ,                                   �.
+                                    𝑢𝑢 − 2𝑢𝑢2 + 4𝑣𝑣 2 + 1 (𝑢𝑢5 − 2𝑢𝑢2 𝑣𝑣 2 − 2𝑢𝑢3 𝑣𝑣 2 + 𝑢𝑢)
+The curve Edwards448 (Section 3.2.3.2) is 4-isogenous to the curve E448 (Section 3.2.3.3),
+where the base point of Edwards448 corresponds to the base point of E448 and where the
+identity element (0, 1) and the point (0, −1) of order two of Edwards448 correspond to the
+identity element (0, 1) on E448. Every other point (x, y) on Edwards448 corresponds to the point
+on E448, where α is the element of GF(p) defined in Section 3.2.2.2:
+                                                      α𝑥𝑥𝑥𝑥            1+𝑑𝑑 𝑥𝑥 2 𝑦𝑦 2
+                                 (𝑥𝑥 ′ , 𝑦𝑦 ′ ) = �                ,                    �.
+                                                  1−𝑑𝑑 𝑥𝑥 2 𝑦𝑦 2        𝑦𝑦 2 − 𝑥𝑥 2
+
+
+
+
+                                                      34
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Appendix C. Generation Details for Recommended Elliptic Curves
+
+C.1.   General Cryptographic Criteria
+All curves recommended in this specification satisfy the following general cryptographic criteria:
+   1. Underlying finite field. The underlying finite field GF(q) shall be either a prime field or q
+      = 2m, where m is a prime number.
+   2. Curve order. Each curve E defined over the finite field GF(q) shall have order |E| = h⋅n,
+      where n is a large prime number, h is co-prime with n, and h is small (h is called the
+      cofactor of E). Each curve shall have cofactor h ≤ 210.
+   3. Base point. Each curve E shall have a fixed base point G of prime order n.
+   4. Avoiding anomalous curve attack. Each curve E defined over the finite field GF(q) shall
+      have order |E| ≠ q so as to avoid attacks using additive transfers.
+   5. Large embedding degree. The elliptic curve discrete logarithm problem in E can be
+      converted to an ordinary discrete logarithm problem defined over the finite field GF(qk),
+      where k is the smallest positive integer so that qk ≡ 1 mod n, called the embedding degree.
+      Each curve shall have embedding degrees k ≥ 210. All of the elliptic curves specified in
+      this document have much larger embedding degrees that are close to the order n (which is
+      typical for elliptic curves).
+   6. Endomorphism field. For each curve E over GF(q) with trace t, the (negative) number
+      Disc = t2 − 4q is closely related to the discriminant of the endomorphism field of E. As of
+      the publication of this document, there is no technical rationale for imposing a large
+      lower bound on the square-free part of |Disc|, although this value is often large except for
+      curves used in pairing-based cryptography. This Recommendation does not impose
+      restrictions on the value of the square-free part of |Disc|.
+
+C.1.1. Implementation Security Criteria
+Each field shall have a fixed representation.
+
+C.2.   Curve Generation Details
+
+C.2.1. Weierstrass Curves Over Prime Fields
+
+C.2.1.1.          Curves P-224, P-256, P-384, P-521
+Each of the curves P-224 (Section 3.2.1.2), P-256 (Section 3.2.1.3), P-384 (Section 3.2.1.4), and
+P-521 (Section 3.2.1.5) is a curve Wa,b in short-Weierstrass form with prime order (and, thus,
+cofactor h = 1). Each curve is defined over a prime field GF(p) where the prime number is of a
+special form to allow efficient modular reduction (see Appendix G.1).
+The NIST prime curves were generated using the procedure in Appendix C.3.1 with hdigest =
+160 and SHA-1 hash function.
+
+
+                                                35
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+   1. The parameter a was set to a ≡ −3 mod p, which allows for optimizations of the group
+      law if implemented via projective coordinates in Weierstrass form.
+   2. The parameter b was derived in a hard-to-invert way using the procedure in Appendix
+      C.3.1 from a pseudorandom Seed value so that the following conditions were satisfied
+      simultaneously:
+           a. 4a3 + 27b2 ≠ 0 in GF(p);
+           b. The curve has prime order n, which implies that h = 1; and
+           c. The curve satisfies the cryptographic criteria in Appendix C.1.
+   3. Select a base point G = (Gx, Gy) of order n.
+
+C.2.1.2.          Curves W-25519 and W-448
+The curves W-25519 (Section 3.2.1.6) and W-448 (Section 3.2.1.7) were obtained from
+Curve25519 and Curve448 via an isomorphic mapping (see Appendix B.1).
+
+C.2.2. Montgomery Curves
+
+C.2.2.1.          Curve25519
+Curve25519 was specified in IETF 7748 by the Crypto Forum Research Group (CFRG). This
+curve is a Montgomery curve MA,B defined over the field GF(p), where p = 2255−19, the curve
+has cofactor h = 8, and the quadratic twist E1 has cofactor h1 = 4. The prime number is of a
+special form to allow efficient modular reduction and finite field operations that try and
+minimize carry effects of operands. The curve parameters A and B are:
+   1. The parameter B was set to B = 1.
+   2. The parameter A was selected as the minimum value of |A| so that the following
+      conditions were satisfied simultaneously:
+           a. The group is cyclic, which implies that A2−4 is not a square in GF(p);
+           b. The curve has cofactor h = 8, which implies that A+2 is a square in GF(p);
+           c. The quadratic twist has cofactor h1 = 4;
+           d. A has the form A ≡ 2 mod 4, which allows optimized implementations of the
+              group law using the Montgomery ladder; and
+           e. The curve and the quadratic twist both satisfy the cryptographic criteria in
+              Appendix C.1.
+   3. Select the base point G = (Gx, Gy) of order n, where |Gx| is minimal, and Gy is even.
+
+C.2.2.2.          Curve448
+This curve is a Montgomery curve MA,B defined over the field GF(p), where p = 2448−2224−1, the
+curve has cofactor h = 4, and the quadratic twist E1 has cofactor h1 = 4. The prime number is of a
+
+
+                                                36
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+special form to allow efficient modular reduction and finite field operations that try to minimize
+the carry effects of operands. The curve parameters A and B are:
+   1. The parameter B was set to B = 1.
+   2. The parameter A was selected as the minimum value of |A| so that the following
+      conditions were satisfied simultaneously:
+           a. The group is cyclic, which implies that A2−4 is not a square in GF(p);
+           b. The curve has cofactor h = 4, which implies that A+2 is not a square in GF(p);
+           c. The quadratic twist has cofactor h1= 4;
+           d. A has the form A ≡ 2 mod 4, which allows optimized implementations of the
+              group law using the Montgomery ladder; and
+           e. The curve and the quadratic twist both satisfy the cryptographic criteria in
+              Appendix C.1.
+   3. Select the base point G = (Gx, Gy) of order n, where |Gx| is minimal, and Gy is even.
+
+C.2.3. Twisted Edwards Curves
+The twisted Edwards curve Edwards25519 (Section 3.2.3.1) was obtained from the Montgomery
+curve Curve25519 (Section 3.2.2.1) via a birational equivalence.
+The Edwards curve E448 (Section 3.2.3.3) was obtained from the Montgomery curve Curve448
+(Section 3.2.2.2) via a birational equivalence.
+The Edwards curve Edwards448 (Section 3.2.3.2) was obtained from the curve E448 (Section
+3.2.3.3) via a 4-isogenous mapping (see Appendix B.4).
+
+C.2.4. Weierstrass Curves over Binary Fields
+
+C.2.4.1.          Koblitz Curves K-233, K-283, K-409, and K-571
+Each of the curves K-233 (Section 3.3.1.2), K-283 (Section 3.3.1.3), K-409 (Section 3.3.1.4),
+and K-571 (Section 3.3.1.5) is a curve Ba,b in short-Weierstrass form with cofactor h = 2 or h = 4.
+Each curve is defined over a binary field GF(2m), where m is a prime number. For Koblitz
+curves, the curve parameters a and b are elements of GF(2) with b = 1. Hence, for each
+parameter m, there are only two Koblitz curves with a = 0 and a = 1. Koblitz curves with a = 0
+have order 0 modulo 4, while those with a = 1 have order 2 modulo 4.
+The curve parameters a and m were chosen to satisfy the following:
+   1. The parameter a was set to a = 0.
+   2. The set of integers m in the interval [160,600] was determined so that the following
+      conditions were satisfied simultaneously:
+           a. m is a prime number;
+
+
+
+
+                                                37
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+           b. The curve has cofactor h = 4, or the quadratic twist of this curve has cofactor h =
+              2 (the latter implies that the Koblitz curve defined over the binary field GF(2m)
+              with a = 1 has cofactor h = 2); and
+           c. The determined curve satisfies the cryptographic criteria in Appendix C.1.
+   3. Select a pair (a, m) from the set determined above.
+   4. Select an irreducible polynomial f(z) of degree m, where f(z) is selected of a special form
+      so as to allow efficient modular reduction (f(z) is a trinomial or pentanomial).
+   5. Select a base point G = (Gx, Gy) of order n.
+
+C.2.4.2.          Pseudorandom Curves B-233, B-283, B-409, and B-571
+Each of the curves B-233 (Section 3.3.2.2), B-283 (Section 3.3.2.3), B-409 (Section 3.3.2.4), and
+B-571 (Section 3.3.2.5) is a curve Ba,b in short-Weierstrass form with cofactor h = 2. Each curve
+is defined over a binary field GF(2m), where m is a prime number, and the prime number is
+among those values for which a binary Koblitz curve exists. The NIST prime curves were
+generated using the procedure in Appendix C.3.3,with hdigest = 160 and SHA-1 hash function.
+The curve parameters a and b are:
+   1. The parameter a was set to a = 1 (this ensures that curves with cofactor h = 2 may exist).
+   2. The parameter b was derived in a hard-to-invert way using the procedure in Appendix
+      C.3.3 from a pseudorandom Seed value so that the following conditions were satisfied
+      simultaneously:
+           a. b ≠ 0 in GF(p);
+           b. The curve has cofactor h = 2; and
+           c. The curve satisfies the cryptographic criteria in Appendix C.1.
+   3. Select a base point G = (Gx, Gy) of order n.
+
+C.3.   Generation and Verification of Pseudorandom Curves
+
+C.3.1. Generation of Pseudorandom Curves (Prime Case)
+When generating the NIST pseudorandom curves (i.e, those in Section 3.2.1), hdigest = 160 and
+SHA-1 hash were used.
+Inputs:
+   1. Positive integer l
+   2. Bit-string s of length hdigest
+   3. Approved hash function HASH with output length of hdigest bits and security design
+       strength of at least requested_security_strength.
+
+Output: Coefficient b used to generate a pseudorandom prime curve
+
+
+
+
+                                                38
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+Process:
+
+Let l be the bit length of p, and define
+                        v =  ( l – 1) /hdigest
+                        w = l – hdigest × v – 1
+    1. Choose an arbitrary hdigest-bit string s as the domain parameter Seed.
+    2. Compute H = HASH(s).
+    3. Let H0 be the bit string obtained by taking the w rightmost bits of H.
+    4. Let z be the integer whose binary expansion is given by the hdigest-bit string s.
+    5. For i from 1 to v:
+       5.1 Define the hdigest-bit string si to be the binary expansion of the integer
+            (z + i) mod (2 hdigest).
+       5.2 Compute hi = HASH(si).
+    6. Let h be the bit string obtained by the concatenation of h0 , h1, … , hv as follows:
+                     h = h0 || h1 || … || hv.
+    7. Let c be the integer whose binary expansion is given by the bit string h.
+    8. If ((c = 0) or (4c + 27 ≡ 0 mod p)), then go to Step 1.
+    9. Choose integers a, b ∈GF(p), such that
+                     c b2 ≡ a3 mod p.
+        (The simplest choice is a = c and b = c. However, they may be chosen differently for
+        performance reasons. For example, the pseudorandom prime curves in this document all
+        have a = -3.)
+    10. Check that the elliptic curve E over GF(p) given by y 2 = x3 + ax + b has suitable order. If
+        not, go to Step 1.
+
+C.3.2. Verification of Curve Generation (Prime Case)
+Given the hdigest domain parameter seed value s, verify that the coefficient b was obtained from
+s via the cryptographic hash function HASH as follows:
+Inputs:
+   1. Positive integer l
+   2. The coefficient b
+   3. Bit-string s of length hdigest
+   4. Approved hash function HASH with output length of hdigest bits and security design
+       strength of at least requested_security_strength
+
+Output: Verification that the coefficient b was obtained from s via the cryptographic hash
+function HASH
+Process:
+
+Let l be the bit length of p, and define
+                 v =  ( l – 1) /hdigest 
+                 w = l – hdigest ×v – 1
+
+
+                                                   39
+NIST SP 800-186                                                    Discrete Logarithm-based Cryptography:
+February 2023                                                            Elliptic Curve Domain Parameters
+
+      1. Compute h = HASH(s).
+      2. Let h0 be the bit string obtained by taking the w rightmost bits of h.
+      3. Let z be the integer whose binary expansion is given by the hdigest-bit string s.
+      4. For i = 1 to v do
+         4.1 Define the hdigest-bit string si to be the binary expansion of the integer
+            (z + i) mod (2hdigest ).
+         4.2 Compute hi = HASH(si).
+      5. Let h be the bit string obtained by the concatenation of h0 , h1, … , hv as follows:
+                  h = h0 || h1 || … || hv
+      6. Let c be the integer whose binary expansion is given by the bit string h.
+      7. Verify that b2 c ≡ –27 mod p.
+
+C.3.3. Generation of Pseudorandom Curves (Binary Case)
+Inputs:
+      1. Prime number m
+      2. Bit-string s of length hdigest
+      3. Approved hash function HASH with output length of hdigest bits and security design
+         strength of at least requested_security_strength
+
+Output: Coefficient b used to generate a pseudorandom binary curve
+
+Process:
+Let
+                  v =  (m – 1) / hdigest 
+                  w = m – hdigest × v
+      1. Choose an arbitrary hdigest-bit string s as the domain parameter seed.
+      2. Compute h = HASH(s).
+      3. Let h0 be the bit string obtained by taking the w rightmost bits of h.
+      4. Let z be the integer whose binary expansion is given by the hdigest-bit string s.
+      5. For i from 1 to v, do:
+         5.1 Define the hdigest-bit string si to be the binary expansion of the integer
+                 (z + i) mod (2hdigest )
+         5.2 Compute hi = HASH(si).
+      6. Let h be the bit string obtained by the concatenation of h0 , h1, … , hv as follows:
+                 h = h0 || h1 || … || hv
+      7. Let b be the element of GF(2m), which is represented by the bit string h in the Gaussian
+         Normal Basis (see Appendix G.3.1).
+      8. Choose an element a of GF(2m).
+      9. Check that the elliptic curve E over GF(2m) given by y2 + xy = x3 + ax2 + b has suitable
+         order. If not, go to Step 1.
+
+
+
+
+                                                   40
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+C.3.4. Verification of Curve Generation (Binary Case)
+Given the hdigest-bit domain parameter seed value s, verify that the coefficient b was obtained
+from s via the cryptographic hash function HASH as follows:
+Inputs:
+   1.   Prime number m
+   2.   The coefficient b (using the normal basis representation)
+   3.   Bit-string s of length hdigest
+   4.   Approved hash function HASH with output length of hdigest bits and security design
+        strength of at least requested_security_strength
+
+Output: Verification that the coefficient b was obtained from s via the cryptographic hash
+function HASH
+
+Process:
+Define
+                  v =  (m – 1) / hdigest 
+                  w= m – hdigest v
+   1. Compute h = HASH(s).
+   2. Let h0 be the bit string obtained by taking the w rightmost bits of h.
+   3. Let z be the integer whose binary expansion is given by the hdigest-bit string s.
+   4. For i = 1 to v, do:
+      4.1 Define the hdigest-bit string si to be binary expansion of the integer (z + i) mod
+           (2160).
+      4.2 Compute hi = HASH(si ).
+   5. For i = 1 to v, do:
+             h = h0 || h1 || … || hv.
+   6. Let c be the element of GF(2m ), which is represented by the bit string h in the Gaussian
+      Normal Basis (see Section G.3.1).
+   7. Verify that c = b.
+
+
+
+
+                                               41
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Appendix D. Elliptic Curve Routines
+
+D.1.   Public Key Validation
+
+D.1.1. Non-binary Curves in Short-Weierstrass Form
+
+D.1.1.1.          Partial Public Key Validation
+Inputs:
+   1. Weierstrass curve Wa,b defined over the prime field GF(p)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as an affine point on Wa,b.
+Process:
+   1. If Q is the point at infinity ∅, output REJECT.
+   2. Let Q = (x, y). Verify that x and y are integers in the interval [0, p−1]. Output REJECT if
+      verification fails.
+   3. Verify that (x, y) is a point on Wa,b by checking that (x, y) satisfies the defining equation
+      y2 = x3 + a x + b, where computations are carried out in GF(p). Output REJECT if
+      verification fails.
+   4. Otherwise, output ACCEPT.
+
+D.1.1.2.          Full Public Key Validation
+Inputs:
+   1. Weierstrass curve Wa,b defined over the prime field GF(p)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as a point on Wa,b of order n.
+
+Process:
+
+   1. Perform partial public key validation on Q using the procedure of Appendix D.1.1.1.
+      Output REJECT if this procedure outputs REJECT.
+   2. Verify that n Q = ∅. Output REJECT if verification fails.
+   3. Otherwise, output ACCEPT.
+
+D.1.2. Montgomery Curves
+
+D.1.2.1.          Partial Public Key Validation
+Inputs:
+   1. Montgomery curve MA,B defined over the prime field GF(p)
+
+
+                                                42
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as an affine point on MA,B.
+
+Process:
+
+   1. If Q is the point at infinity ∅, output REJECT.
+   2. Let Q = (u, v). Verify that both u and v are integers in the interval [0, p−1]. Output
+      REJECT if verification fails.
+   3. Verify that (u, v) is a point on MA,B by checking that (u, v) satisfies the defining equation
+      Bv2 = u (u2 + A u + 1), where computations are carried out in GF(p). Output REJECT if
+      verification fails.
+   4. Otherwise, output ACCEPT.
+
+D.1.2.2.          Full Public Key Validation
+Inputs:
+   1. Montgomery curve MA,B defined over the prime field GF(p)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as a point on MA,B of order n.
+
+Process:
+
+   1. Perform partial public key validation on Q using the procedure of Appendix D.1.2.1.
+      Output REJECT if this procedure outputs REJECT.
+   2. Verify that n Q = ∅. Output REJECT if verification fails.
+   3. Otherwise, output ACCEPT.
+
+D.1.3. Twisted Edwards Curves
+
+D.1.3.1.          Partial Public Key Validation
+Inputs:
+   1. Edwards curve Ea,d defined over the prime field GF(p)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as an affine point on Ea,d.
+
+Process:
+
+   1. Verify that both x and y are integers in the interval [0, p−1]. Output REJECT if
+      verification fails.
+   2. Let Q = (x, y). Verify that (x, y) is a point on Ea,d by checking that (x, y) satisfies the
+      defining equation a x2 + y2 = 1+ d x2 y2, where computations are carried out in GF(p).
+      Output REJECT if verification fails.
+
+
+                                                 43
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+   3. Otherwise, output ACCEPT.
+
+D.1.3.2.          Full Public Key Validation
+Inputs:
+   1. Edwards curve Ea,d defined over the prime field GF(p)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as a point on Ea,d of order n.
+
+Process:
+
+   1. Perform partial public key validation on Q using the procedure of Appendix D.1.3.1.
+      Output REJECT if this procedure outputs REJECT.
+   2. If Q = (0,1), output REJECT.
+   3. Verify that n Q = (0,1). Output REJECT if verification fails.
+   4. Otherwise, output ACCEPT.
+
+D.1.4. Binary Curves in Short-Weierstrass Form
+
+D.1.4.1.          Partial Public Key Validation
+Inputs:
+   1. Weierstrass curve Ba,b defined over the binary field GF(2m)
+   2. Point Q
+
+Output: ACCEPT or REJECT Q as an affine point on Ba,b.
+
+Process:
+
+   1. If Q is the point at infinity ∅, output REJECT.
+   2. Let Q = (x, y). Verify that both x and y are binary polynomials in GF(2m) according to the
+      field representation indicated by the parameter FR. Output REJECT if verification fails.
+   3. Verify that (x, y) is a point on the Ba,b by checking that (x, y) satisfies the defining
+      equation y2 + x y = x3 + a x2 + b, where computations are carried out in GF(2m) according
+      to the field representation indicated by the parameter FR. Output REJECT if verification
+      fails.
+   4. Otherwise, output ACCEPT.
+
+D.1.4.2.          Full Public Key Validation
+Inputs:
+   1. Weierstrass curve Ba,b defined over the binary field GF(2m)
+   2. Point Q
+
+
+
+                                               44
+NIST SP 800-186                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                         Elliptic Curve Domain Parameters
+
+Output: ACCEPT or REJECT Q as a point on Ba,b of order n.
+
+Process:
+
+   1. Perform partial public key validation on Q using the procedure of Appendix D.1.4.1.
+      Output REJECT if this procedure outputs REJECT.
+   2. Verify that n Q = ∅. Output REJECT if verification fails.
+   3. Otherwise, output ACCEPT.
+
+D.2.   Point Compression
+Point compression allows for a shorter representation of elliptic curve points in affine
+coordinates by exploiting algebraic relationships between the coordinate values based on the
+defining equation of the curve in question. Point compression followed by its inverse “point
+decompression” is the identity map.
+
+D.2.1. Prime Curves in Short-Weierstrass Form
+Point compression for non-binary curves in short-Weierstrass form is defined as follows:
+Inputs:
+   1. Weierstrass curve Wa,b defined over the prime field GF(p)
+   2. Point P on Wa,b
+
+Output: Compressed point P
+
+Process:
+
+   1. If P is the point at infinity ∅, set P = P.
+   2. If P = (x, y), set P = (x, y), where y = y mod 2.
+   3. Output P.
+
+Point decompression of an object P with respect to this Weierstrass curve is defined as follows:
+
+Inputs:
+
+   1. Object P
+   2. Weierstrass curve Wa,b defined over the prime field GF(p)
+
+Output: Point P on Wa,b or INVALID
+
+Process:
+
+   1. If P is the point at infinity ∅, output P = P.
+   2. If P is the ordered pair (x, t), where x is an element of GF(p), and t is an element of {0,
+      1}:
+      2.1 Compute w = x3 + a x + b.
+
+
+
+                                                45
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+      2.2 Compute a square root y of w in GF(p) using the procedure of Appendix E.3. Output
+          INVALID if that procedure outputs INVALID.
+      2.3 If y = 0 and t = 1, output INVALID.
+      2.4 If t ≠ y mod 2, set y = p−y.
+      2.5 Output P = (x, y).
+   3. Output INVALID.
+
+D.2.2. Binary Curves in Short-Weierstrass Form
+Point compression for binary curves in short-Weierstrass form is defined as follows:
+Inputs:
+   1. Weierstrass curve Ba,b defined over the binary field GF(2m)
+   2. Point P on Ba,b
+
+Output: Compressed point P
+
+Process:
+
+   1. If P is the point at infinity ∅, set P = P.
+   2. If P = (x, y) and x=0, set P = (x, y), where y = 0.
+   3. If P = (x, y) and x ≠ 0:
+      3.1 Compute 𝑎𝑎 = y/x, where 𝑎𝑎 = 𝑎𝑎0 + 𝑎𝑎1 𝑧𝑧 + ⋯ + 𝑎𝑎𝑚𝑚−1 𝑧𝑧 𝑚𝑚−1 .
+      3.2 Set P = (x, y), where y = 𝑎𝑎0 .
+   4. Output P.
+
+Consequently, for each affine point P = (x, y) on the Weierstrass curve Ba,b, the compressed
+point P is an ordered pair (x, t), where x is an element of GF(2m), and t is an element of GF(2).
+Point decompression of an object P with respect to this Weierstrass curve is defined as follows:
+Inputs:
+
+   1. Object P
+   2. Weierstrass curve Ba,b defined over the binary field GF(2m), where m is an odd integer
+
+Output: Point P on Ba,b or INVALID
+
+Process:
+
+   1. If P is the point at infinity ∅, output P = P.
+   2. If P is the ordered pair (x, t), where x is an element of GF(2m) and t is an element of
+      GF(2), perform the following:
+      2.1 If x = 0, perform the following steps:
+          2.1.1 If t = 1, output INVALID.
+          2.1.2 Set y to the square root of b in GF(2m) using the algorithm of Appendix E.1.
+      2.2 If x ≠ 0, perform the following steps:
+          2.2.1 Compute w = (x3 + a x2 + b)/x2 = x + a + b/x2.
+
+
+                                                 46
+NIST SP 800-186                                               Discrete Logarithm-based Cryptography:
+February 2023                                                       Elliptic Curve Domain Parameters
+
+           2.2.2Compute a solution α in GF(2m) of the equation α2 + α = w using the
+                algorithm of Appendix E.2. Output INVALID if that procedure outputs
+                INVALID.
+         2.2.3 If t ≠ 𝑎𝑎0 , where 𝑎𝑎 = 𝑎𝑎0 + 𝑎𝑎1 𝑧𝑧 + ⋯ + 𝑎𝑎𝑚𝑚−1 𝑧𝑧 𝑚𝑚−1 , set α = α + 1.
+         2.2.4 Set y = α x.
+      2.3 Output P = (x, y).
+   3. Output INVALID.
+
+
+
+
+                                              47
+NIST SP 800-186                                                    Discrete Logarithm-based Cryptography:
+February 2023                                                            Elliptic Curve Domain Parameters
+
+Appendix E. Auxiliary Functions
+
+E.1.     Computing Square Roots in Binary Fields
+                                                                     𝑚𝑚−1
+If x is an element of GF(2m), then its square root is the element 𝑥𝑥 2      .
+
+E.2.     Solving the Equation x2 + x = w in Binary Fields
+Input: Field element w in GF(2m), where m is an odd integer
+Output: Solution α in GF(2m) of the equation α2 + α = w or INVALID
+Process:
+                                   0    1          2        3       𝑚𝑚−1
+    1.   Compute Tr(𝑤𝑤) = 𝑤𝑤 2 + 𝑤𝑤 2 + 𝑤𝑤 2 + 𝑤𝑤 2 + … + 𝑤𝑤 2      (the trace of w).
+    2.   If Tr(w) = 1, output INVALID.
+                                   0      2      4          𝑚𝑚−1
+    3.   Compute α: = Hf(𝑥𝑥) = 𝑤𝑤 2 + 𝑤𝑤 2 + 𝑤𝑤 2 + … + 𝑤𝑤 2     (the half-trace of w).
+    4.   Output α.
+
+E.3.     Computing Square Roots in Non-Binary Fields GF(q)
+The Tonelli-Shanks algorithm can be used to compute a square root given an equation of the
+form x2 ≡ n mod p, where n is an integer – which is a quadratic residue mod p – and p is an odd
+prime.
+Find q and s (with q odd), such that p –1 = q2s by factoring out the powers of 2.
+    Note that if s = 1, as for primes p ≡ 3 mod 4, this reduces to finding x = n(p+1)/4 mod p.
+Check to see if nq = 1. If so, then the root x = n(q+1)/2 mod p.
+                                                                                                 𝑎𝑎
+Otherwise, select a z, which is a quadratic non-residue modulo p. The Legendre symbol � �,
+                                                                                                 𝑝𝑝
+where p is an odd prime and a is an integer, can be used to test candidate values for z to see if a
+value of –1 is returned.
+Search for a solution as follows:
+    1.   Set x = n(q+1)/2 mod p.
+    2.   Set t = nq mod p.
+    3.   Set m = s.
+    4.   Set c = zq mod p.
+    5. While t ≠ 1, repeat the following steps:
+                                                                                𝑖𝑖
+             a) Using repeated squaring, find the smallest i, such that 𝑡𝑡 2 = 1, where 0 < i < m.
+                For example:
+                     Let e = 2.
+                     Loop for i = 1 until i = m.
+                     If te mod p = 1, then exit the loop.
+
+
+
+                                                       48
+NIST SP 800-186                                                     Discrete Logarithm-based Cryptography:
+February 2023                                                             Elliptic Curve Domain Parameters
+
+                   Set e = 2e.
+           b) Update values:
+                             𝑚𝑚−𝑖𝑖−1
+                   𝑏𝑏 = 𝑐𝑐 2           (mod 𝑝𝑝)
+                   𝑥𝑥 = 𝑥𝑥𝑥𝑥(mod 𝑝𝑝)
+                   𝑡𝑡 = 𝑡𝑡𝑏𝑏 2 (mod 𝑝𝑝)
+                   𝑐𝑐 = 𝑏𝑏 2 (mod 𝑝𝑝)
+                   𝑚𝑚 = 𝑖𝑖
+The solution is x, and the second solution is p – x. If the least i found is m, then no solution
+exists.
+Square roots in a non-binary field GF(q) are relatively efficient to compute if q has the special
+form q ≡ 3 mod 4 or q ≡ 5 mod 8. All but one of the elliptic curves recommended in this
+Recommendation are defined over such fields. The following routines describe simplified cases
+to compute square roots for p ≡ 3 mod 4 or p ≡ 5 mod 8.
+   To find a square root of (u/v) if p ≡ 3 mod 4 (as in E448), first compute the candidate root x =
+   (u/v) (p+1)/4 = u3 v (u5v3) (p-3)/4 mod p. If v x2 = u, the square root is x. Otherwise, no square root
+   exists.
+   To find a square root of (u/v) if p ≡ 5 mod 8 (as in Edwards25519), first compute the
+   candidate root x = (u/v) (p+3)/8 = u v3 (u v7) (p-5)/8 mod p. To find the root, check three cases:
+       1. If v x2 = u mod p, the square root is x.
+       2. If v x2 = –u mod p, the square root is x × 2((p-1)/4).
+       3. Otherwise, no square root exists for modulo p.
+   If x = 0 and x0 = 1, point decoding fails. If x mod 2 = x0, then the x-coordinate is x.
+   Otherwise, the x-coordinate is p – x.
+
+E.4.   Computing Inverses in GF(q)
+If x is an element of GF(q) and x ≠ 0, its (multiplicative) inverse is the element xq−2.
+If one is concerned about side-channel leakage, one should compute the inverse using a
+constant-time algorithm. For example, one could indirectly compute u−1 by first computing the
+inverse of the blinded element λu, where λ is a random non-zero element of GF(q), and
+subsequently computing λ(λu)−1 = u−1. This yields an inversion routine where the inversion
+operation itself does not require side-channel protection and which may have relatively low
+computational complexity. Note that there may be other more efficient constant-time inversion
+algorithms.
+
+
+
+
+                                                   49
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+Appendix F. Data Conversion
+
+F.1.   Conversion of a Field Element to an Integer
+The following algorithm is used to convert a field element to an integer. The algorithm is given
+for reference purposes. Other algorithms that produce an equivalent result may be used.
+Input: An element a of the field GF(q)
+Output: A non-negative integer x in the interval [0, q−1]
+Process:
+   1. If q is an odd prime, a is an integer in the interval [0, q−1]. In this case, set x = a.
+   2. If q = 2m, a must be a binary polynomial of a degree smaller than m,
+              a = a(z) = am−1 zm−1 + am−2 zm−2 + … + a1 z + a0, where each coefficient ai is 0 or 1.
+      In this case, set x = a(2) = am−1 2m−1 + am−2 2m−2 + … + a1 21 + a0 20 computed over ℤ, not
+      modulo 2.
+   3. Output x.
+
+F.2.   Conversion of an Integer to a Field Element
+The following algorithm is used to convert an integer to a field element. The algorithm is given
+for reference purposes. Other algorithms that produce an equivalent result may be used.
+Inputs: Non-negative integer x and q, where q is an odd prime or q = 2m
+Output: An element a of the field GF(q)
+Process:
+   1. Set x = x mod q.
+   2. If q is an odd prime, x is an integer in the interval [0, q−1]. In this case, set a = x.
+   3. If q = 2m, x can be uniquely written as x = am−1 2m−1 + am−2 2m−2 + … + a1 2 + x0, where
+      each coefficient xi is 0 or 1. In this case, set x = a(z) = am−1 zm−1 + am−2 zm−2 + … + a1 z1 +
+      a0 20;
+   4. Output a.
+
+F.3.   Conversion of an Integer to a Bit String
+The following algorithm is used to convert an integer to a bit string. The algorithm is given for
+reference purposes. Other algorithms that produce an equivalent result may be used.
+Inputs: Non-negative integer x in the range 0 ≤ x < 2l
+Output: Bit-string X of length l
+Process:
+   1. The integer x can be uniquely written as x = xl−1 2l−1 + xl−2 2l−2 + … + x1 2 + x0, where
+      each coefficient xi is 0 or 1.
+   2. Set X to the bit string (xl−1, xl-2, …, x1, x0).
+
+
+
+                                                 50
+NIST SP 800-186                                                    Discrete Logarithm-based Cryptography:
+February 2023                                                            Elliptic Curve Domain Parameters
+
+   3. Output X.
+
+F.4.   Conversion of a Bit String to an Integer
+The following algorithm is used to convert a bit string to an integer. The algorithm is given for
+reference purposes. Other algorithms that produce an equivalent result may be used.
+Input: Bit-string X of length l
+Output: Non-negative integer x, where x<2l
+Process:
+   1. Let X be the bit string (xl−1, xl−2, …, x1, x0), where each coefficient xi is 0 or 1.
+   2. Set x to the integer value x = xl−1 2l−1 + xl−2 2l−2 + … + x1 2 + x0.
+   3. Output x.
+
+
+
+
+                                                  51
+NIST SP 800-186                                                               Discrete Logarithm-based Cryptography:
+February 2023                                                                       Elliptic Curve Domain Parameters
+
+Appendix G. Implementation Aspects
+
+G.1.     Implementation of Modular Arithmetic
+The prime moduli of the above recommended curves are of a special type (generalized Mersenne
+numbers and Crandall primes) for which modular multiplication can be carried out more
+efficiently than in general. This section provides the rules for implementing faster arithmetic for
+each of these recommended prime moduli.
+The usual way to multiply two integers mod m is to take the integer product and reduce it
+modulo m. One, therefore, has the following problem: given an integer A less than m2, compute
+                                                   B = A mod m.
+In general, one must obtain B as the remainder of an integer division. If m is a generalized
+Mersenne number or a Crandall prime, however, then B can be expressed as a sum or difference
+mod m of a small number of terms. To compute this expression, the integer sum or difference
+can be evaluated and the result reduced modulo m. The latter reduction can be accomplished by
+adding or subtracting a few copies of m.
+The prime modulus p for each of the four recommended P-x curves is a generalized Mersenne
+number.
+
+G.1.1. Curve P-224
+The modulus for this curve is 𝑝𝑝 = 2224 − 296 + 1. Each integer A less than p2 can be written as
+       A = A13 ⋅ 2 416 + A12 ⋅ 2384 + A11 ⋅ 2352 + A10 ⋅ 2320 + A9 ⋅ 2 288 + A8 ⋅ 2 256 + A7 ⋅ 2 224 + A6 ⋅ 2192 +
+       A5 ⋅ 2160 + A4 ⋅ 2128 + A3 ⋅ 296 + A2 ⋅ 2 64 + A1 ⋅ 232 + A0 ,
+
+where each Ai is a 32-bit integer. As a concatenation of 32-bit words, this can be denoted by
+                                            A = ( A13 || A12 || … || A0 ).
+The expression for B is
+                                      B = (T + S 1 + S 2 – D1 – D2) mod p,
+where the 224-bit terms are given by
+   T = ( A6 || A5 || A4 || A3 || A2 || A1 || A0 )
+   S1 = ( A10 || A9 || A8 || A7 || 0 || 0 || 0 )
+   S2 = ( 0 || A13 || A12 || A11 || 0 || 0 || 0 )
+   D1 = ( A13 || A12 || A11 || A10 || A9 || A8 || A7 )
+   D2 = ( 0 || 0 || 0 || 0 || A13 || A12 || A11 ).
+
+G.1.2. Curve P-256
+The modulus for this curve is p = 2256 – 2224 + 2192 + 296 – 1. Each integer A less than p2 can be
+written as
+
+
+
+
+                                                           52
+NIST SP 800-186                                                                 Discrete Logarithm-based Cryptography:
+February 2023                                                                         Elliptic Curve Domain Parameters
+
+     A = A15 ⋅ 2 480 + A14 ⋅ 2 448 + A13 ⋅ 2 416 + A12 ⋅ 2384 + A11 ⋅ 2 352 + A10 ⋅ 2 320 + A9 ⋅ 2 288 + A8 ⋅ 2 256 +
+     A7 ⋅ 2 224 + A6 ⋅ 2192 + A5 ⋅ 2160 + A4 ⋅ 2128 + A3 ⋅ 296 + A2 ⋅ 2 64 + A1 ⋅ 232 + A0 ,
+
+where each A i is a 32-bit integer. As a concatenation of 32-bit words, this can be denoted by
+                                            A = (A15 || A14 || ⋅ ⋅ ⋅ || A0 ).
+The expression for B is
+                        B = (T + 2S1 + 2S2 + S3 + S4 – D1 – D2 – D3 – D4) mod p,
+where the 256-bit terms are given by
+   T = ( A7 || A6 || A5 || A4 || A3 || A2 || A1 || A0 )
+   S1 = ( A15 || A14 || A13 || A12 || A11 || 0 || 0 || 0 )
+   S2 = ( 0 || A15 || A14 || A13 || A12 || 0 || 0 || 0 )
+   S3 = ( A15 || A14 || 0 || 0 || 0 || A10 || A9 || A8 )
+   S4 = ( A8 || A13 || A15 || A14 || A13 || A11 || A10 || A9 )
+   D1 = ( A10 || A8 || 0 || 0 || 0 || A13 || A12 || A11 )
+   D2 = ( A11 || A9 || 0 || 0 || A15 || A14 || A13 || A12 )
+   D3 = ( A12 || 0 || A10 || A9 || A8 || A15 || A14 || A13 )
+   D4 = ( A13 || 0 || A11 || A10 || A9 || 0 || A15 || A14 ).
+
+G.1.3. Curve P-384
+The modulus for this curve is p = 2 384 – 2 128 – 2 96 + 2 32 – 1. Each integer A less than p2 can be
+written as
+   A = A23 ⋅ 2 736 + A22 ⋅ 2 704 + A21 ⋅ 2 672 + A20 ⋅ 2 640 + A19 ⋅ 2 608 + A18 ⋅ 2 576 + A17 ⋅ 2 544 + A16 ⋅ 2 512 +
+   A15 ⋅ 2 480 + A14 ⋅ 2 448 + A13 ⋅ 2 416 + A12 ⋅ 2384 + A11 ⋅ 2352 + A10 ⋅ 2320 + A9 ⋅ 2 288 + A8 ⋅ 2 256 +
+   A7 ⋅ 2 224 + A6 ⋅ 2192 + A5 ⋅ 2160 + A4 ⋅ 2128 + A3 ⋅ 296 + A2 ⋅ 2 64 + A1 ⋅ 232 + A0 ,
+where each A i is a 32-bit integer. As a concatenation of 32-bit words, this can be denoted by
+                                            A = (A23 || A22 || ⋅ ⋅ ⋅ || A0).
+The expression for B is
+                      B = (T + 2S1 + S2 + S3 + S4 + S5 + S6 – D1 – D2 – D3) mod p,
+where the 384-bit terms are given by
+   T = (A11 || A10 || A9 || A8 || A7 || A6 || A5 || A4 || A3 || A2 || A1 || A0 )
+   S1 = ( 0 || 0 || 0 || 0 || 0 || A23 || A22 || A21 || 0 || 0 || 0 || 0 )
+   S2 = (A23 || A22 || A21 || A20 || A19 || A18 || A17 || A16 || A15 || A14 || A13 || A12)
+   S3 = (A20 || A19 || A18 || A17 || A16 || A15 || A14 || A13 || A12 || A23|| A22|| A21)
+   S4 = ( A19 || A18 || A17 || A16 || A15 || A14 || A13 || A12 || A20 || 0 || A23 || 0 )
+   S5 = ( 0 || 0 || 0 || 0 || A23 || A22 || A21 || A20 || 0 || 0 || 0 || 0 )
+   S6 = ( 0 || 0 || 0 || 0 || 0 || 0 || A23 || A22 || A21 || 0 || 0 || A20 )
+   D1 = (A22 || A21 || A20 || A19 || A18 || A17 || A16 || A15 || A14 || A13 || A12 || A23 )
+   D2 = ( 0 || 0 || 0 || 0 || 0 || 0 || 0 || A23 || A22 || A21 || A20 || 0 )
+   D3 = ( 0 || 0 || 0 || 0 || 0 || 0 || 0 || A23 || A23 || 0 || 0 || 0 ).
+
+
+                                                           53
+NIST SP 800-186                                                              Discrete Logarithm-based Cryptography:
+February 2023                                                                      Elliptic Curve Domain Parameters
+
+G.1.4. Curve P-521
+The modulus for this curve is p = 2 521 – 1. Each integer A less than p2 can be written as
+                                              A = A1 ⋅ 2521 + A0,
+where each A i is a 521-bit integer. As a concatenation of 521-bit words, this can be denoted by
+                                                 A = (A1 || A0).
+The expression for B is
+                                             B = (A0 + A1) mod p.
+
+G.1.5. Curve25519
+The modulus for this curve is p = 2255– 19. Each integer A less than p2 can be written
+A = A9⋅ 2230 +A8 ⋅ 2204 + A7 ⋅ 2179 + A6 ⋅ 2153 + A5 ⋅ 2128 + A4 ⋅ 2102 + A3 ⋅ 277 + A2 ⋅ 251 +A1 ⋅ 226 + A0,
+where each Ai is a 64-bit integer. As a concatenation of 64-bit words, this can be denoted by
+                           A = (A9 || A8 || A7 || A6 || A5 || A4 || A3 || A2 || A1 || A0).
+For more details on efficient implementation, see [NEON].
+
+G.1.6. Curve448
+The modulus for this curve is p = 2448−2224 – 1. Each integer A less than p2 can be written
+                                 A = A3 ⋅ 2672 + A2 ⋅ 2448 + A1 ⋅ 2224 + A0,
+where each A i is a 224-bit integer. As a concatenation of 224-bit words, this can be denoted by
+                                           A = (A3 || A2 || A1 || A0).
+The expression for B is
+                                       B = (S1 + S2 + S3 + S4) mod p,
+where the 448-bit terms are given by
+    S1 = ( A1 || A0)
+    S2 = ( A2 || A2)
+    S3 = ( A3 || A3)
+    S4 = ( A3 || 0).
+
+G.2.    Scalar Multiplication for Koblitz Curves
+This section describes a particularly efficient method of computing the scalar multiple Q:= kP on
+the Koblitz curve Wa,b over GF(2m).
+The operation τ is defined by
+                                               τ (x, y) := (x2, y2).
+
+
+
+                                                         54
+NIST SP 800-186                                                      Discrete Logarithm-based Cryptography:
+February 2023                                                              Elliptic Curve Domain Parameters
+
+When the normal basis representation is used, then the operation τ is implemented by
+performing right circular shifts on the bit strings representing x and y.
+Given m and a, define the following parameters:
+   •   C is some integer greater than 5.
+   •   µ = (–1)1–a
+   •   For i = 0 and i = 1, define the sequence si(m) by
+                                   si(0) := 0,     si(1) := 1 – i,
+                            si(m) = µ⋅ si(m – 1) – 2 ⋅ si(m – 2) + (–1)i.
+   •   Define the sequence V(m) by
+                                    V(0) := 2,        V(1) := µ,
+                               V(m) = µ ⋅ V(m –1) – 2 ⋅ V(m – 2).
+For the recommended Koblitz curves, the quantities si(m) and V(m) are as follows:
+Curve K-163:
+   s0(163) = 2579386439110731650419537
+   s1(163) = –755360064476226375461594
+   V(163) = –4845466632539410776804317
+Curve K-233:
+   s0(233) = –27859711741434429761757834964435883
+   s1(233) = –44192136247082304936052160908934886
+   V(233) = –137381546011108235394987299651366779
+Curve K-283:
+   s0(283) = –665981532109049041108795536001591469280025
+   s1(283) = 1155860054909136775192281072591609913945968
+   V(283) = 7777244870872830999287791970962823977569917
+Curve K-409:
+   s0(409) = –18307510456002382137810317198756461378590542487556869338419259
+   s1(409) = –8893048526138304097196653241844212679626566100996606444816790
+   V(409)=        10457288737315625927447685387048320737638796957687575791173829
+Curve K-571:
+   s0(571) = –3737319446876463692429385892476115567147293964596131024123406420\
+             235241916729983261305
+   s1(571) = –3191857706446416099583814595948959674131968912148564658610565117\
+             58982848515832612248752
+
+
+                                                 55
+NIST SP 800-186                                                Discrete Logarithm-based Cryptography:
+February 2023                                                        Elliptic Curve Domain Parameters
+
+   V(571)=        –1483809269816914138996191402970514903645425741804939362329123395\
+                  34208516828973111459843
+The following algorithm computes the scalar multiple Q:= kP on the Koblitz curve Wa,b over
+GF(2m). The average number of elliptic additions and subtractions is at most ∼ 1 + (m/3) and is at
+most ∼ m/3 with probability at least 1 – 25–C.
+   1. For i := 0 to 1, do:
+      1.1 k′ ←  k / 2a–C + (m–9) / 2
+      1.2 g′ ← si(m) · k′
+      1.3 h′ ←  g′ / 2m 
+      1.4 j′ ← V(m) · h′
+      1.5 l′ ← Round((g′ + j′) / 2(m+5) / 2)
+      1.6 λi ← l′ / 2C
+      1.7 fi ← Round(λi)
+      1.8 ηi ← λi – fi.
+      1.9 hi ← 0
+   2. η ← 2 η0 + µ η1
+   3. If (η ≥ 1),
+          then
+           if (ηo – 3 µη1 < –1)
+                then set h1 ← µ.
+                Else, set h0 ← 1.
+                Else,
+                        if (η0 + 4 µ η1 ≥ 2),
+                                then set h1 ← µ.
+   4. If (η < –1),
+          then
+          if (η0 – 3 µ η1 ≥ 1),
+               then set h1 ← – µ.
+               Else, set h0 ← –1.
+               Else,
+                       if (η0 + 4 µ η1 < –2),
+                       then set h1 ← – µ.
+   5. q0 ← f0 + h0
+   6. q1 ← f1 + h1
+   7. r0 ← n – (s0 + µ s1) q0 – 2s1 q1
+   8. r1 ← s1 q0 – s0 q1
+   9. Set Q ← O
+   10. P0 ← P
+   11. While ((r0 ≠ 0) or (r1 ≠ 0))
+       11.1 If (r0 odd), then
+              11.1.1 Set u ← 2 – (r0 – 2 r1 mod 4).
+              11.1.2 Set r0 ← r0 – u.
+
+
+                                                   56
+NIST SP 800-186                                                                                      Discrete Logarithm-based Cryptography:
+February 2023                                                                                              Elliptic Curve Domain Parameters
+
+                          11.1.3 If (u = 1), then set Q ← Q + P0.
+                          11.1.4 If (u = –1), then set Q ← Q – P0.
+              11.2        Set P0 ← τP0.
+              11.3        Set (r0 , r1) ← (r1 + µr0 /2, – r0 /2).
+                          Endwhile
+        12. Output Q.
+
+G.3.          Polynomial and Normal Bases for Binary Fields
+
+G.3.1. Normal Bases
+The elements of GF(2m), where m is odd, are expressed in terms of the type T normal 2 basis B for
+GF(2m) for some T. Each element has a unique representation as a bit string:
+
+                                                                 (a0 a1 … am–1).
+The arithmetic operations are performed as follows:
+Addition: Addition of two elements is implemented by bit-wise addition modulo 2. Thus, for
+example,
+                                                 (1100111) + (1010010) = (0110101).
+Squaring: If
+                                                           α = (a0 a1 … am–2 am–1),
+then
+                                                           α2 = (am–1 a0 a1 … am–2).
+Multiplication: Multiplication depends on the following function F(u,v) on inputs:
+                                  u = (u0 u1 … um–1)                              and        v = (v0 v1 … vm–1),
+which is constructed as follows.
+        1. Set p = Tm + 1.
+        2. Let u be an integer having order T modulo p.
+        3. Compute the sequence F (1), F (2), … , F (p–1) as follows:
+               a. Set w = 1.
+               b. For j from 0 to T–1, do:
+                    i. Set n = w.
+                   ii. For i = 0 to m–1, do:
+                             1. Set F(n) = i.
+                             2. Set n = 2n mod p.
+                  iii. Set w = uw mod p.
+        4. Output the formulae F(u, v), where
+
+
+2
+    It is assumed in this section that m is odd and T is even since this is the only case considered in this standard.
+
+
+
+                                                                             57
+NIST SP 800-186                                                                     Discrete Logarithm-based Cryptography:
+February 2023                                                                             Elliptic Curve Domain Parameters
+
+                                                       p −2
+                                       F (u , v) := ∑ u F ( k +1) v F ( p − k ) .
+                                                       k =1
+This computation only needs to be performed once per basis.
+Given the function F for B, the product
+
+                          (c0 c1 … cm–1) = (a0 a1 … am–1) × (b0 b1 … bm–1)
+is computed as follows:
+    1. Set (u0 u1 … um–1) = (a0 a1 . . . am–1).
+    2. Set (v0 v1 … vm–1) = (b0 b1 . . . bm–1 ).
+    3. For k = 0 to m – 1, do:
+           a. Compute ck = F(u, v).
+           b. Set u = LeftShift (u) and v := LeftShift (v), where LeftShift denotes the circular
+              left shift operation.
+    4. Output c = (c0 c1 … cm–1).
+Example:
+For the type-4 normal basis for GF(27), one has p = 29 and u = 12 or u = 17. Thus, the values of
+F are given by:
+    F (1) = 0     F (8) = 3      F (15) = 6          F (22) = 5
+    F (2) = 1     F (9) = 3      F (16) = 4          F (23) = 6
+    F (3) = 5     F (10) = 2     F (17) = 0          F (24) = 1
+    F (4) = 2     F (11) = 4     F (18) = 4          F (25) = 2
+    F (5) = 1     F (12) = 0     F (19) = 2          F (26) = 5
+    F (6) = 6     F (13) = 4     F (20) = 3          F (27) = 1
+    F (7) = 5     F (14) = 6     F (21) = 3          F (28) = 0
+Therefore,
+          F (u, v) = u0 v1 + u1 (v0 + v2 + v5 + v6) + u2 (v1 + v3 + v4 + v5) + u3 (v2 + v5) +
+                      u4 (v2 + v6) + u5 (v1 + v2 + v3 + v6) + u6 (v1 + v4 + v5 + v6).
+As a result, if
+                               a = (1 0 1 0 1 1 1) and b = (1 1 0 0 0 0 1),
+then
+                               c0 = F ((1 0 1 0 1 1 1), (1 1 0 0 0 0 1)) = 1,
+                               c1 = F ((0 1 0 1 1 1 1), (1 0 0 0 0 1 1)) = 0,
+                                                              ⋮
+                               c6 = F ((1 1 0 1 0 1 1), (1 1 1 0 0 0 0)) = 1,
+so that c = a × b = (1 0 1 1 0 0 1).
+For the binary curves recommended in this specification, the values of T are T = 2 (m = 233), T =
+6 (m = 283), T = 4 (m = 409), and T = 10 (m = 571), respectively.
+
+
+
+                                                          58
+NIST SP 800-186                                                    Discrete Logarithm-based Cryptography:
+February 2023                                                            Elliptic Curve Domain Parameters
+
+G.3.2. Polynomial Basis to Normal Basis Conversion
+Let α be an element of the field GF(2m) with bit-string representation p with respect to a given
+polynomial basis and bit-string representation n with respect to a given normal basis. The bit
+strings p and n are related via
+                                               p Γ = n,
+where Γ is an (m × m) matrix with entries in GF(2). The matrix Γ, which only depends on the
+bases, can be easily computed given its second-to-last row. For each conversion, that second-to-
+last row is given below.
+Degree 233:
+      0x0be 19b89595 28bbc490 038f4bc4 da8bdfc1 ca36bb05 853fd0ed 0ae200ce
+
+Degree 283:
+ 0x3347f17 521fdabc 62ec1551 acf156fb 0bceb855 f174d4c1 7807511c 9f745382
+  add53bc3
+
+Degree 409:
+0x0eb00f2 ea95fd6c 64024e7f 0b68b81f 5ff8a467 acc2b4c3 b9372843 6265c7ff
+  a06d896c ae3a7e31 e295ec30 3eb9f769 de78bef5
+
+Degree 571:
+0x7940ffa ef996513 4d59dcbf e5bf239b e4fe4b41 05959c5d 4d942ffd 46ea35f3
+  e3cdb0e1 04a2aa01 cef30a3a 49478011 196bfb43 c55091b6 1174d7c0 8d0cdd61
+  3bf6748a bad972a4
+
+If r is the second-to-last row of Γ and represents the element β of GF(2m) with respect to the
+normal basis, then the rows of Γ from top to bottom are the bit-string representations of the
+elements
+                                      β m–1, β m–2, …, β 2, β, 1
+with respect to this normal basis. (Note that the element 1 is represented by the all-1 bit string.)
+Alternatively, the matrix is the inverse of the matrix described in Appendix G.3.3.
+More details of these computations can be found in Annex A.7 of the IEEE Standard 1363-2000
+standard [IEEE_1363].
+
+G.3.3. Normal Basis to Polynomial Basis Conversion
+Let α be an element of the field GF(2m) with bit-string representation n with respect to a given
+normal basis and bit-string representation p with respect to a given polynomial basis. The bit
+strings p and n are related via
+                                               n ∆ = p,
+
+
+
+
+                                                  59
+NIST SP 800-186                                                      Discrete Logarithm-based Cryptography:
+February 2023                                                              Elliptic Curve Domain Parameters
+
+where ∆ is an (m × m) matrix with entries in GF(2). The matrix ∆, which depends only on the
+bases, can be easily computed given its top row. For each conversion, that top row is given
+below.
+Degree 233:
+      0x149 9e398ac5 d79e3685 59b35ca4 9bb7305d a6c0390b cf9e2300 253203c9
+
+Degree 283:
+ 0x31e0ed7 91c3282d c5624a72 0818049d 053e8c7a b8663792 bc1d792e ba9867fc
+  7b317a99
+
+Degree 409:
+ 0x0dfa06b e206aa97 b7a41fff b9b0c55f 8f048062 fbe8381b 4248adf9 2912ccc8
+  e3f91a24 e1cfb395 0532b988 971c2304 2e85708d
+
+Degree 571:
+ 0x452186b bf5840a0 bcf8c9f0 2a54efa0 4e813b43 c3d41496 06c4d27b 487bf107
+  393c8907 f79d9778 beb35ee8 7467d328 8274caeb da6ce05a eb4ca5cf 3c3044bd
+  4372232f 2c1a27c4
+
+If r is the top row of ∆ and represents the element β of GF(2 m), then the rows of ∆, from top to
+bottom, are the bit strings representing the elements
+                                                 2             m–1
+                                      β, β 2 , β 2 , … , β 2
+with respect to the polynomial basis. Alternatively, the matrix is the inverse of the matrix
+described in Appendix G.3.2.
+More details of these computations can be found in Annex A.7 of the IEEE Std 1363-2000
+standard.
+
+
+
+
+                                                 60
+NIST SP 800-186                                                  Discrete Logarithm-based Cryptography:
+February 2023                                                          Elliptic Curve Domain Parameters
+
+Appendix H. Other Allowed Elliptic Curves
+
+H.1.   Brainpool Curves
+This standard also allows the curves specified in Elliptic Curve Cryptography (ECC) Brainpool
+Standard Curves and Curve Generation [RFC_5639] for ECDSA signatures as well as EC key
+establishment, which support a security strength of 112 bits or higher. In particular, this includes
+brainpoolP224r1, brainpoolP256r1, brainpoolP320r1, brainpoolP384r1, and brainpoolP512r1.
+These curves were pseudorandomly generated and are allowed to be used for interoperability
+reasons.
+
+H.2.   The Curve secp256k1
+This standard also allows the curve secp256k1 specified in SEC 2: Recommended Elliptic Curve
+Domain Parameters [SEC_2], which supports a security strength of 128 bits. This curve is a
+Koblitz curve with coefficients selected for efficiency reasons. The curve secp256k1 is allowed
+to be used for blockchain-related applications.
+
+
+
+
+                                                 61
+NIST SP 800-186                                                                Discrete Logarithm-based Cryptography:
+February 2023                                                                        Elliptic Curve Domain Parameters
+
+Appendix I. List of Symbols, Abbreviations, and Acronyms
+Selected acronyms and abbreviations used in this publication are defined below.
+a mod n
+Smallest non-negative integer r so that a − r is a multiple of n
+
+a
+The floor of a; the largest integer that is less than or equal to a. For example, 5 = 5, 5.3 = 5, and -2.1 = -3
+
+Ba,b
+Elliptic curve in short-Weierstrass form defined over the binary field GF(2m) with domain parameters a and b
+
+c
+Parameter used in domain parameter generation for some curves Wa,b in short-Weierstrass form, where c = a2/b3
+(optional)
+
+D
+Domain parameters of elliptic curve
+
+Ea,d
+Twisted Edwards curve with domain parameters a and d
+
+G
+Base point of order n of an elliptic curve
+
+GF(q)
+Finite field of size q
+
+GF(p)
+Prime field of size p, represented by the set of integers {0,1, …, p−1}
+
+h
+Cofactor of an elliptic curve
+
+Hf
+Half-trace function (for binary fields)
+
+len(a)
+The length of a in bits; the integer L, where 2L-1 ≤ a < 2L
+
+MA,B
+Montgomery curve, with domain parameters A and B
+
+n
+Order of a prime-order subgroup of elliptic curve
+
+p
+Prime number
+
+Seed
+String from which part of the domain parameters are derived (optional)
+
+t
+Trace of an elliptic curve
+
+Tr
+Trace function (for binary fields)
+
+
+
+
+                                                              62
+NIST SP 800-186                                                           Discrete Logarithm-based Cryptography:
+February 2023                                                                   Elliptic Curve Domain Parameters
+
+Type
+Indication of elliptic curve type
+
+(u, v)
+Coordinates on a Montgomery curve
+
+Wa,b
+Elliptic curve in short-Weierstrass form with domain parameters a and b
+
+(x, y)
+Coordinates on a (twisted) Edwards or Weierstrass curve
+
+(x’, y’)
+Coordinates on an Edwards448 curve that correspond to the x,y coordinates on an E448 curve
+
+0x
+Indication of a hexadecimal string
+
+∅
+Identity element of an elliptic curve
+
+\
+Indication that an integer value stretches over several lines
+
+
+
+
+                                                           63
+NIST SP 800-186                                                              Discrete Logarithm-based Cryptography:
+February 2023                                                                      Elliptic Curve Domain Parameters
+
+Appendix J. Glossary
+base point
+A fixed elliptic curve point that generates the group used for elliptic curve cryptography.
+
+group order
+Cardinality of the group.
+
+identity
+Unique group element 0 for which x + 0 = x for each group element x, relative to the binary group operator +.
+
+inverse
+For some group element x, the unique element y for which x + y is the identity element relative to the binary group
+operator + (y is usually denoted as −x).
+
+isogeny
+A (non-constant) mapping from an elliptic curve to a second elliptic curve, which preserves point addition and fixes
+the identity point.
+
+isomorphism (of elliptic curves)
+A bijective mapping from one elliptic curve to another, which maps addition (on the first curve) to addition (on the
+image curve).
+
+point at infinity
+Identity element of a Montgomery curve or a curve in short-Weierstrass form.
+
+point order
+Smallest non-zero multiple of a group element that results in the group’s identity element.
+
+quadratic twist
+Certain elliptic curve related to a specified elliptic curve.
+
+square
+The property that some element x of a finite field GF(q) can be written as x = z2 for some element z in the same field
+GF(q).
+
+
+
+
+                                                                64
+

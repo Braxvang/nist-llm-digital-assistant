@@ -1,0 +1,57 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+In this subprocess, the resolver starts from a known list of trusted public keys (called trust anchors) and
+establishes trust in the public key of the zone in a given response by traversing through a chain of public
+keys, building the chain by using the DNS name space hierarchy. The trust anchors in a resolver ideally
+consist of the root public keys (if root servers are DNSSEC-aware) or public keys of zones lower in the
+hierarchy. The trust anchor list in a resolver is not built through a DNS transaction; it uses an out-of-band
+mechanism.
+
+The DNSSEC processes described above involve several name server operations and a few resolver
+operations. The name server operations are as follows:
+
+      •    DNSSEC-OP1: Generation of public key-private key pair
+
+      •    DNSSEC-OP2: Secure storage of private keys
+
+      •    DNSSEC-OP3: Public key distribution
+
+      •    DNSSEC-OP4: Zone signing
+
+      •    DNSSEC-OP5: Key rollover (changing of keys)
+
+      •    DNSSEC-OP6: Zone re-signing.
+The resolver operations are as follows:
+
+      •    DNSSEC-OP7: Trust anchors’ configuration
+
+      •    DNSSEC-OP8: Establishing trusted chain and signature verification.
+Name server operations DNSSEC-OP1 through DNSSEC-OP4 and resolver operations DNSSEC-OP7
+and DNSSEC-OP8 are performed either prior to DNSSEC deployment or for secure operation (serving
+signed responses and verification of signatures) and hence are covered in this section. The remaining
+name server operations (key rollovers and zone re-signing – DNSSEC-OP5 and DNSSEC-OP6
+respectively) are performed on a periodic basis after a fully operational DNSSEC deployment and hence
+are covered in Section 11.
+
+9.3       Generation of Public Key-Private Key Pair (DNSSEC-OP1)
+
+DNSSEC specifies generation and verification of digital signatures using asymmetric keys. This requires
+generation of a public key-private key pair. Although the DNSSEC specification does not call for
+different keys (just one key pair), experience from pilot implementations suggests that for easier routine
+security administration operations such as key rollover (changing of keys) and zone re-signing, at least
+two different types of keys are needed. One set is called Key Signing Key (KSK). This key (specifically,
+the private part of the key pair, called KSK-private) will be used only for signing the key set (i.e.,
+DNSKEY RRSet) in the zone file. The other key type is called the Zone Signing Key (ZSK) (whose
+private part is called ZSK-private) and will be used to sign all RRsets in the zone (including DNSKEY
+RRSet). An administrative distinction is made between the KSK and ZSK keys by setting the Secure
+Entry Point (SEP) flag bit in the DNSKEY RR that represents the public part of those keys (in this case, it
+would be called KSK-public).
+
+The logic behind creation of two types of key pairs is to provide separate set of functions for each key
+type and thus reduce the overall complexity of tasks involved in key rollovers and zone re-signing.
+
+
+                                                     9-3
+

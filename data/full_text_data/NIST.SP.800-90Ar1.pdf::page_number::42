@@ -1,0 +1,47 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+                                              Comment: status indications other than SUCCESS
+                                              could be ERROR_FLAG or
+                                              CATASTROPHIC_ERROR_FLAG, in which
+                                              case, the status is returned to the consuming
+                                              application to handle. The Get_entropy_input call
+                                              could return a status of ERROR_FLAG to indicate
+                                              that entropy is currently unavailable, and could
+                                              return CATASTROPHIC_ERROR_FLAG to
+                                              indicate that an entropy source failed.
+           If (status ≠ SUCCESS), return (status, Null).
+           Using state_handle, obtain the new internal state.
+           (status, pseudorandom_bits, new_working_state) = Generate_algorithm
+           (working_state, requested_number_of_bits).
+        Note that if the input of additional_input is not supported, then the additional_input
+        parameter in the Reseed_function call above may be omitted.
+   5. additional_input: An optional input. The maximum length of the additional_input
+      (max_additional_input_length) is implementation dependent, but shall be less than or
+      equal to the specified maximum length for the selected DRBG mechanism (see Section
+      10). If the input of additional_input is not supported, then the input parameter, generate
+      process steps 4 and 7.4, and the additional_input input parameter in generate process
+      steps 7.1 and 8 are omitted.
+Required information not provided by the consuming application during generation:
+   1. Internal state values required for the working_state and administrative information, as
+      appropriate.
+Output to a consuming application after generation:
+   1. status: The status returned from the generate function. If any status other than SUCCESS
+      is returned, a Null string shall be returned as the pseudorandom bits.
+   2.    pseudorandom_bits: The pseudorandom bits that were requested or a Null string.
+Information retained within the DRBG mechanism boundary after generation:
+   Replaced internal state values (i.e., the new working_state).
+Generate Process:
+                                              Comment: Get the internal state and check the input
+                                              parameters.
+   1. Using state_handle, obtain the current internal state for the instantiation. If state_handle
+      indicates an invalid or unused internal state, then return (ERROR_FLAG, Null).
+   2. If requested_number_of_bits > max_number_of_bits_per_request, then return
+      (ERROR_FLAG, Null).
+   3. If requested_security_strength > the security_strength indicated in the internal state, then
+      return (ERROR_FLAG, Null).
+
+
+                                                 33
+

@@ -1,0 +1,56 @@
+                                                                                             NIST SP 800-204                                                            SECURITY STRATEGIES FOR
+                                                                                                                                                        MICROSERVICES-BASED APPLICATION SYSTEMS
+
+                                                                                                   •    For high security microservices, replay detection must be implemented. Based on the
+                                                                                                        risk, this feature can be configured to detect replays 100 % of the time or perform random
+                                                                                                        detection.
+
+                                                                                             4.6       Integrity Assurance Strategies
+
+                                                                                             Integrity assurance requirements in the context of microservices-based applications arise under
+                                                                                             two contexts:
+                                                                                                 • When new versions of microservices are inducted into the system.
+                                                                                                 • For supporting session persistence during a transaction.
+
+                                                                                             Monitored induction of new releases: Whenever a newer version of a microservice is released, its
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204
+
+
+
+
+                                                                                             induction must be a gradual process since (a) all clients may not be ready to use the new version,
+                                                                                             and (b) the behavior of the new version for all scenarios and use cases may not meet the business
+                                                                                             process expectation despite extensive testing. To address this situation, a technique called canary
+                                                                                             release is often adopted [4]. Under this technique, only a limited number of requests are routed to
+                                                                                             the new version after it is brought online, and the rest are routed to the existing operational
+                                                                                             version. After a period of observation provides assurance that the new version meets
+                                                                                             performance and integrity metrics, all of the requests are routed to the new version.
+
+                                                                                             Security (integrity assurance) strategies for the induction of new versions of microservices
+                                                                                             (MS-SS-9):
+
+                                                                                                   •  The traffic to both the existing version and the new version of the service should be
+                                                                                                      routed through a central node, such as an API gateway, to monitor that the blue/green
+                                                                                                      transition occurs in a controlled manner and to monitor the risk associated with a canary
+                                                                                                      release. Security monitoring should cover nodes hosting both the existing and newer
+                                                                                                      versions.
+                                                                                                  • Usage monitoring of the existing version should steadily increase traffic to the new
+                                                                                                      version.
+                                                                                                  • The performance and functional correctness of the new version should be factors in
+                                                                                                      increasing traffic to the new version.
+                                                                                                  • Client preference for the version (existing or new) should be taken into consideration
+                                                                                                      while designing a canary release technique.
+                                                                                             Session persistence: It is critical to send all requests in a client session to the same upstream
+                                                                                             microservice instance since clients execute a complete transaction through multiple requests to a
+                                                                                             specific service, and the target of all requests should be to the same upstream service instance in
+                                                                                             that session. This requirement is called session persistence. A situation that could potentially
+                                                                                             break this requirement is one wherein the microservice stores its state locally, and the load
+                                                                                             balancer handling individual requests forwards a request from an in-progress user session to a
+                                                                                             different microservice server or instance. One of the methods for implementing session
+                                                                                             persistence is sticky cookie. In this method, there is a mechanism to add a session cookie to the
+                                                                                             first response from the upstream microservice group to a given client, identifying (in an encoded
+                                                                                             fashion) the server that generated the response. Subsequent requests from the client include the
+                                                                                             cookie value, and the same mechanism uses it to route the request to the same upstream server
+                                                                                             [16].
+                                                                                                                                                 25
+

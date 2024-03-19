@@ -1,0 +1,45 @@
+       NIST SP 800-90C 3pd (Third Public Draft)                         Recommendation for RBG Constructions
+       September 2022
+
+2346   FAILURE is returned from the Reseed_function, status = FAILURE is also returned to the
+2347   consuming application by the Generate_function, along with a Null value as the returned_bits.
+2348   Whether or not prediction resistance is requested, a status indication is returned from the
+2349   Generate_function call. If status = SUCCESS, a bitstring of at least requested_number_of_bits
+2350   is provided as the returned_bits to the consuming application. If status = FAILURE, returned_bits
+2351   is an empty bitstring.
+
+2352   B.4.3. Reseeding an RBG2 Construction
+2353   The HMAC_DRBG will be reseeded 1) if explicitly requested by the consuming application, 2)
+2354   whenever generation with prediction resistance is requested by the Generate_function, or 3)
+2355   automatically during a Generate_function call at the end of the DRBG’s designed seedlife (see
+2356   the Generate_function specification in [SP800-90A)].
+2357   The Reseed_function call, as specified in Section 2.8.1.3, is:
+2358                                 status = Reseed_function(additional_input).
+2359       •   Since there is only a single instantiation of the HMAC_DRBG, a state_handle was not
+2360           returned from the Instantiate_function (see Appendix B.4.1) and is not used during the
+2361           Reseed_function call.
+2362       •   The additional_input is optional.
+2363   Since entropy is obtained directly from the entropy source (case 2 in Section 5.2.3), the
+2364   implementation has replaced the Get_randomness-source_input call used by the
+2365   Reseed_function in [SP800-90A] with a Get_ES_Bitstring call.
+2366   The HMAC_DRBG is reseeded with a security strength of 256 bits as follows:
+2367                           (status, entropy_bitstring) = Get_ES_Bitstring(256).
+2368   If status = SUCCESS is returned by Get_ES_Bitstring, the entropy_bitstring contains at least 256
+2369   bits of entropy and is at least 256 bits long. Status = SUCCESS is returned to the calling application
+2370   (e.g., the Generate_function) by the Reseed_function.
+2371   If status = FAILURE, entropy_bitstring is an empty (e.g., null) bitstring. The HMAC_DRBG is
+2372   not reseeded, and status= FAILURE is returned from Reseed_function to the calling application.
+
+2373   B.5.    Example of an RBG3(XOR) Construction
+2374   This construction is specified in Section 6.2 and requires a DRBG and a source of full-entropy
+2375   bits. For this example, the entropy source itself does not provide full-entropy output, so the vetted
+2376   Hash conditioning function listed in [SP800-90B] using SHA-256 is used as an external
+2377   conditioning function.
+2378   The Hash_DRBG specified in [SP800-90A] will be used as the DRBG, with SHA-256 used as the
+2379   underlying hash function for the DRBG (note the use of SHA-256 for both the Hash_DRBG and
+2380   the vetted conditioning function). The DRBG will obtain input directly from the RBG’s entropy
+2381   source without conditioning (as shown in Figure 23), since bits with full entropy are not required
+
+
+                                                        70
+

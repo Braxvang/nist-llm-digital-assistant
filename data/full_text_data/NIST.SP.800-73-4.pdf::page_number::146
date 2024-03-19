@@ -1,0 +1,61 @@
+Special Publication 800-73-4                                                       Part 3: PIV Client Application
+Interfaces for Personal Identity Verification                                            Programming Interface
+
+                            INOUT LONG                     outputLength
+                       );
+
+Parameters:            cardHandle                 Opaque identifier of the card to be acted upon as
+                                                  returned by pivConnect.
+
+                       algorithmIdentifier        Identifier of the cryptographic algorithm to be used for
+                                                  the cryptographic operation. [SP800-78, Tables 6-2 and
+                                                  6-3]
+
+                       keyReference               Identifier of the on-card key to be used for the
+                                                  cryptographic operation. See [SP800-78, Table 6-1] and
+                                                  Part 1, Table 4b.
+
+                       algorithmInput             Sequence of bytes used as the input to the cryptographic
+                                                  operation. The algorithmInput for RSA algorithms shall
+                                                  be restricted to the range 0 to n-1, where n is the RSA
+                                                  modulus.
+
+                       inputLength                Length of the algorithm input.
+
+                       algorithmOutput            Sequence of bytes output by the cryptographic operation.
+
+                       outputLength               As an input, length of the buffer allocated for
+                                                  algorithmOutput. As an output, length of the algorithm
+                                                  output.
+
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_INVALID_KEYREF_OR_ALGORITHM
+                       PIV_SECURITY_CONDITIONS_NOT_SATISFIED
+                       PIV_INPUT_BYTES_MALFORMED
+                       PIV_CARD_READER_ERROR
+                       PIV_SM_FAILED
+                       PIV_INSUFFICIENT_BUFFER
+
+The PIV_INPUT_BYTES_MALFORMED error condition indicates that some property of the data to be
+processed such as the length or padding was inappropriate for the requested cryptographic algorithm or
+key.
+
+If the value of keyReference is '04' (PIV Secure Messaging key), then the PIV Middleware shall return
+PIV_INVALID_KEYREF_OR_ALGORITHM.
+
+If the length of the algorithm output is longer than the buffer allocated by the client application, then the
+PIV Middleware shall return PIV_INSUFFICIENT_BUFFER, but shall still set outputLength to the length
+of the algorithm output.
+
+3.4    Entry Points for Credential Initialization and Administration
+
+The PIV Middleware shall not submit data provided to the pivPutData or pivGenerateKeyPair function
+over the contactless interface. If the PIV Middleware is not communicating with the PIV Card via the
+card’s contact interface, then the pivPutData or pivGenerateKeyPair function shall return
+PIV_FUNCTION_NOT_SUPPORTED.
+
+
+
+                                                     11
+

@@ -1,0 +1,63 @@
+9.         Common header for PIV biometric data
+
+9.1        Scope
+All PIV biometric data shall be embedded in a data structure conforming to Common Biometric Exchange Formats
+Framework [CBEFF]. This specifies that all biometric data shall be digitally signed and uniformly encapsulated. This
+covers the following static data:
+―       The PIV Card fingerprints mandated by [FIPS];
+―       The PIV Card facial image mandated by [FIPS];
+―       Any other biometric data that agencies elect to place on PIV Cards (e.g.,iris);
+―       Any biometric records that agencies elect to retain (including purely proprietary, or derivative, elements);
+―       Any biometric data retained by, or for, agencies or Registration Authorities.
+There are three pieces of data that are exempt:
+                                                                                    20
+―       The [EBTS] data of Section 3.4 sent for background checks ;
+                                                                                   21
+―       The OCC data of Section 5.4 that is stored on the PIV Card ;
+For the relevant data above, integrity shall be protected by pre-pending the data with a CBEFF header and appending
+with a signature stored in the CBEFF signature block as depicted in the linear structure of Table 13.
+
+                                                       Table 13 − CBEFF concatenation structure
+                          CBEFF_HEADER                        CBEFF_BIOMETRIC_RECORD                     CBEFF_SIGNATURE_BLOCK
+                            Section 9.2                     Sections 3.2.2, 3.3, 6.3. 6.4 and 7.2               Section 9.3
+                          INCITS 398 5.2.1                           INCITS 398 5.2.2                         INCITS 398 5.2.3
+
+9.2        The CBEFF Header
+The CBEFF Header specified in Table 14 and its notes has been established by NIST as Patron Format "PIV". This
+format has been established as a formal Patron Format per the provisions of [CBEFF, 6.2]. It adds definitive data
+types and the FASC-N field mandated by [FIPS] to a subset of the fields given in Patron Format A [CBEFF, Annex A]. It
+exists independently of Patron Format A. All fields of the format are mandatory.
+
+                                                       Table 14 − Patron format PIV specification
+        Patron Format PIV Field (Numbers in       Length    PIV Data    PIV Conformance
+        parentheses are [CBEFF] clauses)          Bytes     Type        Required Value
+     1. Patron Header Version (5.2.1.4)           1         UINT        0x03
+     2. SBH Security Options (5.2.1.1, 5.2.1.2)   1         Bitfield    See Note 2
+     3. Biometric data block (BDB) Length         4         UINT        Length, in bytes, of the biometric data CBEFF_BIOMETRIC_RECORD
+     4. Signature block (SB) Length               2         UINT        Length, in bytes, of the CBEFF_SIGNATURE_BLOCK. See Note 3
+     5. BDB Format Owner (5.2.1.17)               2         UINT        Some of the CBEFF Header fields in Table 14 take modality-specific values as
+                                                                        detailed in Table 15.
+                                                                        Table 15, row "Biometric Format Owner", identifying the standards developer
+     6. BDB Format Type (5.2.1.17)                2         UINT        Some of the CBEFF Header fields in Table 14 take modality-specific values as
+                                                                        detailed in Table 15.
+                                                                        Table 15, row "Biometric Format Type", identifying the standard
+     7. Biometric Creation Date (5.2.1.10)        8                     See Note 4 for data type
+     8. Validity Period (5.2.1.11)                16                    See Note 5 for data type
+     9. Biometric Type (5.2.1.5)                  3         UINT        Some of the CBEFF Header fields in Table 14 take modality-specific values as
+                                                                        detailed in Table 15.
+                                                                        Table 15, row "Biometric Type" – which modality
+     10. Biometric Data Type (5.2.1.7)            1         Bitfield    Some of the CBEFF Header fields in Table 14 take modality-specific values as
+                                                                        detailed in Table 15.
+                                                                        Table 15, row "Biometric Data Type" – what degree of processing
+
+
+20
+ The ANSI/NIST standard [AN2011] now provides for integrity protection with its own Type 98 record. This may be useful for
+ maintenance of PIV data. See http://biometrics.nist.gov/cs_links/standard/Type_98_Best_Practice_Guidance_v1.3.pdf.
+21
+  For OCC, various pieces of CBEFF information are placed in the Biometric Information Template of Table 7 as standardized in
+ [CARD-BIO Annex C.2].
+
+
+                                                                                                                                                   35
+

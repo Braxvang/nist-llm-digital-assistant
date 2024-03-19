@@ -1,0 +1,62 @@
+Special Publication 800-73-4                                  Interfaces for Personal Identity Verification – Part 2:
+                                                              PIV Card Application Card Command Interface
+
+computed as CMAC(MacKey, MacLen, MacData p ), where MacKey is SK CFRM , MacLen is 128 bits, and
+MacData p is "KC_1_V" || ID sICC || ID sH || Q eH . "KC_1_V" is a 6-byte ASCII string ('4B 43 5F 31 5F 56').
+For Q eH , the coordinates of the ephemeral public key are converted from field elements to byte strings as
+specified in [SP800-56A, Appendix C.2], Field-Element-to-Byte String Conversion, and concatenated
+(with x first) to form a single byte string. CMAC is cipher-based message authentication code from
+[SP800-38B], where the block cipher is AES.
+
+  4.1.8 Command Interface
+The following command interface shall be used for the key establishment protocol.
+
+Command Syntax
+
+        CLA                    '00'
+        INS                    '87'
+                               Algorithm reference ('27' or '2E'), as specified in the 0xAC tag of the
+        P1
+                               application property template
+        P2                     '04' (PIV Secure Messaging key).
+        Lc                     Length of data field
+                               '7C' L1 { '81' L2 { CB H || ID sH || Q eH } '82 00' }, where CB H is 0x00,
+                               ID sH is an 8-byte client application identifier as described in Section
+        Data Field
+                               4.1.3, and Q eH is an ephemeral public key encoded as 04 || X || Y, as
+                               specified in the “Value” column of Table 13.
+        Le                     '00'
+
+
+Response Syntax
+
+        Data Field             '7C' L1 { '82' L2 { CB ICC || N ICC || AuthCryptogram ICC || C ICC } }
+        SW1-SW2                Status word
+
+
+
+         SW1         SW2                                          Meaning
+                               Successful execution where SW2 encodes the number of response
+          '61'       'xx'
+                               data bytes still available
+          '6A'       '80'      Incorrect parameter in command data field
+          '6A'       '86'      Incorrect parameter in P1 or P2
+          '90'       '00'      Successful execution
+
+
+4.2   Secure Messaging
+
+PIV secure messaging is used to protect the integrity and confidentiality of the PIV data being transmitted
+between the card and the relying system. PIV secure messaging shall be provided using symmetric
+session keys derived using the key establishment protocol defined Section 4.1.
+
+Once session keys are established and the card is authenticated as specified in Section 4.1, subsequent
+communication with the card can be performed using secure messaging by setting bits b3 and b4 of the
+CLA byte of the command APDU to 1, resulting in a '0C' or '1C' CLA byte. If bits b3 and b4 of the CLA
+byte are set, then both the command and the response shall be encrypted and integrity protected as
+described in this section. If the PIV Card Application cannot encrypt and integrity protect the response
+(e.g., because it does not support secure messaging or no session keys have been established), the PIV
+
+
+                                                             30
+

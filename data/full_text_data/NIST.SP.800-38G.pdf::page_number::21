@@ -1,0 +1,53 @@
+NIST SP 800-38G                                         METHODS FOR FORMAT-PRESERVING ENCRYPTION
+
+
+
+Algorithm 8: FF1.Decrypt(K, T, X)
+
+Prerequisites:
+Designated cipher function, CIPH, of an approved 128-bit block cipher;
+Key, K, for the block cipher;
+Base, radix;
+Range of supported message lengths, [minlen .. maxlen];
+Maximum byte length for tweaks, maxTlen.
+
+Inputs:
+Numeral string, X, in base radix of length n, such that n ∈ [minlen .. maxlen];
+Tweak T, a byte string of byte length t, such that t ∈ [0 .. maxTlen].
+
+Output:
+Numeral string, Y, such that LEN(Y) = n.
+
+Steps:
+1.    Let u = ⎣n/2⎦; v = n – u.
+2.    Let A = X [1 .. u]; B = X [u + 1 .. n].
+3.    Let b = ⎡ ⎡v ⋅ LOG(radix) ⎤/8⎤.
+4.    Let d = 4 ⎡b/4⎤ + 4
+5.    Let P = [1]1 || [2]1 || [1]1 || [radix]3 || [10]1 ||[u mod 256]1 || [n]4 || [t]4.
+6.    For i from 9 to 0:
+      i.    Let Q = T || [0](−t−b−1) mod 16 || [i]1 || [NUMradix (A)]b.
+      ii.    Let R = PRF(P || Q).
+      iii. Let S be the string of the first d bytes of the following string of ⎡d/16⎤ blocks:
+             R || CIPHK (R ⊕ [1]16) || CIPHK (R ⊕ [2]16) … CIPHK (R ⊕ [⎡d/16⎤ – 1]16).
+      iv. Let y = NUM(S).
+      v.     If i is even, let m = u; else, let m = v.
+      vi. Let c = (NUMradix (B) – y) mod radix m.
+                            m
+      vii. Let C = STR radix (c).
+      viii. Let B = A.
+      ix. Let A = C.
+7.    Return A || B.
+
+Description:
+The FF1.Decrypt algorithm is similar to the FF1.Encrypt algorithm; the differences are in Step 6,
+where: 1) the order of the indices is reversed, 2) the roles of A and B are swapped, and
+3) modular addition is replaced by modular subtraction, in Step 6vi.
+5.2   FF3
+
+The specifications for the FF3.Encrypt and FF3.Decrypt functions are given in Algorithms 9 and
+10 below. The parameters radix, minlen, and maxlen in FF3.Encrypt and FF3.Decrypt shall meet
+the following requirements:
+
+
+                                                  16
+

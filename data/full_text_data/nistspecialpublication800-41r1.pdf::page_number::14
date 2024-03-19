@@ -1,0 +1,59 @@
+                                                                      GUIDELINES ON FIREWALLS AND FIREWALL POLICY
+
+
+2.1.2   Stateful Inspection
+
+Stateful inspection improves on the functions of packet filters by tracking the state of connections and
+blocking packets that deviate from the expected state. This is accomplished by incorporating greater
+awareness of the transport layer. As with packet filtering, stateful inspection intercepts packets at the
+network layer and inspects them to see if they are permitted by an existing firewall rule, but unlike packet
+filtering, stateful inspection keeps track of each connection in a state table. While the details of state table
+entries vary by firewall product, they typically include source IP address, destination IP address, port
+numbers, and connection state information.
+
+Three major states exist for TCP traffic—connection establishment, usage, and termination (which refers
+to both an endpoint requesting that a connection be closed and a connection with a long period of
+inactivity.) Stateful inspection in a firewall examines certain values in the TCP headers to monitor the
+state of each connection. Each new packet is compared by the firewall to the firewall’s state table to
+determine if the packet’s state contradicts its expected state. For example, an attacker could generate a
+packet with a header indicating it is part of an established connection, in hopes it will pass through a
+firewall. If the firewall uses stateful inspection, it will first verify that the packet is part of an established
+connection listed in the state table.
+
+In the simplest case, a firewall will allow through any packet that seems to be part of an open connection
+(or even a connection that is not yet fully established). However, many firewalls are more cognizant of
+the state machines for protocols such as TCP and UDP, and they will block packets that do not adhere
+strictly to the appropriate state machine. For example, it is common for firewalls to check attributes such
+as TCP sequence numbers and reject packets that are out of sequence. When a firewall provides NAT
+services, it often includes NAT information in its state table.
+
+Table 2-1 provides an example of a state table. If a device on the internal network (shown here as
+192.168.1.100) attempts to connect to a device outside the firewall (192.0.2.71), the connection attempt is
+first checked to see if it is permitted by the firewall ruleset. If it is permitted, an entry is added to the state
+table that indicates a new session is being initiated, as shown in the first entry under “Connection State”
+in Table 2-1. If 192.0.2.71 and 192.168.1.100 complete the three-way TCP handshake, the connection
+state will change to “established” and all subsequent traffic matching the entry will be allowed to pass
+through the firewall.
+
+                                         Table 2-1. State Table Example
+
+                                                   Destination       Destination
+             Source Address      Source Port                                        Connection State
+                                                    Address             Port
+               192.168.1.100         1030           192.0.2.71            80             Initiated
+               192.168.1.102         1031          10.12.18.74            80           Established
+               192.168.1.101         1033          10.66.32.122           25           Established
+               192.168.1.106         1035          10.231.32.12           79           Established
+
+
+Because some protocols, most notably UDP, are connectionless and do not have a formal process for
+initializing, establishing, and terminating a connection, their state cannot be established at the transport
+layer as it is for TCP. For these protocols, most firewalls with stateful inspection are only able to track the
+source and destination IP addresses and ports. UDP packets must still match an entry in the state table
+based on source and destination IP address and port information to be permitted to pass—a DNS response
+from an external source would be permitted to pass only if the firewall had previously seen a
+corresponding DNS query from an internal source. Since the firewall is unable to determine when a
+
+
+                                                       2-4
+

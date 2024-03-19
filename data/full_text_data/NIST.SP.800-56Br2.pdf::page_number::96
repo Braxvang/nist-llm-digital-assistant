@@ -1,0 +1,55 @@
+                                                                                               NIST SP 800-56B REV. 2                            RECOMMENDATION FOR PAIR-WISE KEY ESTABLISHMENT
+                                                                                                                                                      USING INTEGER FACTORIZATION CRYPTOGRAPHY
+
+
+                                                                                               8.3.3.4 KAS2-bilateral-confirmation
+                                                                                               Figure 11 depicts a typical flow for a KAS2 scheme with bilateral key confirmation. In this scheme,
+                                                                                               party U and party V assume the roles of both the KC provider and recipient in order to obtain
+                                                                                               bilateral key confirmation. The successful completion of the key-confirmation process provides
+                                                                                               each party with a) assurance that other party has derived the same secret Z value, and b) assurance
+                                                                                               that the other party has actively participated in the process.
+
+                                                                                                              Party U                                                        Party V
+
+                                                                                                        (PubKeyU, PrivKeyU)                                           (PubKeyV, PrivKeyV)
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Br2
+
+
+
+
+                                                                                                     Obtain party V’s public key-           PubKeyV
+                                                                                                         establishment key                 ←   
+
+                                                                                                                                             PubKeyU               Obtain party U’s public key-
+                                                                                                                                               →                    establishment key
+
+                                                                                                          (ZU, CU) =                            CU                       ZU =
+                                                                                                  RSASVE.GENERATE(PubKeyV)                                     RSASVE.RECOVER(PrivKeyV, CU)
+
+                                                                                                            ZV =                                CV                      (ZV, CV) =
+                                                                                                 RSASVE.RECOVER(PrivKeyU, CV)                                   RSASVE.GENERATE(PubKeyU)
+
+                                                                                                             Z = ZU ZV                                                   Z = ZU ZV
+
+                                                                                                  Compute DerivedKeyingMaterial =                               Compute DerivedKeyingMaterial =
+                                                                                                  MacKey || KeyData and destroy Z                               MacKey || KeyData and destroy Z
+
+                                                                                                             MacTagV =?                      MacTagV                       MacTagV =
+                                                                                                TMacTagBits[MAC(MacKey, MacDataV)]                            TMacTagBits[MAC(MacKey, MacDataV)]
+
+                                                                                                             MacTagU =                       MacTagU                       MacTagU =?
+                                                                                                TMacTagBits[MAC(MacKey, MacDataU)]                            TMacTagBits[MAC(MacKey, MacDataU)]
+
+                                                                                                                        Figure 11: KAS2-bilateral-confirmation Scheme
+                                                                                               Each party first performs the appropriate steps of the KAS2-basic scheme as described in Section
+                                                                                               8.3.2.
+                                                                                               To provide bilateral key confirmation (as described in Section 5.6.2), party U and party V exchange
+                                                                                               and verify MacTags that have been computed (as specified in Section 5.6.1) using EphemDataU =
+                                                                                               CU, and EphemDataV = CV.
+                                                                                               Party V provides MacTagV to party U (as specified in Section 5.6.1, with P = V and R = U);
+                                                                                               MacTagV is computed by party V (and verified by party U) using
+                                                                                                                     MacDataV = “KC_2_V” || IDV || IDU || CV || CU{ || TextV}.
+                                                                                               Party U provides MacTagU to party V (as specified in Section 5.6.1, with P = U and R = V);
+                                                                                               MacTagU is computed by party U (and verified by party V) using
+                                                                                                                                                86
+

@@ -1,0 +1,53 @@
+                                NIST Special Publication 800-38D
+
+
+
+Appendix A: Importance of the Uniqueness Requirement on IVs
+
+Sec. 8 contains a uniqueness requirement for the IVs of GCM, across all implementations of the
+authenticated encryption function with any given key. This appendix summarizes why this
+requirement is crucial to the security of GCM, as first described in Ref. [5].
+
+The secure operation of a cryptographic algorithm depends not only on the proper
+implementation of the steps of the algorithm, but also on the adherence to the associated
+requirements. An obvious example for any symmetric key algorithm is that the key needs to be
+kept secret. For GCM, the requirement in Sec. 5.2.1 for the uniqueness of the IVs is almost as
+important, although not as obvious.
+
+Consider first the example of the Counter mode requirement in Ref. [10] for the counter blocks
+to be unique. If this requirement is breached, then the Counter mode encryption function may
+fail to provide the expected confidentiality for the data blocks that correspond to the repeating
+counter blocks, although the other data blocks are not affected.
+
+The Counter mode decryption function has a vulnerability that is arguably more serious.
+Counter-mode ciphertext is “malleable” in the sense that flipping any of its bits will induce the
+corresponding bits of the plaintext to flip upon decryption. Therefore, if an adversary knows a
+plaintext-ciphertext pair and can induce the decryption function to use the counter blocks from
+the known pair, then, by choosing which bits to flip in the known ciphertext, the adversary can
+control the result of decryption, up to the length of the known plaintext.
+
+This vulnerability motivates combining the Counter mode encryption mechanism with an
+authentication mechanism, such as occurs in GCM. The idea is to prevent the adversary’s
+altered ciphertext from being accepted as valid. However, as detailed in Ref. [5], the
+authentication assurance in GCM crucially depends on the uniqueness of the IVs.
+
+In particular, if IVs are ever repeated for the GCM authenticated encryption function for a given
+key, then it is likely that an adversary will be able to determine the hash subkey from the
+resulting ciphertexts. The adversary then could easily construct a ciphertext forgery. In
+particular, given the ciphertext and tag outputs for an invocation of the authenticated encryption
+function, along with the associated IV and AAD inputs, the adversary could substitute any
+ciphertext and AAD strings and use the subkey to generate the valid substitute tag. Although
+this forgery would use the same IV, in most cases it will not be feasible for the authenticated
+decryption function to detect the repetition. Thus, the authentication assurance essentially is lost.
+
+Worse, the loss of authentication means that GCM inherits the problematic malleability of its
+Counter mode ciphertext. In the above scenario, knowing the original plaintext that corresponds
+to the given ciphertext, the adversary can construct the substitute ciphertext in such a way as to
+correspond to any desired plaintext of the same length. In other words, the adversary essentially
+could control the plaintext output of the authenticated decryption function.
+
+
+
+
+                                                 25
+

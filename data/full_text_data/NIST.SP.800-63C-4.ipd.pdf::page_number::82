@@ -1,0 +1,47 @@
+       NIST SP 800-63C-4 ipd                                               Digital Identity Guidelines
+       December 2022                                                       Federation and Assertions
+
+
+2159   12.2. Kerberos Tickets
+2160   The Kerberos Network Authentication Service [RFC4120] was designed to provide strong
+2161   authentication for client/server applications using symmetric-key cryptography on a local,
+2162   shared network. Extensions to Kerberos can support the use of public key cryptography
+2163   for selected steps of the protocol. Kerberos also supports confidentiality and integrity
+2164   protection of session data between the subscriber and the RP. Even though Kerberos
+2165   uses assertions, it was designed for use on shared networks and, therefore, is not truly a
+2166   federation protocol.
+2167   Kerberos supports authentication of a subscriber over a network using one or more IdPs.
+2168   The subscriber implicitly authenticates to the IdP by demonstrating the ability to decrypt
+2169   a random session key encrypted for the subscriber by the IdP. (Some Kerberos variants
+2170   also require the subscriber to explicitly authenticate to the IdP, but this is not universal.)
+2171   In addition to the encrypted session key, the IdP also generates another encrypted object
+2172   called a Kerberos ticket. The ticket contains the same session key, the identity of the
+2173   subscriber to whom the session key was issued, and an expiration time after which the
+2174   session key is no longer valid. The ticket is confidentiality and integrity protected by a
+2175   pre-established key that is shared between the IdP and the RP during an explicit setup
+2176   phase.
+2177   To authenticate using the session key, the subscriber sends the ticket to the RP along with
+2178   encrypted data that proves that the subscriber possesses the session key embedded within
+2179   the Kerberos ticket. Session keys are either used to generate new tickets or to encrypt and
+2180   authenticate communications between the subscriber and the RP.
+2181   To begin the process, the subscriber sends an authentication request to the Authentication
+2182   Server (AS). The AS encrypts a session key for the subscriber using the subscriber’s
+2183   long-term credential. The long-term credential may either be a secret key shared between
+2184   the AS and the subscriber, or in the PKINIT variant of Kerberos, a public key certificate.
+2185   Most variants of Kerberos based on a shared secret key between the subscriber and IdP
+2186   derive this key from a user-generated password. As such, they are vulnerable to offline
+2187   dictionary attacks by passive eavesdroppers, unless Flexible Authentication Secure
+2188   Tunneling (FAST) [RFC6113] or some other tunneling and armoring mechanism is used.
+2189   In addition to delivering the session key to the subscriber, the AS also issues a ticket using
+2190   a key it shares with the Ticket Granting Server (TGS). This ticket is referred to as a Ticket
+2191   Granting Ticket (TGT), since the verifier uses the session key in the TGT to issue tickets
+2192   rather than to explicitly authenticate the verifier. The TGS uses the session key in the
+2193   TGT to encrypt a new session key for the subscriber and uses a key it shares with the RP
+2194   to generate a ticket corresponding to the new session key. The subscriber decrypts the
+2195   session key and uses the ticket and the new session key together to authenticate to the RP.
+2196   When Kerberos authentication is based on passwords, the protocol is known to be
+2197   vulnerable to offline dictionary attacks by eavesdroppers who capture the initial user-
+2198   to-KDC exchange. Longer password length and complexity provide some mitigation
+
+                                                    70
+

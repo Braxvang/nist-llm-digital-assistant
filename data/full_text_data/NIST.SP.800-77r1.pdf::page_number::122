@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-77 REV. 1                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                                      reconfigured to require a new kind of authentication system since it is currently assumed
+                                                                                                      that anyone who can reach the internal services is authorized to use the services.
+                                                                                                 •    Application Layer Solution: File Encryption. Instead of encrypting communications,
+                                                                                                      an application layer solution could encrypt the data itself, which could then be transferred
+                                                                                                      through non-encrypted communications. Using a public key from the agency, the external
+                                                                                                      developers could encrypt their data and then transfer the data to the server over public
+                                                                                                      networks. The data on the server could be decrypted by the developers as needed.
+                                                                                                      Although file encryption is a reasonable solution for transferring files to the agency’s
+                                                                                                      server, it is not well-suited to protecting reports and other files that may be downloaded
+                                                                                                      from the server by the external organizations. Such files would need to be encrypted so
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                      that the external organizations could decrypt them. As developers join or leave the
+                                                                                                      agency or other changes occur to the set of valid keys, all files would need to be
+                                                                                                      encrypted using the new set of keys. The agency could establish a shared key for all
+                                                                                                      external developers, but this would increase the risk of unauthorized access, reduce
+                                                                                                      accountability, and still require considerable maintenance effort, such as distributing new
+                                                                                                      keys in an out-of-band manner.
+
+                                                                                              After further investigations into security, ease of deployment, and cost, the agency selects the
+                                                                                              network layer VPN solution and chooses to use its existing remote access architecture. It is
+                                                                                              important to note that this solution only protects traffic between the external developers’ laptops
+                                                                                              (at home or on the corporate WiFi) and the main office’s VPN gateway; the traffic between the
+                                                                                              VPN gateway and the local servers is not encrypted unless the developers use the SSH protocol
+                                                                                              to provide encryption.
+
+                                                                                              9.2.2   Designing the Solution
+
+                                                                                              The solution is based on the agency’s existing FreeBSD internet router and will only require
+                                                                                              installing the additional strongSwan IPsec software to become an IPsec VPN gateway. The
+                                                                                              router is lightly utilized, so an additional VPN device is not needed for the external developers’
+                                                                                              usage. The strongSwan IPsec implementation supports EAP-TLS for authentication, which can
+                                                                                              use the same AAA backend as the WiFi WPA2 solution. Certificates can be easily added and
+                                                                                              revoked when developers join or leave the agency. The VPN requirement for the internal WiFi
+                                                                                              network can be rolled out as optional first and made mandatory later by deploying a packet filter
+                                                                                              on the firewall that connects the WiFi access point to only allow IKE and ESP packets from the
+                                                                                              WiFi clients.
+
+                                                                                              Figure 18 illustrates the planned design for the VPN architecture. The internal WiFi and the
+                                                                                              remote access clients are considered external (and insecure) networks and are on a different
+                                                                                              segment from the internal networks of the main office. The strategy is to establish an IPsec
+                                                                                              tunnel from the external devices to connect to the main office VPN router. Data sent between the
+                                                                                              developers’ laptops and the VPN router will be encrypted, while data between the VPN router
+                                                                                              and the internal servers (A, B, and C) will not. The tunnel will stay intact until the external
+                                                                                              system or the VPN router manually terminates the tunnel, or the connection is inactive for a
+                                                                                              certain period of time. The VPN router and VPN client software on the developers’ laptops
+                                                                                              support UDP encapsulation and MOBIKE, so remote clients that are on NAT networks or have
+
+
+
+                                                                                                                                              105
+

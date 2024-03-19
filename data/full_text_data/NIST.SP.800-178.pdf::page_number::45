@@ -1,0 +1,61 @@
+                                                                                               NIST SP 800-178                                                    COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                    DATA SERVICES: XACML AND NGAC
+
+
+                                                                                               necessarily need to do so. This is because the basic data service capabilities to consume,
+                                                                                               manipulate, manage, and distribute access rights on data can be attained as combinations of
+                                                                                               read/write operations on data and administrative operations on data elements, attributes, and
+                                                                                               relations that may alter the access state for which users can read/write data.
+
+                                                                                               Consider the following administrative routine that creates a “file management” user and provides
+                                                                                               the user with capabilities to create and manage objects and folders, and control and share access
+                                                                                               to objects in the context of Figure 6b. The routine assumes the pre-existence of the user attribute
+                                                                                               “Users” assigned to the “File Management” policy class as shown in Figure 6b.
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                                 create-file-mgmt-user(user-id, user-name, user-home) {
+                                                                                                      createUAinUA(user-name, Users);
+                                                                                                      createUinUA(user-id, user-name);
+                                                                                                      createOAinPC(user-home, File Management);
+                                                                                                      createAssoc(user-name, {r, w}, user-home);
+                                                                                                      createAssoc(user-name, {create-o-to, delete-o-from}, user-home);
+                                                                                                      createAssoc(user-name, {create-ooa-from, create-ooa-to,
+                                                                                                                              delete-ooa-from, create-oaoa-from,
+                                                                                                                              create-oaoa-to, delete-oaoa-from}, user-home);
+                                                                                                      createAssoc(user-name, {create-assoc-from, delete-assoc-from}, Users);
+                                                                                                      createAssoc(user-name, {create-assoc-to, delete-assoc-to, r-allocate,
+                                                                                                                              w-allocate}, user-home);}
+
+                                                                                               This routine with parameters (u1, Bob, and Bob Home) could have been used to create “file
+                                                                                               management” data service capabilities for user u1 already in Figure 6b. Through the routine the
+                                                                                               user attribute “Bob” is created and assigned to “Users”, and user u1 is created and assigned to
+                                                                                               “Bob”. In addition, the object attribute “Bob Home” is created and assigned to policy class “File
+                                                                                               Management”. In addition, user u1 is delegated administrative capabilities to create, organize,
+                                                                                               and delete object attributes (presented folders) in Bob Home, and u1 is provided with capabilities
+                                                                                               to create, read, write, and delete objects that correspond to files and place those files into his
+                                                                                               folders. Finally, u1 is provided with discretionary capabilities to “grant” to other users in the
+                                                                                               “Users” container capabilities to perform read/write operations on individual files or to all files
+                                                                                               in a folder in his Home.
+
+                                                                                               As already indicated by Figure 6b, and subsequent to the execution of this administrative routine,
+                                                                                               user u1 can grant user u2 (Alice) read/write access to object o2 by using the following routine:
+
+                                                                                                     grant(user-name, rights, file/folder) {
+                                                                                                        createAssoc(user-name, rights, file/folder)}
+
+                                                                                               Through this routine Bob could, under his discretion, “grant” Alice read access to o3. However,
+                                                                                               even if Bob were to do so, Alice would not be able to read o3. This is because of a lack of a
+                                                                                               privilege (u1, r, o3) due to o3’s containment in the “Project Access” policy class. Although Bob
+                                                                                               cannot successfully provide Alice read access to object o3 through his delegated “grant”
+                                                                                               capability, Bob could “leak” the capability to read the content of o3 to Alice. This could be
+                                                                                               achieved by Bob first reading the content of o3 and then writing that content to o2. Even if Bob
+                                                                                               was trusted not to perform such actions, a malicious process acting on Bob’s behalf could do so,
+                                                                                               without Bob’s knowledge. To prevent leakage, the following obligation is added to the
+                                                                                               configuration:
+
+
+                                                                                                                                               33
+

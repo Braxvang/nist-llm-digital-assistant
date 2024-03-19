@@ -1,0 +1,59 @@
+                                                            SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+A zone transfer process has different security implications because it reveals a lot more information than a
+normal DNS Query and because of the increased resource (bandwidth and response time) usage of the
+message. The threats to a zone transfer transaction are discussed in Section 6.2. The protection
+mechanisms are discussed in sections 8.1.2 and 8.2.5.
+
+4.3       Dynamic Updates
+
+As enterprises add, delete, and move around IP-network-based resources (i.e., database servers, Web
+servers, mail servers, and even name servers), corresponding changes may need to be made to the zone
+file that carries information about the domains where the resources are located. In the early days of the
+DNS, DNS zone administrators made such changes manually. When such changes became larger in
+volume and more frequent, however, the manual update process was found to be inadequate, and the
+concept of dynamic updates was introduced. Apart from volume and frequency, there are some
+applications that require instant automatic updates to the DNS zone file through application programs.
+Examples of these applications include Certificate Authority (CA) servers, Dynamic Host Configuration
+Protocol (DHCP) servers, and Internet multicast address servers. Dynamic Updates are always made to
+the zone file of the primary (master) name server.
+
+In a few instances, the DNS server is used as a repository for public key certificates. In these instances, a
+CA server receives a public key from a user, signs it with its private key to generate a certificate, and
+stores this certificate as a CERT or TLSA [DANE] RR in a DNS server. A DHCP server dynamically
+assigns an IP address to a requesting host, and then adds this information (host and newly assigned IP
+address) as an A-type RR in the DNS authoritative name server. The DHCP server also deletes this A-
+type RR after the IP address is returned by the host. An Internet multicast server selects a new multicast
+IP address from the Internet multicast IP address space and assigns it to the newly generated multicast
+group. Then the server adds this information (domain name of multicast group, newly selected multicast
+address) as an A-type RR in the DNS database so that users can join the multicast group using a user
+friendly domain name rather than an IP address.
+
+RFC 2136 [RFC2136] outlines the roadmap for the dynamic update mechanism, which subsequently was
+implemented in BIND 8 version and has continued in all versions since.
+
+The dynamic update facility provides operations for addition and deletion of RRs in the zone file.
+Because updates to the contents of an existing RR can be accomplished through deletion of the old record
+and addition of the new record with the changed contents, no separate update operation is provided.
+
+The suite of operations included in the dynamic update facility consists of the following:
+
+      •    Add or delete individual RRs for an existing domain
+
+      •    Delete specific RRsets (a set of resource records with the same owner name, class, and RRType
+           [e.g., a set of RRs with RRType NS for the domain/owner name example.com with the common
+           class IN of course]) for an existing domain
+
+      •    Delete an existing domain (all resource records for a given domain name [e.g., all RRs for the
+           domain example.com])
+
+      •    Add a new domain (one or more RRs for a new domain [e.g., adding an A-type RR for a new
+           domain NYBranch.example.com]).
+
+
+
+
+                                                      4-5
+

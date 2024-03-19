@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+The pseudo format (containing only the important fields) of NSEC RRs covering the gaps in the
+namespace relating to domain names and RR types found at each name in our zone is as follows:
+
+        example.com.         IN    NSEC     marketing.example.com. (NS SOA MX RRSIG
+        NSEC)
+
+        marketing.example.com.                     IN     NSEC   sales.example.com. (A MX
+        RRSIG NSEC)
+
+        sales.example.com.            IN    NSEC     www.example.com. (NS RRSIG NSEC)
+
+        www.example.com.           IN    NSEC     example.com. (A RRSIG NSEC)
+
+Note that there are as many NSEC RRs as the number of unique domain names in the zone. The NSEC
+RR whose owner name is example.com points to the next domain in the canonical order (i.e.,
+marketing.example.com). The same is true for NSEC RRs pertaining to the domains
+marketing.example.com and sales.example.com. The NSEC RR pertaining to the last domain name (i.e.,
+www.example.com) points to the first domain name in the zone (i.e., example.com).
+
+When a query for “package.example.com IN A” arrives (which does not exist in the zone), the
+authoritative server replies with the NSEC RRSet that proves that the name does not exist in the zone. In
+this case, the response from the server will consist of the normal DNS reply indicating that the name does
+not exist and:
+
+    •   marketing.example.com. NSEC RR indicating there are no authoritative names between
+        “marketing.example.com.” and “sales.example.com”
+
+    •   www.example.com. NSEC RR (the last domain in the zone) proving that there are no wildcard
+        names in the zone that could have been expanded to match the query [RFC4035].
+
+    •   Accompanying RRSIG RRs for each of the foregoing NSEC records for authentication.
+The modifications to the NSEC RRs that are required for the following two operations are as follows:
+
+    •   Adding a new RR type to an existing domain
+
+    •   Deleting an RR type from an existing domain
+
+    •   Adding a new domain name to the zone
+
+    •   Deleting a domain name from the zone.
+Adding a new RR type to an existing domain:
+
+Suppose a new mail host is added to www.example.com. This change will require addition of an MX RR
+to this domain name. Hence, the NSEC RR for www.example.com must be modified to read as follows:
+
+        www.example.com. IN             NSEC     example.com. (A MX RRSIG NSEC)
+
+Deleting an RR type from an existing domain:
+
+
+
+
+                                                   9-16
+

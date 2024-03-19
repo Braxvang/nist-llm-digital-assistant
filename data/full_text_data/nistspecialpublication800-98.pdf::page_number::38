@@ -1,0 +1,60 @@
+GUIDELINES FOR SECURING RFID SYSTEMS
+
+
+
+ The Local ONS is a software component maintained and operated locally by EPCglobal Network
+  members. The Local ONS provides the authoritative database in which all EPCs issued by a specific
+  EPC Manager are indexed with the addresses of their EPCIS location.
+When a member of the EPCglobal Network queries the network for information about an EPC, the Root
+ONS utilizes the EPC Manager Number segment to direct the EPC query to the EPC’s data owner (i.e. the
+EPC Manager). From there, the EPC Manager’s Local ONS utilizes the object class segment to direct the
+query to the EPCIS that stores information for that EPC.
+
+The ONS extends the Internet’s Domain Name System (DNS) to support resolution of an EPC with its
+corresponding EPCIS. ONS EPC resolution works similarly to the name resolution that Internet users
+employ whenever visiting Web sites or sending e-mail messages, but with some significant differences,
+which are presented in Table 2-3.
+
+                 Table 2-3. Comparison of Traditional DNS and ONS Resolution Transactions
+
+           Traditional DNS                               ONS                                 Discussion
+
+User enters a text-based Uniform      EPC Uniform Resource Identifier           The EPC is first translated into a form
+Resource Locator (URL) into a Web     (URI) is converted to a fully qualified   that DNS can interpret.
+browser or an e-mail address into a   domain name.                              The Root ONS is the domain
+messaging client.                     Example:                                  onsepc.com. The Root ONS is built
+Examples:                             urn:epc:id:sgtin:0513347.004106.325       upon the Internet DNS.
+http://www.nist.gov/                  is converted to:
+john.doe@mail.nist.gov                004106.0513347.sgtin.id.onsepc.com
+The messaging client sends the        The Root ONS forwards the query to        The transactions are identical, but
+query to a local DNS resolver,        a Local ONS resolver to resolve the       they involve different types of records
+which queries a DNS server to         converted URI.                            in DNS.
+resolve the domain name (e.g.,        The Root ONS portion of DNS has
+www.nist.gov or mail.nist.gov).       Naming Authority Pointer (NAPTR)
+DNS contains host (A) records for     records for EPCs.
+Web servers and other Internet
+hosts.
+DNS contains mail exchanger (MX)
+records for mail servers.
+DNS returns an IP address for the     The Local ONS returns a service           An IP address alone is insufficient for
+relevant server.                      registration entry for the relevant       the Web services on which most
+Example:                              EPCIS.                                    RFID applications rely. ONS
+                                      Example:                                  supports several types of service
+129.6.13.23                                                                     registrations, which define how
+                                      http://epcis.nist.gov/epc-wsdl.xml        applications will interact with the
+                                      In this example, subsequent               EPCIS.
+                                      communication with epcis.nist.gov
+                                      occurs using Web Services
+                                      Description Language (WSDL).
+The Web browser or messaging          Where required, the Local ONS             ONS-based RFID applications require
+client uses the IP address to         resolves the domain name in the           additional steps to resolve the service
+contact the server at that address.   response using traditional DNS            registration.
+                                      methods and then directs the EPC
+                                      query to the specified service to get
+                                      information about the EPC.
+
+
+
+
+                                                         2-20
+

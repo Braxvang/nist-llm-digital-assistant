@@ -1,0 +1,59 @@
+                                                                                GUIDELINES ON SECURING PUBLIC WEB SERVERS
+
+
+
+7.3      Basic Authentication
+
+The basic authentication technology uses the Web server content’s directory structure. Typically, all files
+in the same directory are configured with the same access privileges. A requesting user provides a
+recognized user identification and password for access to files in a given directory. More restrictive
+access control can be enforced at the level of a single file within a directory if the Web server software
+provides this capability. Each vendor’s Web server software has its own method and syntax for defining
+and using this basic authentication mechanism.
+
+From a security perspective, the main drawback of this technology is that all password information is
+transferred in an encoded, rather than an encrypted, form. Anyone who knows the standardized encoding
+scheme can decode the password after capturing it with a network sniffer. Furthermore, any Web content
+is transmitted as unencrypted plaintext, so this content also can be captured, violating confidentiality.
+These limitations can be overcome using basic authentication in conjunction with SSL/TLS (see Section
+7.5). Basic authentication is supported by standard-compliant Web browsers [Koss00]. Basic
+authentication is useful for protecting information from malicious bots (see Section 5.2.4) because the
+bots should not have the necessary credentials to access the protected directories. However, this
+mechanism should not be considered secure against more determined and sophisticated attackers.
+
+7.4      Digest Authentication
+
+Because of the drawbacks with basic authentication, an improved technique known as digest
+authentication was introduced in version 1.1 of the HTTP protocol. 47 Digest authentication uses a
+challenge-response mechanism for user authentication. Under this approach, a nonce or arbitrary value is
+sent to the user, who is prompted for an ID and password, as with basic authentication. However, in this
+case, the information entered by the user is concatenated and a cryptographic hash of the result is formed.
+This hash is concatenated with the nonce and a hash of the requested method and URL, and the result is
+then rehashed as a response value that is sent to the server.
+
+Because the user’s password is not sent in the clear, it cannot be directly sniffed from the network. The
+user’s password is not needed by the server to authenticate the user—only the hashed value of the user ID
+and password. Because the nonce can serve as an indicator of timeliness (e.g., it can be composed of date
+and time information), replay attacks are also thwarted. Unfortunately, all other information is sent in the
+clear and is vulnerable to interception and alteration. Digest authentication is also susceptible to offline
+dictionary attacks (see Section 7.6) where the attacker tries various passwords in an attempt to recreate
+the captured digest value. These limitations can be overcome using digest authentication in conjunction
+with SSL/TLS (see Section 7.5). 48 Like basic authentication, digest authentication is useful for protecting
+information from malicious bots (see Section 5.2.4).
+
+
+
+
+47
+      More information on basic and digest authentication is available from IETF RFC 2617, HTTP Authentication: Basic and
+      Digest Access Authentication (http://www.ietf.org/rfc/rfc2617.txt).
+48
+      For example, offline dictionary attacks can be performed against intercepted digest authentication passwords to identify the
+      cleartext passwords. Intercepted digest authentication passwords that are sent over SSL-protected connections are not
+      susceptible to offline dictionary attacks.
+
+
+
+
+                                                                7-2
+

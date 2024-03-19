@@ -1,0 +1,63 @@
+                                                                                               NIST SP 800-177 REV. 1                                                                              TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               DANE introduces mechanisms for domains to specify to a client which certiﬁcates should be
+                                                                                               trusted for the domain. With DANE, a domain owner can publish DNS records that declare
+                                                                                               clients should only trust certiﬁcates from a particular CA or that they should only trust only a
+                                                                                               speciﬁc certiﬁcate or public key. Essentially, DANE replaces reliance on the security provided
+                                                                                               by the CA system with reliance on the security provided by DNSSEC.
+
+                                                                                               DANE complements TLS. �e TLS handshake yields an encrypted connection between a server
+                                                                                               and a client and provides a server’s X.509 certiﬁcate to the client. 22 �e TLS protocol does not
+                                                                                               deﬁne how the certiﬁcate should be authenticated. Some implementations may do this as part of
+                                                                                               the TLS handshake, and some may leave it to the application to perform authentication.
+                                                                                               Whichever way is used, there is still a vulnerability: a CA can issue certiﬁcates for any domain,
+                                                                                               and if that a CA is compromised (as has happened more than once all too recently), an attacker
+                                                                                               can have it can issue a replacement certiﬁcate for any domain and take control of a server’s
+                                                                                               connections. Ideally, issuance and delivery of a certiﬁcate should be tied absolutely to the given
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               domain. DANE creates this explicit link by allowing the server domain owner to create a TLSA
+                                                                                               resource record in the DNS [RFC6698] [RFC7671], which identiﬁes the certiﬁcate, its public
+                                                                                               key, or a hash of either. When the client receives an X.509 certiﬁcate in the TLS negotiation, it
+                                                                                               looks up the TLSA RR for that domain and matches the TLSA data against the certiﬁcate as part
+                                                                                               of the client’s certiﬁcate validation procedure.
+
+                                                                                               DANE has a number of usage models (called Certiﬁcate Usages) to accommodate users who
+                                                                                               require diﬀerent forms of authentication. �ese Certiﬁcate Usages are given mnemonic names
+                                                                                               [RFC7218]:
+
+                                                                                                    •    With Certiﬁcate Usage DANE-TA(2), the TLSA RR designates a trust-anchor that issued
+                                                                                                         one of the certiﬁcates in the PKIX chain. [RFC7671] requires that DANE-TA(2) trust
+                                                                                                         anchors be included in the server "certiﬁcate message" unless the entire certiﬁcate is
+                                                                                                         speciﬁed in the TLSA record (i.e., usage 2 0 0, indicating the TLSA RR contains a local
+                                                                                                         root certiﬁcate).
+
+                                                                                                    •    With Certiﬁcate Usage DANE-EE(3), the TLSA RR matches an end-entity, or leaf
+                                                                                                         certiﬁcate.
+
+                                                                                                    •    Certiﬁcate Usages PKIX-TA(0) and PKIX-EE(1) should not be used for opportunistic
+                                                                                                         DANE TLS encryption [RFC 7672]. �is is because, outside of web browsers, there is no
+                                                                                                         authoritative list of trusted certiﬁcate authorities, and PKIX-TA(0) and PKIX-EE(1)
+                                                                                                         require that both the client and the server have a prearranged list of mutually trusted CAs.
+
+                                                                                               In DANE-EE(3) the server certiﬁcate is directly speciﬁed by the TLSA record. �us, the
+
+
+                                                                                                    from trusted root certificates,” February 7, 2012. https://bugzilla.mozilla.org/show_bug.cgi?id=724929, Also “Bug
+                                                                                                    698753—Entrust SubCA: 512-bit key issuance and other CPS violations; malware in wild,” November 8, 2011.
+                                                                                                    https://bugzilla.mozilla.org/show_bug.cgi?id=698753. Also “Revoking Trust in one CNNIC Intermediate Certificate,”
+                                                                                                    Mozilla Security Blog, March 23, 2015. https://blog.mozilla.org/security/2015/03/23/revoking-trust-in-one-cnnic-
+                                                                                                    intermediate-certificate/.
+
+                                                                                               22 Also possibly from client to server.
+
+
+
+                                                                                                                                                           65
+

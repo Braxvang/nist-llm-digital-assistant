@@ -1,0 +1,42 @@
+NIST SP 800-90A Rev. 1                                              Recommendation for Random Number
+                                                                     Generation Using Deterministic RBGs
+
+B.3.4      Generating Pseudorandom Bits Using CTR_DRBG
+
+The implementation returns a Null string as the pseudorandom bits if an error has been detected.
+CTR_DRBG_Generate_function:
+   Input: integer (state_handle, requested_no_of_bits, requested_security_strength,
+          prediction_resistance_request), bitstring additional_input.
+   Output: string status, bitstring pseudorandom_bits.
+   Process:
+                                              Comment: Check the validity of state_handle.
+        1. If ((state_handle < 0) or (state_handle > 4) or (internal_state (state_handle) = {Null,
+           Null, 0, 0}), then Return (“State not available for the indicated state_handle”, Null).
+        2. Get the internal state.
+           2.1   V = internal_state (state_handle).V.
+           2.2   Key = internal_state (state_handle).Key.
+           2.3   security_strength = internal_state (state_handle).security_strength.
+           2.4   reseed_counter = internal_state (state_handle).reseed_counter.
+                                              Comment: Check the rest of the input parameters.
+        3. If (requested_no_of_bits > 4000), then Return (“Too many bits requested”, Null).
+        4. If (requested_security_strength > security_strength), then Return (“Invalid
+           requested_security_strength”, Null).
+        5. If (len (additional_input) > 800), then Return (“additional_input too long”, Null).
+        6. reseed_required_flag = 0.
+        7. If ((reseed_required_flag = 1) OR (prediction_resistance_flag = 1)), then
+           7.1    status = CTR_DRBG_Reseed_function (state_handle,
+                  prediction_resistance_request, additional_input).
+           7.2    If (status ≠ “Success”), then Return (status, Null).
+           7.3    Get the new working state values; the administrative information was not
+                  affected.
+                 7.3.1   V = internal_state (state_handle).V.
+                 7.3.2   Key = internal_state (state_handle).Key.
+                 7.3.3   reseed_counter = internal_state (state_handle).reseed_counter.
+           7.4   additional_input = Null.
+           7.5   reseed_required_flag = 0.
+                                              Comment: Generate bits using the generate
+                                              algorithm.
+
+
+                                                 84
+

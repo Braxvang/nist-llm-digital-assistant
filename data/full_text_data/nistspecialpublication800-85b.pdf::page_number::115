@@ -1,0 +1,55 @@
+Special Publication 800-85B                                   PIV Data Model Testing Specification
+
+
+10.4 Security Object
+
+10.4.1 Data Integrity
+
+10.4.1.1 Verify integrity of data element hashes
+
+Purpose                 Confirms the integrity of the hashes of the data elements of the PIV card
+                        present in the security object.
+Reference(s)            1.     SP80073, Section 1.8.5
+                        2.     AS06.04.01
+Precondition            1.     A valid PIV card is inserted into the contact reader.
+                        2.     A valid PC/SC connection exists between the test application and
+                               the contact reader.
+                        3.     The test application is currently connected to the card application
+                               which is accessible through card handle.
+                        4.     A valid security object is present on the card.
+                        5.     Valid objects whose hashes are referenced in the security object are
+                               present on the card.
+Test Steps              1. Set cardHandle := <<valid card handle>>
+                        2. Set OID := <<Security Object
+                           (2.16.840.1.101.3.7.2.144.0)>>
+                        3. Call pivGetData w/
+                           • (IN) cardHandle
+                               • (IN) OID
+                               • (OUT) data
+                        4. Identify the various data elements that are part of
+                           the security object by parsing the Mapping of Data
+                           Group (DG) to ContainerID (i.e. TAG 0xBA)
+                        5. Extract the ldsSecurityObject from the eContent field
+                           of the Security Object Asymmetric Signature (i.e. TAG
+                           0xBB)
+                        6. Call pivGetData w/ for all those data elements that
+                           are present in the mapping obtained from step 4
+                        7. Compute the hash for each data element and verify that
+                           it matches the hash value present in the
+                           ldsSecurityObject
+Expected Result(s)      The actual hash of the data elements on the PIV card are identical to
+                        their corresponding hash values present in the security object.
+
+
+10.4.2 Signature Block Contents
+
+10.4.2.1 Verify presence of CMS SignedData asymmetric digital signature
+
+Purpose               Confirms that the security object buffer contains an asymmetric digital
+                      signature, implemented as a SignedData type in accordance with RFC
+                      3852
+Reference(s)          1.      AS06.04.02
+                      2.      AS06.04.03
+
+                                                                                                Page 107
+

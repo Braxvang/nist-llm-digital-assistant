@@ -1,0 +1,58 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+8.1.2   Restricting Zone Transfer Transaction Entities
+
+Authoritative name servers (especially primary name servers) should be configured with an allow-transfer
+access control substatement designating the list of hosts from which zone transfer requests can be
+accepted. These restrictions address the denial-of-service threat and potential exploits from unrestricted
+dissemination of information about internal resources. Based on the need to know, the only name servers
+that need to refresh their zone files periodically are the secondary name servers. Hence, zone transfer
+from primary name servers should be restricted to secondary name servers. The zone transfer should be
+completely disabled in the secondary name servers. The address match list argument for the allow-
+transfer substatement should consist of IP addresses of secondary name servers and stealth secondary
+name servers.
+
+The command to create an ACL “valid_secondary_NS” with the IP addresses of three secondary name
+servers is as follows:
+
+        acl “valid_secondary_NS” {
+             224.10.229.5;
+             224.10.235.6;
+             239.10.245.25;
+        };
+
+The allow-transfer substatement can be used in a zone statement and in an options statement. When it is
+used in a zone statement, it can restrict zone transfer for that zone; when it is used in an options statement,
+it can restrict zone transfer for all zones in the name server.
+
+The allow-transfer substatement at the server level is as follows:
+
+        options {
+             allow-transfer { “valid_secondary_NS”; };
+        };
+
+The allow-transfer substatement at the zone level is as follows:
+
+        zone “example.com” {
+             type master;
+             file “zonedb.example.com”;
+             allow-transfer { “valid_secondary_NS”; };
+        };
+
+The foregoing statements apply to primary name servers. In the secondary and stealth secondary name
+servers, zone transfer should be disabled as shown below:
+
+        zone “example.com” {
+             type slave;
+             masters { 224.239.5.1; } ;
+             file “zonedb_bak.example.com”;
+             allow-transfer { none; };
+        };
+
+
+
+
+                                                     8-7
+

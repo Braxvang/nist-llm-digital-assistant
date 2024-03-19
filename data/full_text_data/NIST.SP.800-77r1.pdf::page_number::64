@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                          GUIDE TO IPSEC VPNS
+
+
+                                                                                              5       Deployment of IPsec Using IKE
+
+                                                                                              This section describes the interactions between the IKE and IPsec subsystems. The interaction
+                                                                                              depends on the implementation. This section focuses on the standard protocols used to
+                                                                                              communicate between IKE and IPsec. Although some devices have their own proprietary
+                                                                                              method of communication, in general, the concepts explained in this section will apply to those
+                                                                                              proprietary implementations as well.
+
+                                                                                              The IKE protocol is usually implemented as an application running on the operating system,
+                                                                                              whereas the IPsec protocol is generally implemented in the kernel of the operating system. Some
+                                                                                              devices implement the IPsec subsystem as a program running on the operating system kernel, but
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              for the remainder of this section, it is assumed that IPsec is implemented in the operating system
+                                                                                              kernel.
+
+                                                                                              The communication between IKE and IPsec is usually implemented using the PF_KEYv2 [54] or
+                                                                                              NETLINK [55] protocol. Linux uses NETLINK with the XFRM application programming
+                                                                                              interface (API), whereas BSD-based systems use PF_KEYv2. 40
+
+                                                                                              This section puts IKE and IPsec components together to illustrate how IPsec sessions are set up
+                                                                                              and executed. Each example includes the use of IKE to establish SAs.
+
+                                                                                              5.1     IPsec States and Policies
+
+                                                                                              Each IPsec SA has a state containing information such as the SPI numbers and the encryption
+                                                                                              keys and algorithms used as well as a policy containing the source and destination addresses and
+                                                                                              ports used for matching traffic that is covered by the IPsec SA for encryption/decryption. While
+                                                                                              each state must have a policy, not all policies need to have a state. For example, on-demand
+                                                                                              IPsec connections have a policy that allows the kernel to detect that an outgoing packet should
+                                                                                              trigger an IKE negotiation. Once the IKE SA has been established and an IPsec SA has been
+                                                                                              negotiated, the IKE daemon will install an IPsec state with corresponding policies. During the
+                                                                                              negotiation, the kernel can drop the packet, cache the packet for later transmission, or send the
+                                                                                              packet as is without encrypting it. Usually, UDP packets are dropped, since their unreliable
+                                                                                              nature requires that applications sending these packets need to know when to transmit their
+                                                                                              packets anyway. TCP packets are usually cached because TCP retransmissions are usually very
+                                                                                              slow, and it would make the on-demand tunnel very slow if the first TCP packet was always lost.
+                                                                                              Leaking packets in cleartext only occurs when the network considers the IPsec protection
+                                                                                              optional instead of mandatory.
+
+                                                                                              Once an IPsec SA has been established between two hosts, all traffic that falls within the IPsec
+                                                                                              SA policy must be IPsec-protected. If, for some reason, unencrypted traffic is received, it is
+                                                                                              assumed to have been forged, and the traffic will be dropped.
+
+
+
+
+                                                                                              40    Linux uses the “ip xfrm” command, FreeBSD uses the “setkey” command, and OpenBSD uses the “ipsecctl” command.
+
+
+
+                                                                                                                                                         47
+

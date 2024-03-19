@@ -1,0 +1,54 @@
+NIST SP 800-85A-4                                           PIV CARD APPLICATION & MIDDLEWARE
+                                                                     INTERFACE TEST GUIDELINES
+
+                         2. Length of the buffer allocated for data by the client application is
+                            only 1 byte.
+ Test Steps              1. Set cardHandle := <<valid cardHandle>>
+                         2. Set applicationID := <<AID of PIV Card Application>>
+                         3. Create applicationProperties reference
+                         4. Call pivSelectCardApplication with
+                            • (IN) cardHandle
+                            • (IN) applicationAID
+                            • (IN) aidLength
+                            • (OUT) applicationProperties
+                            • (INOUT) APLength
+ Expected Result(s)      Call returns with status word of PIV_INSUFFICIENT_BUFFER and sets
+                         the value of the APLength parameter to the length of the application
+                         properties.
+ Postcondition(s)        The PIV Card Application is selected.
+
+
+B.4           pivLogIntoCardApplication
+
+B.4.1           Valid Test Assertions
+
+B.4.1.1          Log on to the Card Application
+ Purpose                Validate that the PIV Middleware initiates updates to the security
+                        status(es) with the PIV Card Application.
+ Target                  pivLogIntoCardApplication
+ Reference(s)            1.   SP 800-73-4 Part 3, Section 3.2.3
+                         2.   AS03.03, AS04.01, AS04.02A-R4, AS04.05
+ Precondition(s)         1.   The card has established a connection to the client.
+                         2.   The cardHandle was properly initialized by pivConnect.
+                         3.   The client application has successfully executed the
+                              pivSelectCardApplication command.
+ Test Steps              1. Set cardHandle := <<a valid cardHandle>>
+                         2. Set authenticators := <<valid authenticators byte sequence
+                            for PIV Card Application PIN>>
+                         3. Call pivLogIntoCardApplication with
+                            • (IN) cardHandle
+                            • (IN) authenticators
+                            • (IN) AuthLength
+                         4. Logout and reset security conditions for PIV Middleware
+                            and PIV Card Application
+                         5. Repeat steps 1 through 4 using all remaining valid
+                            authenticators (Global PIN, pairing code, OCC data)
+ Expected Result(s)      Call returns with status_word of PIV_OK.
+ Postcondition(s)        Security context is updated and the client application can now
+                         perform read operations on PIN-protected data objects controlled by
+                         the PIV Card Application. The client is thus logged into the PIV Card
+                         Application.
+
+
+                                          B-9
+

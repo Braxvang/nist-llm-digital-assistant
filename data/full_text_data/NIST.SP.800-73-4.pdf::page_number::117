@@ -1,0 +1,63 @@
+Special Publication 800-73-4                             Interfaces for Personal Identity Verification – Part 2:
+                                                         PIV Card Application Card Command Interface
+
+A.4              Signature Generation with the Digital Signature Key
+
+The GENERAL AUTHENTICATE command can be used to generate signatures. The pre-signature hash
+and padding (if applicable) is computed off card. The PIV Card Application receives the hashed value of
+the original message, applies the private signature key (key reference '9C'), and returns the resulting
+signature to the client application.
+
+Listed below are the card commands sent to the PIV Card Application to generate a signature. It is
+assumed that the cardholder PIN or OCC data has been successfully verified prior to sending the
+GENERAL AUTHENTICATE command.
+
+A.4.1     RSA
+
+This example illustrates signature generation using RSA 2048 (i.e., algorithm identifier '07'). Command
+chaining is used in the first command since the padded hash value sent to the card for signature generation
+is bigger than the length of the data field.
+
+Command 1: (GENERAL AUTHENTICATE – first chain):
+
+            CLA                '10' indicating command chaining
+            INS                '87'
+            P1                 '07'
+            P2                 '9C'
+            Lc                 Length of data field
+                               '7C' – L1 { '82' '00' '81' L2 {first part of the PKCS #1 v1.5 or PSS
+            Data Field
+                               padded message hash value }}
+            Le                 Absent (no response expected)
+
+
+Response 1:
+
+            Data Field         Absent
+            SW1-SW2            '90 00' (Status word)
+
+
+Command 2: (GENERAL AUTHENTICATE – last chain):
+
+            CLA                '00' indicates last command of the chain
+            INS                '87'
+            P1                 '07'
+            P2                 '9C'
+            Lc                 Length of data field
+                               {second and last part of the PKCS #1 v1.5 or PSS padded message
+            Data Field
+                               hash value}
+            Le                 '00'
+
+
+Response 2:
+
+            Data Field         '7C' – L1 {'82' L2 {first part of signature} }
+                               '61 xx' where xx indicates the number of bytes remaining to send by
+            SW1-SW2
+                               the PIV Card Application
+
+
+
+                                                        42
+

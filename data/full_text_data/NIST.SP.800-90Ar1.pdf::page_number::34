@@ -1,0 +1,49 @@
+NIST SP 800-90A Rev. 1                                                     Recommendation for Random Number
+                                                                            Generation Using Deterministic RBGs
+
+
+9 DRBG Mechanism Functions
+All DRBG mechanisms and algorithms are described in this document in pseudocode, which is
+intended to explain functionality. The pseudocode is not intended to constrain real-world
+implementations.
+Except for the health test function, which is discussed in Section 11.3, the functions of the
+DRBG mechanisms in this Recommendation are specified as an algorithm and an “envelope” of
+pseudocode around that algorithm. The pseudocode in each envelope (provided in this section)
+checks the input parameters, obtains input not provided via the input parameters, accesses the
+appropriate DRBG algorithm and manages the internal state. A function need not be
+implemented using such envelopes, but the function shall have equivalent functionality.
+During instantiation and reseeding (see Sections 9.1 and 9.2), entropy input and (usually) a
+nonce are acquired for constructing a seed as discussed in Sections 8.6.1 and 8.6.2. In the
+specifications of this Recommendation, a Get_entropy_input function is used for this purpose.
+The entropy input and nonce shall be provided as discussed in Sections 8.6.5 and 8.6.7 and in
+[SP 800-90C].
+The Get_entropy_input function is specified in pseudocode in [SP 800-90C] for various RBG
+constructions; however, in general, the function has the following meaning:
+    Get_entropy_input: A function that is used to obtain entropy input. The function call is:
+                 (status, entropy_input) = Get_entropy_input (min_entropy, min_ length, max_
+                 length, prediction_resistance_request),
+    which requests a string of bits (entropy_input) with at least min_entropy bits of entropy. The
+    length for the string shall be equal to or greater than min_length bits, and less than or equal
+    to max_length bits. The prediction_resistance_request parameter indicates whether or not
+    prediction resistance is to be provided during the request (i.e., whether fresh entropy is
+    required4). A status code is returned from the function.
+Note that an implementation may choose to define this functionality differently by omitting some
+of the parameters; for example, for many of the DRBG mechanisms, min_length = min_entropy
+for the Get_entropy_input function, in which case, the second parameter could be omitted.
+In the pseudocode in this section, two classes of error codes are returned: ERROR_FLAG and
+CATASTROPHIC_ERROR_FLAG. The handling of these classes of error codes is discussed
+in Section 11.4. The error codes may, in fact, provide information about the reason for the error;
+for example, when ERROR_FLAG is returned because of an incorrect input parameter, the
+ERROR_FLAG may indicate the problem.
+Consuming applications should check the status returned from DRBG functions to determine
+whether or not the request was successful or if remediary action is required. For example, when
+
+
+4 Entropy input may be obtained from an entropy source or an NRBG, both of which provide fresh entropy. Entropy
+input could also be obtained from a DRBG that has access to an entropy source or NRBG.
+The request for prediction resistance rules out the use of a DRBG that does not have access to either an entropy
+source or NRBG.
+
+
+                                                      25
+

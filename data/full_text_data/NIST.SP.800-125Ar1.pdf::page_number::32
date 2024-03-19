@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                                      SECURITY RECOMMENDATIONS FOR
+                                                                         SERVER-BASED HYPERVISOR PLATFORMS
+
+In the para-virtualization approach, the hypervisor presents to the guest an interface of an artificial device that
+has no corresponding hardware counterpart. This enables special, simplified hypervisor-aware I/O drivers
+(called para-virtualized drivers) to be installed in the guest. The calls from these para-virtualized device
+drivers in guest VMs are handled by another device driver (called back-end driver) which directly interfaces
+with the physical device and mediates access to that physical device from para-virtualized guests. In some
+instances, the calls from para-virtualized guest drivers are handled directly by the hypervisor through its
+hypercall interface (the corresponding calls are called hypercalls).
+
+The third approach to device virtualization, the passthrough approach (or direct device assignment), is
+deployed for situations where a VM needs exclusive access to a device (e.g., NIC, disk controller, HBA, USB
+controller, serial port, firewire controller, soundcard) for performance reasons to avoid overhead due to
+emulation. Generally this is required for PCI devices and is also called PCI Passthrough. Since many of these
+devices have a memory-mapped interface, they can read or write directly to or from main memory and are
+also called Direct Memory Access (DMA) capable devices. To provide exclusive access to a DMA capable
+device for a VM, the memory pages of the device are mapped into guest VM’s address space.
+
+Apart from the three types of device virtualization described above, hypervisor hosts can support self-
+virtualizing hardware devices. These devices have interfaces that can export a set of virtual functions (VFs)
+corresponding to a physical function (PF). The hypervisor then can assign these VFs to multiple guest VMs,
+while it retains control of the PF. These devices conform to Single Root I/O Virtualization (SR-IOV)
+specification and thus enable DMA capable devices to be shared among VMs (as virtualization and
+multiplexing are done by the devices themselves) instead of being dedicated to a single VM as in passthrough
+mode.
+
+
+A.3     HY-BF3 (Direct Execution of commands from Guest VMs):
+
+Certain commands from Guest OSs are executed directly by the hypervisor instead of being triggered
+through interrupts and context switching. These commands are called hypercalls and are supported by a
+special interface in the hypervisor. This function applies only to hypervisors that have implemented para-
+virtualization instead of full virtualization.
+
+A.4     HY-BF4 (VM Lifecycle Management)
+
+This encompasses all administrative operations on VMs throughout its life cycle. They include but are not
+limited to:
+
+ •    Creation of VMs conforming to a standard image, ensuring integrity of images and secure storage and
+      retrieval of images; provisioning images with appropriate vCPU, RAM, network, and storage
+ •    Migration of VMs from one hypervisor host to another
+ •    Monitoring of VM execution and traffic flows into and out of VMs & overall configuration
+      management
+ •    Fine-grained access control for VM administration including the basic operations that alter the state of
+      VMs – Start, Pause, Stop.
+ •    Access control and management of snapshots
+
+Management tasks are enabled using a management daemon which provides network interfaces. These
+interfaces are generally implemented not as part of the hypervisor kernel modules but on a privileged VM
+(management VM) that is booted up as an integral part of the hypervisor platform boot process.
+
+
+
+                                                        25
+

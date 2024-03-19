@@ -1,0 +1,58 @@
+NIST SP 800-219r1                                                      Automated Secure Configuration
+July 2023                                                                   Guidance from the mSCP
+
+Appendix D. Example of mSCP Usage by an Assessment Tool Vendor
+This appendix provides an example of how an assessment tool vendor converted mSCP content
+to their tool’s proprietary format so that their tool could perform compliance checks against
+mSCP baselines and rules. Refer to the mSCP GitHub wiki page for the most current list of tool
+vendors and associated content that will support the mSCP baselines.
+This example is for Tenable, Inc. They automated the conversion of mSCP YAML rules into
+their .audit format using Python and YAML libraries. Programmatically approaching this
+conversion allows for faster future releases and greater consistency, and it also maintains the
+integrity of the source content. Because the YAML content is all command-driven, it is
+converted to Tenable’s CMD_EXEC check type for use with the Unix plugin. The YAML rules
+have a “tags” section that was used to create unique audit profiles related to common
+frameworks. An example of these profiles can be seen in the audit file naming convention:
+   •   NIST_macOS_Big_Sur_800-171_v1.4.0.audit
+   •   NIST_macOS_Catalina_800-53r5_high_v1.5.0.audit
+See Tenable’s research highlight [14] for more details.
+The following example shows a YAML-to-audit-check conversion. The content has been
+condensed and abbreviated for the purposes of comparison:
+mSCP YAML
+title: "Limit SSHD to FIPS 140 Validated Ciphers"
+
+discussion: |
+  If SSHD is enabled, then it _MUST_ be configured to limit the ciphers to
+algorithms that are FIPS 140-validated.
+FIPS 140-2 is the current standard for validating that mechanisms used to
+access cryptographic modules utilize authentication that meets federal
+requirements.
+Operating systems utilizing encryption _MUST_ use FIPS-validated mechanisms
+for authenticating to cryptographic modules.
+  NOTE: /etc/ssh/sshd_config will be automatically modified to its original
+state following any update or major upgrade to the operating system.
+
+check: |
+  /usr/bin/grep -c "^Ciphers aes256-ctr,aes192-ctr,aes128-ctr"
+/etc/ssh/sshd_config
+result:
+  integer: 1
+
+Tenable Audit Check
+<custom_item>
+  system      : "Darwin"
+  type        : CMD_EXEC
+  description : "Big Sur - Limit SSHD to FIPS 140 Validated Ciphers"
+  info        : "If SSHD is enabled, then it _MUST_ be configured to limit
+the ciphers to algorithms that are FIPS 140-validated.
+FIPS 140-2 is the current standard for validating that mechanisms used to
+access cryptographic modules utilize authentication that meets federal
+requirements.
+
+Operating systems utilizing encryption _MUST_ use FIPS-validated mechanisms
+for authenticating to cryptographic modules.
+
+
+
+                                                23
+

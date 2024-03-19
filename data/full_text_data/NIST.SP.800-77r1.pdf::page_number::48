@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                         GUIDE TO IPSEC VPNS
+
+
+                                                                                              3.6   Mobile IKE (MOBIKE)
+
+                                                                                              Devices such as mobile phones and laptops often have multiple network interfaces, which allows
+                                                                                              those devices to switch to cheaper and/or faster networks when available. Phones may use the
+                                                                                              local WiFi network at the office or at home and mobile networks (5G/LTE) at other locations.
+                                                                                              Switching also occurs when an existing network connection suddenly degrades. Switching
+                                                                                              networks changes the source IP address used by the device. VPN traffic is still sent to the old, no
+                                                                                              longer used IP address until the device establishes a new IPsec connection.
+
+                                                                                              MOBIKE [38] addresses this issue. It assumes that an internal IP address is assigned by the VPN
+                                                                                              on the device using CPs. This internal IP address will remain with this device regardless of the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              outer IP address used by the device. Once a device switches between its network interfaces, it
+                                                                                              will send an INFORMATIONAL exchange packet with an UPDATE_SA_ADDRESS
+                                                                                              notification. This packet will be sent using the new IP address. The VPN server will be able to
+                                                                                              recognize the IPsec SA based on the SPI numbers, despite the fact that it is suddenly coming
+                                                                                              from a different IP address. Once decrypted and authenticated, the VPN server will notice the
+                                                                                              UPDATE_SA_ADDRESS payload and change the endpoint IP address (and port if
+                                                                                              encapsulation is used due to NAT). It will reply with a confirmation message. At this point, all
+                                                                                              IPsec SA traffic is sent and received using the client’s new IP address. Since the VPN client’s
+                                                                                              applications are only using the internal IP address assigned by the VPN server for
+                                                                                              communication to the remote access network, and this IP address does not change when the
+                                                                                              device itself changes its network interface and outer IP address, all existing connections remain
+                                                                                              intact. The applications are not even aware that the network interfaces have switched.
+
+                                                                                              A device that wakes up from battery saving mode will generally send a MOBIKE update
+                                                                                              whether or not its IP address changed. This ensures that any NAT state updates that have
+                                                                                              happened since the device went to sleep are reported back to the VPN server. For example, the
+                                                                                              NAT device might have terminated the unused NAT port mapping between the device and the
+                                                                                              VPN server. The MOBIKE packet will create a new fresh NAT port mapping entry, and the VPN
+                                                                                              server will immediately be able to update the client’s IP address and port number and activate the
+                                                                                              updated VPN connection.
+
+                                                                                              MOBIKE allows for more complicated setups with multiple IP addresses. While MOBIKE can
+                                                                                              be used as a failover mechanism for the gateway-to-gateway architecture, care should be taken
+                                                                                              with such a deployment. If one of the endpoints is compromised, its state could be copied onto a
+                                                                                              (rogue) machine on the other side of the world, and a MOBIKE update message could be sent to
+                                                                                              redirect all traffic to the rogue location. The most secure option is to disable MOBIKE unless the
+                                                                                              IPsec configuration is for a remote access VPN client.
+
+                                                                                              3.7   Post-quantum Pre-shared Keys (PPKs)
+
+                                                                                              It is unclear when a quantum computer will become available. Sufficiently large quantum
+                                                                                              computers will be able to break the finite field (classic) DH and ECDH key exchanges within the
+                                                                                              timeframe in which it would be expected that IPsec traffic should remain confidential. That is,
+                                                                                              the key exchange could be broken in weeks or months, while the expectation of confidentiality
+                                                                                              would be in the timeframe of decades. Adversaries could store today’s encrypted
+
+
+
+                                                                                                                                              31
+

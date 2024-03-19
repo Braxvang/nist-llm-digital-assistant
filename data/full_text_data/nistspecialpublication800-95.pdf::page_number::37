@@ -1,0 +1,59 @@
+                                                                                GUIDE TO SECURE WEB SERVICES
+
+
+
+service needs to be provided the identity of the originator in a trusted fashion. This can be satisfied using
+WS-Security and SAML.
+
+There are two ways to pass the identity of the originator on to a remote service. First, if the Web service
+received a SAML assertion with the originator’s request, that SAML assertion can be passed on to the
+remote Web service. It may be necessary for the requester service to sign either the SAML assertion or
+the SOAP message so that its own identity is passed to the remote service as well. Another option is for
+the requester service to generate and sign a SAML assertion for the originator itself and pass this SAML
+assertion on to the remote Web service. In this type of configuration it is not possible for the remote Web
+service to determine who originally requested the information. This limitation may be a hindrance in
+chain of trust deployments, as the chain is limited to the last requester.
+
+By contrast, if the originator’s SAML assertion is used or is signed, it is possible to trace the request back
+to the requesting entity. By forwarding a SAML assertion to the remote Web service, the requester
+service is able to assert the identity of the originator of the request. By either signing the SOAP message
+using WS-Security or the SAML assertion, the remote Web service is provided with the identity of the
+requester and can then determine whether or not it will trust the SAML assertion provided. If the
+authentication information requires confidentiality, SSL/TLS or WS-Security’s encryption functionality
+should be used.
+
+The use of signed SAML authentication or authorization assertions should be approached with caution. A
+signed SAML assertion is a token that can be reused by an attacker or a malicious service. Care must be
+taken to ensure that timestamps and validity periods are used and enforced. To address this, SAML
+assertions can be cryptographically bound to individual SOAP messages by signing the parent tag of the
+SAML assertion (e.g., using WS-Security to sign the Security element rather than the contained SAML
+token). While the SAML assertion may be reused, it will be invalid unless the entire signed portion of the
+message is also re-used, making it easier for service providers to detect replay attacks.
+
+3.1.2   WS-Security for Authentication
+
+Many Web services rely on the authentication mechanisms provided by HTTP and SSL/TLS. These
+solutions are only acceptable over a direct connection between two SOAP endpoints. If a SOAP message
+is to travel between multiple SOAP endpoints before reaching its destination, it is not acceptable to rely
+on HTTP and SSL/TLS for authentication, confidentiality, and integrity. There is no guarantee in this
+type of configuration that one of the Web services that handled the message did not misuse or store the
+data. In 2002, Microsoft, IBM, and Verisign released the WS-Security specification to address this
+shortcoming. In 2003, WS-Security was submitted as an OASIS standard, and in 2004 it was released as
+an OASIS standard. The ability of WS-Security to provide authentication (as well as confidentiality and
+integrity) at the SOAP message level is important for Web services to trust the messages they receive.
+
+Authentication in WS-Security is performed by including claims in the WS-Security header of a SOAP
+message. Claims provide information about the identity of the SOAP message sender which can then be
+used to determine whether or not the sender is authorized to access the resources requested. Claims can
+either be endorsed or unendorsed. An endorsed claim, such as an X.509 certificate, provides inherent
+proof that the sender is the entity referenced, because the key referenced in the X.509 certificate can be
+used to verify the signed portion of the SOAP message. An example of an unendorsed claim is a
+username/password pair or a SAML assertion. In an unendorsed claim, there is no inherent method for
+determining that the sender of the SOAP message is the entity that the header specifies.
+
+WS-Security also provides mechanisms for encrypting and signing elements of a SOAP message,
+including any WS-Security tokens. WS-Security explains how to use the XML Security and
+
+
+                                                     3-2
+

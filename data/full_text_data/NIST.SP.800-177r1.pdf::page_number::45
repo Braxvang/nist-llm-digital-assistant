@@ -1,0 +1,60 @@
+                                                                                               NIST SP 800-177 REV. 1                                                         TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               �ere are other mechanisms available as well that are not listed here. Administrators interested in
+                                                                                               seeing the full depth of the SPF syntax are encouraged to read the full speciﬁcation in
+                                                                                               [RFC7208]. To aid administrators, there are some online tools that can be used assist in the
+                                                                                               generation and testing of an SPF record. �ese tools take administrator input and generate the
+                                                                                               text that the administrator then places in a TXT RR in the given domain's zone ﬁle.
+
+                                                                                               4.4.2.3 Example SPF RRs
+
+                                                                                               Some examples of the mechanisms for SPF are given below. In each example, the purported
+                                                                                               sender in the SMTP envelope is example.com
+
+                                                                                               �e given domain has one mail server that both sends and receives mail. No other system is
+                                                                                               authorized to send mail. �e resulting SPF RR would be:
+
+                                                                                                      example.com IN TXT "v=spf1 mx -all"
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               �e given enterprise has a DMZ that allows hosts to send mail but is not sure if other senders
+                                                                                               exist. As a temporary measure, they list the SPF as:
+
+                                                                                                      example.com IN TXT "v=spf1 ip4:192.168.1.0/16 ~all"
+
+                                                                                               �e enterprise has several domains for projects, but only one set of sending MTAs. For each
+                                                                                               domain, there is an SPF RR with the include: declaration pointing to a central TXT RR with the
+                                                                                               SPF policy that covers all the domains. For example, each domain could have:
+
+                                                                                                      example.com IN TXT "v=spf1 include:spf.example.net."
+
+                                                                                               �e follow up query for the spf.example.net then has:
+
+                                                                                                      spf.example.net        IN TXT "v=spf1 ip4:192.168.0.1 …"
+
+                                                                                               �is makes SPF easier to manage for an enterprise with several domains and/or public
+                                                                                               subdomains. Administrators only need to edit spf.example.net to make changes to the SPF RR
+                                                                                               while the other SPF RR's in the other domains simply use the include: tag to reference it. No
+                                                                                               email should originate from the domain:
+
+                                                                                                      example.com IN TXT "v=spf1 -all"
+
+                                                                                               �e above should be added to all domains that do not send mail to prevent them being used by
+                                                                                               phishers looking for sending domains to spoof that they believe may not be monitored as closely
+                                                                                               as those that accept and send enterprise email. This is an important principle for domains that
+                                                                                               think they are immune from email related threats. Domain names that are only used to host web
+                                                                                               or services are advised to publish a “-all” record, to protect their reputation.
+
+                                                                                               Notice that semicolons are not permitted in the SPF TXT record.
+
+                                                                                               Security Recommendation 4-1: Organizations are recommended to deploy SPF to specify
+                                                                                               which IP addresses are authorized to transmit email on behalf of the domain. Domains controlled
+
+                                                                                                                                              32
+

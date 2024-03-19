@@ -1,0 +1,61 @@
+Special Publication 800-73-4                                     Interfaces for Personal Identity Verification – Part 2:
+                                                                 PIV Card Application Card Command Interface
+
+The P1 parameter shall be either '00' or 'FF'. If any other value is specified for the P1 parameter, then the
+PIV Card Application shall return the status word '6A 86'.
+
+If the VERIFY command fails for one of the reasons specified above, then the security status and the retry
+counter of the key reference shall remain unchanged.
+
+If P1='00', and L c and the command data field are absent, the command can be used to retrieve the
+number of further retries allowed ('63 CX'), or to check whether verification is not needed ('90 00').
+
+If P1='00', and L c and the command data field are present, then the authentication data in the command
+data field shall be compared against the reference data associated with the key reference, as specified in
+the following subsections. However, if the key reference is '00', '80', '96', or '97' and the current value of
+the retry counter associated with the key reference is zero, then the PIV Card Application shall return the
+status word '69 83'. 6 In order to protect against blocking over the contactless interface, PIV Card
+Applications that implement secure messaging shall define an issuer-specified intermediate retry value for
+each of these key references and return '69 83' if the command is submitted over the contactless interface
+(over secure messaging or the VCI, as required for the key reference) and the current value of the retry
+counter associated with the key reference is at or below the issuer-specified intermediate retry value. If
+status word '69 83' is returned, then the comparison shall not be made, and the security status and the retry
+counter of the key reference shall remain unchanged.
+
+If P1='FF', and L c and the command data field are absent, the command shall reset the security status of
+the key reference in P2. The security status of the key reference specified in P2 shall be set to FALSE and
+the retry counter associated with the key reference shall remain unchanged.
+
+     3.2.1.1 PIV Card Application PIN and Global PIN
+
+If the key reference is '00' or '80' and the authentication data in the command data field does not satisfy
+the criteria in Section 2.4.3, then the card command shall fail and the PIV Card Application shall return
+either the status word '6A 80' or '63 CX'. If status word '6A 80' is returned, the security status and the retry
+counter of the key reference shall remain unchanged. 7 If status word '63 CX' is returned, the security
+status of the key reference shall be set to FALSE and the retry counter associated with the key reference
+shall be decremented by one.
+
+If the authentication data in the command data field is properly formatted (see previous paragraph) and
+does not match reference data associated with the key reference, then the card command shall fail, the
+PIV Card Application shall return the status word '63 CX', the security status of the key reference shall be
+set to FALSE, and the retry counter associated with the key reference shall be decremented by one.
+
+If the card command succeeds, then the security status of the key reference shall be set to TRUE and the
+retry counter associated with the key reference shall be set to the reset retry value associated with the key
+reference. The initial value of the retry counter and the reset retry value associated with the key reference,
+i.e., the number of successive failures (retries) before the retry counter associated with the key reference
+reaches zero, are issuer dependent.
+
+
+
+
+6 There is no retry counter associated with the pairing code, and so the authentication method cannot be blocked for that key
+
+reference.
+7 It is recommended that in this case the authentication data not be compared to the on-card reference data.
+
+
+
+
+                                                               12
+

@@ -1,0 +1,59 @@
+                                                                                               NIST SP 800-178                                                    COMPARISON OF ABAC STANDARDS FOR
+                                                                                                                                                                    DATA SERVICES: XACML AND NGAC
+
+
+                                                                                               5.3.1   Loading Policies
+
+                                                                                               This phase involves loading policies into memory from disk (or any persistent storage medium)
+                                                                                               and converting them into an in-memory representation or structure that is suitable for efficient
+                                                                                               computation. In regard to XACML, the main components of a policy are: Target (the
+                                                                                               combination of subject, object, action and environmental attribute values) and a set of one or
+                                                                                               more rules. For XACML, this phase has been found to be the most expensive phase in access
+                                                                                               decision computation with significant increase in processing time when working with policy
+                                                                                               stores that contain over 100 policies [26]. Regardless of the number of policies, there is a
+                                                                                               fundamental need to parse and convert the external XML representation of policy to memory
+This publication is available free of charge from: http://dx.doi.org/10.6028/NIST.SP.800-178
+
+
+
+
+                                                                                               structures. Performance optimization strategies have been proposed to include caching frequently
+                                                                                               loaded policies (using “Policy Identifier-Loaded Policy” combination), loading just proxy
+                                                                                               policies (policies that contain only the Target) instead of the full policy contents and using an
+                                                                                               efficient parser (Java DOM-based or StAX-based) for conversion into in-memory structures. In
+                                                                                               regard to NGAC, policies, both on disk and in memory can be represented as a graph [11].
+                                                                                               Consequently, the conversion from the representational format on disk to the in-memory
+                                                                                               structure is minimal and very efficient. In addition, for purposes of computing a decision, all
+                                                                                               information that is needed can reside in memory. In the NGAC reference implementation
+                                                                                               Version 1.6 [11] access control information is loaded into memory when the PDP is initialized,
+                                                                                               and updated when an administrative change occurs.
+
+                                                                                               5.3.2   Finding Applicable Policies
+
+                                                                                               In this phase, the set of memory-resident applicable policies are identified and returned after
+                                                                                               matching the request against the loaded policies. For XACML, results are available to show that
+                                                                                               the speed for matching is not correlated to the number of rules in the policy store, but only to the
+                                                                                               complexity of policy’s Target [29]. Since the process of matching a request against a policy
+                                                                                               requires just the information that is in the policy Target, having proxy policies alone in the
+                                                                                               memory will meet this need. The advantage of having proxy policies, instead of full policies, is
+                                                                                               that it speeds up the process of identifying the applicable policies. After matching is done using a
+                                                                                               proxy policy to identify an applicable policy, the rest of the policy content has to be loaded from
+                                                                                               disk into memory. The overhead involved in this disk operation (loading from policy store to
+                                                                                               memory) becomes significant when the number of policies is large. Another performance
+                                                                                               optimization measure used in this phase is the caching of “Request-Applicable Policies”
+                                                                                               combinations. In regard to NGAC, the discovery of applicable policies, or more accurately
+                                                                                               stated, applicable policy elements, is an inherent aspect of its decision computation. When
+                                                                                               computing a decision NGAC only considers the graph nodes reachable from the nodes
+                                                                                               representing the user and target object in a request.
+
+                                                                                               5.3.3   Decision Processing
+
+                                                                                               The decision process involves evaluating the request against all applicable policies in the
+                                                                                               memory representation and computing the final decision. The most significant task in XACML
+                                                                                               for this phase is the evaluation of logical expressions in the various rules in the applicable
+                                                                                               policies. Secondary tasks are: Retrieval of dynamic attributes (e.g., environmental attribute such
+                                                                                               as time, IP address etc.) through the Context Handler or PIP and application of combining
+                                                                                               algorithms. As such, performance of this phase is impacted by the number of rules in the policy
+
+                                                                                                                                               43
+

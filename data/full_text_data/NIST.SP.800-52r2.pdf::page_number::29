@@ -1,0 +1,54 @@
+NIST SP 800-52 REV. 2                                          GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+3.3.2   Implementation Considerations
+
+System administrators need to fully understand the ramifications of selecting cipher suites and
+configuring applications to support only those cipher suites. The security guarantees of the
+cryptography are limited to the weakest cipher suite supported by the configuration. When
+configuring an implementation, there are several factors that affect the selection of supported
+cipher suites.
+
+RFC 4346 [24] describes timing attacks on CBC cipher suites, as well as mitigation techniques.
+TLS implementations shall use the bad_record_mac error to indicate a padding error when
+communications are secured using a CBC cipher suite. Implementations shall compute the MAC
+regardless of whether padding errors exist.
+
+In addition to the CBC attacks addressed in RFC 4346 [24], the Lucky 13 attack [1]
+demonstrates that a constant-time decryption routine is also needed to prevent timing attacks.
+TLS implementations should support constant-time decryption or near constant-time decryption.
+
+The POODLE attack exploits nondeterministic padding in SSL 3.0 [43]. The vulnerability does
+not exist in the TLS protocols, but the vulnerability can exist in a TLS implementation when the
+SSL decoder code is reused to process TLS data [38]. TLS implementations shall correctly
+decode the CBC padding bytes.
+
+Note that CBC-based attacks can be prevented by using AEAD cipher suites (e.g., GCM, CCM),
+which are supported in TLS 1.2.
+
+3.3.2.1 Algorithm Support
+
+Many TLS servers and clients support cipher suites that are not composed of only NIST-
+approved algorithms. Therefore, it is important that the server is configured to only use NIST-
+recommended cipher suites. This is particularly important for server implementations that do not
+allow the server administrator to specify preference order. In such servers, the only way to
+ensure that a server uses NIST-approved algorithms is to disable cipher suites that use other
+algorithms.
+
+If the server implementation does allow the server administrator to specify a preference, the
+system administrator is encouraged to use the preference recommendations listed in Section
+3.3.1.1.
+
+3.3.3   Validated Cryptography
+
+The cryptographic module used by the server shall be a FIPS 140-validated cryptographic
+module [50, 51]. All cryptographic algorithms that are included in the configured cipher suites
+and the random number generator shall be within the scope of the validation.
+
+Note that the TLS 1.0 and 1.1 pseudorandom function (PRF) uses MD5 and SHA-1 in parallel so
+that if one hash function is broken, security is not compromised. While MD5 is not a NIST-
+approved algorithm, the PRF is specified as acceptable in SP 800-135 [21]. In TLS 1.2, the
+
+
+                                                20
+

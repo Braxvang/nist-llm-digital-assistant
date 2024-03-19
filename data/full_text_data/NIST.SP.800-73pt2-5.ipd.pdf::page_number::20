@@ -1,0 +1,58 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                          Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                             PIV Card Application Card Command Interface
+
+469   3.1.2. GET DATA Card Command
+470   The GET DATA card command retrieves the data content of the single data object whose tag is
+471   given in the data field. 5
+472   Command Syntax
+                    CLA                      '00' or '0C' for secure messaging
+                    INS                      'CB'
+                    P1                       '3F'
+                    P2                       'FF'
+                    Lc                       Length of data field
+                    Data Field               See Table 6
+                    Le                       '00'
+
+473   The L c value is '05' for all PIV data objects except for the 0x7E interindustry tag (Discovery
+474   Object), which has an L c value of '03', and the 0x7F61 interindustry tag (Biometric Information
+475   Templates (BIT) Group Template), which has an L c value of '04'.
+476                          Table 6. Data objects in the data field of the GET DATA card command
+
+                   Name         Tag     M/O                            Comment
+                  Tag list     '5C'     M   BER-TLV tag of the data object to be retrieved. See Table 3, Part 1.
+
+477   Response Syntax
+478   For the 0x7E Discovery Object (if present) and the 0x7F61 BIT Group Template (if present):
+                                             - BER-TLV of the 0x7E Discovery data object (see Section 3.3.2,
+                                             Part 1 for a description of the Discovery Object’s structure returned
+                    Data Field               in the data field) or
+                                             - BER-TLV of the 0x7F61 BIT Group Template (see Table 7 of SP
+                                             800-76)
+                    SW1-SW2                  Status word
+
+479   For all other PIV data objects (if present):
+                                             BER-TLV with the tag '53' containing in the value field of the
+                    Data Field
+                                             requested data object.
+                    SW1-SW2                  Status word
+480
+                     SW1          SW2                                      Meaning
+                                             Successful execution where SW2 encodes the number of response
+                    '61'         'xx'
+                                             data bytes still available
+                    '69'         '82'        Security status not satisfied
+                    '6A'         '82'        Data object not found
+                    '90'         '00'        Successful execution
+481
+
+
+
+
+      5
+         The GET RESPONSE command is used in conjunction with GET DATA to read larger PIV data objects. The GET RESPONSE command is
+      illustrated in Appendix A.4.1 (Command 3).
+
+
+
+                                                                    10
+

@@ -1,0 +1,44 @@
+      NIST SP 800-73pt1-5 ipd (Initial Public Draft)                Interfaces for Personal Identity Verification: Part 1
+      September 2023                                 PIV Card Application Namespace, Data Model, and Representation
+
+418           requirements in the tenth paragraph of [TIG SCEPACS, Section 2.1]: “For full
+419           interoperability of a PACS, it must at a minimum be able to distinguish fourteen digits
+420           (i.e., a combination of an Agency Code, System Code, and Credential Number) when
+421           matching FASC-N based credentials to enrolled card holders.”
+422       •   The Global Unique Identification number (GUID) field must be present and SHALL
+423           include a Card Universally Unique Identifier (UUID) (see Section 3.4.1). The Card
+424           UUID SHALL NOT be modified post-issuance.
+425       •   The Expiration Date is mapped to the reserved for future use (RFU) tag 0x35, keeping
+426           that within the existing scope of the TIG SCEPACS specification. This field SHALL be 8
+427           bytes in length and SHALL be encoded in ASCII as YYYYMMDD. The expiration date
+428           SHALL be the same as printed on the card. The expiration date SHALL NOT be
+429           modified post-issuance.
+430       •   The optional Cardholder UUID field is mapped to RFU tag 0x36. If present, it SHALL
+431           include a Cardholder UUID as described in Section 3.4.2. The Cardholder UUID SHALL
+432           NOT be modified post-issuance.
+433       •   The CHUID SHALL be signed in accordance with Section 3.1.2.1. The card issuer’s
+434           digital signature key SHALL be used to sign the CHUID, and the associated certificate
+435           SHALL be placed in the signature field of the CHUID.
+
+436   3.1.2.1.         Asymmetric Signature Field in CHUID
+437   FIPS 201 requires inclusion of the asymmetric signature field in the CHUID data object. The
+438   asymmetric signature data element of the CHUID SHALL be encoded as a Cryptographic
+439   Message Syntax (CMS) external digital signature, as defined in RFC 5652 [RFC5652].
+440   The issuer asymmetric signature field is implemented as a SignedData type, as specified in
+441   [RFC5652], and SHALL include the following information:
+442
+443       •   The message SHALL include a version field specifying version v3.
+444       •   The digestAlgorithms field SHALL be as specified in [SP800-78].
+445       •   The encapContentInfo SHALL:
+446                o Specify an eContentType of id-PIV-CHUIDSecurityObject
+447                o Omit the eContent field
+448       •   The certificates field SHALL include only a single X.509 certificate, which CAN be used
+449           to verify the signature in the SignerInfo field.
+450       •   The crls field SHALL be omitted.
+451       •   signerInfos SHALL be present and include only a single SignerInfo.
+452       •   The SignerInfo SHALL:
+453                o Use the issuerAndSerialNumber choice for SignerIdentifier
+
+
+                                                            6
+

@@ -1,0 +1,57 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                     GUIDE TO IPSEC VPNS
+
+
+                                                                                              In addition to endpoint security, there are many other possible design considerations. The
+                                                                                              following items describe specific IPsec settings not addressed earlier in this section:
+
+                                                                                                   •    SA Lifetimes. The IPsec endpoints should be configured with lifetimes that balance
+                                                                                                        security and overhead. 62 In general, shorter SA lifetimes tend to support better security,
+                                                                                                        but every SA creation involves additional overhead. In IKEv1, the appropriate lifetime is
+                                                                                                        somewhat dependent on the authentication method. For example, a short lifetime may be
+                                                                                                        disruptive to users in a remote access architecture that requires users to authenticate
+                                                                                                        manually but not disruptive in a gateway-to-gateway architecture with automatic
+                                                                                                        authentication. IKEv2 also decouples rekeying from reauthentication, so rekeying can be
+                                                                                                        performed more frequently without affecting the user. During testing, administrators
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                        should set short lifetimes (perhaps 5 to 10 minutes) so that the rekeying process can be
+                                                                                                        tested more quickly. In operational implementations, IPsec SA lifetimes should generally
+                                                                                                        be set to a few hours with IKE SA lifetimes set somewhat higher. A common default
+                                                                                                        setting for IKE SAs is a lifetime of 24 hours (86,400 seconds) and a lifetime of 8 hours
+                                                                                                        (28,800 seconds) for IPsec SAs. It is important to ensure that the peers are configured
+                                                                                                        with compatible lifetimes; some configurations will terminate an IKE negotiation if the
+                                                                                                        peer uses a longer lifetime than its configured value. Some IKEv2 implementations,
+                                                                                                        especially minimum IKEv2 implementations used with embedded devices, might not
+                                                                                                        support the CREATE_CHILD_SA exchange and, therefore, do not support rekeying
+                                                                                                        without reauthentication.
+                                                                                                   •    IKE Version. IKEv2 should be used instead of IKEv1 where possible. If using IKEv1,
+                                                                                                        the aggressive mode (see RFC 2409 [67] for details) should be avoided because it
+                                                                                                        provides much weaker security compared to the main mode.
+                                                                                                   •    Diffie-Hellman Group Number. DH group numbers 14, 15, 16, 17, 18 [15], 19, 20, and
+                                                                                                        21 [65] are NIST-approved groups. The DH group 22 is not a NIST-approved option
+                                                                                                        because it provides less than 112 bits of security; see [18]. The ECP DH groups 19, 20,
+                                                                                                        and 21 are preferred for security and performance reasons. The DH group used to
+                                                                                                        establish the secret keying material for IKE and IPsec should be consistent with current
+                                                                                                        security requirements for the strength of the encryption keys generated by the IKE KDF.
+                                                                                                   •    Extra Padding. As described in Section 4.1.5, ESP packets can contain optional padding
+                                                                                                        that alters the size of the packet to conceal how many bytes of actual data the packet
+                                                                                                        contains, which is helpful in deterring traffic analysis. Having larger packets increases
+                                                                                                        bandwidth usage and the endpoints’ processing load for encrypting and decrypting
+                                                                                                        packets, so organizations should only use extra padding if traffic analysis is a significant
+                                                                                                        threat (in most cases, it is not) and cost is not an important factor.
+                                                                                                   •    PFS. Because the PFS option provides stronger security, it should be used unless the
+                                                                                                        additional computational requirements of the additional DH key exchanged would pose a
+                                                                                                        problem. For IPsec servers with permanent IPsec tunnels, this is usually not an issue, but
+
+
+                                                                                              62   In most cases, lifetimes should be specified by both time and bytes of traffic so that all SAs, regardless of the volume of
+                                                                                                   traffic, have a limited lifetime. Organizations should not specify a lifetime by bytes of traffic only because an SA that is not
+                                                                                                   used or is used lightly might exist indefinitely.
+
+
+
+                                                                                                                                                               76
+

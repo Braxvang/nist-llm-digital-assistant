@@ -1,0 +1,59 @@
+                                                                                             NIST SP 800-208                                                                            RECOMMENDATION FOR STATEFUL
+                                                                                                                                                                                       HASH-BASED SIGNATURE SCHEMES
+
+                                                                                                    byte[n] M' = M;
+                                                                                                  } else {
+                                                                                                    byte[n] r = PRF(getSK_PRF(SK), toByte(idx_sig, 32));
+                                                                                                    byte[n] M' = H_msg(r || getRoot(SK) || (toByte(idx_sig, n)), M);
+                                                                                                  }
+                                                                                                  idx_leaf = idx_sig - t * 2^(h / d);
+                                                                                                  Sig = idx_sig || r || treeSig(M', SK, idx_leaf, ADRS);
+                                                                                                  return Sig;
+
+                                                                                             7.2.2      XMSSMT External Device Operations
+                                                                                             XMSS^MT external device keygen
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                                  Input: No input
+
+                                                                                                  // Generate top-level key pair on a cryptographic module
+                                                                                                  PK_MT = XMSS'_keyGen(1, 0, NULL);
+
+                                                                                                  t = 0;
+                                                                                                  for each bottom-level key pair to be created {
+                                                                                                    // Generate bottom-level key pair on a cryptographic module
+                                                                                                    PK[t] = XMSS’_keygen(0, t, PK_MT);
+
+                                                                                                      // Submit root of bottom-level key pair’s public key
+                                                                                                      // to be signed by the top-level key pair.
+                                                                                                      SigPK[t] = XMSS'_sign(getRoot(PK[t]));
+
+                                                                                                      // If the public key on the bottom-level tree was created using
+                                                                                                      // a tree address of t, then its root needs to be signed by OTS
+                                                                                                      // key t of the top-level tree. If it was not, then try again. 7
+                                                                                                      while ( getIdx(SigPK[t]) ≠ t ) {
+                                                                                                        t = getIdx(SigPK[t]) + 1;
+                                                                                                        PK[t] = XMSS'_keygen(0, t, PK_MT);
+                                                                                                        SigPK[t] = XMSS'_sign(getRoot(PK[t]));
+                                                                                                      }
+                                                                                                      t = t + 1;
+                                                                                                  }
+
+                                                                                             XMSS^MT external device sign
+
+                                                                                                  Input: Message M
+
+
+                                                                                             7   While the signing cryptographic module should use its one-time keys sequentially, making it possible for the external device to
+                                                                                                 determine in advance which one-time key will be used to sign the public key of the bottom-level tree, the external device
+                                                                                                 cannot specify to the signing cryptographic module which one-time key it should use. So, there is a small chance that an
+                                                                                                 internal glitch in the signing cryptographic module will cause it to skip over one or more key indices and sign the bottom-
+                                                                                                 level’s public key using an unexpected key index. While this event should be rare, if it does happen, the only option is to
+                                                                                                 regenerate the bottom-level key pair, set the tree address to the next expected key index, and then try again.
+
+
+                                                                                                                                                             26
+

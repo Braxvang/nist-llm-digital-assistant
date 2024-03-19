@@ -1,0 +1,28 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+
+                 Figure 12-1: Example of Resolver Architecture Using an Aggregate Cache.
+
+When the local forwarder receives a query it cannot answer out of cache (or authoritative data, if present)
+it forwards the query on to the aggregate cache for recursion. The aggregate cache then performs the
+recursion and returns the final answer to the forwarder, which in turn sends the final answer back to the
+stub resolver.
+
+DNSSEC validation on an enterprise with aggregate caches is slightly more complicated than an
+enterprise that does not use aggregate caches. It is considered wise to perform validation as close to the
+stub resolver as possible, which in this scenario would mean the forwarder. However, if the aggregate
+cache does not perform validation, there is the risk of the aggregate cache having DNSSEC invalid data in
+its cache that would then be sent back to the forwarders. This BOGUS data would only be purged upon
+the TTL expiration, and not be updated with valid data until that time as passed.
+
+One solution is to perform validation at the forwarder and the aggregate cache, and have the forwarder
+send all queries to the aggregate cache with the Checking Disable (CD) bit flag set. That signals to the
+aggregate cache that the forwarder wishes to perform its own validation and should receive the full
+response back. The aggregate cache is still free to perform its own validation of the data, and the
+resulting caches on both sides will remain in sync.
+
+
+                                                   12-16
+

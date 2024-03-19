@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+                file “zonedb.example.com”;
+                update-policy { grant sales.example.com. self
+           sales.example.com.; };
+           };
+
+All dynamic updates from sales.example.com could be restricted to only A and MX RR types of that
+domain as follows:
+
+           zone “example.com” {
+                type master;
+                file “zonedb.example.com”;
+                update-policy {
+                  grant sales.example.com. self sales.example.com. A MX; };
+           };
+
+To allow clients with the TSIG key sales.example.com to update all records pertaining to subdomains of
+NEsales.example.com except the name server records (RR Type NS):
+
+           zone “example.com” {
+                type master;
+                file “zonedb.example.com”;
+                update-policy {
+                      deny sales.example.com. subdomain NE
+           sales.example.com. NS;
+                      grant sales.example.com. subdomain NE
+           sales.example.com. ANY; };
+           };
+
+For Microsoft Windows, authentication is provided using GSS-TSIG. System administrators of Windows
+Servers should consult their implementation’s documentation on how to integrate secure dynamic update
+using GSS-TSIG.
+
+8.3       Recommendations Summary
+
+The following items provide a summary of the major recommendations from this section:
+
+      •    Checklist item 7: It is recommended that the administrator create a named list of trusted hosts (or
+           blacklisted hosts) for each of the different types of DNS transactions. In general, the role of the
+           following categories of hosts should be considered for inclusion in the appropriate ACL:
+
+           –   DMZ hosts defined in any of the zones in the enterprise
+
+           –   All secondary name servers allowed to initiate zone transfers
+
+           –   Internal hosts allowed to perform recursive queries.
+
+      •    Checklist item 8: The TSIG key (secret string) should be a minimum of 112 bits in length if the
+           generator utility has been proven to generate sufficiently random strings [800-57P1]. 128 bits
+           recommended.
+
+      •    Checklist item 9: A unique TSIG key should be generated for each set of hosts (i.e. a unique key
+           between a primary name server and every secondary server for authenticating zone transfers).
+
+
+                                                      8-18
+

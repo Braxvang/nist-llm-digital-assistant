@@ -1,0 +1,60 @@
+A STATISTICAL TEST SUITE FOR RANDOM AND PSEUDORANDOM NUMBER GENERATORS FOR CRYPTOGRAPHIC APPLICATIONS
+
+
+
+                        if ( counter == testid ) {
+                             printf("    Enter MyNewTest Parameter Value:                               ");
+                             scanf("%d", &tp.myNewTestParameter);
+                             printf(“\n”);
+                             continue;
+                        }
+                }
+
+        (d) Embed the test function call into the nist_test_suite function. For example:
+
+                if ((testVector[0] == 1) || (testVector[TEST_MYNEWTEST] == 1))
+                      myNewTest(tp.myNewTestInputParameters,tp.n);
+
+C.2           Incorporating Additional PRNGs
+
+In order to add a PRNG to the test suite, the user should make the following modifications:
+
+1.     [In the file include/defs.h]
+
+        Increment the variable NUMOFGENERATORS by one.
+
+2.     [In the file include/decls.h]
+
+        Insert the new PRNG name into the generatorDir array, For example,
+
+        char generatorDir[20][20] = {"AlgorithmTesting",
+
+                                                         …,"G-SHA1", "MYNEWPRNG"};
+
+3.      [In the file include/generators.h]
+
+        Insert the generator function prototype declaration. For example,
+                 void myNewPRNG();
+
+4.      [In the file generators/generators.c]
+
+        Define the generator function. The general scheme for each PRNG defined in the test
+        suite is as follows:
+
+             Allocate space for epsilon, the n-bit BitField array.
+             for i = 1 to numOfBitStreams {
+               Construct an n-bit sequence using myNewGenerator and store
+               in epsilon.
+               Invoke the nist_test_suite.
+            }
+            Deallocate the space given to epsilon.
+
+        Note: A sub-directory called myNewPRNG/ must be created in the experiments/ directory.
+        Under this new directory, a set of sub-directories must be created for each of the test suite
+        statistical tests. The script createScript has been included to facilitate this operation.
+
+
+
+
+                                                   C-2
+

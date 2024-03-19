@@ -1,0 +1,61 @@
+                                                      GUIDE TO INTEGRATING FORENSIC TECHNIQUES INTO INCIDENT RESPONSE
+
+
+
+          OS. The operating system considers this to be free space and can overwrite any portion of or the
+          entire deleted file at any time.
+      ! Slack Space. As noted previously, filesystems use file allocation units to store files. Even if a
+        file requires less space than the file allocation unit size, an entire file allocation unit is still
+        reserved for the file. For example, if the file allocation unit size is 32 kilobytes (KB) and a file is
+        only 7 KB, the entire 32 KB is still allocated to the file, but only 7 KB is used, resulting in 25 KB
+        of unused space. This unused space is referred to as file slack space, and it may hold residual
+        data such as portions of deleted files.
+      ! Free Space. Free space is the area on media that is not allocated to any partition; it includes
+        unallocated clusters or blocks. This often includes space on the media where files (and even
+        entire volumes) may have resided at one point but have since been deleted. The free space may
+        still contain pieces of data.
+Another way in which data might be hidden is through Alternate Data Streams (ADS) within NTFS
+volumes. NTFS has long supported multiple data streams for files and directories. Each file in an NTFS
+volume consists of an unnamed stream that is used to store the file's primary data, and optionally one or
+more named streams (i.e., file.txt:Stream1, file.txt:Stream2) that can be used to store auxiliary
+information, such as file properties and picture thumbnail data.25 For instance, if a user right-clicks on a
+file in Windows Explorer, views the file’s properties, and then modifies the information displayed in the
+summary tab, the OS stores the summary information for the file in a named stream.
+
+All data streams within a file share the file’s attributes (e.g., timestamps, security attributes). Although
+named streams do affect the storage quota of a file, they are largely concealed from users because
+standard Windows file utilities, such as Explorer, only report the size of a file's unnamed stream. As a
+result, a user cannot readily determine whether a file contains ADS using the standard Windows file
+utilities. This allows hidden data to be contained within any NTFS filesystem. Moving files with ADS to
+non-NTFS filesystems effectively strips ADS from the file, so the ADS can be lost if analysts are not
+aware of their presence. Software and processes are available to identify ADS.26
+
+4.2     Collecting Files
+
+During data collection, the analyst should make multiple copies of the relevant files or filesystems—
+typically a master copy and a working copy. 27 The analyst can then use the working copy without
+affecting the original files or the master copy. Section 4.2.1 describes the primary techniques and tools
+for copying files and residual file data from media. Section 4.2.2 discusses the importance of maintaining
+the integrity of the files and provides guidance on hardware and software that can assist in preserving and
+verifying file integrity. It is often important to collect not only the files, but also significant timestamps
+for the files, such as when the files were last modified or accessed. Section 4.2.3 describes the
+timestamps and explains how they can be preserved. Other technical issues related to file collection, such
+as finding hidden files and copying files from redundant array of inexpensive disks (RAID)
+implementations, are addressed in Section 4.2.4.
+
+
+
+
+25
+      Directories do not have an unnamed stream but may contain named streams.
+26
+      Additional information on ADS is available at
+      http://www.microsoft.com/technet/prodtechnol/winxppro/reskit/c13621675.mspx,
+      http://www.infosecwriters.com/texts.php?op=display&id=53, and within http://www.heysoft.de/Frames/f_faq_ads_en.htm.
+27
+      The purpose of the master copy is to generate additional working copies if the first working copy can no longer be used
+      because of alteration or other reasons.
+
+
+                                                             4-5
+

@@ -1,0 +1,55 @@
+NIST SP 800-52 REV. 2                                                                  GUIDELINES FOR TLS IMPLEMENTATIONS
+
+
+4.5.2     Trust Anchor Store
+
+Having an excessive number of trust anchors installed in the TLS client can increase the chances
+for the client to be spoofed. As the number of trust anchors increase, the number of CAs that the
+client trusts increases, and the chances that one of these CAs or its registration system or process
+will be compromised to issue TLS server certificates also increases.
+
+Clients shall not overpopulate their trust stores with various CA certificates that can be verified
+via cross-certification. 34 Direct trust of these certificates can expose the clients unduly to a
+variety of situations including, but not limited to, revocation or compromise of these trust
+anchors. Direct trust also increases the operational and security burden on the clients to
+promulgate the addition and deletion of trust anchors. Instead, the client shall rely on the server
+overpopulating or not providing the hints list to mitigate the client certificate selection and path-
+building problem as discussed in Section 3.5.4.
+
+4.5.3     Checking the Server Key Size
+
+The only direct mechanism for a client to check if the key size presented in a server public
+certificate is acceptable is for the client to examine the server public key in the certificate. An
+indirect mechanism is to ensure that the server public-key certificate was issued under a policy
+that indicates the minimum cryptographic strength of the signature and hashing algorithms used.
+In some cases, this can be done by the client performing certificate policy processing and
+checking. However, since many TLS clients cannot be configured to accept or reject certificates
+based on the policies under which they were issued, this may require ensuring that the trust
+anchor store only contains trust anchors for CAs that issue certificates under acceptable policies.
+The client shall check the server public key length if the client implementation provides a
+mechanism to do so. The client shall also check the server public key length if the server uses
+ephemeral keys for the creation of the master secret and the client implementation provides a
+mechanism to do so.
+
+The length of each write key is determined by the negotiated cipher suite. Restrictions on the
+length of the shared session keys can be enforced by configuring the client to only support cipher
+suites that meet the key length requirements.
+
+4.5.4     User Interface
+
+When the TLS client is a browser, the browser interface can be used to determine if a TLS
+session is in effect. The indication that a TLS session is in effect varies by browser. Examples of
+indicators include a padlock in the URL bar, the word “secure” preceding the URL, or a different
+color for the URL bar. Some clients, such as browsers, may allow further investigation of the
+server certificate and negotiated session parameters by clicking on the lock (or other indicator).
+Users should examine the interface for the presence of the indicator to ensure that the TLS
+session is in force and should also visually examine website URLs to ensure that the user
+
+34 CA certificates that may be verified via cross-certification may be added to the client’s store as untrusted or intermediate
+
+     certificates. Clients use certificates that are stored as untrusted or intermediate certificates to aid in path-building but do not
+     treat them as trust anchors.
+
+
+                                                                   43
+

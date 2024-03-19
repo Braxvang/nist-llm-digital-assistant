@@ -1,0 +1,59 @@
+                                                                                             NIST SP 800-185                                                                   SHA-3 DERIVED FUNCTIONS: CSHAKE,
+                                                                                                                                                                              KMAC, TUPLEHASH, AND PARALLELHASH
+
+                                                                                              Appendix B—Hashing into a Range (Informative)
+
+                                                                                             XOFs, PRFs, and hash functions with variable-length output like cSHAKE, KMAC, TupleHash,
+                                                                                             and ParallelHash can easily be used to generate an integer X within the range 0 ≤ X < R, denoted
+                                                                                             as 0..R−1 in this document, for any positive integer R. The following method will produce
+                                                                                             outputs that are extremely close to a uniform distribution over that range, assuming that the
+                                                                                             above functions approximate a uniform random variable.
+
+                                                                                             In order to hash into an integer in the range 0..R−1, do the following:
+
+                                                                                             1. Let k = ⌈ lg(R) ⌉ + 128.
+                                                                                             2. Call the hash function with a requested length of at least k bits. Let the resulting bit string be
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-185
+
+
+
+
+                                                                                                Z.
+                                                                                             3. Let N = bits_to_integer(Z) mod R, where the bits_to_integer function is defined below.
+
+                                                                                             At the end of this process, the variable N contains an integer that is extremely close to being
+                                                                                             uniformly distributed in the range 0..R−1. For any possible output value t such that 0 ≤ t < R, the
+                                                                                             following statement is true 12.
+
+                                                                                             |Prob(N=t) – 1/R| ≤ 2−128/R.
+
+                                                                                             In other words, the output of this process will have a very small bias. No value will be very much
+                                                                                             more or less likely to appear as the result of this process than it would have been, had an integer
+                                                                                             been selected uniformly at random from the integers between 0 and R−1, inclusive.
+
+                                                                                             This technique can be applied to SHAKE, cSHAKE, KMAC, TupleHash, or ParallelHash
+                                                                                             whenever an integer within a specific range is needed, so long as it is acceptable for the resulting
+                                                                                             integer to have this very small deviation from the uniform distribution on the integers {0, 1,...,
+                                                                                             R−1}.
+
+                                                                                             The bits_to_integer function converts a bit string to an integer as follows:
+
+                                                                                             bits_to_integer (b1, b2,…, bn):
+
+                                                                                             1. Let (b1, b2,…, bn) be the bits of a bit string from the most significant to the least significant
+                                                                                                bits.
+
+                                                                                             2. 𝑥𝑥 = ∑𝑛𝑛𝑖𝑖=1 2(n-i)bi.
+
+                                                                                             3. Return (x).
+
+
+
+                                                                                             12
+                                                                                                   In fact, the bound is slightly tighter than this. If w = the length of the bitstring Z in bits (w ≥ ⌈ lg(R) ⌉ + 128), then
+                                                                                                  |Prob(N=t) – 1/R| ≤ 2-w.
+
+
+
+                                                                                                                                                            25
+

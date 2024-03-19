@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-208                                                       RECOMMENDATION FOR STATEFUL
+                                                                                                                                                                  HASH-BASED SIGNATURE SCHEMES
+
+                                                                                             7     Distributed Multi-Tree Hash-Based Signatures
+
+                                                                                             If a digital signature key will be used to generate signatures over a long period of time and
+                                                                                             replacing the public key would be difficult, then it will be necessary to prepare for the possibility
+                                                                                             that a cryptographic module holding the private key may fail during the key’s lifetime. In the
+                                                                                             case of most digital signature schemes, a common solution is to make copies of the private key.
+                                                                                             However, in the case of stateful HBS schemes, simply copying the private key would create a
+                                                                                             risk of OTS key reuse.
+
+                                                                                             While it would be possible to have one cryptographic module generate all of the OTS keys and
+                                                                                             then distribute different OTS keys to each of the other cryptographic modules, doing so is not an
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                             option for cryptographic modules that conform to this recommendation: due to the risks
+                                                                                             associated with copying OTS keys, this recommendation prohibits exporting private keying
+                                                                                             material (Section 8).
+
+                                                                                             One option would be to create multiple stateful HBS keys on different cryptographic modules
+                                                                                             and then configure clients to accept signatures created using any of these keys. These keys could
+                                                                                             be distributed to clients all at once or using a mechanism such as the Hash Of Root Key
+                                                                                             certificate extension [23], which provides a mechanism for distributing new public keys over
+                                                                                             time.
+
+                                                                                             Another option would be to create a single stateful HBS key in which the OTS private keys are
+                                                                                             distributed across multiple cryptographic modules. The easiest way to have OTS keys on
+                                                                                             multiple cryptographic modules without exporting private keys is to use HSS or XMSSMT with
+                                                                                             two levels of trees where the trees are instantiated on different cryptographic modules. First, a
+                                                                                             top-level LMS or XMSS key pair would be created in a cryptographic module. The top level’s
+                                                                                             OTS keys would only be used to sign the roots of other trees. Then, bottom-level LMS or XMSS
+                                                                                             key pairs would be created, and the public keys from those key pairs (i.e., the roots of their
+                                                                                             Merkle trees) would be signed by OTS keys of the top-level key pair. The OTS keys of the
+                                                                                             bottom-level key pairs would be used to sign ordinary messages. The number of bottom-level
+                                                                                             key pairs that could be created would be limited only by the number of OTS keys in the top-level
+                                                                                             key pair.
+
+                                                                                             As an example, suppose that an organization wishes to have a single XMSSMT key with the OTS
+                                                                                             private keys being distributed across two cryptographic modules (in case one fails), and the
+                                                                                             organization has determined that, at most, 10 000 signatures will need to be generated over the
+                                                                                             lifetime of the XMSSMT key. The organization could create a top-level XMSS key pair in one
+                                                                                             cryptographic module using the XMSSMT-SHA2_20/2_256 parameter set and then create 10
+                                                                                             bottom-level XMSS keys in that same cryptographic module. An additional 10 bottom-level
+                                                                                             XMSS keys could be created in a second cryptographic module with all 20 of the bottom-level’s
+                                                                                             keys being signed by OTS keys of the top-level key pair.
+
+                                                                                             When working with distributed multi-tree hash-based signatures, the cryptographic module that
+                                                                                             holds the top-level tree is a potential single point of failure. Once this cryptographic module
+                                                                                             fails, it is no longer possible to sign additional bottom-level key pairs. Consequently, all of the
+                                                                                             bottom-level keys should be generated up front as part of the initial key generation ceremony.
+                                                                                             Once the top-level key has been used to sign all of the bottom-level keys, the top-level key is no
+
+                                                                                                                                              22
+

@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-77 REV. 1                                                        GUIDE TO IPSEC VPNS
+
+
+                                                                                                     crypto ipsec transform-set 1 esp-gcm-128
+                                                                                                      mode transport
+                                                                                                     crypto ipsec transform-set 2 esp-cbc-128 esp-sha256-hmac
+                                                                                                      mode transport
+
+                                                                                                 15. Associate the transform sets to the IPsec profile. This will ensure that the tunnel will
+                                                                                                     use the defined IPsec settings, including setting PFS to Group19.
+
+                                                                                                     crypto ipsec profile default
+                                                                                                      set transform-set 1 2
+                                                                                                      set pfs group19
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                                 16. Create a GRE tunnel interface that will be protected by IKE and IPsec. As soon as
+                                                                                                     cryptography is enabled on this interface, the IKE session will begin. This tunnel
+                                                                                                     interface will have an IPv4 and IPv6 address, providing dual stack functionality. TCP
+                                                                                                     MSS clamping is used.
+
+                                                                                                     interface tunnel 1
+                                                                                                      ip address 172.16.1.1 255.255.255.252
+                                                                                                      ipv6 address 2001:db8:0:2::1/64
+                                                                                                      tunnel source g1/1
+                                                                                                      tunnel destination 198.51.100.1
+                                                                                                      tunnel protection ipsec profile default
+                                                                                                      tcp adjust-mss 1360
+
+                                                                                                     There will be a single IPsec SA created with the traffic selectors being GRE (IP protocol
+                                                                                                     47) from the tunnel source to the tunnel destination. On the Cisco IOS, GRE
+                                                                                                     encapsulation allows for any IP traffic to be sent with the IPsec SA.
+
+                                                                                              The remaining steps apply to both routing-based and policy-based VPNs.
+
+                                                                                                 17. Define the permitted traffic in an access control list. Create an access list to only
+                                                                                                     permit IKE and ESP traffic. This is applied to the physical interface so that only IKE and
+                                                                                                     IPsec traffic is permitted along with ICMP messages that relate to Path MTU Discovery
+                                                                                                     (PMTUD).
+
+                                                                                                     ip access-list outside_in
+                                                                                                      permit esp host 198.51.100.1 host 203.0.113.1
+                                                                                                      permit udp host 198.51.100.1 4500 host 203.0.113.1 4500
+                                                                                                      permit udp host 198.51.100.1 500 host 203.0.113.1 500
+                                                                                                      permit icmp host 198.51.100.1 host 203.0.113.1 packet-too-
+                                                                                                     big
+                                                                                                      permit icmp host 198.51.100.1 host 203.0.113.1
+                                                                                                     administratively-prohibited
+                                                                                                      deny ip any any log
+
+
+
+
+                                                                                                                                            101
+

@@ -1,0 +1,49 @@
+does not apply to Key Signing Keys. KSK’s shall follow the guidance set in Part 1 of this
+Recommendation [SP 800-57 Part 1].
+
+It is recommended that zone administrators migrate DNSSEC zone signing algorithms to
+ECDSA by 2015 or when support for ECDSA appears in DNSSEC components,
+whichever is sooner.
+
+To minimize the risk when using 1024-bit RSA ZSK’s with DNSSEC, ZSK’s should be
+changed more frequently: every one to three months, with a signature validity period of
+five to seven days. The ZSK-rollover sequence discussed in [SP 800-81] is recommended
+to maintain a valid chain of authentication in DNS data.
+
+8.1.5 Special Considerations for NSEC3
+There is a special variant to DNSSEC that minimizes the risk of information leakage and
+is known as the Hashed Next Secure (NSEC3) RR [RFC 5155]. In DNSSEC, a client can
+map the contents of the zone by sending a series of queries for the Next Secure (NSEC)
+RR type found in error messages. These NSEC RRs provide signed proof that the queried
+name did not exist, but also provides two names that do exist in the zone as part of that
+proof. NSEC3 attempts to minimize this information leakage of zone names by using the
+hash values of the two existing names (currently using SHA-1 only). However, this
+requires the server and client to be able to perform multiple SHA-1 hash calculations
+during runtime; note that this method could be used to mount a Denial of Service attack
+against the server if multiple requests are made.
+NSEC3 was designed to solve a specific class of information leakage that could lead to a
+complete mapping of network resources in a DNS zone. NSEC3 deployment risks are
+often greater than the usefulness provided by using NSEC3, unless there is an overriding
+need to deploy NSEC3 beyond zone content protection (examples include protecting
+personally identifying information that may be contained in the DNS). However, it is a
+good idea to use NSEC3-aware client software, because a client may access a zone that
+uses NSEC3 RRs with DNSSEC.
+System installers and administrators should develop a transition plan to migrate from
+SHA-1 to SHA-256, and to do so when SHA-256 becomes available in major software
+distributions. This would involve deploying both SHA-1 and SHA-256-based NSEC3
+RRs until it is observed that SHA-256-aware implementations have become widely used
+in the Internet community.
+
+8.2 Security/Compliance Issues
+1. Even though 1024-bit RSA keys are allowed until October 1, 2015 to accommodate
+   older versions of DNS clients, 2048-bit RSA keys are strongly recommended for use.
+
+2. Although not strictly necessary to the specification, a Key Signing Key should be
+   used to maintain security chains from the parent zone (e.g., .gov) to the zone (e.g.,
+   nist.gov). This KSK should be securely transmitted to the delegating parent
+   according to the policy and procedure established by the parent zone.
+
+
+
+                                            52
+

@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-208                                                  RECOMMENDATION FOR STATEFUL
+                                                                                                                                                             HASH-BASED SIGNATURE SCHEMES
+
+                                                                                             have been designed to work with XMSSMT instances that have more than two layers, the
+                                                                                             algorithms in Section 7.2.2 assume that an XMSSMT instance with exactly two layers is being
+                                                                                             created.
+
+                                                                                             7.2.1   Modified XMSS Key Generation and Signature Algorithms
+                                                                                             Algorithm 10': XMSS'_keyGen
+
+                                                                                               // L needs to be in the range [0 … d-1]
+                                                                                               // t needs to be in the range [0 … 2^((d-1-L)(h/d)) - 1]
+                                                                                               Input: level L, tree t,
+                                                                                                      public key of top-level tree PK_MT (if L ≠ d - 1)
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                               Output: XMSS public key PK
+
+                                                                                               Initialize S_XMSS with an n-byte string using an approved
+                                                                                               random bit generator [6], where the instantiation of the
+                                                                                               random bit generator supports at least 8n bits of security
+                                                                                               strength;
+
+                                                                                               // SEED needs to be generated for the top-level XMSS key.
+                                                                                               // For all other XMSS keys, the value needs to be copied from
+                                                                                               // the top-level XMSS key.
+                                                                                               if ( L = d – 1 ) {
+                                                                                                 Initialize SEED with an n-byte string using an approved
+                                                                                                 random bit generator [6], where the instantiation of the
+                                                                                                 random bit generator supports at least 8n bits of security
+                                                                                                 strength;
+                                                                                               } else {
+                                                                                                 SEED = getSEED(PK_MT);
+                                                                                               }
+                                                                                               setSEED(SK, SEED);
+
+                                                                                               ADRS = toByte(0, 32);
+                                                                                               ADRS.setLayerAddress(L);
+                                                                                               ADRS.setTreeAddress(t);
+
+                                                                                               // Initialization for SK-specific contents
+                                                                                               idx = t * 2^(h / d);
+                                                                                               for ( i = 0; i < 2^(h / d); i++ ) {
+                                                                                                 ADRS.setOTSAddress(i);
+                                                                                                 // For each OTS key, i, generate the private key value for
+                                                                                                 // chain in the OTS key.
+                                                                                                 for ( j=0; j < len; j++) {
+                                                                                                   ADRS.setChainAddress(j);
+                                                                                                   sk[j] = PRFkeygen(S_XMSS, SEED || ADRS);
+                                                                                                 }
+                                                                                                 // Set the secret key for OTS key i to the array of len
+                                                                                                 // private key values generated for that key.
+
+                                                                                                                                           24
+

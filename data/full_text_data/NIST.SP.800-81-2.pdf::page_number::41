@@ -1,0 +1,60 @@
+                                                            SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+for securing the DNS query/response transaction are data origin authentication and data integrity
+verification.
+
+These services could be provided by establishing trust in the source and verifying the signature of the data
+sent by that source. The specification for a digital signature mechanism in the context of the DNS
+infrastructure is in IETF’s DNSSEC standard. The objectives, additional RRs, and DNS message contents
+involved in the DNSSEC are specified through RFCs 4033, 4034, and 4035 [RFC4033], [RFC4034],
+[RFC4035]. In DNSSEC, trust in the public key (for signature verification) of the source is established
+not by going to a third party or a chain of third parties (as in public key infrastructure [PKI] chaining), but
+by starting from a trusted zone (such as the root zone) and establishing the chain of trust down to the
+current source of response through successive verifications of signature of the public key of a child by its
+parent. The public key of the trusted zone is called the trust anchor.
+
+After authenticating the source, the next process DNSSEC calls for is to authenticate the response. This
+requires that responses consist of not only the requested RRs but also an authenticator associated with
+them. In DNSSEC, this authenticator is the digital signature of an RRSet. The digital signature of an
+RRSet is encapsulated through a special RRType called RRSIG. The DNS client using the trusted public
+key of the source (whose trust has just been established) then verifies the digital signature to detect if the
+response is valid or bogus.
+
+To ensure that RRs associated with a query are really missing in the zone file and have not been removed
+in transit, the DNSSEC mechanism provides a means for authenticating the nonexistence of an RR. It
+generates a special RR called an NSEC (or NSEC3) RR that lists the RRTypes associated with an owner
+name as well as the next name in the zone file. It sends this special RR, along with its signature, to the
+resolving name server. By verifying this signature, a DNSSEC-aware resolving name server can
+determine which authoritative owner name exists in a zone and which authoritative RRTypes exist at
+those owner names.
+
+To protect against the threat of incorrect application of expansion rules for wildcard RRs, the DNSSEC
+mechanism provides a means of comparing the validated wildcard RR against an NSEC (or NSEC3) RR
+and thereby verifying that the name server applied the wildcard expansion rules correctly in generating an
+answer.
+
+DNSSEC can guarantee the integrity of name resolution responses to DNS clients acting on behalf of
+Internet-based resources, provided the clients perform the DNSSEC signature verification. In many cases,
+however, these DNS clients are stub resolvers that are not DNSSEC-aware. If signature verification is
+performed by the resolving name server providing name resolution service for the clients that are stub
+resolvers, the end-to-end integrity of the response data can be guaranteed only by protecting the
+communication channel between the resolving name server and the stub resolver.
+
+IETF’s design criteria consider DNS data to be public; hence, confidentiality is not one of the security
+goals of DNSSEC. DNSSEC is not designed to directly protect against denial-of-service threats, although
+it does so indirectly by providing message integrity and source authentication. DNSSEC also does not
+provide communication channel security because name resolution queries and responses travel over
+millions of nodes of the public Internet. DNSSEC also can lead to a new type of weakness that did not
+exist in DNS before. An artifact of how DNSSEC performs negative responses allows a client to map all
+the names in a zone. This is called Zone Walking. Zone Walking provides an attacker with a “map” of a
+target zone with all domain names and IP addresses in the zone and enables him/her to determine the
+configuration of the internal network and launch some targeted attacks on some key hosts. Therefore, it is
+advisable that a zone only contains zone data that the administrator wants to be made public or use the
+
+
+
+
+                                                      6-3
+

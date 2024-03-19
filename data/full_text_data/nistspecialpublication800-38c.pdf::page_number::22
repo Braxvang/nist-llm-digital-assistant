@@ -1,0 +1,49 @@
+decryption-verification process is a payload, the contents of the payload do not constitute
+evidence for its authenticity beyond the assurance that the mode already provides.
+
+Also, an attacker may be able to intercept a legitimate ciphertext and “replay” it for verification
+at a later time. To defend against such an event, the controlling protocol or application should
+typically provide the receiver with a means to detect replayed messages, out-of-sequence
+messages, and missing messages, for example, by numbering legitimate messages sequentially.
+
+
+B.2    Selection of the MAC Length
+
+Larger values of Tlen provide greater authentication assurance, as described in Section B.1. The
+performance tradeoff is that larger values of Tlen require more bandwidth/storage for the
+ciphertext.
+
+Although the formatting function in Appendix A permits Tlen to be any integer multiple of 16
+between 32 and 128, inclusive, a value of Tlen that is less than 64 shall not be used without a
+careful analysis of the risks of accepting inauthentic data as authentic.
+
+In particular, a value of Tlen smaller than 64 should not be used unless the controlling protocol
+or application environment sufficiently restricts the number of times that the decryption-
+verification process can return INVALID, across all implementations under any given key. For
+example, the short duration of a session or, more generally, the low bandwidth of the
+communication channel may preclude many repeated trials.
+
+Similarly, for larger values of Tlen, the controlling protocol or the application environment
+should limit the number of inauthentic input sets that may be presented to the decryption-
+verification process to a number commensurate with the value of the protected data.
+
+This guidance can be quantified in terms of the following two bounds: 1) the highest acceptable
+probability for an inauthentic message to pass the decryption-verification process, and 2) a limit
+on the number of times that the output is the error message INVALID before the key is retired,
+across all implementations of the decryption-verification process under the key. Given estimates
+of these quantities, denoted Risk and MaxErrs, respectively, Tlen should satisfy the following
+inequality:
+
+        Tlen ≥ lg( MaxErrs / Risk ) .
+
+For example, suppose that a system will not output INVALID for more than 1024 messages
+before retiring the key (i.e., MaxErrs=210), and that the users can tolerate about a one in a million
+chance that the system will accept an inauthentic message (i.e., Risk=2-20). In this case, Tlen may
+be as low as 32. On the other hand, if MaxErrs=232 and Risk=2-32, then Tlen should be at least
+64.
+
+
+
+
+                                                 16
+

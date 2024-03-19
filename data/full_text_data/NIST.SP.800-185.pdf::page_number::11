@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-185                                                  SHA-3 DERIVED FUNCTIONS: CSHAKE,
+                                                                                                                                                             KMAC, TUPLEHASH, AND PARALLELHASH
+
+                                                                                             2.3.1   Integer to Byte String Encoding
+
+                                                                                             Two internal functions, left_encode and right_encode, are defined to encode integers as byte
+                                                                                             strings. Both functions can encode integers up to an extremely large maximum, 22040−1.
+
+                                                                                             left_encode(x) encodes the integer x as a byte string in a way that can be unambiguously parsed
+                                                                                             from the beginning of the string by inserting the length of the byte string before the byte string
+                                                                                             representation of x.
+
+                                                                                             right_encode(x) encodes the integer x as a byte string in a way that can be unambiguously parsed
+                                                                                             from the end of the string by inserting the length of the byte string after the byte string
+                                                                                             representation of x.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-185
+
+
+
+
+                                                                                             Using the function enc8() to encode the individual bytes, these two functions are defined as
+                                                                                             follows:
+
+                                                                                             right_encode(x):
+                                                                                             Validity Conditions: 0 ≤ x < 22040
+
+                                                                                             1. Let n be the smallest positive integer for which 28n > x.
+                                                                                             2. Let x1, x2,…, xn be the base-256 encoding of x satisfying:
+                                                                                                    x = ∑ 28(n-i)xi, for i = 1 to n.
+                                                                                             3. Let Oi = enc8(xi), for i = 1 to n.
+                                                                                             4. Let On+1 = enc8(n).
+                                                                                             5. Return O = O1 || O2 || … || On || On+1.
+
+                                                                                             left_encode(x):
+                                                                                             Validity Conditions: 0 ≤ x < 22040
+
+                                                                                             1. Let n be the smallest positive integer for which 28n > x.
+                                                                                             2. Let x1, x2, …, xn be the base-256 encoding of x satisfying:
+                                                                                                    x = ∑ 28(n-i)xi, for i = 1 to n.
+                                                                                             3. Let Oi = enc8(xi), for i = 1 to n.
+                                                                                             4. Let O0 = enc8(n).
+                                                                                             5. Return O = O0 || O1 || … || On−1 || On.
+
+                                                                                             As an example, right_encode(0) will yield 00000000 10000000, and left_encode(0) will
+                                                                                             yield 10000000 00000000.
+
+                                                                                             2.3.2   String Encoding
+
+                                                                                             The encode_string function is used to encode bit strings in a way that may be parsed
+                                                                                             unambiguously from the beginning of the string, S. The function is defined as follows:
+
+                                                                                             encode_string(S):
+                                                                                             Validity Conditions: 0 ≤ len(S) < 22040
+
+                                                                                             1. Return left_encode(len(S)) || S.
+
+                                                                                                                                             5
+

@@ -1,0 +1,43 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+   Process:
+        1. temp = Null.
+        2. While (len (temp) < 256) do
+            2.1   V = (V + 1) mod 2128.
+            2.2   output_block = AES_ECB_Encrypt (Key, V).
+            2.3   temp = temp || output_block.
+        3. temp = leftmost (temp, 256).
+        4   temp = temp ⊕ provided_data.
+        5. Key = leftmost (temp, 128).
+        6. V = rightmost (temp, 128).
+        7. Return (Key, V).
+B.3.2       Instantiation of CTR_DRBG Using a Derivation Function
+
+This implementation will return a text message and an invalid state handle (−1) when an error is
+encountered. Block_Cipher_df is the derivation function in Section 10.3.2, and uses AES-128 in
+the ECB mode as the Block_Encrypt function.
+Note that this implementation does not include the prediction_resistance_flag in the input
+parameters, nor save it in the internal state, since prediction resistance is known to be supported.
+CTR_DRBG_Instantiate_function:
+   Input: integer (requested_instantiation_security_strength), bitstring personalization_string.
+   Output: string status, integer state_handle.
+   Process:
+                                              Comment: Check the validity of the input
+                                              parameters.
+        1. If (requested_instantiation_security_strength > 128) then Return (“Invalid
+           requested_instantiation_security_strength”, −1).
+        2. If (len (personalization_string) > 800), then Return (“Personalization_string too
+           long”, −1).
+        3. If (requested_instantiation_security_strength ≤ 112), then security_strength = 112
+            Else security_strength = 128.
+                                              Comment: Get the entropy input.
+        4. (status, entropy_input) = Get_entropy_input (security_strength, security_strength,
+           1000, prediction_resistance_request).
+        5. If (status ≠ “Success”), then Return (status, −1).
+
+
+
+                                                  81
+

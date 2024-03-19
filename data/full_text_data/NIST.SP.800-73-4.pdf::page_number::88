@@ -1,0 +1,60 @@
+Special Publication 800-73-4                                    Interfaces for Personal Identity Verification – Part 2:
+                                                                PIV Card Application Card Command Interface
+
+    3.2.1.2 On-Card Biometric Comparison
+
+If the key reference is '96' or '97' and the authentication data in the command data field is not of length
+3N, where N satisfies the requirements for minimum and maximum number of minutiae specified in the
+BIT, then the card command shall fail, and the PIV Card Application shall return the status word '6A 80'.
+The security status and the retry counter of the key reference shall remain unchanged.
+
+If the authentication data in the command data field is properly formatted (see previous paragraph) and
+does not match reference data associated with the key reference, then the card command shall fail, the
+PIV Card Application shall return the status word '63 CX', the security status of the key reference shall be
+set to FALSE, and the retry counter associated with the key reference shall be decremented by one.
+
+If the card command succeeds, then the security status of the key reference shall be set to TRUE and the
+retry counter associated with the key reference shall be set to the reset retry value associated with the key
+reference. The initial value of the retry counter and the reset retry value associated with the key reference,
+i.e., the number of successive failures (retries) before the retry counter associated with the key reference
+reaches zero, are issuer dependent.
+
+    3.2.1.3 Pairing Code
+
+If the key reference is '98' and the authentication data in the command data field does not match the
+reference data associated with the key reference, the command shall fail and the PIV Card Application
+shall return the status word '63 00'. If the authentication data in the command data field does not satisfy
+the criteria in Section 2.4.3, then the PIV Card Application may return the status word '6A 80' instead of
+'63 00'. If status word '6A 80' is returned, the security status of the key reference shall remain unchanged.
+If status word '63 00' is returned, the security status of the key reference shall be set to FALSE.
+
+If the card command succeeds, then the security status of the key reference shall be set to TRUE.
+
+Command Syntax
+
+                                 '00' or '10' indicating command chaining
+         CLA
+                                 '0C' or '1C' for secure messaging
+         INS                     '20'
+         P1                      '00' or 'FF'
+         P2                      Key reference. See Part 1, Table 4a.
+                                 Absent 8 – for absent command data field
+         Lc                      '08' – for PIV Card Application PIN, Global PIN, or pairing code
+                                 3N – for OCC data (where N is the number of minutiae)
+                                 Absent,7 PIV Card Application PIN, Global PIN, or pairing code
+         Data Field              authentication data as described in Section 2.4.3, or OCC data as
+                                 described in Section 5.5.2 of [SP800-76].
+         Le                      Absent
+
+
+
+
+8 If P1='00', and L and the command data field are absent, the command can be used to retrieve the number of further retries
+                   c
+allowed ('63 CX'), or to check whether verification is not needed ('90 00').
+
+
+
+
+                                                               13
+

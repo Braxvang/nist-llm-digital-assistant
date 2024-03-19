@@ -1,0 +1,60 @@
+                                                                                              NIST SP 800-204B                                                           ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                                       APPLICATIONS USING A SERVICE MESH
+
+                                                                                               apiVersion: security.istio.io/v1beta1
+                                                                                               kind: AuthorizationPolicy
+                                                                                               metadata:
+                                                                                                name: backend
+                                                                                                namespace: product
+                                                                                               spec:
+                                                                                                action: ALLOW
+                                                                                                rules:
+                                                                                                - from:
+                                                                                                  - source:
+                                                                                                     principals: ["cluster.local/ns/product/sa/frontend"]
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                                  to:
+                                                                                                  - operation:
+                                                                                                     methods: ["GET"]
+                                                                                                     paths: ["/info*"]
+                                                                                                  - operation:
+                                                                                                     methods: ["POST"]
+                                                                                                     paths: ["/data"]
+                                                                                                  when:
+                                                                                                  - key: request.auth.claims[iss]
+                                                                                                    values: ["accounts.google.com"]
+                                                                                                                             Figure 4.1 – An example Istio authorization policy
+                                                                                                This allows the front end to call specific methods on the backend only if the request has an EUC attached issued
+                                                                                                                                            by “accounts.google.com.”
+
+
+
+                                                                                              EUAZ-SR-3: All application traffic should carry end user credentials, and there should be a
+                                                                                              policy in the mesh enforcing that credentials are present.
+
+                                                                                              This is recommended even if the application is enforcing authentication and authorization
+                                                                                              independently of the mesh because these organization-wide controls allow functionalities like
+                                                                                              audit to be built on top of the mesh at a lower cost to central teams responsible for compliance
+                                                                                              and controls.
+
+                                                                                              4.5.3   Model-based Authorization Policies
+
+                                                                                              The service-level authorization policies and a use case of end-user authorization policies that
+                                                                                              uses JWT are natively implemented in the proxies. Since these cannot be used for resource-
+                                                                                              level authorization policies, support for model-based authorization policies is needed as well.
+                                                                                              As already alluded to in Section 4.5.2, this requires a call from the proxy to an external
+                                                                                              authorization server, which holds the model-based authorization engine to obtain an access
+                                                                                              decision.
+
+                                                                                              The service principals in these model-based policies are identities (e.g., Service Account)
+                                                                                              provided by the underlying application orchestration platform (e.g., Kubernetes) and are the
+                                                                                              same as those used by authorization policies natively supported in the proxies. The user
+                                                                                              principals are usually obtained from the JWT. The popular access control models in the
+                                                                                              external authorization servers are RBAC and ABAC.
+
+                                                                                                                                                       21
+

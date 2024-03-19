@@ -1,0 +1,46 @@
+NIST SP 800-186                                                               Discrete Logarithm-based Cryptography:
+February 2023                                                                       Elliptic Curve Domain Parameters
+
+Appendix G. Implementation Aspects
+
+G.1.     Implementation of Modular Arithmetic
+The prime moduli of the above recommended curves are of a special type (generalized Mersenne
+numbers and Crandall primes) for which modular multiplication can be carried out more
+efficiently than in general. This section provides the rules for implementing faster arithmetic for
+each of these recommended prime moduli.
+The usual way to multiply two integers mod m is to take the integer product and reduce it
+modulo m. One, therefore, has the following problem: given an integer A less than m2, compute
+                                                   B = A mod m.
+In general, one must obtain B as the remainder of an integer division. If m is a generalized
+Mersenne number or a Crandall prime, however, then B can be expressed as a sum or difference
+mod m of a small number of terms. To compute this expression, the integer sum or difference
+can be evaluated and the result reduced modulo m. The latter reduction can be accomplished by
+adding or subtracting a few copies of m.
+The prime modulus p for each of the four recommended P-x curves is a generalized Mersenne
+number.
+
+G.1.1. Curve P-224
+The modulus for this curve is 𝑝𝑝 = 2224 − 296 + 1. Each integer A less than p2 can be written as
+       A = A13 ⋅ 2 416 + A12 ⋅ 2384 + A11 ⋅ 2352 + A10 ⋅ 2320 + A9 ⋅ 2 288 + A8 ⋅ 2 256 + A7 ⋅ 2 224 + A6 ⋅ 2192 +
+       A5 ⋅ 2160 + A4 ⋅ 2128 + A3 ⋅ 296 + A2 ⋅ 2 64 + A1 ⋅ 232 + A0 ,
+
+where each Ai is a 32-bit integer. As a concatenation of 32-bit words, this can be denoted by
+                                            A = ( A13 || A12 || … || A0 ).
+The expression for B is
+                                      B = (T + S 1 + S 2 – D1 – D2) mod p,
+where the 224-bit terms are given by
+   T = ( A6 || A5 || A4 || A3 || A2 || A1 || A0 )
+   S1 = ( A10 || A9 || A8 || A7 || 0 || 0 || 0 )
+   S2 = ( 0 || A13 || A12 || A11 || 0 || 0 || 0 )
+   D1 = ( A13 || A12 || A11 || A10 || A9 || A8 || A7 )
+   D2 = ( 0 || 0 || 0 || 0 || A13 || A12 || A11 ).
+
+G.1.2. Curve P-256
+The modulus for this curve is p = 2256 – 2224 + 2192 + 296 – 1. Each integer A less than p2 can be
+written as
+
+
+
+
+                                                           52
+

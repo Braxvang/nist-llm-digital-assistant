@@ -1,0 +1,46 @@
+NIST SP 800-90A Rev. 1                                              Recommendation for Random Number
+                                                                     Generation Using Deterministic RBGs
+
+
+           7.2 V = (V + w) mod 2440.
+              ! requested _ no _ of _ bits #
+       8. m = "                               .
+              "         outlen             $$
+       9. data = V.
+       10. W = the Null string.
+       11. For i = 1 to m
+           11.1 w = Hash (data).
+           11.2 W = W || w.
+           11.3 data = (data + 1) mod 2440.
+       12. pseudorandom_bits = leftmost (W, requested_no_of_bits).
+       13. H = Hash (0x03 || V).
+       14. V = (V + H + C + reseed_counter) mod 2440.
+       15. reseed_counter = reseed_counter + 1.
+                                                  Comments: Update the working_state.
+       16. Update the changed values in the state.
+           16.1 internal_state (state_handle).V = V.
+           16.2 internal_state (state_handle).reseed_counter = reseed_counter.
+        17. Return (“Success”, pseudorandom_bits).
+
+B.2 HMAC_DRBG Example
+
+This example of HMAC_DRBG uses the SHA-256 hash function. Reseeding and prediction
+resistance are not supported. The nonce for instantiation consists of a random value with
+security_strength/2 bits of entropy; the nonce is obtained by increasing the call for entropy bits
+via the Get_entropy_input call by security_strength/2 bits (i.e., by adding security_strength/2
+bits to the security_strength value). The HMAC_DRBG_Update function is specified in Section
+10.1.2.2.
+A personalization string is supported, but additional input is not. A total of three internal states
+are provided. For this implementation, the functions and algorithms are written as separate
+routines. Also, the Get_entropy_input function uses only two input parameters, since the first
+two parameters (as specified in Section 9) have the same value, and prediction resistance is not
+available.
+The internal state contains the values for V, Key, reseed_counter, and security_strength, where V
+and C are bitstrings, and reseed_counter and security_strength are integers.
+In accordance with Table 2 in Section 10.1, security strengths of 112, 128, 192 and 256 bits may
+be instantiated. Using SHA-256, the following definitions are applicable for the instantiate and
+generate functions and algorithms:
+
+
+                                                    76
+

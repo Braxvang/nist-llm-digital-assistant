@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+Restriction at server level with override for authoritative zones:
+
+In this strategy, the allowable set of internal clients who can submit queries to the name server is specified
+through the acl statement as follows:
+
+        acl internal_hosts {192.158.43.3; 192.158.43.6; 192.158.44.56;};
+
+The server-wide option would be to restrict all queries to the list of clients:
+
+        options {
+                allow-query { internal_hosts; };
+                - or –
+                allow-recursion { internal_hosts; };
+                };
+The option can be overridden by specifying zones for which this name server is authoritative (thus
+allowing queries to that zone from all clients):
+
+        zone “example.com” {
+             type master;
+             file “zonedb.example.com”;
+             allow-query { any; };
+        };
+
+Restricting all recursive queries to a specified set of IP addresses:
+
+Server-wide restriction:
+
+        options {
+             allow-recursion { internal_hosts; };
+        };
+
+Restricting recursion through views:
+
+The purpose of creating views is to create a logical partition made up of a combination of clients (based
+on IP addresses) and zones for which recursive queries will be supported and those for which they will
+not be supported. In the following example, the view recursion_view is enabled to define the scope of IP
+addresses and zones that are permitted to submit recursive queries; no_recursion_view is meant for
+disallowing recursion.
+
+        view recursion_view {
+             match-clients { internal_hosts; };
+             recursion yes;
+        };
+
+        view no_recursion_view {
+             match-clients { any; };
+             recursion no;
+        };
+
+It should be noted that NSD (as of the time of writing) is an authoritative only DNS server. Therefore, an
+NSD server will never act as a recursive server and only serve authoritative information from the zones it
+is configured to serve.
+
+
+                                                      8-6
+

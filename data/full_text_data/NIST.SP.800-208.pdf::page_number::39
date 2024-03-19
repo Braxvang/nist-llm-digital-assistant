@@ -1,0 +1,58 @@
+                                                                                             NIST SP 800-208                                                        RECOMMENDATION FOR STATEFUL
+                                                                                                                                                                   HASH-BASED SIGNATURE SCHEMES
+
+                                                                                             9     Security Considerations
+
+                                                                                             9.1   One-Time Signature Key Reuse
+
+                                                                                             Both LMS and XMSS are stateful signature schemes. If an attacker were able to obtain
+                                                                                             signatures for two different messages created using the same one-time signature (OTS) key, then
+                                                                                             it would become computationally feasible for that attacker to create forgeries [13]. As noted in
+                                                                                             [8], extreme care needs to be taken in order to avoid the risk that an OTS key will be reused
+                                                                                             accidentally. While the conformance requirements in Section 8.1 prevent many of the actions
+                                                                                             that could result in accidental OTS key reuse, cryptographic modules still need to be carefully
+                                                                                             designed to ensure that unexpected behavior cannot result in an OTS key being reused.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                             In order to avoid reuse of an OTS key, the state of the private key must be updated each time a
+                                                                                             signature is generated. If the private key is stored in non-volatile memory, then the state of the
+                                                                                             key must be updated in the nonvolatile memory to mark an OTS key as unavailable before the
+                                                                                             corresponding signature that was generated using the OTS key is exported. Depending on the
+                                                                                             environment, this can be nontrivial to implement. With many operating systems, simply writing
+                                                                                             the update to a file is not sufficient because the write operation will be cached with the actual
+                                                                                             write to non-volatile memory occurring later. If the cryptographic module loses power or crashes
+                                                                                             before the write to non-volatile memory occurs, then the state update will be lost. If a signature
+                                                                                             were exported after the write operation was issued, but before the update was written to non-
+                                                                                             volatile memory, there would be a risk that the OTS key would be used again after the
+                                                                                             cryptographic module restarts.
+
+                                                                                             Some hardware cryptographic modules implement monotonic counters, which are guaranteed to
+                                                                                             increment each time the counter’s value is read. When available, using the current value of a
+                                                                                             monotonic counter to determine which OTS key to use for a signature may be very helpful in
+                                                                                             avoiding unintentional reuse of an OTS key.
+
+                                                                                             9.2   Hash Collisions
+
+                                                                                             For LMS and XMSS, as for the other approved digital signature schemes [4], the signature
+                                                                                             generation algorithm is not applied directly to the message but to a message digest generated by
+                                                                                             the underlying hash function. The security of any signature scheme depends on the inability of an
+                                                                                             attacker to find distinct messages with the same message digest.
+
+                                                                                             There are two ways that an attacker might find these distinct messages. The attacker could look
+                                                                                             for a message that has the same message digest as a message that has already been signed (a
+                                                                                             second preimage), or the attacker could look for any two messages that have the same message
+                                                                                             digest (a generic collision) and then try to get the private key holder (i.e., signer) to sign one of
+                                                                                             them [21]. Finding a second preimage is much more difficult than finding a generic collision,
+                                                                                             and it would be infeasible for an attacker to find a second preimage with any of the hash
+                                                                                             functions allowed by this recommendation.
+
+                                                                                             LMS and XMSS both use randomized hashing. When a message is presented to be signed, a
+                                                                                             random value is created and prepended to the message, and the hash function is applied to this
+                                                                                             expanded message to produce the message digest. Prepending the random value makes it
+                                                                                             infeasible for anyone other than the signer to find a generic collision because finding a collision
+
+                                                                                                                                               30
+

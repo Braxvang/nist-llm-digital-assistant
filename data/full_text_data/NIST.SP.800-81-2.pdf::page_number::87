@@ -1,0 +1,60 @@
+                                                         SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+In some situations, establishing a trusted path between stub resolvers and the resolving name servers that
+provide DNS service for them is not feasible. An example is where the resolving name server is not under
+the administrative domain of the enterprise but is run by an ISP. In this situation, the end-to-end
+protection for DNS query/response can be ensured only by having a DNSSEC-aware stub resolver or a
+stub resolver that can use message authentication (TSIG or SIG(0)) to communicate with a trusted
+caching server. A DNSSEC-aware stub resolver can indicate to the local resolving name server that it
+wants to perform its own signature validation by setting the checking disabled (CD) bit in its query
+messages. Or a stub resolver must be manually configured to use a specific resolving name server and
+use TSIG/SIG(0) to provide message authentication.
+
+9.9   Dynamic Updates in a DNSSEC-aware Zone
+
+Section 4.3 lists the various logical operations on a zone file during the course of a dynamic update. The
+four logical operations can be regarded as consisting of two basic operations: addition of RRs and
+deletion of RRs. Updating an RR can be regarded as a combination of the two basic operations of addition
+and deletion. Addition and deletion of RRs involve no further operation on the rest of the RRs in the zone
+file in nonsecure zones. In a secure zone, however, there is one NSEC RR (and a corresponding RRSIG
+RR) to cover every gap in the namespace.
+
+There is one NSEC RR for every unique owner name in the zone. This NSEC RR points to the next
+owner name in the canonical order (ordering obtained by lexicographically sorting the domain names
+within a zone). The NSEC RR for the last owner name in canonical order points to the zone apex name
+(in other words, the zone name). Hence, conceptually NSEC RRs form a circular link list that traverses
+the unique domains names in a zone.
+
+Consider the organization and contents of NSEC RRs for the zone example.com. Suppose the following is
+the canonical order of the unique domain names in the zone:
+
+        example.com.   IN SOA ns.example.com. admin.example.com. (
+        12985 3600 2700 8000 3600 )
+                   IN RRSIG ( SOA )
+                   IN NS ns.example.com.
+                   IN RRSIG ( NS )
+                   IN MX mail.example.com.
+                   IN RRSIG ( MX )
+
+        ns.example.com.          IN    A    192.253.101.7
+
+        mail.example.com.           IN     A   192.253.101.8
+
+        marketing.example.com.  IN A 192.253.101.9
+                   IN RRSIG ( A )
+                   IN MX mail.example.com.
+                   IN RRSIG ( MX )
+
+        sales.example.com.  IN NS                  ns.example.com.
+                   IN RRSIG ( NS )
+
+        www.example.com.  IN A 192.253.101.10
+                   IN RRSIG ( A )
+
+
+
+
+                                                  9-15
+

@@ -1,0 +1,47 @@
+NIST SP 800-207A                                          ZTA Model for Access Control in Cloud-Native
+September 2023                                              Applications in Multi-Location Environments
+
+
+   •   The enforcement infrastructure that implements the security controls (mainly consisting
+       of PEPs) should satisfy the properties of a security kernel: always invoked (non-by-
+       passable), verifiable, and independent of the application code.
+   •   The core tenant or primary function of ZTA at runtime is implementing an identity-based
+       segmentation of applications that leverages the enforcement infrastructure.
+
+       Requirements for Identity-Based Segmentation Policies for ZTA
+The following policy checks should be implemented at runtime through the deployment of
+identity-tier policies in order to realize identity-based segmentation:
+   •   ID-SEG-REC-1: Encrypted connection between service endpoints — Service endpoints
+       can be located in different subnets, different availability zones or regions in a cloud
+       provider environment, in different clouds, or on-premises. Wherever they are located,
+       communication between any two should be encrypted to ensure eavesdropping protection
+       and message authenticity.
+   •   ID-SEG-REC-2: Service authentication — Each service should present a short-lived
+       cryptographically verifiable identity credential to other services that is authenticated per
+       connection and reauthenticated regularly.
+       Note on the above recommendation: In an ideal situation, services would be authenticated
+       for each service request. Since this is highly disruptive from the point of view of
+       application transaction response, this authentication is accomplished at the connection
+       level via mutual Transport Layer Security (mTLS) when a service makes an initial
+       connection establishment as part of its inter-service call. This authentication is not
+       performed again in subsequent calls. However, the security of this operation is ensured
+       by not allowing the connections to be very long (usually as long as the time to live [TTL]
+       of the service’s identity certificate or as short as 15-30 minutes, depending on the
+       configuration).
+   •   ID-SEG-REC-3: Service to service authorization — Services should leverage runtime
+       service identity (ID-SEG-REC-2) to enforce granular policies and have the capability to
+       call external authorization services if the mesh-level proxies are insufficient to enforce
+       dynamic authorization policies.
+   •   ID-SEG-REC-4: End user authentication — Since all application requests are triggered
+       by user actions, a robust identity management system is required to assign and maintain
+       user identities and enforce robust protocols with phishing-resistant multi-factor
+       authentication (MFA). This system should be used to issue a cryptographically verifiable
+       runtime token that represents the user principal to the rest of the infrastructure (e.g., a
+       JSON Web Token [JWT]), and services should authenticate the credential at each hop.
+       Note on the above recommendation: Authenticating the user in session at every hop is
+       impractical at scale. Therefore, NIST recommends using short-lived end user credentials
+       (e.g., OAuth 2.0 tokens) for external users and exchanging them for a locally
+       authenticatable token, like a JWT, that is authenticated at each hop.
+
+                                                 8
+

@@ -1,0 +1,64 @@
+Special Publication 800-73-4                                       Interfaces for Personal Identity Verification – Part 2:
+                                                                   PIV Card Application Card Command Interface
+
+              SW1             SW2                                         Meaning
+               '6A'           '82'         Application not found
+                  '90'        '00'         Successful execution
+
+
+  3.1.2    GET DATA Card Command
+
+The GET DATA card command retrieves the data content of the single data object whose tag is given in
+the data field. 5
+
+Command Syntax
+
+             CLA                           '00' or '0C' for secure messaging
+             INS                           'CB'
+             P1                            '3F'
+             P2                            'FF'
+             Lc                            Length of data field*
+             Data Field                    See Table 6
+             Le                            '00'
+
+
+* The L c value is '05' for all PIV data objects except for the 0x7E interindustry tag (Discovery Object),
+which has an L c value of '03', and the 0x7F61 interindustry tag (Biometric Information Templates (BIT)
+Group Template), which has an L c value of '04'.
+
+                         Table 6. Data Objects in the Data Field of the GET DATA Card Command
+
+            Name           Tag       M/O                                  Comment
+           Tag list        '5C'      M      BER-TLV tag of the data object to be retrieved. See Table 3, Part 1.
+
+
+Response Syntax
+For the 0x7E Discovery Object (if present) and the 0x7F61 BIT Group Template (if present):
+
+                                            - BER-TLV of the 0x7E Discovery data object (see Section 3.3.2,
+                                            Part 1 for a description of the Discovery Object’s structure returned
+             Data Field                     in the data field) or
+                                            - BER-TLV of the 0x7F61 BIT Group Template (see Table 7 of SP
+                                            800-76)
+             SW1-SW2                        Status word
+
+
+For all other PIV data objects (if present):
+
+                                            BER-TLV with the tag '53' containing in the value field of the
+             Data Field
+                                            requested data object.
+             SW1-SW2                        Status word
+
+
+
+
+5 The GET RESPONSE command is used in conjunction with GET DATA to accomplish the reading of larger PIV data objects.
+
+The GET RESPONSE command is illustrated in Appendix A.4.1 (Command 3).
+
+
+
+
+                                                                   10
+

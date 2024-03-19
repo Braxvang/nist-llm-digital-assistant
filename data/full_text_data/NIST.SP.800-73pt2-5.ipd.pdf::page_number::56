@@ -1,0 +1,54 @@
+       NIST SP 800-73pt2-5 ipd (Initial Public Draft)                   Interfaces for Personal Identity Verification: Part 2
+       September 2023                                                      PIV Card Application Card Command Interface
+
+1202   Command 3 — GET RESPONSE APDU
+       CLA                  '00'
+       INS                  'C0'
+       P1                   '00'
+       P2                   '00'
+       Le                   xx length of remaining response, as indicated by previous SW1-SW2
+
+1203   Response 3:
+       Data Field           {second and last part of encoded message EM}
+       SW1-SW2              '90 00' (Status word)
+
+
+1204   A.5.2. Elliptic Curve Cryptography Diffie-Hellman
+1205   An ECDH key agreement scheme does not send an encrypted symmetric key to the participating
+1206   entities. Instead, the two entities involved in the key agreement scheme compute a shared secret
+1207   by combining their ECC private key(s) with the other party’s public key(s). The resulting shared
+1208   secret (Z) serves as an input to a key derivation function (KDF), which each entity independently
+1209   invokes to derive a common secret key. The secret key MAY be used as a session key or to
+1210   encrypt a session key.
+
+1211   A.5.2.1.         ECDH With the PIV KMK
+1212   The PIV Card supports ECDH key agreement by performing the elliptic curve cryptography
+1213   cofactor Diffie-Hellman (ECC CDH) primitive [SP800-56A, Section 5.7.1.2] using its ECC
+1214   KMK private key and an ECC public key that is provided as input to the GENERAL
+1215   AUTHENTICATE command. All other procedures required to complete key agreement are
+1216   performed by the cardholder’s client application and its associated cryptographic module.
+
+1217   A.5.2.1.1        GENERAL AUTHENTICATE Command
+
+1218   The sequence of commands to perform the ECC CDH primitive from [SP800-56A, Section
+1219   5.7.1.2] with the private ECC KMK is illustrated below for ECC: Curve P-256.
+1220   Command – GENERAL AUTHENTICATE
+         CLA                  '00'
+         INS                  '87'
+         P1                   '11'
+         P2                   '9D'
+         Lc                   Length of data field
+                              '7C' – L1 {'82' '00' '85' L2 { '04' || X || Y}}, where
+                                   • '04' || X || Y is the other party’s public key, a point on Curve
+                                        P-256, encoded without the use of point compression, as
+         Data Field
+                                        described in [SECG, Section 2.3.3].
+                                   • The length of each coordinate (X and Y) is 32 bytes.
+                                   • The value of L2 is 65 bytes.
+         Le                   '00'
+
+
+
+
+                                                               46
+

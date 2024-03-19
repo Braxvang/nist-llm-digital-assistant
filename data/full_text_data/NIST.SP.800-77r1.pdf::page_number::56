@@ -1,0 +1,59 @@
+                                                                                              NIST SP 800-77 REV. 1                                                                                   GUIDE TO IPSEC VPNS
+
+
+                                                                                              packets, AEAD algorithms cannot be used in IKEv1. IKEv1 can, however, still negotiate AEAD
+                                                                                              algorithms for ESP.
+
+                                                                                              The nonce used by an AEAD algorithm must be unique for every encryption operation with the
+                                                                                              same secret key but does not need to be unpredictable. 37 The nonce in IKE is built using an
+                                                                                              implicit part (the salt) and an explicit part (the IV). The implicit part is based on the keying
+                                                                                              material calculated from the DH key exchange and negotiated PRF, similar to how secret
+                                                                                              encryption keys are generated. This value is never transmitted and binds the encryption to the
+                                                                                              DH channel. The explicit part is transmitted and usually based on an increasing, and thus unique,
+                                                                                              counter. Reuse of the IV with the same secret key compromises the security of the data. Thus,
+                                                                                              these algorithms shall be used in conjunction with IKE and cannot be used with static or manual
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              keys. An SA shall be terminated before the counter reaches its maximum possible value.
+
+                                                                                              4.1.4     Common ESP Algorithms
+
+                                                                                              Examples of common algorithms used by ESP are AES-GCM [50] and AES-CBC [51] with
+                                                                                              HMAC-SHA-2. Most algorithms have limitations on the amount of data that can be safely
+                                                                                              encrypted with a single key and requirements for auxiliary parameters.
+
+                                                                                              Triple DES has been deprecated since 2019 and will be disallowed after 2023. It is much slower
+                                                                                              than AES-GCM and AES-CBC. Triple DES is also cryptographically weaker and requires more
+                                                                                              frequent rekeying to avoid birthday attacks due to its smaller block size of 64 bits. The HMAC-
+                                                                                              MD5 and HMAC-SHA-1 integrity algorithms are also no longer NIST-approved.
+
+                                                                                              For the latest cryptographic recommendations, see NIST SP 800-131A [18] and FIPS 140-3 [14].
+
+                                                                                              4.1.5     ESP Packet Fields
+
+                                                                                              ESP adds a header and a trailer around each packet’s payload. As shown in Figure 9, each ESP
+                                                                                              header is composed of two fields:
+                                                                                                   •    SPI. Each IPsec SA (inbound and outbound) contains an SPI value, which acts as a
+                                                                                                        unique identifier for the IPsec SA. The endpoints use these SPI values along with the
+                                                                                                        destination IP address and (optionally) the IPsec protocol type (in this case, ESP) to
+                                                                                                        determine which SA is being used and which decryption key should be used.
+                                                                                                   •    (Extended) Sequence Number. Each packet is assigned a sequential number, and only
+                                                                                                        packets within a sliding window of sequence numbers are accepted. This provides
+                                                                                                        protection against replay attacks because duplicate packets will use the same sequence
+                                                                                                        number. The use of sequence numbers also helps thwart denial-of-service attacks because
+                                                                                                        old packets that are replayed will have sequence numbers outside of the window and will
+                                                                                                        be dropped immediately without performing any more processing. Originally (in IPsec-
+                                                                                                        v2), the sequence numbers for IPsec packets were defined as a 32-bit number. Current
+
+                                                                                              37   The terms nonce and IV have not seen consistent use between NIST and IETF publications. In general, what is required is
+                                                                                                   the use of a guaranteed, unique, non-secret value. Note that the IV needed for the AEAD algorithm is separate from the
+                                                                                                   integrity check value (ICV) used in each packet to ensure that two identical plaintext payloads encrypt to different encrypted
+                                                                                                   payloads (and thus cannot be detected as identical).
+
+
+
+                                                                                                                                                              39
+

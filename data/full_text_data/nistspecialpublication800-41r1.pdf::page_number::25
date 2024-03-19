@@ -1,0 +1,56 @@
+                                                                     GUIDELINES ON FIREWALLS AND FIREWALL POLICY
+
+
+Most network architectures are hierarchical, meaning that a single path from an outside network splits
+into multiple paths on the inside network—and it is generally most efficient to place a firewall at the node
+where the paths split. This has the advantage of positioning the firewall where there is no question as to
+what is “outside” and what is “inside.” However, there may be reasons to have additional firewalls on the
+inside of the network, such as to protect one set of computers from another. If a network’s architecture is
+not hierarchical, the same firewall policies should be used on all ingresses to the network. In many
+organizations, there is only supposed to be one ingress to the network, but other ingresses are set up on an
+ad-hoc basis, often in ways that are not allowed by overall policy. In these situations, if a properly
+configured firewall is not placed at each entry point, malicious traffic that would normally be blocked by
+the main ingress can enter the network by other means.
+
+The diagrams in Figures 3-1 and 3-2 each show a single firewall; however, many implementations use
+multiple firewalls. Some vendors sell high-availability (HA) firewalls, which allow one firewall to take
+over for another if the first firewall fails or is taken offline for maintenance. HA firewalls are deployed in
+pairs at the same spot in the network topology so that they both have the same external and internal
+connections. While HA firewalls can increase reliability, they can also introduce some problems, such as
+the need to combine logs between the paired firewalls and possible confusion by administrators when
+configuring the firewalls (for example, knowing which firewall is pushing its policy changes to the other
+firewall). HA functionality may be provided through a variety of vendor-specific techniques.
+
+3.2   Firewalls Acting as Network Address Translators
+
+Most firewalls can perform NAT, which is sometimes called port address translation (PAT) or network
+address and port translation (NAPT). Despite the popular misconception, NAT is not part of the security
+functionality of a firewall. The security benefit of NAT—preventing a host outside the firewall from
+initiating contact with a host behind NAT—can just as easily be achieved by a stateful firewall with less
+disruption to protocols that do not work as well behind NAT. However, turning on a firewall’s NAT
+feature is usually easier than properly configuring the firewall policy to have the same protections, so
+many people think of NATs as primarily a security feature.
+
+Typically, a NAT acts as a router that has a network with private addresses on the inside and a single
+public address on the outside. The way a NAT performs this many-to-one mapping varies between
+implementations, but almost always involves the following:
+
+ Hosts on the inside network initiating connections to the outside network cause the NAT to map the
+  source port of the connection to a different source port that is controlled by the NAT. The NAT uses
+  this source port number to map connections from the outside back to the host on the inside.
+ Hosts on the outside of the network cannot initiate contact with hosts on the inside network. In some
+  firewalls, the NAT can be configured to map a particular destination port on the NAT to a particular
+  host on the inside of the NAT; for example, all HTTP requests that go to the NAT could be directed
+  to a single host on the protected side of the firewall. This feature is sometimes called pinholing.
+Although NATs are not in and of themselves security features of a firewall, they interact with the
+firewall’s security policy. For example, any policy that requires that all HTTP servers accessible to the
+outside be on the DMZ must prevent the NAT from pinholing TCP port 80. Another example of where
+NATs interact with security policy is the ability to identify the source of traffic in a firewall’s logs. If a
+NAT is used, it must report the private address in the logs instead of the translated public address,
+otherwise the logs will incorrectly identify many hosts by the single public address.
+
+
+
+
+                                                       3-3
+

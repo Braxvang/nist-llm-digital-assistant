@@ -1,0 +1,61 @@
+Special Publication 800-73-4                                                       Part 3: PIV Client Application
+Interfaces for Personal Identity Verification                                            Programming Interface
+
+When used as an argument to the pivConnect entry point on the PIV client API described in this section,
+an '8x' series data object with zero length together with a '9x' series data object requests the return of all
+available card readers of the described type on the described node. Thus, '7F 21 04 81 00 90 00' would
+request a list of all available PC/SC card readers on the host on which the client application was running.
+
+                       CDLength                    Length of the card description parameter.
+
+                       cardHandle                  The returned opaque identifier of a communication
+                                                   channel to a particular ICC and hence of the card itself.
+                                                   cardHandle is used in all other entry points on the PIV
+                                                   client API to identify to which card the functionality of
+                                                   the entry point is to be applied.
+
+Return Codes:          PIV_OK
+                       PIV_CONNECTION_DESCRIPTION_MALFORMED
+                       PIV_CONNECTION_FAILURE
+                       PIV_CONNECTION_LOCKED
+
+3.1.3    pivDisconnect
+
+Purpose:               Disconnect the PIV API from the PIV Card Application and the ICC containing the
+                       PIV Card Application.
+
+Prototype:             status_word pivDisconnect(
+                          IN handle            cardHandle
+                       );
+
+Parameters:            cardHandle                  Opaque identifier of the card to be acted upon as
+                                                   returned by pivConnect. The value of cardHandle is
+                                                   undefined upon return from pivDisconnect.
+
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_CARD_READER_ERROR
+
+If secure messaging has been established, then the PIV Middleware shall zeroize the secure messaging
+session keys.
+
+3.2     Entry Points for Data Access
+
+3.2.1    pivSelectCardApplication
+
+Purpose:               Set the PIV Card Application as the currently selected card application and establish
+                       the PIV Card Application’s security state.
+
+Prototype:             status_word pivSelectCardApplication(
+                          IN handle            cardHandle,
+                          IN sequence of byte applicationAID,
+                          IN LONG              aidLength,
+                          OUT sequence of byte applicationProperties,
+                          INOUT LONG           APLength
+                       );
+
+
+
+
+                                                       7
+

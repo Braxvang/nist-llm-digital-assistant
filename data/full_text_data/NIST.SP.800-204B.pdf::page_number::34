@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-204B                                                   ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                               APPLICATIONS USING A SERVICE MESH
+
+                                                                                              and sends it to the proxy, which then performs the certificate validation process on behalf of
+                                                                                              the calling service or client during each service request. The identity is encoded as URI and
+                                                                                              carried in a certificate’s SAN (subject alternate name) field. It must be mentioned that the
+                                                                                              certificates that carry service account identities are short-lived certificates (rotated every hour
+                                                                                              or few hours) rather than the conventional HTTPS TLS terminating certificates whose validity
+                                                                                              lasts for several months.
+
+                                                                                              5.2.2    End User + Service-to-Service Request (EU+SVC-SVC) – Supporting
+                                                                                                       Infrastructure
+
+                                                                                              The policy object used for authorizing this type of request was described in Section 4.5.2. This
+                                                                                              request type requires the verification of two identities: the calling user identity and the service
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                              identity. As described in the previous section, the service mesh provides the feature to perform
+                                                                                              authorization based on service identities. Since this is a standard feature, no extra components
+                                                                                              need to be built in the service mesh infrastructure for this type of authorization. However, when
+                                                                                              end user identities are introduced for authorization, the authorization framework should be
+                                                                                              tightly integrated with the following components of the architecture:
+
+                                                                                              ● The service orchestration control plane for obtaining application object attributes as well as
+                                                                                                attributes of the registered application users (which includes user credentials), thus playing
+                                                                                                the role of PIP in ABAC-based authorization
+                                                                                              ● A service mesh control plane for obtaining tokens that encode the claims based on the
+                                                                                                authorization decision
+                                                                                              ● A service mesh data plane in the service proxy for making calls to the authorization engine
+                                                                                                (which is just another service), obtaining the authorization decision, enforcing the service-
+                                                                                                to-service authorization policies, making calls to the service mesh control plane for
+                                                                                                authorization tokens (e.g., JWT), and attaching the tokens to the service request
+
+                                                                                              An advantage of an EU+SVC-SVC request processing scheme is that authorizations at a finer
+                                                                                              level of granularity than the method level can be specified, and conformant claims can be
+                                                                                              included in the authorization token. A disadvantage is that there is overhead involved in
+                                                                                              enforcing two layers of authorization – one layer based on policies specified for SVC-SVC
+                                                                                              requests and a second layer based on EU+SVC-SVC requests. Access control processing logic
+                                                                                              based on the second layer involves multiple calls by service proxy, such as (1) a call to the
+                                                                                              authorization engine service to obtain the access decision after obtaining the user attributes
+                                                                                              (including user credentials) and application object attributes from the orchestration system, (2)
+                                                                                              obtaining the authorization token from the service mesh control plane based on the access
+                                                                                              decision, and (3) including the authorization token along with the service request.
+
+                                                                                              5.3     Advantages of ABAC Authorization Framework for Service Mesh
+
+                                                                                              This section provides the justification for the various building blocks of the architecture for the
+                                                                                              authorization framework (e.g., the service mesh and NGAC-based ABAC model). It also
+                                                                                              highlights the scalability and flexibility of certain components such as proxy APIs and the
+                                                                                              NGAC authorization engine.
+
+                                                                                              a. A service mesh is the right architecture for the enforcement of authorization policies since
+                                                                                                 the components involved are moved out of the application and executed in a space where
+                                                                                                                                                 26
+

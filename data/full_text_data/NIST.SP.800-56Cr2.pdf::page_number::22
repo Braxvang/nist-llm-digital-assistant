@@ -1,0 +1,52 @@
+                                                                                               NIST SP 800-56C REV. 2                                   RECOMMENDATION FOR KEY DERIVATION METHODS
+                                                                                                                                                                     IN KEY ESTABLISHMENT SCHEMES
+
+
+                                                                                                          values of salt and/or L. The inclusion of additional copies of the values of salt and L in
+                                                                                                          FixedInfo would ensure that each block of derived keying material is affected by all of
+                                                                                                          the information conveyed in OtherInput. See [SP 800-56A] and [SP 800-56B] for more
+                                                                                                          detailed recommendations concerning the format and content of FixedInfo (also known
+                                                                                                          as OtherInfo in earlier versions of those documents).
+                                                                                               Process:
+                                                                                                  1.   If L > 0, then set reps = L / H_outputBits; otherwise, output an error indicator and exit
+                                                                                                       this process without performing the remaining actions (i.e., omit steps 2 through 8).
+                                                                                                  2.   If reps > (232 −1), then output an error indicator and exit this process without performing
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-56Cr2
+
+
+
+
+                                                                                                       the remaining actions (i.e., omit steps 3 through 8).
+                                                                                                  3.   Initialize a big-endian 4-byte unsigned integer counter as 0x00000000, corresponding to
+                                                                                                       a 32-bit binary representation of the number zero.
+                                                                                                  4.   If counter || Z || FixedInfo is more than max_H_inputBits bits long, then output an error
+                                                                                                       indicator and exit this process without performing any of the remaining actions (i.e., omit
+                                                                                                       steps 5 through 8).
+
+                                                                                                  5.   Initialize Result(0) as an empty bit string (i.e., the null string).
+                                                                                                  6.   For i = 1 to reps, do the following:
+                                                                                                           6.1    Increment counter by 1.
+                                                                                                           6.2    Compute K(i) = H(counter || Z || FixedInfo).
+                                                                                                           6.3 Set Result(i) = Result(i – 1) || K(i).
+                                                                                                  7.   Set DerivedKeyingMaterial equal to the leftmost L bits of Result(reps).
+                                                                                                  8.   Output DerivedKeyingMaterial.
+
+                                                                                               Output:
+                                                                                                     The bit string DerivedKeyingMaterial of length L bits (or an error indicator).
+
+                                                                                               Notes:
+                                                                                                  In step 6.2 above, if H(x) = hash(x) or H(x) = HMAC-hash(salt, x), the entire output block of
+                                                                                                  the hash function, hash, shall be used when computing the output of H. Some approved
+                                                                                                  choices for hash (e.g., SHA-512/224, SHA-512/256, and SHA-384, as specified in [FIPS 180])
+                                                                                                  include an internal truncation operation. In such a case, the “entire output” of hash is the output
+                                                                                                  block as defined in its specification. (For example, in the case of hash = SHA-384, the entire
+                                                                                                  output is defined as a 384-bit block resulting from the internal truncation of a certain 512-bit
+                                                                                                  value).
+                                                                                                  If H(x) = KMAC#(salt, x, H_outputBits, S), then choosing H_outputBits = L will likely be the
+                                                                                                  most efficient way to produce the desired L bits of keying material.
+                                                                                                  The derived keying material DerivedKeyingMaterial shall be computed in its entirety before
+                                                                                                  outputting any portion of it.
+
+
+                                                                                                                                                   14
+

@@ -1,0 +1,54 @@
+                               NIST SP 800-135, Revision 1
+
+
+
+
+         input = (key_id  master_salt) ||0x0000,
+where key_id and master_salt are right-aligned. More zero bits are pre-pended to the
+key_id so that len(master_salt) = len(key_id) before the (key_id  master_salt)
+operation is performed. After key_id and master_salt are XORed together, the result is
+then appended with 16 zero bits to form the input, a 128-bit value.
+
+The input is used as input to AES-128, AES-192 or AES-256 to produce a session
+encryption key, cipher salt or authentication key, with k_master being the encryption
+key. k_master is 128, 192 or 256 bits, depending on which encryption function is
+used. More details can be found in RFC 6188 [RFC 6188].
+
+m = L 128 (128 is the bit length of the AES output, and m ≥ 1)
+Derived_keying1 = AES(k_master, input)
+Derived_keying2 = AES(k_master, input + 1)
+               .
+               .
+               .
+Derived_keyingm = AES(k_master, input + (m – 1))
+
+K = the L leftmost bits of
+    (Derived_keying1 || Derived_keying2 ||…|| Derived_keyingm).
+
+The SRTP KDF is approved when the following conditions are satisfied:
+
+      (1)   The KDF is performed in the context of the SRTP protocol.
+      (2)   The AES encryption operation is as specified in FIPS 197.
+
+5.4         Simple Network Management Protocol (SNMP) Key Derivation
+            Function/Key Localization Function
+ The User-based Security Model (USM) for SNMP version 3 (SNMPv3) (RFC 2571
+[RFC 2571]) is specified in RFC 2574. In this security model, a key localization
+function (i.e., a key derivation function) is used with a secret password when a user
+needs to share a different secret key with each authoritative SNMP engine 8 . Two key
+localization functions are specified in this model. Each uses an MD5 or SHA-1 hash
+function to generate different secret keys to share with each authoritative SNMP
+engine. The inputs to the key localization function are the password and the
+snmpEngineID, which is unique for each authoritative SNMP engine. If the hash
+function is collision resistant, then by using different snmpEngineIDs, the key
+localization function will produce different keys. Below is the description of the key
+localization function with SHA-1.
+
+
+8
+ One of the SNMP engines involved in each communication is designated to be the authoritative
+SNMP engine, see RFC 2574 Section 1.5.1 for details.
+
+
+                                                16
+

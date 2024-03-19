@@ -1,0 +1,56 @@
+                                                                                             NIST SP 800-185                                                         SHA-3 DERIVED FUNCTIONS: CSHAKE,
+                                                                                                                                                                    KMAC, TUPLEHASH, AND PARALLELHASH
+
+                                                                                             unless N1 = N2 and S1 = S2, the two instances produce unrelated outputs. Note that this includes
+                                                                                             the case where N1 and S1 are empty strings. That is, cSHAKE with any customization is domain-
+                                                                                             separated from the ordinary SHAKE function specified in FIPS 202.
+
+                                                                                             3.3      Definition
+
+                                                                                             cSHAKE is defined in terms of SHAKE or KECCAK[c], as follows: it either returns the result of a
+                                                                                             call to SHAKE (if N and S are both empty strings), or returns the result of a call to KECCAK(c)
+                                                                                             with a padded encoding of N and S concatenated to the input string X.
+
+                                                                                             cSHAKE128(X, L, N, S):
+                                                                                             Validity Conditions: len(N)< 22040 and len(S)< 22040
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-185
+
+
+
+
+                                                                                             1. If N = "" and S = "":
+                                                                                                    return SHAKE128(X, L);
+                                                                                             2. Else:
+                                                                                                    return KECCAK[256](bytepad(encode_string(N) || encode_string(S), 168) || X || 00, L).
+
+                                                                                             cSHAKE256(X, L, N, S):
+                                                                                             Validity Conditions: len(N)< 22040 and len(S)< 22040
+
+                                                                                             1. If N = "" and S = "":
+                                                                                                    return SHAKE256(X, L);
+                                                                                             2. Else:
+                                                                                                    return KECCAK[512](bytepad(encode_string(N) || encode_string(S), 136) || X || 00, L).
+
+                                                                                             Note that the numbers 168 and 136 are rates (in bytes) of the KECCAK[256] and KECCAK[512]
+                                                                                             sponge functions, respectively; the characters 00 in the Courier New font in these definitions
+                                                                                             specify two zero bits.
+
+                                                                                             3.4      Using the Function-Name Input
+
+                                                                                             The cSHAKE function includes an input string that may be used to provide a function name (N).
+                                                                                             This is intended for use by NIST in defining SHA-3-derived functions, and should only be set to
+                                                                                             values defined by NIST 6. This parameter provides a level of domain separation by function
+                                                                                             name. Users of cSHAKE should not make up their own names—that kind of customization is the
+                                                                                             purpose of the customization string S, to be discussed in Sec. 3.5. Nonstandard values of N could
+                                                                                             cause interoperability problems with future NIST-defined functions.
+
+
+
+
+                                                                                             6
+                                                                                                 NIST will always make the function name N a byte-oriented value.
+
+
+
+                                                                                                                                                      8
+

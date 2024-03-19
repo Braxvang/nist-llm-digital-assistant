@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+13.       Guidelines on Securing Validating Resolvers
+
+As discussed in Section 6.1.4, DNSSEC provides data origin authentication and integrity protection for
+DNS data. This is done using digital signatures stored with the DNS data and validated by DNS clients.
+DNS clients that perform this validation are referred to as validators.
+
+DNS validators check responses by building an authentication chain (a.k.a. chain of trust) from the
+response data to a pre-configured trusted key. This may involve the validator sending follow up queries
+for public keys or other information (such as DS RR’s) to obtain the full DNSSEC chain. Therefore,
+validators are often recursive servers that can perform their own DNS resolution process and cache
+results.
+
+13.1 Enabling DNSSEC Validation
+
+Configuring DNSSEC validation requires two tasks: configuring the server to perform validation (not
+always required) and configure one or more trusted public keys to act as trust anchors. How this is done
+depends on the DNS implementation used, but BIND will be used as an example.
+
+The policy in determining which DNSSEC public keys to configure as trust anchors is beyond the scope
+of this guide and would be the part of the organization's security policy. However, given the hierarchy
+used in DNS, the higher the public key, the wider range of DNS responses can be validated using that
+key.
+
+13.1.1 On the Stub Client
+
+A stub resolver software, by definition, does not perform full resolution and hence is not DNSSEC-aware.
+Even if the stub is DNSSEC aware, it may not be able to perform its own validation, but rely on an
+upstream server to perform validation on its behalf.
+
+
+13.1.2 Configuring DNSSEC on a Windows 7 or Windows 8 System
+
+Microsoft Windows 7 and Windows 8 operating systems have the option of having the stub resolver to
+explicitly request DNSSEC validation for a given domain. This is done using the Name Resolution Policy
+Table (NRPT). A system administrator can set the domain and whether the system should expect
+DNSSEC validation from responses. These policies can be set on an individual or enterprise wide basis.
+
+The details on how to set this option in Windows is available from the Microsoft TechNet website14. Note
+however that the option is set for an entire domain, not a single zone. If the policy is set for a domain, the
+client will automatically expect DNSSEC validation for any subzone under the domain as well, and will
+reject any non-validated responses.
+
+
+13.1.3 Using a Validating Recursive Server
+
+Most current stub resolvers cannot perform DNSSEC validation and may not understand DNSSEC at all.
+These stub resolvers will have to rely on an upstream validating recursive resolver to perform DNSSEC
+validation on its behalf. On an trusted enterprise network, this does not pose a significant risk, as there
+
+
+14
+     http://technet.microsoft.com/en-us/library/ee649207(v=WS.10).aspx
+
+
+                                                             13-20
+

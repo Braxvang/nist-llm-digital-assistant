@@ -1,0 +1,59 @@
+                                                                                             NIST SP 800-208                                                    RECOMMENDATION FOR STATEFUL
+                                                                                                                                                               HASH-BASED SIGNATURE SCHEMES
+
+                                                                                             longer needed, as copies of the signatures created using OTS keys of the top-level key pair may
+                                                                                             be stored outside of the cryptographic module.
+
+                                                                                             In order to avoid the top-level key being a single point of failure, the two options described
+                                                                                             above could be combined to create multiple distributed multi-tree HBS keys. Multiple top-level
+                                                                                             keys pairs would initially be created, each on a different cryptographic module, and clients
+                                                                                             would be configured to accept signatures created using any of these keys. Then, whenever a new
+                                                                                             bottom-level key needed to be created, it could be signed by any one of the top-level keys. This
+                                                                                             would allow for new bottom-level keys to be created as long as at least one of the cryptographic
+                                                                                             modules that contains a top-level key remained operational. Of course, the same level of care
+                                                                                             should be used when signing a bottom-level key as would be used during the initial key
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                             generation ceremony (or as would be used in making a copy of an RSA or ECDSA private key).
+
+                                                                                             7.1   HSS
+
+                                                                                             In the case of HSS, the distributed multi-tree scheme described above can be implemented using
+                                                                                             multiple cryptographic modules that individually implement LMS without modifications. The
+                                                                                             top-level LMS public key can be converted to an HSS public key by an external, non-
+                                                                                             cryptographic device. This device can also submit the public keys of the bottom-level LMS keys
+                                                                                             for signature by the top-level LMS key. In HSS, the operation for signing the root of a lower-
+                                                                                             level tree is the same as the operation for signing an ordinary message. Finally, this external
+                                                                                             device can submit ordinary messages to cryptographic modules that hold the bottom-level LMS
+                                                                                             keys for signing and then combine the resulting LMS signatures with the top-level key’s
+                                                                                             signature on the bottom-level LMS public key in order to create the HSS signature for the
+                                                                                             ordinary messages (see Algorithm 7 and Algorithm 8 in [2]).
+
+                                                                                             7.2   XMSSMT
+
+                                                                                             Distributing the implementation of an XMSSMT instance across multiple cryptographic modules
+                                                                                             requires each cryptographic module to implement slightly modified versions of the XMSS key
+                                                                                             and signature generation algorithms provided in [1]. The modified versions of these algorithms
+                                                                                             are provided in Section 7.2.1. The modifications are primarily intended to ensure that each
+                                                                                             XMSS key uses the appropriate values for its layer and tree addresses when computing prefixes
+                                                                                             and bitmasks. The modifications also ensure that every XMSS key uses the same value for SEED
+                                                                                             and that the root of the top-level tree is used when computing the hashes of messages to be
+                                                                                             signed.
+
+                                                                                             Note that while Algorithm 15 in [1] indicates that an XMSSMT secret key has a single SK_PRF
+                                                                                             value that is shared by all of the XMSS secret keys, Algorithm 10' in Section 7.2.1 has each
+                                                                                             cryptographic module generate its own value for SK_PRF. While generating a different SK_PRF
+                                                                                             for each cryptographic module does not exactly align with the specification in [1], doing so does
+                                                                                             not affect either interoperability or security. SK_PRF is only used to pseudorandomly generate
+                                                                                             the value r in Algorithm 16, which is used for randomized hashing, and any secure method for
+                                                                                             generating random values could be used to generate r.
+
+                                                                                             Section 7.2.2 describes the steps that an external, non-cryptographic device needs to perform in
+                                                                                             order to implement XMSSMT key and signature generation using a set of cryptographic modules
+                                                                                             that implement the algorithms in Section 7.2.1. While Algorithms 10' and 12' in Section 7.2.1
+
+                                                                                                                                            23
+

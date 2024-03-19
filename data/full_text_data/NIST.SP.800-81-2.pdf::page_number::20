@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+Organizations that register and obtain an enterprise-level domain name often have to create child domains
+to properly identify Internet resources associated with various functional units. For example, the owner of
+the domain name example.com might create the subdomain shipping to create and identify resources
+associated with the shipping department of the organization. Similarly, many other subdomains (in this
+context, third-level domains) may be created to properly identify all of the Internet resources of the
+organization. Often, however, in any one organization (that is, the owner of a second-level domain) there
+will be many third-level domains but few Internet resources (Web servers, application servers, etc.) in
+each of these domains. Hence, it is not economical to assign a unique name server for each of these third-
+level and lower-level domains. Furthermore, it is administratively convenient to group all information
+pertaining to an organization’s primary domain (i.e., a second-level or enterprise-level domain) and all its
+subdomains into a single resource and manage it as a unit.
+
+To facilitate this grouping, the DNS defines the concept of a zone. A zone may be either an entire domain
+or a domain with one or more subdomains. A zone is a configurable entity within a name server under
+which information on all Internet resources pertaining to a domain and a selected set of subdomains is
+described. Thus, zones are administrative building blocks of the DNS name space just as domains are the
+structural building blocks. As a result, the term zone commonly is used even to refer to a domain that is
+managed as a standalone administrative entity (e.g., the root zone, the .com zone). This document uses the
+term zone to refer to a resource entity that contains domain name information about one or more domains
+and is managed as a single administrative entity. In other words, the zone is the configurable resource
+inside a deployed name server installation that contains the domain name information.
+
+With this overall knowledge of DNS infrastructure (name servers and resolvers), domain names, zones,
+name servers of various levels (i.e., root servers and TLD servers) and resolvers, the name resolution
+function can now be defined in more detail. When a user types the URL www.example.com into a Web
+browser, the browser program contacts a type of resolver called a stub resolver that then contacts a local
+name server (called a recursive name server or resolving name server). The resolving name server will
+check its cache to determine whether it has valid information (the information is determined to be valid
+on the basis of criteria described later in this document) to provide IP address for the accessed Internet
+resource (i.e., www.marketing.example.com). If not, the resolving name server checks the cache to
+determine whether it has the information regarding the name server for the zone marketing.example.com
+(since this is the zone that is expected to contain the resource www.marketing.example.com). If the name
+server’s IP address is in the cache, the resolver’s next query will be directed against that name server. If
+the IP address of the name server of marketing.example.com is not available in the cache, the resolver
+determines whether it has the name server information for a zone that is one level higher than
+marketing.example.com (i.e., example.com). If the name server information for example.com is not
+available, the next search will be for the name server of the .com zone in the cache.
+
+If the complete search of the cache (as described above) does not yield the required information, the
+resolving name server has no alternative but to start its search by querying the name server in the topmost
+zone in the DNS name space hierarchy (i.e., the root server). If the cache search is successful, the
+resolving name server has to query the name servers in one of the levels below the root zone (in this
+context, either marketing.example.com, example.com, or .com). Because the set of iterative queries
+starting from the root server subsumes the set starting from any of the lower-level servers, this section
+describes the name resolution process starting from the query sent to the root server by the resolving
+name server at the enterprise-level.
+
+Contact with the root servers is enabled by a file called the “root hints” file that is usually present in every
+name server in DNS. The root hints file contains the IP address of one or more of the 13 root servers. The
+root server will contain information about the name servers for its child zones (i.e., TLDs). A TLD (e.g.,
+.com) will contain name server information about its child zones (e.g., example.com). The name server
+
+
+                                                      2-4
+

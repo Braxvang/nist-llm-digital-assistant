@@ -1,0 +1,61 @@
+Special Publication 800-73-4                                                              Part 3: PIV Client Application
+Interfaces for Personal Identity Verification                                                   Programming Interface
+
+                       oidLength                       Length of the object identifier.
+
+                       data                            Retrieved data content.
+
+                       DataLength                      As an input, length of the buffer allocated for data. As an
+                                                       output, length of the data retrieved from the PIV Card.
+
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_INVALID_OID
+                       PIV_DATA_OBJECT_NOT_FOUND
+                       PIV_SECURITY_CONDITIONS_NOT_SATISFIED
+                       PIV_CARD_READER_ERROR
+                       PIV_SM_FAILED
+                       PIV_INSUFFICIENT_BUFFER
+
+If the length of the retrieved data is longer than the buffer allocated by the client application, then the PIV
+Middleware shall return PIV_INSUFFICIENT_BUFFER, but shall still set DataLength to the length of the
+retrieved data. If the PIV Card Application returns a zero-length data object, then the PIV Middleware
+shall return PIV_DATA_OBJECT_NOT_FOUND.
+
+3.2.5    pivLogoutOfCardApplication
+
+Purpose:               Reset the application security state/status of the PIV Card Application.
+Prototype:             status_word pivLogoutOfCardApplication(
+                          IN handle            cardHandle
+                       );
+
+Parameters:            cardHandle                      Opaque identifier of the card to be acted upon as
+                                                       returned by pivConnect. The cardHandle remains valid
+                                                       after execution of this function.
+Return Codes:          PIV_OK
+                       PIV_INVALID_CARD_HANDLE
+                       PIV_CARD_READER_ERROR
+
+3.3     Entry Points for Cryptographic Operations
+
+3.3.1    pivCrypt
+
+Purpose:               Perform a cryptographic operation 4 such as encryption or signing on a sequence of
+                       bytes. Part 1, Appendix C describes recommended procedures for PIV algorithm
+                       identifier discovery.
+Prototype:             status_word pivCrypt(
+                          IN handle                             cardHandle,
+                          IN byte                               algorithmIdentifier,
+                          IN byte                               keyReference,
+                          IN sequence of byte                   algorithmInput,
+                          IN LONG                               inputLength,
+                          OUT sequence of byte                  algorithmOutput,
+
+4
+  The pivCrypt function does not perform any cryptographic operations itself. It provides the interface to the GENERAL
+AUTHENTICATE command to perform cryptographic operations on card. All cryptographic operations, except SM on the client
+side, are performed outside the PIV Middleware.
+
+
+                                                          10
+

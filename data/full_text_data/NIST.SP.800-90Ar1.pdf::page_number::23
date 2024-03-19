@@ -1,0 +1,51 @@
+NIST SP 800-90A Rev. 1                                              Recommendation for Random Number
+                                                                     Generation Using Deterministic RBGs
+
+8.4 Security Strengths Supported by an Instantiation
+
+The DRBG mechanisms specified in this Recommendation support four security strengths: 112,
+128, 192 or 256 bits. The security strength for the instantiation is requested during DRBG
+instantiation, and the instantiate function obtains the appropriate amount of entropy for the
+requested security strength. Each DRBG mechanism has restrictions on the security strength it
+can support, based on its design (see Section 10).
+The actual security strength supported by a given instantiation depends on the DRBG
+implementation and on the amount of entropy provided to the instantiate function. Note that the
+security strength actually supported by a particular instantiation could be less than the maximum
+security strength possible for that DRBG implementation (see Table 1). For example, a DRBG
+that is designed to support a maximum security strength of 256 bits could, instead, be
+instantiated to support only a 128-bit security strength if the additional security provided by the
+256-bit security strength is not required (e.g., by requesting only 128 bits of entropy during
+instantiation, rather than 256 bits of entropy).
+                         Table 1: Possible Instantiated Security Strengths
+
+    Maximum Designed               112                 128             192               256
+     Security Strength
+    Possible Instantiated          112            112, 128        112, 128, 192    112, 128, 192,
+     Security Strengths                                                                 256
+
+
+Following instantiation, a request can be made to the generate function for pseudorandom bits
+(see Section 9.3). The pseudorandom bits returned from a DRBG shall not be used for any
+application that requires a higher security strength than the DRBG is instantiated to support. The
+security strength provided in these returned bits is the minimum of the security strength
+supported by the DRBG and the length of the bit string returned, i.e.:
+          Security_strength_of_output = min(output_length, DRBG_security_strength).
+A concatenation of bit strings resulting from multiple calls to a DRBG will not provide a security
+strength for the concatenated string that is greater than the instantiated security strength of the
+DRBG. For example, two 128-bit output strings requested from a DRBG that supports a128-bit
+security strength cannot be concatenated to form a 256-bit string with a security strength of 256
+bits. A more complete discussion of this issue is provided in [SP 800-90C].
+For each generate request, the security strength to be provided for the bits is requested. Any
+security strength can be requested during a call to the generate function, up to the security
+strength of the instantiation, e.g., an instantiation could be instantiated at the 128-bit security
+strength, but a request for pseudorandom bits could indicate that a lesser security strength is
+actually required for the bits to be generated. Assuming that the request is valid, the requested
+number of bits is returned.
+When an instantiation is used for multiple purposes, the minimum security strength requirement
+for each purpose must be considered. The DRBG needs to be instantiated for the highest security
+strength required. For example, if one purpose requires a security strength of 112 bits, and
+
+
+
+                                                  14
+

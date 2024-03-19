@@ -1,0 +1,62 @@
+                                                                                              NIST SP 800-77 REV. 1                                                       GUIDE TO IPSEC VPNS
+
+
+                                                                                              crypto ikev2 profile default
+                                                                                              identity local fqdn west.example.gov
+                                                                                              match identity remote fqdn east.example.gov
+                                                                                              authentication local pre-share key XXXXXXXXX
+                                                                                              authentication remote pre-share key XXXXXXXXX
+                                                                                              !
+                                                                                              crypto ipsec transform-set 1 esp-gcm-128
+                                                                                              mode tunnel
+                                                                                              crypto ipsec transform-set 2 esp-cbc-128
+                                                                                              mode tunnel
+                                                                                              !
+                                                                                              crypto map west-east 1 ipsec-isakmp
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-77r1
+
+
+
+
+                                                                                              set peer 203.0.113.1
+                                                                                              set transform-set 1 2
+                                                                                              set pfs group19
+                                                                                              set ikev2-profile default
+                                                                                              match address 100
+                                                                                              !
+                                                                                              interface g1/1
+                                                                                                ip address 198.51.100.1 255.255.255.0
+                                                                                                no ip directed-broadcast
+                                                                                              !
+                                                                                              ip classless
+                                                                                              ip route 0.0.0.0 0.0.0.0 20.20.20.20
+                                                                                              no ip http server
+                                                                                              !
+                                                                                              ip access-list extended 100
+                                                                                                permit ip 192.0.0.0 0.0.0.255 192.0.2.0 0.0.0.255
+                                                                                                permit ipv6 2001:db8:0:1::/64 2001:db8:0:2::/64
+                                                                                              !
+                                                                                              line con 0
+                                                                                              login
+                                                                                                transport input none
+                                                                                              line aux 0
+                                                                                              line vty 0 4
+                                                                                              login
+                                                                                              !
+                                                                                              end
+
+                                                                                              C.2   Section 9.1 Case Study Alternative Using strongSwan on FreeBSD
+
+                                                                                              The following lists the contents of the same configuration provided in Appendix C.1 but using
+                                                                                              strongSwan on FreeBSD:
+                                                                                              # /usr/local/etc/swanctl/swanctl.conf
+                                                                                              connections {
+                                                                                                   west-east {
+                                                                                                         local_addrs = 198.51.100.1
+                                                                                                         remote_addrs = 203.0.113.1
+                                                                                                         local {
+
+
+
+                                                                                                                                            140
+

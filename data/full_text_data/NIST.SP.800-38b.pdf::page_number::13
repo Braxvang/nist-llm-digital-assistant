@@ -1,0 +1,59 @@
+                                                                                             NIST SP 800-38B                                                                      BLOCK CIPHER MODES:
+                                                                                                                                                                          CMAC MODE FOR AUTHENTICATION
+
+
+
+                                                                                                        Input:
+                                                                                                        message M of bit length Mlen.
+
+                                                                                                        Output:
+                                                                                                        MAC T of bit length Tlen.
+
+                                                                                                        Suggested Notation:
+                                                                                                        CMAC(K, M, Tlen) or, if Tlen is understood from the context, CMAC(K, M).
+
+                                                                                                        Steps:
+                                                                                                        1.     Apply the subkey generation process in Sec. 6.1 to K to produce K1 and K2.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-38B
+
+
+
+
+                                                                                                        2.     If Mlen = 0, let n = 1; else, let n = Mlen/b.
+                                                                                                        3.     Let M1, M2, ... , Mn-1, Mn* denote the unique sequence of bit strings such that M =
+                                                                                                               M1 || M2 || ... || Mn-1 || Mn*, where M1, M2,..., Mn-1 are complete blocks. 2
+                                                                                                        4.     If Mn* is a complete block, let Mn = K1 ⊕ Mn*; else, let Mn = K2 ⊕ (Mn*||10j), where
+                                                                                                               j = nb-Mlen-1.
+                                                                                                        5.     Let C0 = 0b.
+                                                                                                        6.     For i = 1 to n, let Ci = CIPHK(Ci-1 ⊕ Mi).
+                                                                                                        7.     Let T = MSBTlen(Cn).
+                                                                                                        8.     Return T.
+
+                                                                                             In Step 1, the subkeys are generated from the key. In Steps 2–4, the input message is formatted
+                                                                                             into a sequence of complete blocks in which the final block has been masked by a subkey. There
+                                                                                             are two cases:
+
+                                                                                                   •    If the message length is a positive multiple of the block size, then the message is partitioned
+                                                                                                        into complete blocks. The final block is masked with the first subkey; in other words, the
+                                                                                                        final block in the partition is replaced with the exclusive-OR of the final block with the
+                                                                                                        first subkey. The resulting sequence of blocks is the formatted message.
+
+                                                                                                   •    If the message length is not a positive multiple of the block size, then the message is
+                                                                                                        partitioned into complete blocks to the greatest extent possible, i.e., into a sequence of
+                                                                                                        complete blocks followed by a final bit string whose length is less than the block size. A
+                                                                                                        padding string is appended to this final bit string, in particular, a single ‘1’ bit followed by
+                                                                                                        the minimum number of ‘0’ bits, possibly none, that are necessary to form a complete
+                                                                                                        block. The complete final block is masked, as described in the previous bullet, with the
+                                                                                                        second subkey. The resulting sequence of blocks is the formatted message.
+
+                                                                                             In Steps 5 and 6, the cipher block chaining (CBC) technique, with the zero block as the
+                                                                                             initialization vector, is applied to the formatted message. In Steps 7 and 8, the final CBC output
+                                                                                             block is truncated according to the MAC length parameter that is associated with the key, and the
+                                                                                             result is returned as the MAC.
+
+
+                                                                                             2
+                                                                                                 Consequently, if Mlen ≤ b, then M = M1*.
+
+                                                                                                                                                   8
+

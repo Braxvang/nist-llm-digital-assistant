@@ -1,0 +1,47 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+Information retained within the DRBG mechanism boundary after reseeding:
+   Replaced internal state values (i.e., the working_state).
+Reseed Process:
+                                             Comment: Get the current internal state and check
+                                             the input parameters.
+   1. Using state_handle, obtain the current internal state. If state_handle indicates an invalid
+      or unused internal state, return (ERROR_FLAG).
+   2. If prediction_resistance_request is set, and prediction_resistance_flag is not set, then
+      return (ERROR_FLAG).
+   3. If the length of the additional_input > max_additional_input_length, return
+      (ERROR_FLAG).
+                                             Comment: Obtain the entropy input.
+   4.   (status, entropy_input) = Get_entropy_input (security_strength, min_length,
+        max_length, prediction_resistance_request).
+                                             Comment: status indications other than SUCCESS
+                                             could be ERROR_FLAG or
+                                             CATASTROPHIC_ERROR_FLAG, in which
+                                             case, the status is returned to the consuming
+                                             application to handle. The Get_entropy_input call
+                                             could return a status of ERROR_FLAG to indicate
+                                             that entropy is currently unavailable, and could
+                                             return CATASTROPHIC_ERROR_FLAG to
+                                             indicate that an entropy source failed.
+   5. If (status ≠ SUCCESS), return (status).
+                                             Comment: Get the new working_state using the
+                                             appropriate reseed algorithm in Section 10.
+   6. new_working_state = Reseed_algorithm (working_state, entropy_input,
+      additional_input).
+   7    Replace the working_state in the internal state for the DRBG instantiation (e.g., as
+        indicated by state_handle) with the values of new_working_state obtained in step 6.
+   8. Return (SUCCESS).
+
+9.3 Generating Pseudorandom Bits Using a DRBG
+
+This function is used to generate pseudorandom bits after instantiation or reseeding. The generate
+function:
+   1. Checks the validity of the input parameters.
+   2. Calls the reseed function to obtain sufficient entropy if the instantiation needs additional
+      entropy because the end of the seedlife has been reached or prediction resistance is
+
+
+                                                31
+

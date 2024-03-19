@@ -1,0 +1,55 @@
+NIST SP 800-156                                                REPRESENTATION OF PIV CHAIN-OF-TRUST
+                                                                             FOR IMPORT AND EXPORT
+
+</xs:complexType>
+
+
+The PIVChainOfTrustType complex type offers a choice to either encrypt the PIV
+chain-of-trust records, or to leave the record unencrypted. PIV chain-of-trust records
+contain personally identifiable information (PII) of actual PIV cardholders and thus shall
+always be encrypted when in transit. The unencrypted sequence is intended to allow a
+recipient of the record to validate/test XML records as required. The recipient of the
+record should protect the records accordingly when not in use (i.e., data at rest
+protection).
+
+Each instance of the <EnrollmentRecord> element contains the enrollment information
+captured by the PIV issuer for a single PIV cardholder. There is a minimum of one
+instance of this element, and there is no limit to the maximum number of
+<EnrollmentRecord> elements that may be contained in the <PIVChainOfTrust>
+element. This allows a single instance of the <PIVChainOfTrust> element to contain
+several PIV cardholder records in an XML file.
+
+Encrypted PIV chain-of-trust records are intended to include a confidentiality protection
+mechanism. The encrypted content and associated encryption details are defined by the
+XML Encryption Syntax and Processing specification [XMLEnc]. The <EncryptedData>
+Type attribute should be present and contain a value of
+http://www.w3.org/2001/04/xmlenc#Element. The encryption method algorithm for the
+<EncryptedData> element should be set to: http://www.w3.org/2001/04/xmlenc#aes256-
+cbc.
+
+The <xenc:EncryptedKey> element is defined in the [XMLEnc] standard and used to
+transport encrypted symmetric keys from the originator to a known recipient(s). The
+symmetric key value is always encrypted to the recipient(s). A public key from a PKI
+certificate should be used to encrypt the symmetric key. The sender should select an
+encryption certificate for the recipient issued under a policy that has been cross-certified
+with the Federal Bridge CA (FBCA) at the Medium Hardware or High Assurance Level.
+The sender should use http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p as the key
+transport algorithm to encrypt the key. Each encrypted key should include a Recipient
+attribute that contains a hint as to which recipient the encrypted key value is intended for.
+An example value that could be used in the Recipient attribute is the distinguished name
+(DN) from the recipient’s encryption certificate subject field.
+
+A procedure for the exchange of the key encryption key is outside the scope of this
+document. Some example mechanisms for this exchange include the use of
+Secure/Multipurpose Internet Mail Extensions (S/MIME) email exchanges to share the
+encryption certificates, or a webpage that supports Hyper Text Transfer Protocol with
+Secure Sockets Layer (HTTPS) using an FPKI SSL certificate or an Extended Validation
+Secure Sockets Layer (EVSSL) certificate, where links to the encryption certificates for
+recipient federal agencies or service providers can be accessed and downloaded.
+
+All PIV chain-of-trust records are signed using XML Signature. An XML Signature
+protects the integrity of the data and authenticates the issuer of the chain-of-trust. A valid
+
+
+                                              7
+

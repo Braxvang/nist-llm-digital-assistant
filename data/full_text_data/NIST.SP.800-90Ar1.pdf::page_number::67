@@ -1,0 +1,46 @@
+NIST SP 800-90A Rev. 1                                               Recommendation for Random Number
+                                                                      Generation Using Deterministic RBGs
+
+
+         4. While (len (temp) < requested_number_of_bits) do:
+            4.1   If ctr_len < blocklen
+                  4.1.1 inc = (rightmost (V, ctr_len) + 1) mod 2ctr_len.
+                  4.1.2 V = leftmost (V, blocklen-ctr_len) || inc.
+                  Else
+                  4.1.2 V = (V+1) mod 2blocklen.
+            4.2   output_block = Block_Encrypt (Key, V).
+            4.3   temp = temp || output_block.
+         5. returned_bits = leftmost (temp, requested_number_of_bits).
+                                               Comment: Update for backtracking resistance.
+         6. (Key, V) = CTR_DRBG_Update (additional_input, Key, V).
+         7. reseed_counter = reseed_counter + 1.
+         8. Return (SUCCESS, returned_bits, Key, V, reseed_counter).
+
+10.3 Auxiliary Functions
+
+Derivation functions are internal functions that are used during DRBG instantiation and
+reseeding to either derive internal state values or to distribute entropy throughout a bitstring.
+Two methods are provided. One method is based on the use of hash functions (see Section
+10.3.1), and the other method is based on the use of block cipher algorithms (see Section
+10.3.2). The block cipher derivation function specified in Section 10.3.2 uses a BCC function
+and a Block_Encrypt call that are discussed in Section 10.3.3.
+The presence of these derivation functions in this Recommendation does not implicitly approve
+these functions for any other application.
+10.3.1      Derivation Function Using a Hash Function (Hash_df)
+
+This derivation function is used by the Hash_DRBG specified Section 10.1.1. The hash-based
+derivation function hashes an input string and returns the requested number of bits. Let Hash be
+the hash function used by the DRBG mechanism, and let outlen be its output length.
+The following or an equivalent process shall be used to derive the requested number of bits:
+Hash_df (input_string, no_of_bits_to_return):
+   1. input_string: The string to be hashed.
+   2. no_of_bits_to_return: The number of bits to be returned by Hash_df. The maximum
+      length (max_number_of_bits) is implementation dependent, but shall be less than or
+      equal to (255 × outlen). no_of_bits_to_return is represented as a 32-bit integer.
+Output:
+
+
+
+
+                                                   58
+

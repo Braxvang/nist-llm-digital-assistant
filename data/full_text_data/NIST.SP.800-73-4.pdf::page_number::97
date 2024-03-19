@@ -1,0 +1,66 @@
+Special Publication 800-73-4                                           Interfaces for Personal Identity Verification – Part 2:
+                                                                       PIV Card Application Card Command Interface
+
+4.     Secure Messaging
+
+If a PIV Card Application implements the optional secure messaging protocol for non-card-management
+operations, it shall be implemented as specified in this section. Secure messaging is initiated through the
+use of a key establishment protocol. The key establishment protocol defined here is a one-way
+authentication protocol that authenticates the PIV Card Application to the client application and
+establishes a set of session keys that may be subsequently used to protect the communication channel
+between the two parties. 13 PIV Cards may implement a different secure messaging protocol for card
+management operations. Such a protocol is outside of the scope of this document, however, if it is to be
+used for remote post issuance updates it shall satisfy the requirements of [FIPS201, Section 2.9.2].
+
+Section 4.1 describes the key establishment protocol used to support secure messaging in the PIV Card
+Application. Section 4.2 describes the use of secure messaging to protect commands and responses sent
+between the client application and the PIV Card Application.
+
+4.1    The Key Establishment Protocol
+
+The key establishment protocol for the PIV Card Application uses the One-Pass Diffie-Hellman, C(1e, 1s,
+ECC CDH) Scheme from [SP800-56A] in a manner that is based on a simplified profile of OPACITY
+with Zero Key Management [ANSI504-1], as depicted below.
+
+                 Client Application (H)                                                                   PIV Card Application (ICC)
+ CB H = 0x00                                                   H1
+ Generate an ephemeral key pair (d eH ; Q eH ) from the domain H2
+ parameters specified in the response to the SELECT command
+ Send CB H || ID sH || Q eH                                    H3       CB H || ID sH || Q eH
+                                                                                                ID sICC = T 8 (SHA256(C ICC ))                                C1
+                                                                                                CB ICC = CB H & 'F0'                                          C2
+                                                                                                Check that CB ICC is 0x00                                     C3
+                                                                                                Verify that Q eH is a valid public key for the domain         C4
+                                                                                                parameters of Q sICC
+                                                                                                Z = ECC_CDH(d sICC , Q eH )                                   C5
+                                                                                                Generate nonce N ICC                                          C6
+                                                                                                SK CFRM || SK MAC || SK ENC || SK RMAC = KDF(Z, len, OtherInfo)
+                                                                                                        C7
+                                                                                                Zeroize Z                                                     C8
+                                                                                                AuthCryptogram ICC =                                          C9
+                                                                                                        CMAC(SK CRFM , “KC_1_V” || ID sICC || ID sH || Q eH )
+                                                                       CB ICC || N ICC ||       Zeroize SK CFRM                                               C10
+                                                                       AuthCryptogram ICC       Return CB ICC || N ICC || AuthCryptogram ICC || C ICC         C11
+                                                                       || C ICC
+ Check that CB ICC is 0x00                                       H4
+ Verify C ICC signature and subject public key                   H5
+ ID sICC = T 8 (SHA256(C ICC ))                                  H6
+ Extract Q sICC from C ICC                                       H7
+ Z = ECC_CDH(d eH , Q sICC )                                     H8
+ Zeroize d eH                                                    H9
+ SK CFRM || SK MAC || SK ENC || SK RMAC = KDF(Z, len, OtherInfo) H10
+ Zeroize Z                                                       H11
+ Check that AuthCryptogram ICC equals                            H12
+           CMAC(SK CFRM , “KC_1_V” || ID sICC || ID sH || Q eH )
+ Zeroize SK CFRM                                                 H13
+
+
+
+
+13 The protocol does not provide forward secrecy.
+
+
+
+
+                                                                       22
+

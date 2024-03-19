@@ -1,0 +1,56 @@
+Special Publication 800-73-4                            Interfaces for Personal Identity Verification – Part 2:
+                                                        PIV Card Application Card Command Interface
+
+response from the card is verified using the public key in the certificate. If the signature verifies, then the
+PIV cardholder is authenticated.
+
+Table 20 shows the GENERAL AUTHENTICATE card commands sent to the PIV Card Application to
+realize cardholder authentication when the X.509 Certificate for PIV Authentication includes a 2048-bit
+RSA public key. It is assumed that the cardholder PIN or OCC data has been successfully verified prior to
+sending the GENERAL AUTHENTICATE command.
+
+              Table 20. Validation of the PIV Card Application Using GENERAL AUTHENTICATE
+
+            Command                                Response                              Comment
+'10 87 07 9A FF 7C 82 01 06 82                                              Client application sends a
+00 81 82 01 00 00 01 FF FF FF                                               challenge to the PIV Card
+FF ... FF FF FF FF FF 00 9D F4                                              Application indicating the
+6E 09 E7 D6 19 18 53 1E 6E 1C                                               reference data associated with
+66 87 C4 3E CF FF 7D 53 47 BD                                               key reference '9A' is to be used
+2E 93 19' ("..." represents 208                                             with algorithm '07'. [SP800-78,
+bytes of challenge data)                                                    Tables 6-1 and 6-2] The
+                                                                            challenge data, which in this
+                                                                            example is encoded as specified
+                                                                            for TLS version 1.1 client
+                                                                            authentication, is '00 01 FF ... 18
+                                                                            BC A7'. Bit 5 of CLA byte is set
+                                                                            to one indicating command
+                                                                            chaining is needed. L e is absent
+                                                                            indicating no data is expected.
+                                      '90 00'                               PIV Card Application indicates it
+                                                                            received the command
+                                                                            successfully.
+'00 87 07 9A 0B 94 53 76 FE A7                                              Client application sends
+91 72 14 18 BC A7 00'                                                       remaining data with the second
+                                                                            and last command of the chain.
+                                                                            L e is '00' to indicate that the
+                                                                            expected length of the response
+                                                                            data field is 256 bytes.
+                                      '7C 82 01 04 82 82 01 00 29 69        PIV Card Application returns the
+                                      44 3B 49 AC 5B 70 63 51 A1 5B         result of signing the challenge
+                                      B5 ... AD F7 0B 7D A6 4C 6C           using the indicated key reference
+                                      AA 62 40 C5 FA A8 7E A2 2B            data and algorithm ('29 69 44 3B
+                                      DC 92 18 56 8B CE F4 69 14 D9         49 AC…'). The last two bytes '61
+                                      83 61 08' ("..." represents 208       08' indicate 8 more bytes are
+                                      bytes of response data)               available to read from the card.
+'00 C0 00 00 08'                                                            The GET RESPONSE command
+                                                                            is used to request remaining 8
+                                                                            bytes.
+                                      '30 1B 11 06 AE E2 F1 2E 90 00'       PIV Card Application sends the
+                                                                            remaining 8 bytes.
+
+
+
+
+                                                      41
+

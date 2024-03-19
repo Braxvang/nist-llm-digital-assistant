@@ -1,0 +1,48 @@
+NIST SP 800-90A Rev. 1                                           Recommendation for Random Number
+                                                                  Generation Using Deterministic RBGs
+
+
+The following process or its equivalent shall be used as the reseed algorithm for this DRBG
+mechanism (see reseed process step 6 of Section 9.2):
+   CTR_DRBG_Reseed_algorithm (working_state, entropy_input, additional_input)
+       1. working_state: The current values for V, Key and reseed_counter (see Section
+          10.2.1.1).
+       2. entropy_input: The string of bits obtained from the randomness source.
+       3. additional_input: The additional input string received from the consuming
+          application. Note that the length of the additional_input string may be zero.
+   Output:
+       1. new_working_state: The new values for V, Key, and reseed_counter.
+   CTR_DRBG Reseed Process:
+       1. seed_material = entropy_input || additional_input.
+                                             Comment: Ensure that the length of the
+                                             seed_material is exactly seedlen bits.
+       2. seed_material = df (seed_material, seedlen).
+       3. (Key, V) = CTR_DRBG_Update (seed_material, Key, V).
+       4. reseed_counter = 1.
+       5. Return (V, Key, reseed_counter).
+
+10.2.1.5     Generating Pseudorandom Bits Using CTR_DRBG
+
+Notes for the generate function specified in Section 9.3:
+   The generation of pseudorandom bits using a CTR_DRBG instantiation requires a call to the
+   Generate_function specified in Section 9.3. Process step 8 of that function calls the generate
+   algorithm specified in this section. The values for max_number_of_bits_per_request and
+   max_additional_input_length, and blocklen are provided in Table 3 of Section 10.2.1. If the
+   derivation function is not used, then the maximum allowed length of additional_input =
+   seedlen.
+   For this DRBG mechanism, there are two cases for the processing. For each case, let
+   CTR_DRBG_Update be the function specified in Section 10.2.1.2, and let Block_Encrypt
+   be the function specified in Section 10.3.3. The seed length (seedlen) and the value of
+   reseed_interval are provided in Table 3 of Section 10.2.1. The value of ctr_len is known by
+   an implementation.
+
+10.2.1.5.1     Generating Pseudorandom Bits When a Derivation Function is Not Used
+
+This method of generating bits is used when a derivation function is not used by an
+implementation.
+The following process or its equivalent shall be used as the generate algorithm for this DRBG
+mechanism (see step 8 of the generate process in Section 9.3.3):
+
+
+                                                55
+

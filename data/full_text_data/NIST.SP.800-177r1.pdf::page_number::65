@@ -1,0 +1,60 @@
+                                                                                               NIST SP 800-177 REV. 1                                                                                 TRUSTWORTHY EMAIL
+
+
+
+
+                                                                                               One solution that can reduce the impact due to domain-based validation failures is the
+                                                                                               Authenticated Receiver Chain (ARC) 14 extension. ARC is an extension of DKIM that generates
+                                                                                               a chain of custody (called an “ARC Set”) as an email message moves from one MTA to another.
+                                                                                               �e ARC Set is actually three new headers that contain a receiver’s authentication results, an
+                                                                                               additional signature over the message a second signature over selected headers (including the
+                                                                                               other ARC headers). Downstream receivers include their authentication results as well as also
+                                                                                               signing the previous handler’s ARC headers. ARC can be used to give information about
+                                                                                               authentication results throughout the chain of possession. ARC is not perfect because a malicious
+                                                                                               actor can alter the ARC Set, so ARC should only be seen as a purported chain of custody and a
+                                                                                               way to use indirect email ﬂows without invalidating previous authentication results.
+
+                                                                                               ARC may be especially useful when using third party email scanners (or TIC providers). A
+                                                                                               federal agency’s cloud email provider can forward all email to the TIC provider for scanning.
+                                                                                               Upon resubmission of the email, the cloud email provider can examine the ARC chain to see that
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-177r1
+
+
+
+
+                                                                                               the incoming email was validated previously and only returning from (known) third party
+                                                                                               scanning and override the sending domain’s DMARC policy in favor of a local policy about
+                                                                                               messages received from the TIC provider that has a valid ARC chain. As of the time of writing,
+                                                                                               ARC is still being ﬁnalized in the IETF. However, email service providers and administrators
+                                                                                               are encouraged to look at ARC as a means to minimize the impact of domain-based validation
+                                                                                               failures when forwarding email, or when using email mailing lists.
+
+                                                                                               Forwarding in general creates problems for DMARC results processing, and as of this writing,
+                                                                                               universal solutions are still in development. �ere is a currently existing set of mitigations that
+                                                                                               could be used by the mail relay and by the receiver, but would require modiﬁed MTA processing
+                                                                                               from traditional SPF and DKIM processing:
+
+                                                                                                   1. �e mediator can alter the message-From: ﬁeld to match the envelope-From:. In this case
+                                                                                                      the SPF lookup would be on the mediator’s domain.
+                                                                                                   2. After making the customary modiﬁcations, which break the originators DKIM signature,
+                                                                                                      the email relay can generate its own DKIM signature over the modiﬁed header and body.
+                                                                                                      Multiple DKIM signatures in a message are acceptable and DMARC policy is that at
+                                                                                                      least one of the signatures must authenticate to pass DMARC.
+
+                                                                                               It should also be noted that if one or the other (SPF or DKIM) authentication and domain
+                                                                                               alignment checks pass, then the DMARC policy could be satisﬁed.
+
+                                                                                               At the receiver side, if a message fails DMARC and is bounced (most likely in the case where
+                                                                                               the sender publishes a p=reject policy), then a mailing list may respond by unsubscribing the
+                                                                                               recipient. Mailing list managers should be sensitive to the reasons for rejection and avoid
+                                                                                               unsubscribing recipients if the bounce is due to message authentication issues. If the mailing list
+                                                                                               is in a domain where the recommendations in this document can be applied, then such mailing
+
+
+                                                                                               14 Authenticated Receiver Chain (ARC) Protocol. Work-in-Progress. https://datatracker.ietf.org/doc/draft-ietf-dmarc-arc-
+
+                                                                                                   protocol/
+
+
+                                                                                                                                                             52
+

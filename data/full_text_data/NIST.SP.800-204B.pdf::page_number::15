@@ -1,0 +1,56 @@
+                                                                                              NIST SP 800-204B                                                  ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                              APPLICATIONS USING A SERVICE MESH
+
+                                                                                              deploying pods that do some form of A/B testing or canary deployments, but they are done at the
+                                                                                              connection level and provide no fine-grained control or fast failback. For example, if a developer
+                                                                                              wants to deploy a new version of a microservice and pass 10 % of traffic through it, they will
+                                                                                              have to scale at least 10 containers – nine for the old version and one for the new version.
+                                                                                              Furthermore, Kubernetes cannot split the traffic intelligently and instead balances loads between
+                                                                                              pods in a round-robin fashion. Every Kubernetes container within a pod has a separate log, and
+                                                                                              hence a custom solution over Kubernetes must be implemented to capture and consolidate them.
+
+                                                                                              Although the Kubernetes dashboard offers features like monitoring pods and checking their
+                                                                                              health, it does not expose metrics that describe how application components interact with each
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                              other, how much traffic flows through each of the pods, or what chains of containers make up the
+                                                                                              application. Since traffic flow cannot be traced through Kubernetes pods out of the box, it is
+                                                                                              unclear where the failure for that application request occurred on the chain.
+
+                                                                                              A service mesh addresses these limitations [9]. This document will first consider the service
+                                                                                              mesh architecture, followed by implementation of service mesh capabilities in the context of the
+                                                                                              reference platform (Kubernetes).
+
+                                                                                              2.2    Service Mesh Reference Platform – Conceptual Architecture
+
+                                                                                              A service mesh is the network of microservices that provide the various application services and
+                                                                                              control the interactions between them. It helps to manage microservices-based applications using
+                                                                                              two major components:
+
+                                                                                              1. Data Plane. This is the component that performs the actual routing or communication of
+                                                                                                 messages between microservices. It also gathers telemetry data, which helps to monitor the
+                                                                                                 health and state of the services. The traffic that flows through the data plane is the
+                                                                                                 application-related (business) data.
+                                                                                              2. Control Plane. This is the component that provides an API to define policies. This API is
+                                                                                                 often independent of the platform on which the microservices application runs. The control
+                                                                                                 plane also helps the administrator populate the data plane component with a configuration
+                                                                                                 that determines how to route traffic. The control plane is the brain of a service mesh. The
+                                                                                                 traffic that flows through the control plane consists of messages of interaction between
+                                                                                                 service mesh components.
+
+                                                                                              The control plane may consist of multiple modules, and the distribution of functionality among
+                                                                                              these modules may be different in various service mesh offerings. However, they all provide the
+                                                                                              following core functions:
+
+                                                                                              a. A module that parses the policy rules defined in the control plane and converts them into
+                                                                                                 configuration parameters in the data plane module (i.e., the sidecar proxy). These policies
+                                                                                                 may pertain to various functions, such as authentication, authorization, service discovery,
+                                                                                                 traffic management (including load balancing), intelligent routing, blue-green deployments,
+
+                                                                                              chooses to use as the cluster's ingress controller.
+
+                                                                                                                                                    7
+

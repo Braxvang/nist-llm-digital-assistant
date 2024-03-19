@@ -1,0 +1,60 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+In this statement, the file “sales_internal.db” contains the authoritative information for zone
+“sales.mycom.com” and restricts that information to queries coming from the address list named
+“internal_hosts”. Section 8.1.1 provides details on how to set up this list. To set up a view of the same
+zone, but with only external hosts for queries coming from outside the network, the following view
+statement is used in the same configuration file:
+
+         view “outsider” {
+              match-clients { any; };
+              match-destinations { public_hosts; };
+              recursion no;
+              zone sales.mycom.com {
+                    type master;
+                    file “sales_external.db”;
+              };
+         };
+
+This statement is very similar to the previous statement, except that the file with the zone view is
+“sales.external.db” and the client list is given as “any”, meaning that queries coming from both outside
+and inside the network can see the same external view of “sales.mycom.com.” Together, these statements
+allow internal clients to view both the internal and external hosts in “sales.mycom.com,” whereas external
+hosts (not on the same network) can see only DNS information contained in the external view of the zone
+where the destination matches the address list “public_hosts.”
+
+7.2.9    Limiting Information Exposure Through Separate Name Servers for Different
+         Clients
+
+Instead of having the same set of authoritative name servers serve different types of clients, an enterprise
+could have two different sets of authoritative name servers. One set, called external name servers, can be
+located within a DMZ; these would be the only name servers that are accessible to external clients and
+would serve RRs pertaining to hosts with public services (Web servers that serve external Web pages or
+provide B2C services, mail servers, etc.) The other set, called internal name servers, is to be located
+within the firewall and should be configured so they are not reachable from outside and hence provide
+naming services exclusively to internal clients. The purpose of both architecture options (i.e., two
+different sets of name servers and split DNS) is to prevent the outside world from knowing the IP
+addresses of internal hosts. This configuration may be the only available option for enterprises that use
+DNS server software that does not have the view feature found in BIND or organizations that use NSD as
+their authoritative DNS server.
+
+7.3     Content Control of Zone File
+
+As stated in Section 5.7, the only protection approach for content control of DNS zone file is the use of a
+zone file integrity checker. The effectiveness of integrity checking using a zone file integrity checker
+depends upon the database of constraints built into the checker. Hence, the deployment process consists
+of developing these constraints with the right logic and the only determinant of the truth value of these
+logical predicates are the parameter values for certain key fields in the format of various RRTypes. The
+choice of these parameter values forms the deployment guidelines and is discussed in Section 10.
+
+7.4     Recommendations Summary
+
+The following items provide a summary of the major recommendations from this section:
+
+
+
+
+                                                     7-6
+

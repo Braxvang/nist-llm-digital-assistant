@@ -1,0 +1,60 @@
+                                                                                             NIST SP 800-208                                                                            RECOMMENDATION FOR STATEFUL
+                                                                                                                                                                                       HASH-BASED SIGNATURE SCHEMES
+
+                                                                                             attacker would be able to generate valid signatures for other message digests. For example, given
+                                                                                             𝑠𝑠𝑘𝑘 = 𝐻𝐻(𝑥𝑥𝑘𝑘 ), as in Figure 2, an attacker would be able to generate a signature for a message
+                                                                                             digest with a kth digit of 2 by applying H to 𝑠𝑠𝑘𝑘 once or to a message digest with a kth digit of 3
+                                                                                             by applying H to 𝑠𝑠𝑘𝑘 twice. An attacker could not, however, generate a signature for a message
+                                                                                             digest with a kth digit of 0 as this would require finding some value y such that 𝐻𝐻(𝑦𝑦) = 𝑠𝑠𝑘𝑘 ,
+                                                                                             which would not be feasible as long as H is preimage-resistant.
+
+                                                                                             In order to protect against the above attack, the Winternitz signature scheme computes a
+                                                                                             checksum of the message digest and signs the checksum along with the digest. For an n-digit
+                                                                                             message digest, the checksum is computed as ∑𝑛𝑛−1 𝑘𝑘=0(𝑏𝑏 − 1 − 𝑁𝑁𝑘𝑘 ). The checksum is designed so
+                                                                                             that the value is non-negative, and any increase in a digit in the message digest will result in the
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-208
+
+
+
+
+                                                                                             checksum becoming smaller. This prevents an attacker from creating an effective forgery from a
+                                                                                             message signature since the attacker can only increase values within the message digest and
+                                                                                             cannot decrease values within the checksum.
+
+                                                                                             Figure 3 shows an example of a signature for a 32-bit message digest using b = 16. The digest is
+                                                                                             written as eight hexadecimal digits, and a separate hash chain is used to sign each digit with each
+                                                                                             hash chain having its own private key. 2
+
+
+                                                                                                                                                      Digest                                                Checksum
+                                                                                                 Digest          6          3         F          1             E       9          0          B             3             D
+
+                                                                                                 Private        x0         x1         x2         x3            x4      x5         x6         x7            x8            x9
+                                                                                                 Key
+
+                                                                                                 Signature    H6(x0)     H3(x1)    H15(x2)     H(x3)      H14(x4)    H9(x5)       x6       H11(x7)       H3(x8)    H13(x9)
+
+                                                                                                 Public       H15(x0)   H15(x1)    H15(x2)    H15(x3)     H15(x4)   H15(x5)    H15(x6)     H15(x7)      H15(x8)    H15(x9)
+                                                                                                 Key
+                                                                                                                                      Figure 3: A sample Winternitz signature
+
+                                                                                             3.2      Merkle Trees
+
+                                                                                             While a single, long-term public key could be created from a large set of OTS public keys by
+                                                                                             simply concatenating the keys together, the resulting public key would be unacceptably large.
+                                                                                             XMSS and LMS instead use Merkle hash trees [18], which allow for the long-term public key to
+                                                                                             be very short in exchange for requiring a small amount of additional information to be provided
+                                                                                             with each OTS key. To create a hash tree, the OTS public keys are hashed once to form the
+                                                                                             leaves of the tree, and these hashes are then hashed together in pairs to form the next level up.
+                                                                                             Those hash values are then hashed together in pairs, the resulting hash values are hashed
+                                                                                             together, and so on until all of the public keys have been used to generate a single hash value (the
+                                                                                             root of the tree), which will be used as the long-term public key.
+
+
+
+                                                                                             2   If SHA-256 were used as the hash function, then the message digest would be encoded as 64 hexadecimal digits, and the
+                                                                                                 checksum would be encoded as three hexadecimal digits.
+
+
+                                                                                                                                                               8
+

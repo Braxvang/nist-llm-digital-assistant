@@ -1,0 +1,45 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+The protocol means to minimize information leakage through zone enumeration is to deploy the NSEC3
+variant of the NSEC RR [RFC5155]. The NSEC3 RR is similar in format to the NSEC RR, but uses
+hashed domain names for the owner name and next name (e.g. using SHA-1 or another one-way hash
+algorithm). Like RRSIG and NSEC RRs, NSEC3 RRs are generated during the zone signing process,
+however both servers and clients may need to perform hash calculations during run time to construct
+responses (on the server side) and validate responses (on the client side). Because of this, NSEC3
+deployment requires more computation than DNSSEC signed zones containing NSEC RRs.
+
+
+
+
+                                  Figure 10-1. NSEC3 Hash Name Space
+
+NSEC3 RRs contain other options than just the (hashed) next name and RRType bitmap. There are also 2
+values associated with the NSEC3 RR: the iterations (number of times each name is hashed) and the salt
+(string appended to each name before hashing). These values are configurable during signing and are
+used to increase the work necessary by an attacker. Both values should be changed on a regular basis to
+maintain protection against zone enumeration.
+
+The salt value should be changed every time the entire zone is resigned. The salt value should be a
+random string with a length small enough to ensure that appending the salt value to the domain name does
+not result in a FQDN considered too long for the DNS protocol (a single label in the DNS protocol can be
+256 octets). A value between 1 - 15 octets would be acceptable for the majority of cases. Note that for
+zones that are dynamically resigned as needed may not be able to change the salt for NSEC3 RR's as an
+atomic process. In these cases, the salt rollover procedure is similar to the key algorithm rollover
+procedure in that the NSEC3 RR chain with the new salt is generated first (ending with the
+NSEC3PARAM RR) before removing the old (outgoing) NSEC3 chain.
+
+The iterations value depends on factors that are largely beyond the control of DNS administrators. The
+iterations value is included to increase the amount of work an attacker must complete when conducting a
+brute force attack offline against a known hashed name from the zone. The goal is to set this value so the
+amount of work is equal to the time needed to conduct a brute force attack against the server itself
+(including network lag, etc.). So choosing a value for the iterations requires a good estimate of the
+computational power available to an attacker and the time required to perform a brute force dictionary
+attack against an online DNS server. However, setting the value too high would result more work being
+done by the server and valid clients that may result in slow response time for end users and may be a
+possible Denial of Service (DoS) vector for servers and clients.
+
+
+                                                   10-4
+

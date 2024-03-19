@@ -1,0 +1,58 @@
+NIST SP 800-125B                                                             SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                                FOR VM PROTECTION
+
+
+3.      Network Path Redundancy Configurations for VM Protection
+
+Configuring multiple communication paths for a VM to communicate is essential for ensuring
+availability, so any network configuration for achieving this can be looked upon as an integral part of
+network-based protection for VMs. This section discusses options for configuring these paths.
+
+The physical network configuration in a data center is largely unaffected by the presence of virtualized
+hosts, except for some tasks such as VLAN configuration of ports in the physical switches connecting to
+the virtualized hosts, and configuration of the associated links as trunk links. The configuration options
+discussed in this section relating to network path redundancy for VMs are confined to the virtual network
+inside the virtualized hosts including their pNICs.
+
+The virtual network configuration features provided in most hypervisor offerings involve a combination
+of load balancing and failover policy options. From a network path redundancy perspective, only failover
+policy options are of interest.
+
+3.1     NIC Teaming Configuration for Network Path Redundancy
+
+Hypervisor offerings provide a configuration feature called network interface card (NIC) teaming. NIC
+teaming allows administrators to combine multiple pNICs into a NIC team for NIC failover capabilities in
+a virtualized host. 1 The members of the NIC team are connected to the different uplink ports of the same
+virtual switch. Failover capability requires at least two pNICs in the NIC team. One of them can be
+configured as “active” and the other as “standby”. If an active pNIC fails or traffic fails to flow through it,
+the traffic will start flowing (or be routed) through the standby pNIC, thus maintaining continuity of
+network traffic flow from all VMs connected to that virtual switch. This type of configuration is also
+called active-passive NIC bonding.
+
+Some hypervisor offerings allow NIC teaming functionality to be defined at the VM level. A NIC
+teaming feature at the VM level enables administrators to create a NIC team using vNICs of a VM. This
+enables the VM’s NICs to perform the same NIC team functionality inside the VM, just like their pNIC
+counterparts do at the virtualized host level.
+
+3.2     Policy Configuration Options for NIC Teaming
+
+Different hypervisors offer different policy configuration options relating to NIC teaming that may have
+an impact on failover. These options pertain to different ways in which the NIC team detects NIC/link
+failure and performs failover. One option detects failures by monitoring electrical signals from the pNIC
+itself. Another option is to send beacon probes (Ethernet broadcast frames) on a regular basis to detect
+link failure and configuration problems.
+
+NIC teaming has a significant disadvantage. Because of the limited number of NICs available for each
+virtualized host, the additional NICs used for virtual traffic path redundancy may reduce the ability to
+isolate traffic in certain scenarios. For example, in overlay-based network segmentation deployments,
+data and control plane traffic need to be separated (i.e., carried by different NICs) for network
+configuration integrity. Hence, such scenarios may call for a tradeoff between two security goals –
+creating redundant network paths vis-a-vis achieving the necessary logical isolation through network
+segmentation.
+
+
+1     NIC teaming can also help improve virtual network load balancing. This is done to improve performance, not availability, so
+      it is outside the scope of this publication.
+
+                                                               12
+

@@ -1,0 +1,64 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                    Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                       PIV Card Application Card Command Interface
+
+           Step #                                  Description                                                          Comment
+           C2            CB ICC = CB H & 'F0'                                                     Create the PIV Card Application’s control byte
+                                                                                                  from the client application’s control byte,
+                                                                                                  indicating that persistent binding has not been
+                                                                                                  used in the transaction even if CB H indicates
+                                                                                                  that the client application supports it. This
+                                                                                                  MAY be done by setting CB ICC to the value of
+                                                                                                  CB H and then setting the four least significant
+                                                                                                  bits of CB ICC to 0.
+           C3            Check that CB ICC is 0x00                                                Return an error ('6A 80') if CB ICC is not 0x00.
+           C4            Verify that Q eH is a valid public key for the domain                    Perform partial public-key validation of Q eH
+                         parameters of Q sICC                                                     [SP800-56A, Section 5.6.2.3.3], 16 where the
+                                                                                                  domain parameters are those of Q sICC . Verify
+                                                                                                  that P1 is '27' if the domain parameters of Q sICC
+                                                                                                  are those of Curve P-256 or that P1 is '2E' if the
+                                                                                                  domain parameters of Q sICC are those of Curve
+                                                                                                  P-384. Return '6A 86' if P1 has the incorrect
+                                                                                                  value. Return '6A 80' if public-key validation
+                                                                                                  fails.
+           C5            Z = ECC_CDH (d sICC , Q eH )                                             Compute the shared secret Z using the ECC
+                                                                                                  CDH primitive [SP800-56A, Section 5.7.1.2].
+           C6            Generate nonce N ICC                                                     Create a random nonce, where the length is as
+                                                                                                  specified in Table 18. The nonce should be
+                                                                                                  created using an approved random bit
+                                                                                                  generator where the security strength supported
+                                                                                                  by the random bit generator is at least as great
+                                                                                                  as the bit length of the nonce being generated
+                                                                                                  [SP800-56A, Section 5.3].
+           C7            SK CFRM || SK MAC || SK ENC || SK RMAC =                                 Compute the key confirmation key and the
+                                                         KDF (Z, len, Otherinfo)                  session keys. See Section 4.1.6.
+           C8            Zeroize Z                                                                Destroy the shared secret generated in Step C5.
+           C9            AuthCryptogram ICC =                                                     Compute the authentication cryptogram for key
+                            CMAC(SK CFRM , "KC_1_V" || ID sICC || ID sH || Q eH )                 confirmation, as described in Section 4.1.7.
+           C10           Zeroize SK CFRM                                                          Destroy the key confirmation key derived in
+                                                                                                  Step C7.
+           C11           Return CB ICC || N ICC || AuthCryptogram ICC || C ICC
+
+
+779   4.1.3. Notations
+780                                            Table 17: Notations used in Protocol Description
+
+                        Name                                       Comment                                           Format    Size (in bytes)
+                 ICC                    Integrated Circuit Card (PIV Card)                                           N/A      N/A
+                 ID sICC                Static, non-anonymous PIV Card identifier, which is the                      Binary   8 bytes
+                                        truncated hash of C ICC
+                 GUID                   Card UUID (see Section 3.4.1 of Part 1)                                      Binary   16 bytes
+                 C ICC                  Secure messaging card verifiable certificate, which is                       CVC
+                                        authenticated by client application. See Section 4.1.5.
+                 ID sH                  Client application identifier. This is a locally assigned                    Binary   8 bytes
+                                        identifier for the client application. If none is available, it
+                                        could be set to all zeros.
+
+
+
+      16
+           The PIV Card Application may perform full public-key validation instead [SP800-56A, Section 5.6.2.3.2].
+
+
+
+                                                                              24
+

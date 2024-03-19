@@ -1,0 +1,56 @@
+NIST SP 800-125B                                                              SECURE VIRTUAL NETWORK CONFIGURATION
+                                                                                                 FOR VM PROTECTION
+
+
+Since VMs are the end nodes of a virtual network, the originating and ending networks in any inter-VM
+communication are virtual networks. A software-based virtual firewall, either functioning in a VM or in
+the hypervisor kernel, would be a natural mechanism to control inter-VM traffic. However, since
+connection between any two virtual segments (in different virtualized hosts, at least) goes through a
+physical network, a physical firewall can also be deployed to control inter-VM traffic between VMs in
+different virtualized hosts. This was one of the earliest approaches adopted for controlling inter-VM
+traffic.
+
+A physical firewall configuration to control inter-VM traffic is analyzed for its pros and cons in Section
+4.1. A subnet-level (VM-based) virtual firewall approach for controlling inter-VM traffic is discussed in
+Section 4.2.
+
+Scenario 2: Traffic Flowing Into and Out of a VM
+
+In this scenario, traffic flowing into and out of a particular VM needs to be controlled based on fine-
+grained policies. To enforce these policies, a mechanism is needed to intercept packets between the vNIC
+of a VM and the virtual switch within the hypervisor kernel. Such a mechanism is provided by a class of
+virtual firewalls called kernel-level virtual firewalls, NIC-level firewalls, or hypervisor-mode firewalls.
+The advantages and disadvantages of this class of virtual firewalls are discussed in Section 4.3.
+
+Firewall Classes
+
+A brief overview of the three classes of firewalls mentioned above (physical firewall, subnet-level virtual
+firewall, and kernel-based virtual firewall) is given below to facilitate analysis of their advantages and
+disadvantages. 2
+
+    •    Physical firewalls: These firewalls can perform their functions in either hardware or software.
+         Their distinguishing feature is that no other software runs on the server where the firewall is
+         installed; in other words, the hardware of the server is dedicated to running only one application,
+         the firewall application.
+    •    Virtual firewalls: Virtual firewalls are entirely software-based. The disadvantages and limitation
+         of physical firewalls motivated the development of virtual firewalls. They are distinguished from
+         physical firewalls because they share computing, network, and storage resources with other VMs
+         within the virtualized host where they are installed. The two sub-classes of virtual firewalls are:
+         (a) Subnet-level virtual firewalls: These run in a dedicated VM, which is usually configured
+             with multiple vNICs. Each vNIC is connected to a different subnet or security zone of the
+             virtual network. Since they communicate with the virtual network only through the vNICs of
+             the VM platform, they are agnostic to the type of virtual network.
+         (b) Kernel-level virtual firewalls: These firewalls are logically placed between the vNIC of
+             VMs and the virtual switch inside the hypervisor kernel. They function as loadable
+             (hypervisor) kernel modules using the hypervisor’s introspection application programming
+             interface (API), which enables them to intercept every packet coming into and out of an
+             individual VM. Subsequent filtering of packets can be performed either in the hypervisor
+             kernel itself or in a dedicated VM. In the latter case, the portion of the firewall functioning as
+             a kernel module performs the function of just intercepting and forwarding the traffic to a VM-
+             based module, and the actual filtering of traffic is done in the VM-based module (just as a
+
+2   Discussion of application proxies that provide firewall services for applications running a specific protocol (e.g., HTTP for
+    web servers, SMTP for email servers, etc.) is outside the scope of this document.
+
+                                                               15
+

@@ -1,0 +1,56 @@
+NIST SP 800-125A REV. 1                                                        SECURITY RECOMMENDATIONS FOR
+                                                                           SERVER-BASED HYPERVISOR PLATFORMS
+
+•       A common threat in virtualization platforms involves a malicious VM accessing areas of memory
+        belonging to other VMs. This is called a VM Escape attack. Hardware platforms with IOMMU provide
+        safety against this through features such as Direct Memory Access (DMA) remapping, which limits
+        allowed DMA access to the assigned protection domain (i.e., preventing a device from performing
+        DMA beyond its allocated area).
+•       The advantage of hardware providing assistance for both forms of virtualization is that the emulation
+        module of the hypervisor can present the true hardware architecture of the physical host instead of
+        modified hardware architecture. The consequence of this feature is that an unmodified Guest OS, along
+        with their native device drivers, can be run in VMs. The security implication of enabling this feature
+        is that significantly more CVE data is available for a Guest OS, as well as patch versions and certified
+        device drivers for each OS version.
+
+    Security Recommendation HY-SR-2: The hardware of the virtualized host should provide assistance for
+    virtualization for instruction sets and memory management using MMU since the hardware support provides
+    the following security assurances that cannot be guaranteed with purely software-based virtualization:
+
+    •    Better memory management controls can prevent attacks such as buffer overflow.
+    •    The feature for re-mapping of DMA transfers in IOMMU provides better isolation of I/O devices.
+         Further, the feature to directly assign I/O devices to a specific VM and enable direct access to those
+         resources eliminates the need for providing emulated device drivers for that VM, thus reducing the size
+         of trusted code.
+    •    Guest OS code and hypervisor code execute in different processor modes, providing better isolation.
+    •    Privilege-level isolation can provide better protection for device access mediation functions, and
+         hardware-based memory protection can provide better VM-level protection.
+    •    By supporting full virtualization, COTS versions of OSs can allow for easier patching and updating than
+         having to perform the same operations on modified or ported versions of OSs that are the only types that
+         can be run on para-virtualized platforms.
+    •    Since many features of virtualization are now available in hardware, the size of the hypervisor code will
+         be small, enabling better security attestation and verification.
+
+4.2 VM Memory Allocation Scheduling Options
+
+The hypervisor's memory scheduler is responsible for meeting the memory requirements for all workloads
+running in all VMs at all times. Like an OS, a typical hypervisor meets this requirement by using a
+combination of physical RAM and swap files called hypervisor kernel swap files. Further, a typical VM does
+not always require the entire memory it has been configured for. For these reasons, it is a viable overall
+virtualization configuration decision to have the combined configured memory of all VMs running on a
+virtualized host to exceed the total physical RAM, provided that there are no memory-sensitive applications
+running in VMs. However, over-commit—the ratio of the total configured memory of VMs to host physical
+RAM—should not be too high as it may result in performance degradation of certain VM workloads that
+require a significant amount of memory.
+
+Another factor affecting the availability of the virtualized host or hypervisor for certain workloads in a VM is
+the ratio of the physical RAM size to kernel swap file size that is maintained by the memory scheduler of the
+hypervisor. Since a low ratio will deny execution of certain workloads for certain VMs, there should be a
+configuration option available in the hypervisor to specify a guaranteed physical amount of RAM for each
+VM. Also, in order to avoid a situation in which a particular VM makes use of the physical RAM for its entire
+configured memory, there should be a feature to specify a limit on the guaranteed physical RAM. Finally,
+there may be certain workloads that are time-sensitive, and the VMs hosting them should have some priority
+in getting the required memory resources compared to other running VMs. Therefore, a configuration option
+to specify a priority value for each VM should also exist.
+                                                          13
+

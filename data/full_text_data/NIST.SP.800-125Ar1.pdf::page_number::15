@@ -1,0 +1,57 @@
+NIST SP 800-125A REV. 1                                                     SECURITY RECOMMENDATIONS FOR
+                                                                        SERVER-BASED HYPERVISOR PLATFORMS
+
+
+The third approach to device virtualization, the passthrough approach (or direct device assignment), is
+deployed for situations where a VM needs exclusive access to a device (e.g., NIC, disk controller, Host Bus
+Adapter (HBA), USB controller, serial port, firewire controller, soundcard, etc.) for performance reasons so
+as to avoid overhead due to emulation. Since generally this is required for Peripheral Component Interconnect
+(PCI) devices, this is also called as PCI Passthrough. Since many of these devices have a memory-mapped
+interface, they can read or write directly to or from main memory and are also called Direct Memory Access
+(DMA) capable devices. To provide exclusive access to a DMA capable device for a VM, the memory pages
+of the device are mapped into guest VM’s address space. The following is the threat due to DMA capable
+devices.
+
+Threat due to DMA-capable hardware devices (HY-DV5): The security threat from a DMA-capable device is
+that, since the VM controls the device, it can program the device to perform DMA operations directed at any
+physical (host) memory location, including the areas belonging to other VMs or the hypervisor [6]. Thus, the
+direct device assignment has the potential to subvert the isolation between VMs (rather making the MMU
+enforced isolation function (part of HY-BF1) meaningless).
+
+In addition to three types of device virtualization described above, hypervisor hosts can support self-
+virtualizing hardware devices. These devices have interfaces that can export a set of virtual functions (VFs)
+corresponding to a physical function (PF). The hypervisor then can assign these VFs to multiple guest VMs,
+while it retains control of the PF. These devices conform to Single Root I/O Virtualization (SR-IOV)
+specification and thus enable DMA capable devices to be shared among VMs (as virtualization and
+multiplexing are done by the devices themselves) instead of being dedicated to a single VM as in passthrough
+mode.
+
+
+2.2.3   Potential Threat to HY-BF3
+
+The previous subsection presented a scenario (i.e., para-virtualization) where the hypervisor has to execute
+certain instructions through its hypercall interface. A potential security issue with hypercalls is that the lack
+of proper validation of certain operations (e.g., not verifying the operation scope and allowing a full dump
+of a VM’s Virtual Machine Control Block) can potentially cause the entire hypervisor host to crash. This is
+again a design vulnerability that must be addressed through proper validation and testing of the relevant
+hypervisor code rather than through configuration or deployment procedures.
+
+2.2.4   Potential Threats to HY-BF4
+
+Potential threats to the secure execution of tasks under this function (i.e., VM Lifecycle Management) include:
+
+•   Presence of non-standard VM images in the library, including those with outdated OS versions and
+    patches, which could result in any of the platform-level threats (HYP-T1 through HYP-T3)
+•   Presence of non-standard running VM instances due to their creation from non-standard images,
+    restoration from snapshots, a drift from standard as a result of a lapse in monitoring, and updates that
+    could result in any of the platform-level threats (HYP-T1 through HYP-T3)
+
+In most instances, the management operations on VMs are performed using commands submitted through a
+GUI or a scripting environment, both of which are supported by a management daemon at the back-end. Secure
+execution of the above operations is addressed through security recommendations HY-SR9 through HY-SR18
+in section 6.
+
+
+
+                                                       8
+

@@ -1,0 +1,57 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+If the new ZSK (the next ZSK to be used) has been compromised, it should be replaced immediately in
+the zone key set. This replacement also can be done atomically because the new key was not used to
+produce any RRSIGs; only the zone key set needs to be re-signed. It also is possible simply to remove the
+compromised key and replace it with a new ZSK in one update.
+
+There still is a danger of attackers using the compromised ZSK to forge responses coming from the zone.
+This danger exists as long as the current KSK is still active, with the option of initiating a KSK rollover.
+Once a ZSK has been compromised, a zone administrator should initiate a rollover of the KSK as soon as
+possible.
+
+11.3.2 Emergency KSK Rollover
+
+When a zone’s KSK has been compromised, the only response is to initiate a KSK rollover with the
+parent. This rollover, however, is not the same process as a scheduled KSK rollover. There must be a way
+to alert the parent zone administrator that the old KSK has been compromised and not to accept any KSK
+rollover messages using that key. The replacement key must be transmitted and verified using some other
+secure channel to ensure the child zone’s identity and may involve one or more non-DNSSEC
+authentication methods. This process could be the same as that used to establish the original KSK of the
+child zone.
+
+
+Checklist item 33: A DNS administrator should have the emergency contact information for the
+immediate parent zone to use when an emergency KSK rollover must be performed.
+
+Checklist item 34: A parent zone must have an emergency contact method made available to its
+delegated child subzones in case of emergency child subzone KSK rollover. There also should be a secure
+means of obtaining the subzone’s new KSK.
+
+
+The only way to minimize the exposure period to a minimum, it is a good idea for a zone administrator to
+keep the signature validity period (time between signature inception and expiration fields in the RRSIG
+record RDATA) as short as possible. Since a compromised KSK can only be used by an attacker for as
+long as the non-compromised parent zone vouches for its security. The downside to shorter signature
+validity periods is that it leads to frequent re-signing (see below). A zone administrator must take the
+resources required in re-signing into consideration when choosing a signature validity period for
+delegation DS RRset RRSIG(s).
+
+11.4 Re-Signing a Zone
+
+The zone file has to be re-signed (new RRSIG RRs generated) in the following situations:
+
+    •   The signatures have expired or are about to expire.
+
+    •   The zone file content has changed (as a result of dynamic updates for example).
+
+    •   One of the signing keys has been compromised or is scheduled for replacement.
+There are two strategies for re-signing zone data:
+
+
+
+
+                                                     11-6
+

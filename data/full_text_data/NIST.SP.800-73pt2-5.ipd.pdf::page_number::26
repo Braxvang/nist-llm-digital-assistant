@@ -1,0 +1,57 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                   PIV Card Application Card Command Interface
+
+644   satisfied. If a key reference is specified in P2 that is not supported by the card, the PIV Card
+645   Application SHALL return the status word '6A 88'. 10
+646   If the reset retry counter authentication data (PUK) in the command data field of the command
+647   does not match the reference data associated with the PUK, then the PIV Card Application
+648   SHALL return the status word '63 CX'. If the current value of the PUK’s retry counter is zero,
+649   then the PIN’s retry counter shall not be reset, the PIV Card Application shall return the status
+650   word '69 83', and the reset operation shall be blocked.
+651   If the new reference data (PIN) in the command data field of the command does not satisfy the
+652   criteria in Section 2.4.3, then the PIV Card Application SHALL return the status word '6A 80'. If
+653   the reset retry counter authentication data (PUK) in the command data field of the command
+654   does not match the reference data associated with the PUK and the new reference data (PIN) in
+655   the command data field of the command does not satisfy the criteria in Section 2.4.3, then the
+656   PIV Card Application SHALL return status word '6A 80' or '63 CX'. If the PIV Card Application
+657   returns status word '6A 80', then the retry counter associated with the PIN SHALL NOT be reset,
+658   the security status of the PIN’s key reference SHALL remain unchanged, and the PUK’s retry
+659   counter SHALL remain unchanged. 11 If the PIV Card Application returns status word '63 CX',
+660   then the retry counter associated with the PIN SHALL NOT be reset, the security status of the
+661   PIN’s key reference SHALL be set to FALSE, and the PUK’s retry counter SHALL be
+662   decremented by one.
+663   If the card command succeeds, then the PIN’s retry counter SHALL be set to its reset retry value.
+664   Optionally, the PUK’s retry counter MAY be set to its initial reset retry value. The security status
+665   of the PIN’s key reference SHALL NOT be changed.
+666   The initial retry counter associated with the PUK (i.e., the number of failures of the RESET
+667   RETRY COUNTER command before the PUK’s retry counter reaches zero) is issuer-dependent.
+668   Command Syntax
+                  CLA                       '00'
+                  INS                       '2C'
+                  P1                        '00'
+                  P2                        '80' (PIV Card Application PIN).
+                  Lc                        '10'
+                                            Reset retry counter authentication data (PUK) concatenated without delimitation
+                  Data Field                with the new reference data (PIN) (both PUK and PIN as described in Section
+                                            2.4.3)
+                  Le                        Absent
+
+669   Response Syntax
+                    SW1          SW2                                       Meaning
+                     '63'        'CX'       Reset failed, X indicates the number of further allowed resets
+                     '69'         '83'      Reset operation blocked
+                    '6A'          '80'      Incorrect parameter in command data field
+                    '6A'          '81'      Function not supported
+                    '6A'          '88'      Key reference not found
+                     '90'         '00'      Successful execution
+
+      10
+         The PIV Card Application may be implemented to reset the retry counter associated with OCC data when new OCC data is loaded onto the
+      card.
+      11
+         It is recommended that in this case the authentication data not be compared to the on-card reference data.
+
+
+
+                                                                          16
+

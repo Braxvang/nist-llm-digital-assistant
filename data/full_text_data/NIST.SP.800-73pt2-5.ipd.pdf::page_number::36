@@ -1,0 +1,61 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)                                    Interfaces for Personal Identity Verification: Part 2
+      September 2023                                                                       PIV Card Application Card Command Interface
+
+793   C ICC is used to authenticate the PIV Card Application. The specific data object tags and specified
+794   order must be used for both CVCs to allow the CVC processing within authentication protocols.
+795   The specific data object tags for C ICC and the optional Intermediate CVC are provided in Table
+796   19 and Table 20, respectively.
+797   The signature of the secure messaging CVC (DigitalSignature object) is calculated over the
+798   concatenation of the TLV-encoded Credential Profile Identifier, Issuer Identification Number,
+799   Subject Identifier, CardHolderPublicKey Data Object, and Role Identifier (i.e., { '5F29' '01' '80' }
+800   || { '42' '08' IIN } || { '5F20' '10' GUID } || { '7F49' L1 { { '06' L2 OID } { '86' L3 '04' X Y } } } {
+801   '5F4C' '01' '00' }). Before signing the CVC, the signer SHALL perform partial public-key
+802   validation [SP800-56A, Section 5.6.2.3.2] for the public key that will be placed in the public-key
+803   object and SHALL verify that the PIV Card is in possession of the corresponding private key
+804   (see [SP800-56A, Section 5.6.2.2.3.2] and [SP800-57, Section 8.1.5.1.1.2] for discussions on
+805   methods to obtain assurance of private-key possession).
+806                                 Table 19. Secure messaging card verifiable certificate format
+
+        Tag           Tag          Tag        Length                  Name                                 Value
+      0x7F21                                               Card Verifiable Certificate
+                   0x5F29                    1             Credential Profile          0x80
+                                                           Identifier
+                   0x42                      8             Issuer Identification       The leftmost 8 bytes of the
+                                                           Number                      subjectKeyIdentifier in the content signing
+                                                                                       certificate needed to verify the signature on
+                                                                                       C ICC 17
+                   0x5F20                    16            Subject Identifier          GUID (Card UUID)
+                   0x7F49                    Variable       CardHolderPublicKey
+                                                            Data Object
+                                  0x06       Variable       Algorithm OID              Possible values are:
+                                                                                       0x2A8648CE3D030107 for ECDH (Curve
+                                                                                       P-256) or
+                                                                                       0x2B81040022 for ECDH (Curve P-384)
+                                  0x86       Variable       Public-key object          Coded as follows: 04 || X || Y, where X and
+                                                                                       Y are the coordinates of the point on the
+                                                                                       curve. See the “Value” column of Table 13.
+                   0x5F4C                    1             Role Identifier             0x00 for card-application key CVC
+                   0x5F37                    Variable      DigitalSignature object     DigitalSignature ::= SEQUENCE {
+                                                                                                 signatureAlgorithm
+                                                                                                 AlgorithmIdentifier,
+                                                                                                 signatureValue BIT STRING
+                                                                                       }
+                                                                                       AlgorithmIdentifier ::= SEQUENCE {
+                                                                                                 algorithm         OBJECT
+                                                                                       IDENTIFIER,
+                                                                                                 parameters        ANY DEFINED
+                                                                                       BY
+                                                                                                           algorithm OPTIONAL
+                                                                                       }
+                                                                                       algorithm is 1.2.840.10045.4.3.2 for
+                                                                                       ECDSA with SHA-256 (cipher suite 2) and
+                                                                                       1.2.840.10045.4.3.3 for ECDSA with SHA-
+
+      17
+         If the public key needed to verify the signature on the secure messaging CVC appears in an Intermediate CVC, then the Issuer Identification
+      Number SHALL be the value of the Subject Identifier in the Intermediate CVC.
+
+
+
+                                                                             26
+

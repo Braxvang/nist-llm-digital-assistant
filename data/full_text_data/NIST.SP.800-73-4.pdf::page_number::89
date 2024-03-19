@@ -1,0 +1,57 @@
+Special Publication 800-73-4                                   Interfaces for Personal Identity Verification – Part 2:
+                                                               PIV Card Application Card Command Interface
+
+Response Syntax
+
+          SW1       SW2                                          Meaning
+          '63'      '00'       Verification failed
+          '63'      'CX'       Verification failed, X indicates the number of further allowed retries
+          '69'      '82'       Security status not satisfied
+          '69'      '83'       Authentication method blocked
+          '6A'      '80'       Incorrect parameter in command data field
+          '6A'      '81'       Function not supported
+          '6A'      '86'       Incorrect parameter in P1
+          '6A'      '88'       Key reference not found
+          '90'      '00'       Successful execution
+
+
+  3.2.2   CHANGE REFERENCE DATA Card Command
+
+The CHANGE REFERENCE DATA card command initiates the comparison of the authentication data in
+the command data field with the current value of the reference data and, if this comparison is successful,
+replaces the reference data with new reference data.
+
+Only reference data associated with key references '80' and '81' specific to the PIV Card Application (i.e.,
+local key reference) and the Global PIN with key reference '00' may be changed by the PIV Card
+Application CHANGE REFERENCE DATA command. The PIV Card Application may allow the
+reference data associated with other key references to be changed by the PIV Card Application CHANGE
+REFERENCE DATA, if PIV Card Application will only perform the command with other key references
+if the requirements specified in Section 2.9.2 of FIPS 201-2 are satisfied. If any key reference value is
+specified that is not supported by the card, the PIV Card Application shall return the status word '6A 88'.
+Key reference '80' reference data shall be changed by the PIV Card Application CHANGE REFERENCE
+DATA command. The ability to change reference data associated with key references '81' and '00' using
+the PIV Card Application CHANGE REFERENCE DATA command is optional.
+
+If key reference '81' is specified and the command is submitted over the contactless interface (including
+SM or VCI), then the card command shall fail. If key reference '00' or '80' is specified and the command
+is not submitted over either the contact interface or the VCI, then the card command shall fail. In each
+case, the security status and the retry counter of the key reference shall remain unchanged.
+
+If the current value of the retry counter associated with the key reference is zero, then the reference data
+associated with the key reference shall not be changed and the PIV Card Application shall return the
+status word '69 83'. If the command is submitted over the contactless interface (VCI) and the current
+value of the retry counter associated with the key reference is at or below the issuer-specified intermediate
+retry value (see Section 3.2.1), then the reference data associated with the key reference shall not be
+changed and the PIV Card Application shall return the status word '69 83'.
+
+If the authentication data in the command data field does not match the current value of the reference data
+or if either the authentication data or the new reference data in the command data field of the command
+does not satisfy the criteria in Section 2.4.3, the PIV Card Application shall not change the reference data
+associated with the key reference and shall return either status word '6A 80' or '63 CX', with the following
+restrictions. If the authentication data in the command data field satisfies the criteria in Section 2.4.3 and
+matches the current value of the reference data, but the new reference data in the command data field of
+the command does not satisfy the criteria in Section 2.4.3, the PIV Card Application shall return status
+
+
+                                                           14
+

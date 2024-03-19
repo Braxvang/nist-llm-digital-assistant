@@ -1,0 +1,75 @@
+A.2.1      Formatting of the Control Information and the Nonce
+
+The leading octet of the first block of the formatting, B0, contains four flags for control
+                                                                          B
+
+
+
+
+information: two single bits, called Reserved and Adata, and two strings of three bits, to encode
+the values t and q. The encoding of t is [(t-2)/2]3, and the encoding of q is [q-1]3. Thus, for
+example, if the MAC length is 8 octets, then t is encoded as 011. Note that the encoding 000 in
+both cases does not correspond to a permitted value of t or q. The Reserved bit is reserved to
+enable future extensions of the formatting; it shall be set to ‘0’. The Adata bit is ‘0’ if a=0 and
+‘1’ if a>0. The ordering of the flags within the octet is given in Table 1.
+
+                             Table 1: Formatting of the Flags Octet in B0             B
+
+
+
+
+    Bit number           7         6         5          4                     3           2       1     0
+     Contents         Reserved   Adata             [(t-2)/2]3                                  [q-1]3
+
+The remaining 15 octets of the first block of the formatting are devoted to the nonce and the
+binary representation of the message length in q octets, as given in Table 2.
+
+                                      Table 2: Formatting of B0       B
+
+
+
+
+                 Octet number              0               1 ... 15-q                 16-q ... 15
+                   Contents              Flags                  N                         Q
+
+For example, if B0 is
+                  B
+
+
+
+
+        01101110 00010011 11010100 10100011 01011101 01110001 10100101 00000000
+        00000000 00000000 00000000 00000000 00000000 00000000 01000100 00000001:
+
+   •     The associated data will not be empty (because Adata=1).
+   •     The MAC will consist of 12 octets (because [(t-2)/2]3=101).
+   •     The octet length of Q is 7 (because [q-1]3=110), so Q is 00000000 000000000 00000000
+         00000000 00000000 01000100 00000001.
+   •     The payload will consist of 17,409 octets (because Q=[17409]56).
+   •     The octet length of N is 8 (because n=15-q and q=7), so N=00010011 11010100
+         10100011 01011101 01110001 10100101 00000000 00000000.
+
+A.2.2      Formatting of the Associated Data
+
+If a=0, as indicated by the Adata field in the first octet of B0, then there are no blocks devoted to
+                                                                  B
+
+
+
+
+the associated data in the formatted data. If a>0, then a is encoded as described below, and the
+encoding of a is concatenated with the associated data A, followed by the minimum number of
+‘0’ bits, possibly none, such that the resulting string can be partitioned into 16-octet blocks.
+These blocks are denoted in the formatted data as B1, B2, … Bu for some positive integer u that
+                                                       B      B                   B
+
+
+
+
+depends on a.
+
+The value a is encoded according to the following three cases:
+
+
+                                                 13
+

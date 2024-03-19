@@ -1,0 +1,47 @@
+      NIST SP 800-73pt2-5 ipd (Initial Public Draft)          Interfaces for Personal Identity Verification: Part 2
+      September 2023                                             PIV Card Application Card Command Interface
+
+482           PIV Card Application Card Commands for Authentication
+
+483   3.2.1. VERIFY Card Command
+484   The VERIFY card command initiates the comparison in the card of the reference data indicated
+485   by the key reference with authentication data in the data field of the command.
+486   Key reference '80' specific to the PIV Card Application (i.e., local key references) and,
+487   optionally, the Global PIN with key reference '00', the OCC data (key references '96' and '97'),
+488   and pairing code (key reference '98') are the only key references that MAY be verified by the
+489   PIV Card Application’s VERIFY command. The PIV Card Application MAY allow other key
+490   references to be verified by the PIV Card Application’s VERIFY command if they are used for
+491   card management operations.
+492   Key reference '80' SHALL be able to be verified by the PIV Card Application VERIFY
+493   command. If the PIV Card Application does not contain the Discovery Object as described in
+494   Part 1, then no other key reference SHALL be able to be verified by the PIV Card Application
+495   VERIFY command. If the PIV Card Application contains the Discovery Object, then the ability
+496   of the PIV Card Application’s VERIFY command to verify key references '00', '96', '97', and '98'
+497   SHALL be as specified by the first byte of the Discovery Object’s PIN Usage Policy value:
+498       •   If Bit 6 is one, then key reference '00' SHALL be able to be verified by the PIV Card
+499           Application VERIFY command.
+500       •   If Bit 5 is one, then key references '96' and/or '97', as specified in the Biometric
+501           Information Templates Group Template, SHALL be able to be verified by the PIV Card
+502           Application VERIFY command.
+503       •   If Bit 4 is one, then key reference '98' SHALL be able to be verified by the PIV Card
+504           Application VERIFY command.
+505   If any key reference value is specified that CANNOT be verified by the PIV Card Application,
+506   then the PIV Card Application SHALL return the status word '6A 88'.
+507   The VERIFY command MAY be submitted over the contact interface and, under some
+508   conditions, over the contactless interface. The card command SHALL fail if:
+509       •   The key reference is '00' or '80', and the command is not submitted over either the contact
+510           interface or the VCI, or
+511       •   The key reference is '96', '97', or '98', and the command is submitted over the contactless
+512           interface without secure messaging.
+513   The P1 parameter SHALL be either '00' or 'FF'. If any other value is specified for the P1
+514   parameter, then the PIV Card Application SHALL return the status word '6A 86'.
+515   If the VERIFY command fails for one of the reasons specified above, then the security status and
+516   the retry counter of the key reference SHALL remain unchanged.
+517   If P1='00' and L c and the command data field are absent, the command CAN be used to retrieve
+518   the number of further retries allowed ('63 CX') or to check whether verification is not needed ('90
+519   00').
+
+
+
+                                                       11
+

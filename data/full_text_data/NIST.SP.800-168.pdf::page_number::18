@@ -1,0 +1,51 @@
+Appendix 1: Reference test methodology for bytewise approximate
+matching
+
+  This appendix presents detailed example methodologies for testing bytewise approximate
+  matching algorithms with controlled and real data.
+
+  Testing with controlled data. The main purpose of controlled data experiments is to know
+  exactly the ground truth by carefully constructing the test cases. In this case, the goal is to build
+  artifacts—files—that have known common substrings. The most practical way to accomplish
+  this is to use (pseudo-)random data.
+
+  The first step is to determine appropriate sizes for the constructed files. This will vary
+  depending on the intended application, but if the size distribution of the almost 1,000,000 files
+  in the govdoc-corpus can be treated as representative, it may be sufficient to evaluate
+  algorithms against six reference file sizes—1, 4, 16, 64, 256 and 1024 KiB. As shown in Table
+  1, nearly 91% of all files in this set are smaller than 1 MiB.
+
+            Table 1. Cumulative empirical file size distribution in the govdoc-corpus.
+        File size range (KiB)              4           16     64     256    1024
+        Cumulative probability (%)         5.4        20.71   52.54    75.82     90.60
+
+
+  Test methodology. The proposed approach consists of four basic steps: build a set of
+  unique files, create mutations of them, run approximate matching comparisons between
+  the original and modified versions (for all algorithms), and summarize the results with
+  appropriate statistics. In regards to producing the file modifications, we provide four
+  example modification methods, below. Each corresponds to one of the four test
+  examples listed in sections 3.3.2 and 3.3.3. In each, f1 refers to the original randomly
+  generated file, f2 refers to a copy of that file that is transformed according to the method,
+  and X refers to a set of object sizes to be tested with that method.
+     Fragment detection: f2 is a fragment of f1, selected randomly for each run of the test, where
+      the size of f2 ranges the values X, which are selected such that each element of X is less
+      than the size of f1. For reference, the default settings of FRASH [3] recommend X = {.01s1,
+      .02s1, .03s1, .04s1, .05s1, .1s1, .15s1, .2s1, .3s1, .5s1}, where s1 is the size of f1.
+
+     Single-common-block correlation: f1 and f2 have equal size and share a common byte
+      string (block), the size of which ranges across the values in X. The position of the common
+      block and its content are chosen randomly for each file/run combination. For reference, the
+      default settings of FRASH [3] recommend X = {.01s1, .02s1, .03s1, .04s1, .05s1, .1s1, .15s1,
+      .2s1, .3s1, .5s1}, where s1 is the size of f1.
+
+     Alignment robustness: f2 is prefixed with a random byte string of size s where s ranges
+      across the values in X. The content of the prefix is randomized across runs. For reference,
+      the default settings of FRASH [3] recommend X = {.01s1, .02s1, .03s1, .04s1, .05s1, .1s1,
+      .2s1}, where s1 is the size of f1.
+
+     Random-noise resistance: f2 is edited with some number, n, of single-byte edit operations
+      (either additions, deletions or replacements) applied to it at random, where n ranges across
+      the values in X. For reference, the default settings of FRASH [3] recommend X = {.005s1,
+                                                 11
+

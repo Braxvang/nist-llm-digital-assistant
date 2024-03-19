@@ -1,0 +1,57 @@
+                                                                               GUIDE TO SECURE WEB SERVICES
+
+
+
+    adding safe logic (bounds definition and checking logic) to otherwise overflow-prone functions.
+    Libsafe is the best known example of an antioverflow library-based countermeasure.
+A.2.4     Race Conditions
+
+Race conditions most often arise when multiple processes simultaneously attempt to access a shared
+resource (such as a file or variable), and these multiple access attempts have not been expected by the
+developer (i.e., the appropriate controls and checks to avoid such conflicts have not been implemented).
+Race conditions can be triggered intentionally by an attacker who uses the Web service in a way that
+causes it to spawn a large number of multiple processes that attempt to access the same file.
+
+In object-oriented programming, it is important to verify within the program code that race conditions are
+minimized; this is done by not sharing common variables among object instances. Instead, the developer
+allocates a unique variable for each object instance. When global variables are used, they should be
+general values that cannot be changed by individual subroutines or functions; instead, the values are
+passed via references and stored in local variables. For each file access, the program is written to verify
+that the file is free before opening it. The program also includes logic for checking for and handling
+object-in-use errors. If the Web service accesses a database, it does so using appropriate transaction-
+oriented code.
+
+A.2.5     Symlink Attacks
+
+Symbolic links (symlinks) are links on Unix and Linux systems that point from one file to another file. A
+symlink vulnerability is exploited by making a symbolic link from a file to which an attacker does have
+access, to a file to which the attacker does not have access. The objective of the symlink attack is to trick
+a Web service program that has access rights to a given file into acting as a de facto proxy on the
+attacker’s behalf by operating on (modifying or deleting) a file on which the program would not otherwise
+operate. Symlink attacks are often coupled with timing (race condition) attacks. Symlinks do not exist on
+Windows systems, so symlink attacks cannot be performed against programs/files on those systems.
+
+A.2.6     Exploiting Unprotected Administrator Interfaces
+
+Many Web services have administrative interfaces that contain vulnerabilities. Typical vulnerabilities in
+local and remote administration interfaces include:
+
+ Incorrectly configured access control security levels. If the access controls on the administration
+  interface are set too low (e.g., equal to user-level access), an attacker who manages to gain less-than-
+  administrator privileges may be able to access and exploit the administration interface.
+ Incorrectly configured SSL security levels. If the SSL is configured incorrectly, it may not achieve
+  cryptographic separation of administrator sessions/tunnels from user sessions/tunnels. In addition,
+  incorrectly configured SSL may not perform client or server authentication as expected, allowing for
+  man-in-the-middle attacks.
+ Authentication of administrators. When using HTTP Basic Authentication or HTML Form
+  Authentication without SSL, the administrator’s password is transmitted between the administrator’s
+  client and the Web service host in unencrypted form. If intercepted, the attacker gains access not just
+  to administrator-accessible data, but also to privileged processes, configuration files, and security
+  files. While the HTTP Digest Authentication does not send the administrator’s password in cleartext
+  form, the attacker can simply retransmit the digest to gain access to the service.
+
+
+
+
+                                                    A-4
+

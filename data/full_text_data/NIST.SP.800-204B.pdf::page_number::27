@@ -1,0 +1,58 @@
+                                                                                              NIST SP 800-204B                                                  ABAC FOR MICROSERVICES-BASED
+                                                                                                                                                              APPLICATIONS USING A SERVICE MESH
+
+                                                                                              restrict access to individual services (e.g., “service Foo in namespace A can call service Bar in
+                                                                                              namespace B”).”
+
+                                                                                              Policies should describe the minimum access required for application functionality (e.g.,
+                                                                                              “service ‘foo’ in namespace A can perform ‘GET /bar’ on service ‘bar’ in namespace B”).
+
+                                                                                              4.5.2   End-user Level Authorization Policies
+
+                                                                                              Given an authentication policy like Section 4.4.3, a sidecar in the mesh can extract a principal
+                                                                                              from the request to perform authorization on. Further, the sidecar typically has additional
+                                                                                              context about the request, including the resource being accessed (e.g., the path in an
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204B
+
+
+
+
+                                                                                              HTTP/REST API) and the action being taken (e.g., the HTTP verbs GET and PUT in the
+                                                                                              request to that API). This gives the sidecar enough information to act as a PEP and call a policy
+                                                                                              decision point.
+
+                                                                                              This is the most common case, especially for organizations with traditional Identity and Access
+                                                                                              Management (IAM) systems that exist as an external service, often called by an Software
+                                                                                              Development Kit (SDK). To handle this case, a service mesh’s sidecar proxy will typically
+                                                                                              support calling external services to render an authentication and authorization verdict. For
+                                                                                              example, the reference implementation Istio supports this via Envoy’s (i.e., the sidecar proxy)
+                                                                                              external authorization service [15].
+
+                                                                                              The requirements for enabling end-user level authorization policies are numbered using the
+                                                                                              acronym EAUZ-SR-X, where EAUZ stands for end-user level authorization, SR stands for
+                                                                                              security recommendation, and X is the sequence number:
+
+                                                                                              EUAZ-SR-1: When a sidecar communicates with an authentication or authorization system,
+                                                                                              that communication must be secured with either the mesh’s built-in service-to-service
+                                                                                              authentication and authorization capabilities or using an existing enterprise Identity and
+                                                                                              Access Management (IAM) that is not part of the service mesh.
+
+                                                                                              An example is the external Software as a Service (SaaS) IAM, such as AuthO.
+
+                                                                                              EUAZ-SR-2: The sidecar should generate logs for every service request to ensure that
+                                                                                              authentication and authorization policies are enforced and relay telemetry data for the
+                                                                                              generation of metrics to ensure no degradation of service that will impact availability.
+
+                                                                                              End user authorization is not applied to the decision endpoint of the external authorization
+                                                                                              (PDP) service since the service is the principal making the call. It also avoids needing a default
+                                                                                              policy that allows all users to call the decision endpoint of the PDP. End user authorization
+                                                                                              should be applied to the PAP and other administrative endpoints of the authorization system,
+                                                                                              and applying that authorization can be facilitated by the mesh.
+
+                                                                                              However, there is another case that is common enough to address in which an external
+                                                                                              authorization system is not required. Making a network call to an authorization service for
+                                                                                              every hop in a service chain can be expensive and cause centralized failures. To mitigate these
+                                                                                              problems, many organizations will exchange end user credentials at ingress for an internal,
+
+                                                                                                                                                19
+

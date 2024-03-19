@@ -1,0 +1,55 @@
+resulting output block is the first block of the ciphertext. This output block is also exclusive-
+ORed with the second plaintext data block to produce the second input block, and the forward
+cipher function is applied to produce the second output block. This output block, which is the
+second ciphertext block, is exclusive-ORed with the next plaintext block to form the next input
+block. Each successive plaintext block is exclusive-ORed with the previous output/ciphertext
+block to produce the new input block. The forward cipher function is applied to each input block
+to produce the ciphertext block.
+
+In CBC decryption, the inverse cipher function is applied to the first ciphertext block, and the
+resulting output block is exclusive-ORed with the initialization vector to recover the first
+plaintext block. The inverse cipher function is also applied to the second ciphertext block, and
+the resulting output block is exclusive-ORed with the first ciphertext block to recover the second
+plaintext block. In general, to recover any plaintext block (except the first), the inverse cipher
+function is applied to the corresponding ciphertext block, and the resulting block is exclusive-
+ORed with the previous ciphertext block.
+
+In CBC encryption, the input block to each forward cipher operation (except the first) depends on
+the result of the previous forward cipher operation, so the forward cipher operations cannot be
+performed in parallel. In CBC decryption, however, the input blocks for the inverse cipher
+function, i.e., the ciphertext blocks, are immediately available, so that multiple inverse cipher
+operations can be performed in parallel.
+
+The CBC mode is illustrated in Figure 2.
+
+6.3   The Cipher Feedback Mode
+
+The Cipher Feedback (CFB) mode is a confidentiality mode that features the feedback of
+successive ciphertext segments into the input blocks of the forward cipher to generate output
+blocks that are exclusive-ORed with the plaintext to produce the ciphertext, and vice versa. The
+CFB mode requires an IV as the initial input block. The IV need not be secret, but it must be
+unpredictable; the generation of such IVs is discussed in Appendix C.
+
+The CFB mode also requires an integer parameter, denoted s, such that 1 ≤ s ≤ b. In the
+                                                                  #                            #
+specification of the CFB mode below, each plaintext segment (P j) and ciphertext segment (C j)
+consists of s bits. The value of s is sometimes incorporated into the name of the mode, e.g., the
+1-bit CFB mode, the 8-bit CFB mode, the 64-bit CFB mode, or the 128-bit CFB mode.
+
+The CFB mode is defined as follows:
+
+       CFB Encryption:                I1 = IV;
+                                                            #
+                                      Ij = LSBb-s(Ij –1) | C j -1   for j = 2 … n;
+                                      Oj = CIPHK(Ij)                for j = 1, 2 … n;
+                                         #   #
+                                      C j = P j ⊕ MSBs(Oj)          for j = 1, 2 … n.
+
+       CFB Decryption:                I1 = IV;
+                                                            #
+                                      Ij = LSBb-s(Ij -1 )| C j -1   for j = 2 … n;
+
+
+
+                                                   11
+

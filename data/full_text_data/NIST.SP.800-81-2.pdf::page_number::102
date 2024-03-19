@@ -1,0 +1,56 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+    •   Communicate its new KSK to its parent in a way that the parent can authenticate it
+
+    •   In addition, the parent has to generate a new DS RR (which will replace the old DS RR) that
+        contains the hash of the new KSK and then sign the newly generated DS RR.
+To enable the parent to authenticate the new KSK (referred to as KSK2) based on the existing chain of
+trust, the zone performing the key rollover (i.e., the child zone) generates a DNSKEY RRSet using the
+DNSKEY RRs of the existing key together with a new DNSKEY RR for the KSK2. It then generates two
+signatures (two RRSIG RRs)—one using the private key of the existing KSK and the other using the
+private key of the new KSK. It then sends the newly generated DNSKEY RRSet together with the RRSIG
+RRs (in plural because there are two signatures, corresponding to KSK and KSK2, respectively) to the
+parent. The set of RRs sent to the parent is given below in a pseudo format:
+
+        example.com  DNSKEY <key-id: 43543> /* the new KSK */
+        example.com  DNSKEY <key-id: 78546> /* the existing KSK */
+        example.com  DNSKEY <key-id: 98342> /* ZSK */
+        example.com  RRSIG(DNSKEY) <signer:example.com signing-key:
+        78546> /* the entire DNSKEY RRSet signed with existing KSK */
+        example.com  RRSIG(DNSKEY) <signer:example.com signing-key:
+        43543> /* the entire DNSKEY RRSet signed with new KSK */
+
+On receiving this information, the parent performs the following functions:
+
+    •   It verifies whether the KSK it trusts (i.e., 78456) has indeed signed the newly generated
+        DNSKEY RRSet that includes the new KSK (KSK2). It does this using the newly generated
+        DNSKEY RRSet, the first of the RRSIG RRs (the one that says 78456 as the signing key,) and its
+        own DS RR.
+
+    •   It also verifies that KSK2 is authentic (the child zone holds the private key of KSK2) by verifying
+        the second RRSIG RR (the one that says 43543 as the signing key) against the DNSKEY RRSet.
+
+    •   It then generates a new DS RR containing the hash of the new KSK (KSK2).
+
+    •   The parent must then generate a RRSIG covering the new DS RR of the KSK2.
+With these tasks performed by the parent, the KSK rollover process from the child’s perspective is
+essentially complete. The parent zone must then update its zone file with the new DS RR. This is similar
+to updating any other RRSet, which includes generating any new RRSIGs, as required.
+
+    •   The parent zone adds the new DS RR (DS2) to the DS RRset in the delegation
+
+    •   The parent waits for the new DS RR to propagate (min of the TTL of the DS RRset)
+
+    •   The parent can then remove the expiring DS RR from the DS RRset, triggering a resigning of the
+        zone
+The delegated child zone should keep the expiring KSK in its key set until it has confirmed that the parent
+has performed the appropriate DS update to ensure that the chain of authentication remains intact during
+the KSK rollover. After the child zone confirms that the delegating parent has updated the delegation
+information for the child, the child zone administrator should remove the old KSK from the keyset and re-
+sign the keyset with the ZSK and the new KSK. The administrator should remove the old (now expired)
+
+
+                                                   11-4
+

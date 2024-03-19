@@ -1,0 +1,58 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+4.        DNS Transactions
+
+The most common types of DNS transactions are the following:
+
+      •    DNS query/response
+
+      •    Zone transfer
+
+      •    Dynamic updates
+
+      •    DNS NOTIFY.
+This section describes each of these transaction types.
+
+4.1       DNS Query/Response
+
+This is the most common transaction in DNS. A DNS query originates from a resolver; the destination is
+an authoritative or caching name server. The most common query is a lookup for an RR, based on its
+owner name or RRType. The response may consist of a single RR, an RRSet, or an appropriate error
+message.
+
+As discussed previously, there are two types of queries: iterative and recursive. DNS resolvers that send
+iterative queries tend to be more robust with regard to the types of responses they provide because they
+may have to follow multiple referrals to obtain the final answer to a given query. If they also have a DNS
+cache, they can build up a global view of name servers in the DNS and the responses from previous
+queries. This can be used to shorten the turnaround time for future queries. Recursive queries usually are
+sent from stub resolvers that do not have the capability to handle complex DNS operations. Instead, they
+rely on an upstream DNS entity (usually a name server with a cache that sends iterative queries on behalf
+of a collection of stub resolvers) to perform the query and return the ultimate answer.
+
+DNS queries are sent in a single UDP packet. The response usually is a single UDP packet as well, but
+data size may result in truncation—in which case the normal procedure is to reissue the query using TCP.
+UDP is preferred because of its lower overhead in consuming resources, and DNS administrators should
+make sure the zone data in responses do not result in a large percentage of truncated DNS responses.
+
+DNS queries are sent in the clear, and it is assumed that the response received is correct and from an
+authentic source. As a result, it is possible for an active attacker to intercept (and alter) or forge responses
+back to a querying client. Section 6.1 provides a more detailed examination of threats to the DNS
+query/response transaction. Sections 8.1.1 and 9 provide security solutions proposed to address these
+threats.
+
+4.2       Zone Transfer
+
+A zone transfer refers to the way a (secondary) slave server refreshes the entire contents of its zone file
+from the (primary) master servers. This process enables a secondary name server to keep its zone file in
+synch with its primary name server. A zone transfer transaction starts as a query from a secondary name
+server to a primary name server. A zone transfer query—in contrast to a DNS Query—requests all RRs
+from a zone instead of requesting RRs of a given owner name or RRType. A zone transfer query
+originates from a secondary name server either in response to a DNS NOTIFY message (see Section 4.4)
+or on the basis of the value of the Refresh data item in the RData field of the zone’s Start of Authority
+(SOA) RR.
+
+
+                                                      4-4
+

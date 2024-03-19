@@ -1,0 +1,43 @@
+                                                           SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+cryptographic suite is rolled alternates each month. Extending the active key life time to two months
+from one (more traditional) is considered a larger security risk, since the key is in use longer (and
+therefore subject to a longer window of attack), but the risk is still not severe enough for the majority of
+zones.
+
+
+
+
+                            Figure 11-1: Key Lifecycles Using Multiple Algorithms
+
+
+
+KSK rollovers can be handled the same way, but since KSK's are rolled over less frequently this is not a
+big contributor compared to ZSK rollover schedules.
+
+Also note that this process assumes that the zone’s KSK is not being used as a trust anchor, and that there
+is a signed parent for the zone. If that is not case then the zone administrator must follow a variation of
+the steps in RFC 5011 Section 6.3 [RFC 5011] when finishing the rollover of the KSK. This would
+involve setting the revoke bit on the algorithm A KSK then waiting the hold-down time before removing
+it
+
+11.6 Special Consideration When Transitioning from NSEC Signed Zones to NSEC3
+     Signed Zones
+
+For whatever policy decision, an organization using a DNSSEC signed zone may wish to transition their
+zone from using NSEC for authenticated denial of existence to using NSEC3 RRs. Due to the nature of
+caching in the DNS and DNSSEC, this cannot be done in an atomic fashion; i.e., the NSEC chain
+replaced by an NSEC3 chain in a single operation. This transition is done by moving the DNSKEY
+RRset from the algorithm code (see Section 9.3) associated with RSA/SHA-1 (code 5) to a special
+NSEC3 signaling code for RSA/SHA-1 (code 7).
+
+Transitioning is similar to rolling over to a new algorithm since (sometimes) the algorithm code changes
+as well. The only real difference is at the end when an NSEC3 chain in the signed zone replaces the
+NSEC chain.
+
+
+
+                                                    11-9
+

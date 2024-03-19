@@ -1,0 +1,59 @@
+                                                                 GUIDELINES FOR THE SECURE DEPLOYMENT OF IPV6
+
+
+A new resource record type, AAAA (pronounced quad-A), is defined to store a host’s IPv6 address. A
+128-bit IPv6 address is encoded in the data portion of a AAAA resource record in network byte order
+(high-order byte first). A AAAA resource record stores a single IPv6 address, so a host with more than
+one IPv6 address may have more than one such record. AAAA queries for a specified domain name
+return all associated AAAA resource records in the answer section of a response.
+
+A special domain is defined to look up names corresponding to an IPv6 address. The intent of this
+domain is to provide a reverse mapping of an IPv6 address to a host name (stored as a DNS PTR resource
+record). The domain is rooted at IP6.ARPA. An IPv6 address is represented as a name in the IP6.ARPA
+domain with a sequence of four-bit nibbles written as hexadecimal digits and separated by dots with the
+suffix IP6.ARPA. The sequence of 32 nibbles is encoded in reverse order, i.e., the low-order nibble is
+encoded first, followed by the next low-order nibble and so on. For example, the reverse lookup domain
+name corresponding to the address 2001:db8:2:3:4:5:678:90ab is:
+
+                  b.a.0.9.8.7.6.0.5.0.0.0.4.0.0.0.3.0.0.0.2.0.0.0.8.b.d.0.1.0.0.2.IP6.ARPA
+
+Note that zero suppression and double-colon compression cannot be used in reverse DNS names.
+
+All existing query types that perform type A (IPv4 address) additional section processing, i.e., name
+server (NS), service location (SRV), and mail exchange (MX) query types, must be modified or redefined
+to perform both type A and type AAAA additional section processing. This means that a name server
+must add any relevant IPv4 addresses and any relevant IPv6 addresses available locally to the Additional
+Section of a response when processing any one of the above queries.
+
+Several DNS implementations have been observed handling queries for AAAA records incorrectly, and
+these have been documented in RFC 4074. They may return the wrong data, wrong error codes, or
+nothing at all. Most of these errors result in unreachable services, delays, timeouts, or faulty assumptions
+by caching servers, but the RFC indicates places where these errors can also be exploited in denial-of-
+service attacks. In addition, some firewalls and Intrusion Detection Systems (IDSs) have experienced
+problems handling DNS responses that are larger than 512 bytes.
+
+When performing a DNS address query, DNS is responsible only for resolving a domain name to a set of
+IP addresses. Applications and operating systems are responsible for choosing how to use the IPv6
+AAAA or IPv4 A records that may be returned. This topic is called address selection, and it is an
+important part of using IPv6 and dual IPv4-IPv6 networks correctly. As a result, receiving unexpected
+AAAA records may cause an application that is not IPv6 aware to fail. Combining both IPv6 and IPv4
+records into the same domain can lead to application problems that are beyond the scope of the DNS
+administrator. The Domain Name System – Security Technical Implementation Guide version 4r1
+mentioned above recommends using different DNS names for IPv6-enabled hosts until all such problems
+(or at least the critical ones) are fixed. It also may be useful during pilot tests or early deployment to use
+names in separate domains for IPv6 servers, e.g., imap.IPv6.example.com, although one would like such
+names to handle IPv4 and IPv6 completely transparently in the long term.
+
+A dual stack host needs a mechanism for choosing between IPv4 and IPv6. When DNS returns a set of
+different addresses, resolvers need to be configured either to choose which addresses to pass to an
+application or to forward all of the addresses and leave the choice to the application.
+
+IPv6 link-local addresses should never be put into the DNS (and site-local addresses should not be used at
+all). Temporary (RFC 3041) addresses are usually meant to be anonymous, so putting them into DNS
+would be an unusual choice and would require frequent updates. Putting 6to4 addresses into DNS may be
+sensible, but one may need cooperation from a local or regional registry to set up the IP6.ARPA PTR
+
+
+
+                                                     3-38
+

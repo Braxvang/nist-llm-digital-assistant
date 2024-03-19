@@ -1,0 +1,60 @@
+                                                                     SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+To use the allow-update statement, an address match list must be created. The command to create an ACL
+DU_Allowed_List with one IP address is as follows:
+
+            acl “DU_Allowed_List” {
+                 192.249.12.21;
+            };
+
+The ACL DU_Allowed_List (consisting of IP addresses of hosts allowed to send dynamic update requests
+for updating the contents of the zone example.com) is used within the allow-update substatement of the
+zone statement as follows:
+
+            zone “example.com” {
+                 type master;
+                 file “zonedb.example.com”;
+                 allow-update { “DU_Allowed_List”; };
+            };
+
+Dynamic update requests generally originate from hosts such as DHCP servers that assign IP addresses
+dynamically to hosts. Once they assign an IP address to a new host, they need to store the FQDN-to-IP
+address mapping (by creating an A RR) and address-to-FQDN mapping (by creating a PTR RR)
+information in the primary authoritative name servers for the zones. Creation of this information occurs
+through dynamic updates.
+
+As of the time of writing, NSD does not support dynamic update so there are no comparable configuration
+options for NSD. All dynamic update messages sent to a DNS sever running NSD will be rejected.
+Updates to a zone must be done offline and then the server signaled to reload the new modified zone.
+
+For details on how to secure dynamic update on Windows DNS servers, administrators should consult the
+Microsoft TechNet for details 7.
+
+8.1.6       Restricting BIND DNS NOTIFY Transaction Entities
+
+Once zone transfers have been set up between servers, it is a good idea to make sure that secondary name
+servers are informed about changes to zone file data through a notification message. By default, a
+notification message is sent whenever a primary name server detects a change in the zone file. It sends a
+DNS NOTIFY message to every name server listed in the NS RRSet in the zone because they are the
+recognized secondary name servers of the zone. DNS administrators should keep notification on because
+this configuration will allow updates to be propagated quickly to secondary name servers. If the DNS
+administrator wants to turn off the functionality for a specific zone, however, the notify substatement
+should be used in the zone statement of that zone:
+
+            zone “example.com” {
+                 type master;
+                 notify no;
+                 file “zonedb.example.com”;
+            };
+
+If there are any additional servers to which the zone administrator wants the DNS NOTIFY message to be
+sent (e.g., a stealth slave server), the “also-notify” substatement should be added to the zone statement,
+and the IP addresses of the additional servers should be specified as its parameter values, as shown below:
+7
+    http://technet.microsoft.com/en-us/library/cc771255.aspx
+
+
+                                                               8-9
+

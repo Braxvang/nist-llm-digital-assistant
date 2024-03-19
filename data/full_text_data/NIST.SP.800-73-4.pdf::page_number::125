@@ -1,0 +1,45 @@
+Special Publication 800-73-4                         Interfaces for Personal Identity Verification – Part 2:
+                                                     PIV Card Application Card Command Interface
+
+            Command                             Response                              Comment
+verified, privileged operations may be performed over the contactless interface. So, the GENERAL
+AUTHENTICATE command is used to perform a challenge/response with the PIV Authentication key.
+For the command, ENC C5 is the result of encrypting the challenge along with the padding bytes using an
+IV of AES(SK ENC , '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05'), and T C-MAC,5 is computed using
+T C-MAC,4 as the MCV. The challenge to be encrypted is '7C 82 01 06 82 00 81 82 01 00 00 01 FF FF …
+BC A7' from the example in Table 20.
+For the response ENC R5 is the result of encrypting the response along with the padding bytes using an IV
+of AES(SK ENC , '80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 05'), and T R-MAC,5 is computed using
+T R-MAC,4 as the MCV. The response to be encrypted is '7C 82 01 04 82 82 01 00 29 69 44 3B … E2 F1 2E'
+from the example in Table 20.
+1C 87 07 9A FF 87 82 01 11 01                                            The GENERAL
+<bytes 1 – 250 of ENC C5 >                                               AUTHENTICATE command is
+                                                                         used to send a challenge to the
+                                                                         PIV Card. This command
+                                                                         includes the first part of the
+                                                                         challenge.
+                                     90 00                               PIV Card Application indicates
+                                                                         that it received the first part of
+                                                                         the command successfully.
+0C 87 07 9A 23 <bytes 251 –                                              The remaining challenge data is
+272 of ENC C5 > 97 01 00 8E 08                                           sent, including the BER-TLV
+T 8 (T C-MAC,5 ) 00                                                      encoded L e and the BER-TLV
+                                                                         encoded C-MAC.
+                                     87 82 01 11 01 <bytes 1 – 251 of PIV Card Application sends first
+                                     ENC R5 > 61 1B                      part of the result of signing the
+                                                                         challenge. The padding indicator
+                                                                         is '01' to indicate that padding
+                                                                         was applied.
+00 C0 00 00 1B                                                           The remaining portion of
+                                                                         response is requested.
+                                     <bytes 252 – 272 of ENC R5 > 99     PIV Card Application sends final
+                                     02 90 00 8E 08 T 8 (T R-MAC,5 ) 90  portion of the result of signing
+                                     00                                  the challenge, along with the
+                                                                         BER-TLV encoded status word
+                                                                         and R-MAC.
+
+
+
+
+                                                    50
+

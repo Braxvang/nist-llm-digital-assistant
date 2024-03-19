@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+seen as BOGUS to other DNSSEC validators). However, DNSSEC-unaware clients will not know to do
+this comparison, so there is the risk that invalid DNSSEC RRsets will be stored in DNSSEC unaware
+caches.
+
+TTL values should be on the order of hours, with a recommended range of 1800 (30 minutes) to 86400 (1
+day). If a zone administrator knows that the DNS data is likely to change frequently, the TTL value
+should be set low, to insure that old, stale data is purged from client caches. If the zone administrator
+believes the DNS data will not change frequently, then the TTL value can be set higher, to gain optimal
+benefit of caching in client systems. Note that some specialized load-balancing scenarios rely on much
+shorter time periods (60 seconds or less), but for the majority of DNS data, 30 minutes to 24 hours is
+sufficient. If the data is signed using DNSSEC, the value should always be long enough to insure that the
+data will not be purged from client caches before those clients have a chance to validate it. Experience
+has shown that very low TTL values (e.g. 30 seconds and under) can cause problems with DNSSEC
+validating caches and these values should be avoided for DNSSEC signed RRsets.
+
+Checklist item 28: TTL values for DNS data should be set between 30 minutes (1800 seconds) and 24
+hours (86,400 seconds).
+
+Checklist item 29: TTL values for RRsets should be set to be a fraction of the DNSSEC signature
+validity period of the RRSIG that covers the RRset.
+
+
+10.6 Recommendations Summary
+
+The following items provide a summary of the major recommendations from this section:
+
+    •   Checklist item 18: The refresh value in the zone SOA RR should be chosen with the frequency
+        of updates in mind. If the zone is signed, the refresh value should be less than the RRSIG validity
+        period.
+
+    •   Checklist item 19: The retry value in a zone SOA RR should be 1/10th of the refresh value.
+
+    •   Checklist item 20: The expire value in the zone SOA RR should be 2 to 4 weeks.
+
+    •   Checklist item 21: The minimum TTL value should be between 30 minutes and 5 days.
+
+    •   Checklist item 22: A DNS administrator should take care when including HINFO, RP, LOC, or
+        other RR types that could divulge information that would be useful to an attacker, or the external
+        view of a zone if using split DNS. These RR types should be avoided if possible and only used if
+        necessary to support operational policy.
+
+    •   Checklist item 23: A DNS administrator should review the data contained in any TXT RR for
+        possible information leakage before adding it to the zone file.
+
+    •   Checklist item 24: The validity period for the RRSIGs covering a zone’s DNSKEY RRSet
+        should be in the range of 2 days to 1 week. This value helps reduce the vulnerability period
+        resulting from a key compromise.
+
+    •   Checklist item 25: A zone with delegated children should have a validity period of a few days to
+        1 week for RRSIGs covering the DS RR for a delegated child. This value helps reduce the child
+        zone’s vulnerability period resulting from a KSK compromise and scheduled key rollovers.
+
+
+                                                   10-6
+

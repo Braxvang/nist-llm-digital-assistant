@@ -1,0 +1,54 @@
+                                                                                              NIST SP 800-204C                                              DEVSECOPS FOR A MICROSERVICES-BASED
+                                                                                                                                                                   APPLICATION WITH SERVICE MESH
+
+                                                                                              •   If build or test fails in CI pipeline - Send build reports to developers and stop further pipeline
+                                                                                                  tasks. The code repositories should be configured to automatically block all pull requests
+                                                                                                  from CD pipeline [34]
+                                                                                              •   If audit fails – Send build reports to security team and stop further pipeline tasks
+                                                                                              •   Ensuring that developers can only access the application code and not any of the five pipeline
+                                                                                                  code types
+                                                                                              •   During the build and release process, signing the release artifact during each required CI/CD
+                                                                                                  stage (preferably multi-party signing)
+                                                                                              •   During production release, verify that all required signatures (generated with multiple phase
+                                                                                                  keys) are present to ensure that no one bypasses the pipeline.
+This publication is available free of charge from: https://doi.org/10.6028/NIST.SP.800-204C
+
+
+
+
+                                                                                              4.7 Workflow Models in CI/CD Pipelines
+
+                                                                                              The next common issue involves workflow models. All CI/CD pipelines can have two types of
+                                                                                              workflow models, which depend on the automated tools that are deployed as part of the pipeline:
+                                                                                                  1. Push-based model
+                                                                                                  2. Pull-based model
+
+                                                                                              In the CI/CD tools that support the push-based model, changes made in one stage or phase of the
+                                                                                              pipeline trigger changes in the subsequent stages and phases. For example, through a series of
+                                                                                              encoded scripts, the new builds in the CI system trigger changes to the CD portion of the pipeline
+                                                                                              and thus change the deployment infrastructure (e.g., Kubernetes cluster). The security downside
+                                                                                              of using the CI system as the basis for change in deployments is the possibility of exposing
+                                                                                              credentials outside of the deployment environment in spite of best efforts to secure the CI scripts,
+                                                                                              which operate outside of the trusted domain of the deployment infrastructure. Since CD tools
+                                                                                              have the keys to production systems, push-based models are rendered insecure.
+
+                                                                                              In a pull-based workflow model, an operator that pertains to the deployment environment (e.g.,
+                                                                                              Kubernetes Operator, Flux, ArgoCD) pulls new images from inside of the environment as soon as
+                                                                                              the operator observes that a new image has been pushed to the registry. The new image is pulled
+                                                                                              from the registry, the deployment manifest is automatically updated, and the new image is
+                                                                                              deployed in the environment (e.g., cluster). Thus, the convergence of the actual deployment
+                                                                                              infrastructure state with the state declaratively described in the Git deployment repository is
+                                                                                              achieved. Additionally, the deployment environment credentials (e.g., cluster credentials) are not
+                                                                                              exposed outside of the production environment. Therefore, a pull-based model, which typically
+                                                                                              uses a GitOps repository for storing the source code and builds, is highly recommended.
+
+
+
+                                                                                              4.7.1 GitsOps Workflow Model for CI/CD – A Pull-based Model
+
+                                                                                              The GitOps workflow model is an improvement on the CI/CD pipeline (for the delivery portion
+                                                                                              of the pipeline), which uses a pull-based workflow model instead of the push-based model
+                                                                                              supported by many CI/CD tools. In this model, the CI portion of the pipeline is unchanged since
+                                                                                              the CI engine (e.g., Jenkins, GitLab CI) is still used for creating builds for the changed code,
+                                                                                                                                                25
+

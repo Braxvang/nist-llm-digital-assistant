@@ -1,0 +1,61 @@
+Special Publication 800-73-4        Interfaces for Personal Identity Verification – Part 1: PIV
+                                 Card Application Namespace, Data Model and Representation
+
+The “DG-number-to-Container-ID” mapping object TLV in tag 0xBA encapsulates a series of three-
+byte sequences – one for each PIV data object included in the Security Object. The first byte is the
+Data Group (DG) number, and the second and third bytes are the most and least significant bytes
+(respectively) of the Container ID value. The DG number assignment is arbitrary; however, the same
+number assignment applies to the DataGroupNumber(s) in the DataGroupHash(es). This will ensure
+that the ContainerIDs in the mapping object refer to the correct hash values in the Security Object
+(0xBB).
+
+The 0xBB Security Object is formatted according to [MRTD, Appendix 3 to Section IV]. The Logical
+Data Structure (LDS) Security Object itself must be in ASN.1 DER format, formatted as specified in
+[MRTD, Appendix A.3.2]. This structure is then inserted into the encapContentInfo field of the
+Cryptographic Message Syntax (CMS) object specified in [MRTD, Appendix A.3.1].
+
+The card issuer’s digital signature key used to sign the CHUID shall also be used to sign the Security
+Object. The signature field of the Security Object, tag 0xBB, shall omit the issuer’s certificate, since
+it is included in the CHUID. At a minimum, unsigned data objects, such as the Printed Information
+data object, shall be included in the Security Object if present. For maximum protection against
+credential splicing attacks (credential substitution), it is recommended, however, that all PIV data
+objects, except the PIV X.509 certificates and the Secure Messaging Certificate Signer data object, be
+included in the Security Object.
+
+3.2     Conditional Data Elements
+
+The following two data elements are mandatory if the cardholder has a government-issued email
+account at the time of credential issuance. These two data elements, when implemented, shall
+conform to the specifications provided in this document.
+
+3.2.1     X.509 Certificate for Digital Signature
+
+The X.509 Certificate for Digital Signature and its associated private key, as defined in FIPS 201,
+support the use of digital signatures for the purpose of document signing. The digital signature private
+key and its corresponding certificate are only available over the contact interface or VCI. The read
+access control rule for the X.509 Certificate for Digital Signing is “Always,” meaning the certificate
+can be read without access control restrictions. The PKI cryptographic function (see Table 4b) is
+protected with a “PIN Always” or “OCC Always” access rule. In other words, the PIN or OCC data
+must be submitted and verified every time immediately before a digital signature key operation. This
+ensures cardholder participation every time the private key is used for digital signature generation. 5
+
+3.2.2     X.509 Certificate for Key Management
+
+The X.509 Certificate for Key Management and its associated private key, as defined in FIPS 201,
+support the use of encryption for the purpose of confidentiality. The key management private key and
+its corresponding certificate are only available over the contact interface or VCI. This key pair may be
+escrowed by the issuer for key recovery purposes. The read access control rule for the X.509
+certificate is “Always,” meaning the certificate can be read without access control restrictions. The
+PKI cryptographic function (see Table 4b) is protected with a “PIN” or “OCC” access rule. In other
+words, once the PIN or OCC data is submitted and verified, subsequent key management key
+
+
+5 [NISTIR7863], Cardholder Authentication for the PIV Digital Signature Key, addresses the appropriate use of PIN caching
+
+related to digital signatures.
+
+
+
+
+                                                              8
+

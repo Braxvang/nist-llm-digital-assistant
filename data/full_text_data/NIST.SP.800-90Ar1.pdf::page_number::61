@@ -1,0 +1,48 @@
+NIST SP 800-90A Rev. 1                                             Recommendation for Random Number
+                                                                    Generation Using Deterministic RBGs
+
+
+       7. Return (Key, V).
+10.2.1.3     Instantiation of CTR_DRBG
+
+Notes for the instantiate function specified in Section 9.1:
+   The instantiation of CTR_DRBG requires a call to the Instantiate_function specified in
+   Section 9.1. Process step 9 of that function calls the instantiate algorithm specified in this
+   section. The values of highest_supported_security_strength and min_length are provided in
+   Table 3 of Section 10.2.1. The contents of the internal state are provided in Section 10.2.1.1.
+The instantiate algorithm:
+   For this DRBG mechanism, there are two cases for processing. In each case, let
+   CTR_DRBG_Update be the function specified in Section 10.2.1.2. The output block length
+   (blocklen), key length (keylen), seed length (seedlen) and security_strengths for the block
+   cipher algorithms are provided in Table 3 of Section 10.2.1.
+10.2.1.3.1   Instantiation When a Derivation Function is Not Used
+
+When instantiation is performed using this method, full-entropy input is required, and a nonce is
+not used. The following process or its equivalent shall be used as the instantiate algorithm for
+this DRBG mechanism:
+   CTR_DRBG_Instantiate_algorithm (entropy_input, personalization_string,
+     security_strength):
+       1. entropy_input: The string of bits obtained from the randomness source.
+       2. personalization_string: The personalization string received from the consuming
+          application. Note that the length of the personalization_string may be zero.
+       3. security_strength: The security strength for the instantiation. This parameter is
+          optional for CTR_DRBG.
+       Output:
+       1. initial_working_state: The initial values for V, Key, and reseed_counter (see Section
+          10.2.1.1).
+   CTR_DRBG Instantiate Process:
+        1. temp = len (personalization_string).
+                                              Comment: Ensure that the length of the
+                                              personalization_string is exactly seedlen bits. Note
+                                              that in Section 9.1, processing step 3 obtained an
+                                              entropy_input of seedlen bits using Table 3 to
+                                              define the minimum and maximum lengths, which
+                                              are both equal to seedlen bits.
+       2. If (temp < seedlen), then personalization_string = personalization_string || 0seedlen -
+          temp
+               .
+       3. seed_material = entropy_input ⊕ personalization_string.
+
+
+                                                  52
+

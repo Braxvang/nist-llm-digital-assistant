@@ -1,0 +1,59 @@
+               The Technical Specification for the Security Content Automation Protocol (SCAP): SCAP Version 1.1
+
+
+
+4.7.3    Mapping OVAL Results to XCCDF Results
+
+When evaluating an <xccdf:Rule> element that references an OVAL Definition, the
+<xccdf:rule-result> element SHALL be used to capture the result of this evaluation. This result
+SHALL be determined by evaluating the referenced OVAL Definition on a target host. The
+<xccdf:result> value recorded SHALL be mapped from the OVAL Definition Result produced
+during evaluation.
+
+While the OVAL specification permits limiting result status reporting, SCAP-compliant content SHALL
+include full status reporting including Error, Unknown, Not Applicable, Not Evaluated, True, and False.
+
+SCAP compliant processors that generate XCCDF <xccdf:rule-result> elements SHALL apply
+the mapping illustrated in Table 7 when deriving <xccdf:Rule> results from OVAL Definition
+processing. The corresponding <xccdf:rule-result/xccdf:result> value SHALL be
+recorded based on the @class of the OVAL Definition where applicable.
+                    Table 7. Deriving XCCDF Rule Results from OVAL Definition Results
+
+                    OVAL Definition Result                           XCCDF Rule Result
+                    error                                            error
+                    unknown                                          unknown
+                    not applicable                                   notapplicable
+                    not evaluated                                    notchecked
+                     Definition Class  Definition Result
+                     compliance          true
+                     vulnerability       false                       pass
+                     inventory           true
+                     patch               false
+                     Definition Class    Definition Result
+                     compliance            false
+                     vulnerability         true                      fail
+                     inventory             false
+                     patch                 true
+
+The mappings in Table 7 are specific to each OVAL Definition class. For example, if an OVAL
+Definition of class ―compliance‖ is processed and the XCCDF returns a result of ―true‖, the product is
+conveying the fact that the system was found to be compliant with that check and therefore returns a
+―pass‖ result. A similar definition for a vulnerable condition will return results of ―false‖ if that
+vulnerability was not found on the examined devices, resulting in a ―pass‖ from the XCCDF rule.
+
+If the <xccdf:Rule> under evaluation has an <xccdf:check-content-ref> element with the
+@name attribute omitted, then the result of each evaluated OVAL Definition SHALL be recorded as a
+separate <xccdf:rule-result>. This will commonly occur for a “security_patches_up_to_date”
+check, as defined in Section 3.2.6.4. In this case the <xccdf:rule-result/xccdf:check-
+content-ref> SHALL identify the specific check result of each evaluated OVAL definition using the
+@href and @name attributes as described in Section 4.7, item 8c. .
+
+4.8     OVAL Results
+
+Each SCAP OVAL result data stream component SHALL use the <oval-res:oval_results>
+element as the document element. Each OVAL result data stream component SHALL validate against
+
+
+
+                                                      26
+

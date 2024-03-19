@@ -1,0 +1,59 @@
+SECURE DOMAIN NAME SYSTEM (DNS) DEPLOYMENT GUIDE
+
+
+
+If different keys are used; one set for the internal view and another set for external zones, the zone
+administrator needs to keep operations separate to prevent using the wrong set for a zone. If this happens,
+it will appear as if there was an incorrect key rollover, which will result in validation failures.
+
+11.7.5 Considerations for Mobile End Users
+
+The main issues with split horizon DNS deployments come from mobile users moving from the internal
+LAN to an external network and vice-versa. If the mobile host always relies on an internal recursive
+server for resolution and validation (via a Virtual Private Network tunnel or some other method), then
+there is not much that a mobile client needs to be concerned about. The user just needs to be sure that
+there is a secure connection back to the internal network and an internal recursive server that can accept
+queries.
+
+It is recommended that mobile hosts have a means to securely access internal hosts via the ability to use
+an internal recursive DNS server. The client (or administrators) may wish to configure the mobile client
+to send all DNS queries back through the local internal recursive server if there is any question as to the
+security of the remote network the mobile system is currently using.
+
+If the client does its own validation (i.e., does not rely on validation being done at the recursive caching
+server), then it needs to be configured with any internal and external keys as trust anchors. This adds
+complexity to the DNS management of the end system and may require the end system to change
+configuration when moving across network boundaries.
+
+It is recommend that a mobile host that does its own validation have the internal DNSSEC key configured
+as a trust anchor along with any other trust anchors. This would allow the mobile host to perform its own
+validation even when the local network may not be fully trustworthy. However, when traveling across
+network boundaries, the mobile client must be able to reconfigure its validator to not use the internal zone
+key as a trust anchor when not on the internal network.
+
+11.8 Recommendations Summary
+
+The following items provide a summary of the major recommendations from this section:
+
+    •   Checklist item 30: The (often longer) KSK needs to be rolled over less frequently than the ZSK.
+        The recommended rollover frequency for the KSK is once every 1 to 2 years, whereas the ZSK
+        should be rolled over every 1 to 3 months for operational consistency but may be used longer if
+        necessary for stability or if the key is of the appropriate length. Both keys should have an
+        Approved length according to NIST SP 800-57 Part 1 [800-57P1], [800-57P3].
+
+    •   Zones that pre-publish the new public key should observe the following:
+
+        –   Checklist item 31: The secure zone that pre-publishes its public key should do so at least one
+            TTL period before the time of the key rollover.
+
+        –   Checklist item 32: After removing the old public key, the zone should generate a new
+            signature (RRSIG RR), based on the remaining keys (DNSKEY RRs) in the zone file.
+
+    •   Checklist item 33: A DNS administrator should have the emergency contact information for the
+        immediate parent zone to use when an emergency KSK rollover must be performed.
+
+
+
+
+                                                    11-12
+

@@ -1,0 +1,54 @@
+NIST SP 800-38G                                        METHODS FOR FORMAT-PRESERVING ENCRYPTION
+
+
+under the key, is applied to P using the byte-reversed ordering convention, to produce a block, S.
+(In Figure 1 S corresponds to the output of FK.) In Steps 4iv to 4vi, S is combined with the
+substring A to produce a numeral string C in the same base and with the same length. (In Figure
+1, the combining of S with A is indicated by the “+” operation, although this operation is
+different than for FF1 in that FF3 uses the opposite ordering convention for the conversion of
+strings to numbers and vice versa.) In particular, in Step 4iv, S is converted to a number, y. In
+Step 4v, the number y is added to the number represented by the substring A, and the result is
+reduced modulo the mth power of radix, yielding a number, c, which is converted to a numeral
+string in Step 4vi. In Steps 4vii and 4viii, the roles of A and B are swapped for the next round:
+the substring B is renamed as the substring A, and the modified A (i.e., C) is renamed as B.
+
+This completes one round of the Feistel structure in FF3. After the eighth round, the
+concatenation of A and B is returned as the output in Step 5.
+
+
+Algorithm 10: FF3.Decrypt(K, T, X)
+
+Prerequisites:
+Designated cipher function, CIPH, of an approved 128-bit block cipher;
+Key, K, for the block cipher;
+Base, radix;
+Range of supported message lengths, [minlen .. maxlen].
+
+Inputs:
+Numeral string, X, in base radix of length n, such that n ∈ [minlen .. maxlen];
+Tweak bit string, T, such that LEN(T ) = 64.
+
+Output:
+Numeral string, Y, such that LEN(Y ) = n.
+
+Steps:
+1.    Let u = ⌈n/2⌉; v = n – u.
+2.    Let A = X [1 .. u]; B = X [u + 1 .. n].
+3.    Let TL = T [0 ..31] and TR = T [32 ..63]
+4.    For i from 7 to 0:
+      i.    If i is even, let m = u and W = TR, else let m = v and W =TL.
+      ii.   P = W ⊕ [i]4 || [NUMradix (REV(A))]12.
+      iii Let S = REVB(CIPHREVB(K) REVB(P)).
+      iv. Let y = NUM(S).
+      v.    Let c = (NUMradix (REV(B)) – y) mod radix m.
+                                m
+      vi. Let C = REV(STR radix (c)).
+      vii. Let B = A.
+      viii. Let A = C.
+5.    Return A || B.
+
+
+
+
+                                                 18
+

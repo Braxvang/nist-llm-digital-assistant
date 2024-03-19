@@ -1,0 +1,48 @@
+NIST SP 800-90A Rev. 1                                            Recommendation for Random Number
+                                                                   Generation Using Deterministic RBGs
+
+
+   The internal state for the DRBG, including the working_state and administrative information
+   (see Sections 8.3 and 10 for definitions of the working_state and administrative information).
+Instantiate Process:
+                                             Comment: Check the validity of the input
+                                             parameters.
+   1. If requested_instantiation_security_strength > highest_supported_security_strength, then
+      return (ERROR_FLAG, Invalid).
+   2. If prediction_resistance_flag is set, and prediction resistance is not supported, then return
+      (ERROR_FLAG, Invalid).
+   3. If the length of the personalization_string > max_personalization_string_length, return
+      (ERROR_FLAG, Invalid).
+   4. Set security_strength to the lowest security strength greater than or equal to
+      requested_instantiation_security_strength from the set {112, 128, 192, 256}.
+   5. Null step.                             Comment: This null step replaces a step from the
+                                             original version of SP 800-90 without changing the
+                                             step numbers.
+                                             Comment: Obtain the entropy input.
+   6.   (status, entropy_input) = Get_entropy_input (security_strength, min_length,
+        max_length, prediction_resistance_request).
+                                             Comment: status indications other than SUCCESS
+                                             could be ERROR_FLAG or
+                                             CATASTROPHIC_ERROR_FLAG, in which
+                                             case, the status is returned to the consuming
+                                             application to handle. The Get_entropy_input call
+                                             could return a status of ERROR_FLAG to indicate
+                                             that entropy is currently unavailable, and could
+                                             return CATASTROPHIC_ERROR_FLAG to
+                                             indicate that an entropy source failed.
+   7. If (status ≠ SUCCESS), return (status, Invalid).
+   8. Obtain a nonce.                        Comment: This step shall include any appropriate
+                                             checks on the acceptability of the nonce. See
+                                             Section 8.6.7.
+                                             Comment: Call the appropriate instantiate algorithm
+                                             in Section 10 to obtain values for the initial
+                                             working_state.
+   9. initial_working_state = Instantiate_algorithm (entropy_input, nonce,
+      personalization_string, security_strength).
+   10. Get a state_handle for a currently empty internal state. If an empty internal state cannot
+       be found, return (ERROR_FLAG, Invalid).
+
+
+
+                                                28
+
