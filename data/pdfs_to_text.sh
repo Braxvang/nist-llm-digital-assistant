@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Author: Braxton VanGundy
+# This script converts every page of the PDFs found in the PDF dataset to a text file.
+
 PDF_DIR="./full_pdf_dataset"
 OUTPUT_DATA_DIR="./full_text_data/"
 
