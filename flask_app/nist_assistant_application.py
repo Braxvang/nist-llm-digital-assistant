@@ -75,8 +75,8 @@ def get_answer_from_llm(user_question: str):
 
     # Init model
     llm = Llama(model_path=LLM_PATH, 
-                n_gpu_layers=-1, 
-                n_ctx=16384,
+                n_gpu_layers=-1, # set this value to 0 if you are going to use CPU only
+                n_ctx=16384, # Mistral instruct V02 should be able to handle 32768 tokens, but due to my GPU VRAM limitations I had to cut that in half.
                 chat_format='llama-2',
                 )
 
@@ -89,12 +89,12 @@ def get_answer_from_llm(user_question: str):
                         "content": user_question_with_docs
                     }
                 ],
-                max_tokens=1000,
-                temperature=0.0,
+                max_tokens=1000,  # This can be increased, but I found 1000 to work well. 
+                temperature=0.0,  # Set to 0 since we do not want the chatbot to be creative and make up stuff that's not in the NIST docs.
                 stream=True
                 )
 
-    # Display the answer to the user
+    # Stream the answer to the user
     for chunk in response:
         if "content" in chunk['choices'][0]['delta']:
             yield chunk['choices'][0]['delta']['content']
@@ -110,13 +110,13 @@ def get_most_similar_pages(user_question: str) -> list[str]:
         list[str]: The list of relevant documents
     """
 
-    # Download model
+    # Download the sentence transformer base model
     model = SentenceTransformer('all-MiniLM-L6-v2')
 
     # will hold all of our NIST text data
     corpus: list[str] = []
 
-    # Load sentences & embeddings from disc
+    # Load NIST SP-800 sentences & embeddings from disc
     with open(EMBEDDING_SAVE_FILE, "rb") as fIn:
         stored_data = pickle.load(fIn)
         corpus = stored_data["sentences"]
