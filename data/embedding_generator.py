@@ -13,10 +13,10 @@ import json
 from typing import Final
 
 # The path to the training data
-TEXT_FILE_DIR: Final[str] = './data/full_text_data' 
+TEXT_FILE_DIR: Final[str] = './full_text_data' 
 
 # The path and name to save the embedding model
-EMBEDDING_SAVE_FILE: Final[str] = './models/nist_sp800_embeddingsv1.pkl'
+EMBEDDING_SAVE_FILE: Final[str] = '../models/nist_sp800_embeddingsv1.pkl'
 
 def clean_text_from_pdfs(input_text: str) -> str:
     """Cleans unwanted characters from the pdf files
