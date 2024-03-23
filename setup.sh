@@ -45,6 +45,6 @@ echo "Finished reconstructing mistral-instruct, removing fileparts as they are n
 rm $MODEL_DIRECTORY/mistral-instruct-v02.*
 
 # Provide instructions to the user
-echo "The setup has completed.  To run the application, activate the python environment found in \"venv\" then cd into the \"flask_app\" directory and run the command \"flask --app nist_assistant_application run\""
+echo "\n\nThe setup has completed.  To run the application, activate the python environment found in \"venv\" then cd into the \"flask_app\" directory and run the command \"flask --app nist_assistant_application run\""
 echo "Note: If llama.cpp is not using your GPU, you may have to uninstall llama_cpp_python from the venv and then reinstall it using this command: \"CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir\""
 

@@ -33,7 +33,11 @@ The architecture of this application has been kept simple for demonstration purp
 
 4. Ask the NIST assistant a question using the provided text box.  Monitor the output from the flask command in step 2 to check for status after asking your question, the bot should start responding (may be very slow if you are using your CPU). 
 
-NOTE: If you have a capable NVIDIA GPU, i.e. Pascal architecture or newer with 12GB or more of VRAM, and a supported version of the CUDA toolkit but the LLM is still using your CPU, then you may need to uninstall sentence transformers from the Python environment and then reinstall it using the following command: `CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir`
+NOTE: If you have a capable NVIDIA GPU, i.e. Pascal architecture or newer with 12GB or more of VRAM, and a supported version of the CUDA toolkit but the LLM is still using your CPU, then you may need to uninstall llama-cpp-python from the Python environment and then reinstall it using the following commands: 
+
+1. `export CUDACXX=/usr/local/cuda/bin/nvcc` (this path may vary depending on your system configuration)
+
+2. `CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir`
 
 ## Requirements
 
