@@ -11,9 +11,9 @@ The architecture of this application has been kept simple for demonstration purp
 
 1. The user asks a question to the web interface which gets sent to the backend for processing. 
 
-2. The users question gets ingested by Sentence Transformers so we can find the top 10 NIST pages that are most relevant to the user's question.
+2. The users question gets ingested by Sentence Transformers so we can find the top 5 NIST pages that are most relevant to the user's question.
 
-3. The 10 relevant pages, the users question, and a system prompt (the instructions for the LLM) get sent to the LLM for processing.
+3. The 5 relevant pages, the users question, and a system prompt (the instructions for the LLM) get sent to the LLM for processing.
 
 4. The LLM processes this data and uses the information in the provided NIST pages to come up with an answer to the user's question. 
 

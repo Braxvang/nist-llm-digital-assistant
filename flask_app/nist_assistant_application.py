@@ -33,7 +33,7 @@ def nist_assistant() -> Response:
     Returns:
         Response: Stream of text data from LLM
     """
-    question_from_frontend = request.json['messages']
+    question_from_frontend = request.json['messages'][0]['content']
 
     return Response(get_answer_from_llm(question_from_frontend),  mimetype='text/event-stream')
 
@@ -65,28 +65,28 @@ def get_answer_from_llm(user_question: str):
                         " a specific page out of a NIST document, to generate an answer."
                         "Tell the user the title of the NIST document the information is being referenced from along with the page number. " 
                         "If the information is being referenced from multiple documents, list all of the document names where the information is coming from."
-                        "Only use the information provided in the JSON data!")
+                        "Only use the information provided in the JSON data! Do not tell the user you are using data in a JSON format.")
 
     # Setup the user question, need to concatanate the user's question with the relevant NIST documents
-    user_question_with_docs: str = (f"Using only the information from the NIST documents provided below as JSON, provide an answer to the following question: {user_question}\n\n"
+    user_question_with_prompt_and_docs: str = (f"System Prompt: {system_prompt} \n\n\n Using only the information from the NIST documents provided below as JSON,"
+                                               f" provide an answer to the following question: {user_question}\n\n"
                         f"\n\n {relevant_documents_str}")
 
-    print(str(user_question_with_docs))
+    print(str(user_question_with_prompt_and_docs))
 
     # Init model
     llm = Llama(model_path=LLM_PATH, 
                 n_gpu_layers=-1, # set this value to 0 if you are going to use CPU only
                 n_ctx=16384, # Mistral instruct V02 should be able to handle 32768 tokens, but due to my GPU VRAM limitations I had to cut that in half.
-                chat_format='llama-2',
+                chat_format='mistral-instruct',
                 )
 
     # Query the LLM using our system prompt and user question + NIST documents
     response = llm.create_chat_completion(
                 messages = [
-                    {"role": "system", "content": system_prompt},
                     {
                         "role": "user",
-                        "content": user_question_with_docs
+                        "content": user_question_with_prompt_and_docs
                     }
                 ],
                 max_tokens=1000,  # This can be increased, but I found 1000 to work well. 
@@ -125,8 +125,8 @@ def get_most_similar_pages(user_question: str) -> list[str]:
     # Encode the user's query
     query_embedding = model.encode(user_question)
 
-    # Find the top 10 corpus documents matching the user's query
-    hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=10)
+    # Find the top 5 corpus documents matching the user's query
+    hits = util.semantic_search(query_embedding, corpus_embeddings, top_k=5)
 
     # Add the relevant documents to a list to be returned to the LLM
     relevant_docs: list[str] = []
